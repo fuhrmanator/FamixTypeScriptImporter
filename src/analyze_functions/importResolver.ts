@@ -1,17 +1,24 @@
 import { ImportDeclaration, SourceFile } from "ts-morph";
+import { logger } from "../analyze";
 
 // Initialize an empty map to store import resolutions
-export const importResolutions: Record<string, { modulePath: string; importName: string }[]> = {};
+export const importResolutions: Record<string, { exportModulePath: string; importName: string }[]> = {};
 
-// Create a custom resolver function
+/**
+ * Maps an import name to an export module path (stored in `importResolutions`)
+ * @param importerSourceFile Source file that contains the import declaration
+ * @param importDeclaration the import declaration to resolve
+ * @param importName the name of the import to resolve
+ */
 export function resolveImport(
-    sourceFile: SourceFile,
-    importDeclaration: ImportDeclaration | undefined,
+    importerSourceFile: SourceFile,
+    importDeclaration: ImportDeclaration,
     importName: string
-) {
-    if (!importDeclaration) {
-        importResolutions[importName] = [];
-        return;
+): void {
+
+    const moduleSpecifier = importDeclaration.getModuleSpecifier();
+    if (!moduleSpecifier) {
+        throw new Error(`Could not find module specifier for "${importDeclaration.getText()}"`);
     }
 
     // Check if it's a default import
@@ -22,7 +29,7 @@ export function resolveImport(
         if (!importResolutions[importName]) {
             importResolutions[importName] = [];
         }
-        importResolutions[importName].push({ modulePath, importName: fullyQualifiedName });
+        importResolutions[importName].push({ exportModulePath: modulePath, importName: fullyQualifiedName });
         return;
     }
 
@@ -35,20 +42,28 @@ export function resolveImport(
         if (!importResolutions[importName]) {
             importResolutions[importName] = [];
         }
-        importResolutions[importName].push({ modulePath, importName: fullyQualifiedName });
+        importResolutions[importName].push({ exportModulePath: modulePath, importName: fullyQualifiedName });
         return;
     }
 
-    // Check if it's a named import
+    // Check if it's a named import (third-party falls into here)
     const namedImports = importDeclaration.getNamedImports();
     for (const namedImport of namedImports) {
         if (namedImport.getName() === importName) {
             const fullyQualifiedName = namedImport.getName();
-            const modulePath = importDeclaration.getModuleSpecifierSourceFile()!.getFilePath();
+            const getModuleSpecifierSourceFile = importDeclaration.getModuleSpecifierSourceFile();
+            let modulePath = "";
+            if (!getModuleSpecifierSourceFile) {
+                // Assume it's a third-party module
+                logger.debug(`Could not find module specifier source file for "${importDeclaration.getText()} with fqn of ${fullyQualifiedName}. Assuming third-party module"`);
+                modulePath = importName;
+            } else {
+                modulePath = getModuleSpecifierSourceFile.getFilePath();
+            }
             if (!importResolutions[importName]) {
                 importResolutions[importName] = [];
             }
-            importResolutions[importName].push({ modulePath, importName: fullyQualifiedName });
+            importResolutions[importName].push({ exportModulePath: modulePath, importName: fullyQualifiedName });
             return;
         }
     }
