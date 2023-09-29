@@ -10,7 +10,7 @@ import { ProcessImportClauses } from "./analyze_functions/processImportClauses";
 
 import { Logger } from "tslog";
 
-export const logger = new Logger({ name: "ts2famix", minLevel: 3});
+export const logger = new Logger({ name: "ts2famix", minLevel: 3, stylePrettyLogs: false});
 export const config = { "expectGraphemes": false };
 
 /**
@@ -57,9 +57,8 @@ export class Importer {
         const classes = this.processFiles.getClasses();
         const interfaces = this.processFiles.getInterfaces();
         const modules = this.processFiles.getModules();
-        const exports = this.processFiles.getExports();
 
-        this.processImportClauses.processImportClauses(modules, exports);
+        this.processImportClauses.processImportClauses(modules);
         this.processAccesses.processAccesses(accesses);
         this.processInvocations.processInvocations(methodsAndFunctionsWithId);
         this.processInheritances.processInheritances(classes, interfaces);

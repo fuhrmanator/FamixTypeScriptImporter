@@ -56,8 +56,7 @@ export class FamixFunctionsTypes {
             if (isPrimitiveType) {
                 fmxType = new Famix.PrimitiveType(this.famixRep);
                 fmxType.setIsStub(true);
-            }
-            else if (isParameterizedType) {
+            } else if (isParameterizedType) {
                 fmxType = new Famix.ParameterizedType(this.famixRep);
                 const parameterTypeNames = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">")).split(",").map(s => s.trim());
                 const baseTypeName = typeName.substring(0, typeName.indexOf("<")).trim();
@@ -67,8 +66,7 @@ export class FamixFunctionsTypes {
                 });
                 const fmxBaseType = this.createOrGetFamixType(baseTypeName, element);
                 (fmxType as Famix.ParameterizedType).setBaseType(fmxBaseType);
-            }
-            else {
+            } else {
                 fmxType = new Famix.Type(this.famixRep);
             }
 

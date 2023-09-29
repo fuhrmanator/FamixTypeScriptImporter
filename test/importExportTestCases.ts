@@ -3,9 +3,10 @@ import { Project, SourceFile } from "ts-morph";
 export function createSourceFileMap(project: Project) {
   const sourceFileMap = new Map<string, SourceFile>();
   for (const testCase of importCases.concat(exportCases)) {
-    const sourceFile = project.createSourceFile(`src/${testCase.name}.ts`, testCase.content, {
+    const sourceFile = project.createSourceFile(`test_src/${testCase.name}.ts`, testCase.content, {
       overwrite: true,
     });
+    sourceFile.saveSync();
     sourceFileMap.set(testCase.name, sourceFile);
   }
   return sourceFileMap;

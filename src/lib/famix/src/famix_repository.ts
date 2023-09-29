@@ -34,6 +34,10 @@ export class FamixRepository {
   public getFamixEntityByFullyQualifiedName(fullyQualifiedName: string): FamixBaseElement | undefined {
     const allEntities = Array.from(this.elements.values()).filter(e => e instanceof NamedEntity) as Array<NamedEntity>;
     const entity = allEntities.find(e => e.getFullyQualifiedName() === fullyQualifiedName);
+    if (entity === undefined) {
+      allEntities.forEach(e => console.log(`'${e.getName()}' (id: ${e.id}) fqn: ${e.getFullyQualifiedName()}`));
+      throw new Error(`Entity with fully qualified name ${fullyQualifiedName} not found`);
+    }
     return entity;
   }
 
@@ -195,6 +199,20 @@ export class FamixRepository {
     this.elements.add(element);
     element.id = this.idCounter;
     this.idCounter++;
+  }
+
+  /**
+   * Checks for uniqueness of a fully qualified names in the repository
+   * @param elementRecentlyAdded a NamedEntity to add
+   */
+  public checkUniqueFQN(elementRecentlyAdded: NamedEntity): void {
+    // make sure there are no duplicates of fully qualified name of the elementRecentlyAdded
+    const allNamedEntities = Array.from(this.elements.values()).filter(e => e instanceof NamedEntity) as Array<NamedEntity>;
+    const allNamedEntitiesWithSameFQN = allNamedEntities.filter(e => e.getFullyQualifiedName() === elementRecentlyAdded.getFullyQualifiedName());
+    if (allNamedEntitiesWithSameFQN.length > 1) {
+      allNamedEntitiesWithSameFQN.forEach(e => console.log(`'${e.getName()}' (id: ${e.id}) fqn: ${e.getFullyQualifiedName()}`));
+      throw new Error(`Duplicate fully qualified name ${elementRecentlyAdded.getFullyQualifiedName()}`);
+    }
   }
 
   /**

@@ -1,5 +1,5 @@
 import { Project } from 'ts-morph';
-import { importResolutions, resolveImport } from '../src/analyze_functions/importResolver';
+import { resolveImport } from '../src/analyze_functions/importResolver';
 import { createSourceFileMap } from './importExportTestCases';
 
 // Create a new project
@@ -7,13 +7,6 @@ const project = new Project();
 const sourceFileMap = createSourceFileMap(project);
 
 describe('resolveImport', () => {
-
-  beforeEach(() => {
-    // Reset importResolutions before each test case, clear all key-value pairs
-    Object.keys(importResolutions).forEach(key => {
-      delete importResolutions[key];
-    });
-  });
 
   it("should import and use a named export", () => {
     const importerModule = sourceFileMap.get('importBasicExport')!;
@@ -23,11 +16,11 @@ describe('resolveImport', () => {
     const importName = importDeclaration.getImportClauseOrThrow().getNamedImports()[0].getName();
     expect(importName).toEqual('variable1');
 
-    resolveImport(importerModule, importDeclaration, importName);
+    const resolution = resolveImport(importerModule, importDeclaration, importName);
 
     const exporterModule = sourceFileMap.get('basicExport')!;
     expect(exporterModule).toBeDefined();
-    expect(importResolutions[importName]).toEqual([{ exportModulePath: exporterModule.getFilePath(), importName }]);
+    expect(resolution).toEqual({ exportModulePath: exporterModule.getFilePath(), importName });
   });
 
   it("should import and use a default export", () => {
@@ -38,11 +31,11 @@ describe('resolveImport', () => {
     const importName = importDeclaration.getDefaultImport()!.getText();
     expect(importName).toEqual('greetFunction');
 
-    resolveImport(importerModule, importDeclaration, importName);
+    const resolution = resolveImport(importerModule, importDeclaration, importName);
 
     const exporterModule = sourceFileMap.get('defaultExport')!;
     expect(exporterModule).toBeDefined();
-    expect(importResolutions[importName]).toEqual([{ exportModulePath: exporterModule.getFilePath(), importName }]);
+    expect(resolution).toEqual({ exportModulePath: exporterModule.getFilePath(), importName });
   });
 
   it("should import and use multiple named exports", () => {
@@ -59,13 +52,13 @@ describe('resolveImport', () => {
     const exporterModule = sourceFileMap.get('namedExports')!;
     expect(exporterModule).toBeDefined();
 
-    resolveImport(importerModule, importDeclaration, importName0);
-    expect(importResolutions[importName0])
-      .toEqual([{ exportModulePath: exporterModule.getFilePath(), importName: importName0 }]);
+    let resolution = resolveImport(importerModule, importDeclaration, importName0);
+    expect(resolution)
+      .toEqual({ exportModulePath: exporterModule.getFilePath(), importName: importName0 });
 
-    resolveImport(importerModule, importDeclaration, importName1);
-    expect(importResolutions[importName1])
-      .toEqual([{ exportModulePath: exporterModule.getFilePath(), importName: importName1 }]);
+    resolution = resolveImport(importerModule, importDeclaration, importName1);
+    expect(resolution)
+      .toEqual({ exportModulePath: exporterModule.getFilePath(), importName: importName1 });
   });
 
   it("should re-export and import a named export", () => {
@@ -75,13 +68,13 @@ describe('resolveImport', () => {
 
     const importName = importDeclaration.getNamedImports()[0].getName();
     expect(importName).toEqual('renamedExport');
-    
+
     const exporterModule = sourceFileMap.get('reexportNamedExport')!;
     expect(exporterModule).toBeDefined();
 
-    resolveImport(importerModule, importDeclaration, importName);
-    expect(importResolutions[importName])
-      .toEqual([{ exportModulePath: exporterModule.getFilePath(), importName: importName }]);
+    const resolution = resolveImport(importerModule, importDeclaration, importName);
+    expect(resolution)
+      .toEqual({ exportModulePath: exporterModule.getFilePath(), importName: importName });
   });
 
   it("should re-export and import a default export", () => {
@@ -95,9 +88,9 @@ describe('resolveImport', () => {
     const exporterModule = sourceFileMap.get('reexportDefaultExport')!;
     expect(exporterModule).toBeDefined();
 
-    resolveImport(importerModule, importDeclaration, importName);
-    expect(importResolutions[importName])
-      .toEqual([{ exportModulePath: exporterModule.getFilePath(), importName: importName }]);
+    const resolution = resolveImport(importerModule, importDeclaration, importName);
+    expect(resolution)
+      .toEqual({ exportModulePath: exporterModule.getFilePath(), importName: importName });
   });
 
   it("should handle import from within a namespace", () => {
@@ -111,10 +104,10 @@ describe('resolveImport', () => {
     const exporterModule = sourceFileMap.get('exportWithinNamespace')!;
     expect(exporterModule).toBeDefined();
 
-    resolveImport(importerModule, importDeclaration, importName);
+    const resolution = resolveImport(importerModule, importDeclaration, importName);
 
-    expect(importResolutions[importName])
-      .toEqual([{ exportModulePath: exporterModule.getFilePath(), importName: importName }]);
+    expect(resolution)
+      .toEqual({ exportModulePath: exporterModule.getFilePath(), importName: importName });
   });
 
   it("should handle import from third-party libraries", () => {
@@ -126,9 +119,9 @@ describe('resolveImport', () => {
     const importName = importDeclaration.getNamedImports()[0].getName();
     expect(importName).toEqual('isString');
 
-    resolveImport(importerModule, importDeclaration, importName);
+    const resolution = resolveImport(importerModule, importDeclaration, importName);
 
-    expect(importResolutions[importName]).toEqual([{ exportModulePath: importName, importName: importName }]);
+    expect(resolution).toEqual({ exportModulePath: importName, importName: importName });
   });
 
   // it("should handle import from a non-existent module", () => {
@@ -149,5 +142,5 @@ describe('resolveImport', () => {
   // it("should handle code splitting and tree shaking", () => {
   //   // Test code for code splitting and tree shaking
   // });
-  
+
 });

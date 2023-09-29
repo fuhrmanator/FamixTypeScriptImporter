@@ -1,20 +1,18 @@
 import { ImportDeclaration, SourceFile } from "ts-morph";
 import { logger } from "../analyze";
 
-// Initialize an empty map to store import resolutions
-export const importResolutions: Record<string, { exportModulePath: string; importName: string }[]> = {};
-
 /**
  * Maps an import name to an export module path (stored in `importResolutions`)
  * @param importerSourceFile Source file that contains the import declaration
  * @param importDeclaration the import declaration to resolve
  * @param importName the name of the import to resolve
+ * @returns the export module path and the import name
  */
 export function resolveImport(
     importerSourceFile: SourceFile,
     importDeclaration: ImportDeclaration,
     importName: string
-): void {
+) {
 
     const moduleSpecifier = importDeclaration.getModuleSpecifier();
     if (!moduleSpecifier) {
@@ -26,11 +24,7 @@ export function resolveImport(
         const defaultImportIdentifier = importDeclaration.getDefaultImport();
         const fullyQualifiedName = defaultImportIdentifier.getText();
         const modulePath = importDeclaration.getModuleSpecifierSourceFile()!.getFilePath();
-        if (!importResolutions[importName]) {
-            importResolutions[importName] = [];
-        }
-        importResolutions[importName].push({ exportModulePath: modulePath, importName: fullyQualifiedName });
-        return;
+        return { exportModulePath: modulePath, importName: fullyQualifiedName };
     }
 
     // Check if it's a namespace import
@@ -39,11 +33,7 @@ export function resolveImport(
         // For namespace imports, we assume that the imported name will be available on the namespace
         const fullyQualifiedName = namespaceImport.getText();
         const modulePath = importDeclaration.getModuleSpecifierSourceFile()!.getFilePath();
-        if (!importResolutions[importName]) {
-            importResolutions[importName] = [];
-        }
-        importResolutions[importName].push({ exportModulePath: modulePath, importName: fullyQualifiedName });
-        return;
+        return { exportModulePath: modulePath, importName: fullyQualifiedName };
     }
 
     // Check if it's a named import (third-party falls into here)
@@ -60,11 +50,7 @@ export function resolveImport(
             } else {
                 modulePath = getModuleSpecifierSourceFile.getFilePath();
             }
-            if (!importResolutions[importName]) {
-                importResolutions[importName] = [];
-            }
-            importResolutions[importName].push({ exportModulePath: modulePath, importName: fullyQualifiedName });
-            return;
+            return { exportModulePath: modulePath, importName: fullyQualifiedName };
         }
     }
 }

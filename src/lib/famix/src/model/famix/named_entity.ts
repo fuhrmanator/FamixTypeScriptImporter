@@ -4,6 +4,7 @@ import { Invocation } from "./invocation";
 import { ImportClause } from "./import_clause";
 import { Alias } from "./alias";
 import { Decorator } from "./decorator";
+import { logger } from "../../../../../analyze";
 
 export class NamedEntity extends SourcedEntity {
 
@@ -14,6 +15,7 @@ export class NamedEntity extends SourcedEntity {
   }
 
   public setFullyQualifiedName(fullyQualifiedName: string): void {
+    logger.debug("FQN set to " + fullyQualifiedName + " for '" + this.getName() + "'");
     this.fullyQualifiedName = fullyQualifiedName;
   }
 

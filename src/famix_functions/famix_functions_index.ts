@@ -1,4 +1,4 @@
-import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration } from "ts-morph";
+import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ts } from "ts-morph";
 import * as Famix from "../lib/famix/src/model/famix";
 import { FamixRepository } from "../lib/famix/src/famix_repository";
 import { FQNFunctions } from "../fqn";
@@ -73,7 +73,19 @@ export class FamixFunctionsIndex {
             fmxIndexFileAnchor.setEndPos(sourceEnd + 1);
 
             if (!(famixElement instanceof Famix.Association) && !(famixElement instanceof Famix.Comment) && !(sourceElement instanceof CommentRange) && !(sourceElement instanceof Identifier) && !(sourceElement instanceof ImportSpecifier) && !(sourceElement instanceof ExpressionWithTypeArguments)) {
-                (famixElement as Famix.NamedEntity).setFullyQualifiedName(this.FQNFunctions.getFQN(sourceElement));
+                let fqn = this.FQNFunctions.getFQN(sourceElement);
+                // Fix the FQN for literal types, e.g. const a = "Hello", 
+                //   because the type ends with .a (as for the variable's fqn) rather than ."Hello"
+                if (!fqn.endsWith('"') 
+                    && famixElement instanceof Famix.NamedEntity 
+                    && fqn.substring(fqn.lastIndexOf(".") + 1) !== famixElement.getName()) {
+                        // remove the last part of the FQN
+                        fqn = fqn.substring(0, fqn.lastIndexOf("."));
+                        fqn = fqn + "." + famixElement.getName();
+                }
+
+                (famixElement as Famix.NamedEntity).setFullyQualifiedName(fqn);
+                this.famixRep.checkUniqueFQN(famixElement as Famix.NamedEntity);
             }
         } else {
             // sourceElement is null

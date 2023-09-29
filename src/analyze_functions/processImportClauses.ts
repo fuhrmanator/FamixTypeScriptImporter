@@ -1,6 +1,7 @@
-import { ImportDeclaration, SourceFile, ExportedDeclarations } from "ts-morph";
+import { ImportDeclaration, SourceFile } from "ts-morph";
 import { FamixFunctions } from "../famix_functions/famix_functions";
 import { logger } from "../analyze";
+import { resolveImport } from "./importResolver";
 
 /**
  * This class is used to build a Famix model for the import clauses
@@ -22,34 +23,51 @@ export class ProcessImportClauses {
      * @param modules An array of modules
      * @param exports An array of maps of exported declarations
      */
-    public processImportClauses(modules: Array<SourceFile>, exports: Array<ReadonlyMap<string, ExportedDeclarations[]>>): void {
-        logger.info(`processImportClauses: Creating import clauses:`);
+    public processImportClauses(modules: Array<SourceFile>): void {
+        logger.info(`Creating import clauses:`);
         modules.forEach(module => {
-            module.getImportDeclarations().forEach(impDecl => {
-                const path = this.getModulePath(impDecl);
+            logger.debug(`Processing module ${module.getFilePath()}`);
+            module.getImportDeclarations().forEach(importDeclaration => {
+                logger.debug(`Processing import declaration ${importDeclaration.getText()}`);
 
-                impDecl.getNamedImports().forEach(namedImport => {
-                    logger.debug(`processImportClauses: Importing (named) ${namedImport.getName()} from ${impDecl.getModuleSpecifierValue()}`);
+                const path = this.getModulePath(importDeclaration);
+
+                logger.debug(`Importing from ${path}`);
+
+                importDeclaration.getNamedImports().forEach(namedImport => {
+                    logger.debug(`Importing (named) ${namedImport.getName()} from ${importDeclaration.getModuleSpecifierValue()}`);
                     const importedEntityName = namedImport.getName();
-                    let importFoundInExports = false;
-                    exports.forEach(e => {
-                        if (e.has(importedEntityName)) {
-                            importFoundInExports = true;
-                        }
-                    });
-                    this.famixFunctions.createFamixImportClause({importDeclaration: impDecl,
+
+                    const resolution = resolveImport(module, importDeclaration, importedEntityName);
+
+                    // what's an example of resolution?
+                    // { exportModulePath: modulePath, importName: fullyQualifiedName };
+
+                    // create a new object from the resolution and add other info
+                    const importClauseInfo = {...resolution, 
+                        importDeclaration: importDeclaration, 
                         importer: module, 
-                        moduleSpecifierFilePath: path, 
-                        importElement: namedImport, 
-                        isInExports: importFoundInExports, 
-                        isDefaultExport: false});
+                        importElement: namedImport};
+
+                    // what is the importClauseInfo object?
+                    // { exportModulePath: modulePath, importName: fullyQualifiedName, importDeclaration: importDeclaration, importer: module, importElement: namedImport };
+                    this.famixFunctions.createFamixImportClauseNew(importClauseInfo);
+
+                    // define a new function createFamixImportClauseNew that takes the importClauseInfo object and creates the FamixImportClause object
+
+                    // this.famixFunctions.createFamixImportClause({importDeclaration: importDeclaration,
+                    //     importer: module, 
+                    //     moduleSpecifierFilePath: path, 
+                    //     importElement: namedImport, 
+                    //     isInExports: importFoundInExports, 
+                    //     isDefaultExport: false});
                 });
 
-                const defaultImport = impDecl.getDefaultImport();
+                const defaultImport = importDeclaration.getDefaultImport();
                 if (defaultImport !== undefined) {
-                    logger.debug(`processImportClauses: Importing (default) ${defaultImport.getText()} from ${impDecl.getModuleSpecifierValue()}`);
+                    logger.debug(`Importing (default) ${defaultImport.getText()} from ${importDeclaration.getModuleSpecifierValue()}`);
                     // call with module, impDecl.getModuleSpecifierValue(), path, defaultImport, false, true
-                    this.famixFunctions.createFamixImportClause({importDeclaration: impDecl,
+                    this.famixFunctions.createFamixImportClause({importDeclaration: importDeclaration,
                         importer: module,
                         moduleSpecifierFilePath: path,
                         importElement: defaultImport,
@@ -57,10 +75,10 @@ export class ProcessImportClauses {
                         isDefaultExport: true});
                 }
 
-                const namespaceImport = impDecl.getNamespaceImport();
+                const namespaceImport = importDeclaration.getNamespaceImport();
                 if (namespaceImport !== undefined) {
-                    logger.debug(`processImportClauses: Importing (namespace) ${namespaceImport.getText()} from ${impDecl.getModuleSpecifierValue()}`);
-                    this.famixFunctions.createFamixImportClause({importDeclaration: impDecl,
+                    logger.debug(`Importing (namespace) ${namespaceImport.getText()} from ${importDeclaration.getModuleSpecifierValue()}`);
+                    this.famixFunctions.createFamixImportClause({importDeclaration: importDeclaration,
                         importer: module, 
                         moduleSpecifierFilePath: path, 
                         importElement: namespaceImport, 
@@ -79,7 +97,7 @@ export class ProcessImportClauses {
      */
     private getModulePath(i: ImportDeclaration): string {
         let path: string;
-        if (i.getModuleSpecifierSourceFile() === undefined) {
+        if (i.getModuleSpecifierSourceFile() === undefined) { // no source file, so it's a third-party module?
             if (i.getModuleSpecifierValue().substring(i.getModuleSpecifierValue().length - 3) === ".ts") {
                 path = i.getModuleSpecifierValue();
             }

@@ -134,6 +134,7 @@ export class FamixFunctions {
 
             fmxClass.setName(clsName);
             fmxClass.setFullyQualifiedName(classFullyQualifiedName);
+            this.famixRep.checkUniqueFQN(fmxClass);
             fmxClass.setIsAbstract(isAbstract);
 
             this.famixFunctionsIndex.makeFamixIndexFileAnchor(cls, fmxClass);
@@ -526,6 +527,26 @@ export class FamixFunctions {
         this.famixFunctionsAssociations.createFamixInheritance(cls, inhClass);
     }
 
+    /**
+     * Creates a Famix import clause
+     * @param importClauseInfo An import clause
+     * @param importDeclaration An import declaration (optional)
+     * @param importer A source file which is a module
+     * @param moduleSpecifier The name of the module where the export declaration is
+     * @param moduleSpecifierFilePath The path of the module where the export declaration is
+     * @param importElement The imported entity
+     * @param isInExports A boolean indicating if the imported entity is in the exports
+     * @param isDefaultExport A boolean indicating if the imported entity is a default export
+     */    
+    public createFamixImportClauseNew(importClauseInfo: {
+        exportModulePath: string,
+        importName: string,
+        importDeclaration: ImportDeclaration,
+        importer: SourceFile,
+        importElement: ImportSpecifier }): void {
+        this.famixFunctionsAssociations.createFamixImportClauseNew(importClauseInfo);
+    }
+    
     /**
      * Creates a Famix import clause
      * @param importClauseInfo An import clause

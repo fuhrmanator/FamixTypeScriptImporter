@@ -120,6 +120,7 @@ export class FamixFunctionsAssociations {
 
             superClass.setName(inhClassName);
             superClass.setFullyQualifiedName(inhClassFullyQualifiedName);
+            this.famixRep.checkUniqueFQN(superClass); 
             superClass.setIsStub(true);
 
             this.famixFunctionsIndex.makeFamixIndexFileAnchor(inhClass, superClass);
@@ -130,6 +131,46 @@ export class FamixFunctionsAssociations {
 
         this.famixFunctionsIndex.makeFamixIndexFileAnchor(null, fmxInheritance);
     }
+
+    /**
+     * Creates a Famix ImportClause object and relationships
+     * @param info The information needed to create a Famix import clause
+     * @param exportModulePath The path of the module where the export declaration is
+     * @param importName The name of the imported entity
+     * @param importDeclaration The import declaration
+     * @param importer A source file which is a module
+     * @param importElement The imported entity
+     */
+    public createFamixImportClauseNew(info: {
+        exportModulePath: string,
+        importName: string,
+        importDeclaration: ImportDeclaration,
+        importer: SourceFile,
+        importElement: ImportSpecifier }): void {
+        const { exportModulePath, importName, importDeclaration, importer, importElement } = info;
+
+        logger.debug(`Creating import clause: importName = ${importName}, exportModulePath = ${exportModulePath}, importDeclaration = ${importDeclaration.getText()}, importer = ${importer.getFilePath()}, importElement = ${importElement.getText()}`);
+
+        const fmxImportClause = new Famix.ImportClause(this.famixRep);
+
+        // set the importer as the importing entity
+        const importerFullyQualifiedName = this.FQNFunctions.getFQN(importer);
+        const fmxImporter = this.getFamixEntityByFullyQualifiedName(importerFullyQualifiedName) as Famix.Module;
+        fmxImportClause.setImportingEntity(fmxImporter);
+
+        // set the exported entity
+        const pathName = "\"" + exportModulePath + "\"." + importName;
+        logger.debug(`imported entity's pathName = ${pathName}`);
+        const importedEntity = this.getFamixEntityByFullyQualifiedName(pathName) as Famix.NamedEntity;
+        fmxImportClause.setImportedEntity(importedEntity);
+        fmxImportClause.setModuleSpecifier(importDeclaration?.getModuleSpecifierValue() as string);
+
+        // make an index file anchor for the import clause
+        this.famixFunctionsIndex.makeFamixIndexFileAnchor(importDeclaration, fmxImportClause);
+
+        fmxImporter.addOutgoingImport(fmxImportClause);
+    }
+
 
     /**
      * Creates a Famix import clause
@@ -143,13 +184,14 @@ export class FamixFunctionsAssociations {
      */
     public createFamixImportClause(importClauseInfo: {importDeclaration?: ImportDeclaration, importer: SourceFile, moduleSpecifierFilePath: string, importElement: ImportSpecifier | Identifier, isInExports: boolean, isDefaultExport: boolean}): void {
         const {importDeclaration, importer, moduleSpecifierFilePath, importElement, isInExports, isDefaultExport} = importClauseInfo;
-        logger.debug(`createFamixImportClause: Creating import clause:`);
+        logger.debug(`Creating import clause:`);
         const fmxImportClause = new Famix.ImportClause(this.famixRep);
 
         let importedEntity: Famix.NamedEntity;
         let importedEntityName: string;
         let pathName = "\"" + moduleSpecifierFilePath + "\".";
-        if (importElement instanceof ImportSpecifier) {
+        // comment the following line
+        if (importElement instanceof ImportSpecifier) { 
             importedEntityName = importElement.getName();
             pathName = pathName + importedEntityName;
             if (isInExports) {
@@ -163,9 +205,10 @@ export class FamixFunctionsAssociations {
                 }
                 this.famixFunctionsIndex.makeFamixIndexFileAnchor(importElement, importedEntity);
                 importedEntity.setFullyQualifiedName(pathName);
+                this.famixRep.checkUniqueFQN(importedEntity); 
             }
         }
-        else {
+        else { // importElement is an Identifier
             importedEntityName = importElement.getText();
             if (isDefaultExport) {
                 pathName = pathName + "defaultExport";
@@ -177,6 +220,7 @@ export class FamixFunctionsAssociations {
             importedEntity.setName(importedEntityName);
             this.famixFunctionsIndex.makeFamixIndexFileAnchor(importElement, importedEntity);
             importedEntity.setFullyQualifiedName(pathName);
+            this.famixRep.checkUniqueFQN(importedEntity); 
         }
 
         const importerFullyQualifiedName = this.FQNFunctions.getFQN(importer);

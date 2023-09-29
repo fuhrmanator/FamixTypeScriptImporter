@@ -1,6 +1,6 @@
 import { Project } from "ts-morph";
 import { Importer, logger } from "../src/analyze";
-import { ImportClause, IndexedFileAnchor, Module, NamedEntity, Variable, Function as FamixFunction } from "../src/lib/famix/src/model/famix";
+import { ImportClause, IndexedFileAnchor, Module, Variable, Function as FamixFunction } from "../src/lib/famix/src/model/famix";
 import { getTextFromAnchor } from "./testUtils";
 import { createSourceFileMap } from "./importExportTestCases";
 
@@ -17,7 +17,7 @@ const NUMBER_OF_MODULES = 13,
     NUMBER_OF_IMPORT_CLAUSES = 8;
 const importClauses = Array.from(fmxRep._getAllEntitiesWithType("ImportClause")) as Array<ImportClause>;
 const moduleList = Array.from(fmxRep._getAllEntitiesWithType('Module')) as Array<Module>;
-const entityList = Array.from(fmxRep._getAllEntitiesWithType('NamedEntity')) as Array<NamedEntity>;
+//const entityList = Array.from(fmxRep._getAllEntitiesWithType('NamedEntity')) as Array<NamedEntity>;
 const variableList = Array.from(fmxRep._getAllEntitiesWithType('Variable')) as Array<Variable>;
 const functionList = Array.from(fmxRep._getAllEntitiesWithType('Function')) as Array<FamixFunction>;
 
