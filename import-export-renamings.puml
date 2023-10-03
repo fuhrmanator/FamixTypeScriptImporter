@@ -1,0 +1,40 @@
+@startuml Object diagram
+hide empty members
+
+together {
+    class ExportedElement {
+        name: string
+    }
+
+    class Renaming {
+        name: string
+        context: string
+        renamedOn: 'import' | 'export'
+    }
+
+    ExportedElement "1" -- "~* aliases" Renaming : //Can-be-renamed-by// >
+}
+
+together {
+    object "foo : ExportedElement" as foo {
+        name = 'foo'
+        aliases = Renaming[]
+    }
+
+    object "exportRenamedFoo : Renaming" as r1 {
+        name = "exportRenamedFoo"
+        context = "./reexportNamedExport.ts"
+        renamedOn = "export"
+    }
+
+    object "importRenamedFoo : Renaming" as r2 {
+        name = "importRenamedFoo"
+        context = "./importRenamedExport.ts"
+        renamedOn = "import"
+    }
+
+    foo::aliases --> r1
+    foo::aliases --> r2
+}
+
+@enduml
