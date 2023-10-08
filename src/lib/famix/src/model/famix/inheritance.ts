@@ -29,9 +29,9 @@ export class Inheritance extends Association {
 
 
   public getJSON(): string {
-    const mse: FamixJSONExporter = new FamixJSONExporter("Inheritance", this);
-    this.addPropertiesToExporter(mse);
-    return mse.getJSON();
+    const json: FamixJSONExporter = new FamixJSONExporter("Inheritance", this);
+    this.addPropertiesToExporter(json);
+    return json.getJSON();
   }
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {

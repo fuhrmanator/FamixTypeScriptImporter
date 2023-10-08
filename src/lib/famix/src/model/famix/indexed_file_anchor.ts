@@ -35,9 +35,9 @@ export class IndexedFileAnchor extends SourceAnchor {
 
 
   public getJSON(): string {
-    const mse: FamixJSONExporter = new FamixJSONExporter("IndexedFileAnchor", this);
-    this.addPropertiesToExporter(mse);
-    return mse.getJSON();
+    const json: FamixJSONExporter = new FamixJSONExporter("IndexedFileAnchor", this);
+    this.addPropertiesToExporter(json);
+    return json.getJSON();
   }
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {

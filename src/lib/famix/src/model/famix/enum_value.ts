@@ -17,9 +17,9 @@ export class EnumValue extends StructuralEntity {
 
 
   public getJSON(): string {
-    const mse: FamixJSONExporter = new FamixJSONExporter("EnumValue", this);
-    this.addPropertiesToExporter(mse);
-    return mse.getJSON();
+    const json: FamixJSONExporter = new FamixJSONExporter("EnumValue", this);
+    this.addPropertiesToExporter(json);
+    return json.getJSON();
   }
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {

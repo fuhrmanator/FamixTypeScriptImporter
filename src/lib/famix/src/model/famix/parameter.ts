@@ -17,9 +17,9 @@ export class Parameter extends StructuralEntity {
 
 
   public getJSON(): string {
-    const mse: FamixJSONExporter = new FamixJSONExporter("Parameter", this);
-    this.addPropertiesToExporter(mse);
-    return mse.getJSON();
+    const json: FamixJSONExporter = new FamixJSONExporter("Parameter", this);
+    this.addPropertiesToExporter(json);
+    return json.getJSON();
   }
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {

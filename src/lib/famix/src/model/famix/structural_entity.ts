@@ -31,9 +31,9 @@ export class StructuralEntity extends NamedEntity {
 
 
   public getJSON(): string {
-    const mse: FamixJSONExporter = new FamixJSONExporter("StructuralEntity", this);
-    this.addPropertiesToExporter(mse);
-    return mse.getJSON();
+    const json: FamixJSONExporter = new FamixJSONExporter("StructuralEntity", this);
+    this.addPropertiesToExporter(json);
+    return json.getJSON();
   }
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {

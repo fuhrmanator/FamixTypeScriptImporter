@@ -19,9 +19,9 @@ export class ParameterizableClass extends Class {
 
 
   public getJSON(): string {
-    const mse: FamixJSONExporter = new FamixJSONExporter("ParameterizableClass", this);
-    this.addPropertiesToExporter(mse);
-    return mse.getJSON();
+    const json: FamixJSONExporter = new FamixJSONExporter("ParameterizableClass", this);
+    this.addPropertiesToExporter(json);
+    return json.getJSON();
   }
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {

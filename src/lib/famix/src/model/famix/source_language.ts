@@ -6,6 +6,11 @@ export class SourceLanguage extends Entity {
 
   private sourcedEntities: Set<SourcedEntity> = new Set();
 
+  // name of the source language
+  get name(): string {
+    return "TypeScript";
+  }
+
   public getSourcedEntities(): Set<SourcedEntity> {
     return this.sourcedEntities;
   }
@@ -19,13 +24,14 @@ export class SourceLanguage extends Entity {
 
 
   public getJSON(): string {
-    const mse: FamixJSONExporter = new FamixJSONExporter("SourceLanguage", this);
-    this.addPropertiesToExporter(mse);
-    return mse.getJSON();
+    const json: FamixJSONExporter = new FamixJSONExporter("SourceLanguage", this);
+    this.addPropertiesToExporter(json);
+    return json.getJSON();
   }
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
+    exporter.addProperty("name", this.name);
     exporter.addProperty("sourcedEntities", this.getSourcedEntities());
   }
 }

@@ -43,7 +43,7 @@ if ((argv.input as string).endsWith('tsconfig.json')) {
     famixRep = importer.famixRepFromPaths(paths);
 }
 
-const jsonOutput = famixRep.getJSON();
+const jsonOutput = famixRep.export({format: "json"});
 const jsonFilePath = argv.output as string;
 
 fs.writeFile(jsonFilePath, jsonOutput, (err) => {
