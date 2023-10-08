@@ -1,11 +1,10 @@
 import { FamixBaseElement } from "./famix_base_element";
-import { Class, Interface, Namespace, Variable, Method, Function as FamixFunctionEntity, Type, NamedEntity, ScriptEntity, Module } from "./model/famix";
+import { Class, Interface, Namespace, Variable, Method, Function as FamixFunctionEntity, Type, NamedEntity, ScriptEntity, Module, SourceLanguage } from "./model/famix";
 
 /**
  * This class is used to store all Famix elements
  */
 export class FamixRepository {
-
   private elements = new Set<FamixBaseElement>(); // All Famix elements
   private famixClasses = new Set<Class>(); // All Famix classes
   private famixInterfaces = new Set<Interface>(); // All Famix interfaces
@@ -15,6 +14,10 @@ export class FamixRepository {
   private famixFunctions = new Set<FamixFunctionEntity>(); // All Famix functions
   private famixFiles = new Set<ScriptEntity | Module>(); // All Famix files
   private idCounter = 1; // Id counter
+
+  constructor() {
+    this.addElement(new SourceLanguage(this));  // add the source language entity (TypeScript)
+  }
 
   /**
    * Gets a Famix entity by id
@@ -37,7 +40,13 @@ export class FamixRepository {
     return entity;
   }
 
-  
+  export(arg0: { format: string; }) {
+    if(arg0.format === "json") {
+      return this.getJSON();
+    }
+  }
+
+
   // Only for tests
 
   /**
