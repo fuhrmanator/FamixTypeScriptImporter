@@ -1,6 +1,6 @@
 import { Project } from "ts-morph";
-import { Importer, config } from "../src/analyze";
-import { IndexedFileAnchor, Method, Module, ScriptEntity, SourceLanguage } from "../src/lib/famix/src/model/famix";
+import { Importer } from "../src/analyze";
+import { SourceLanguage } from "../src/lib/famix/src/model/famix";
 
 const importer = new Importer();
 const project = new Project();
