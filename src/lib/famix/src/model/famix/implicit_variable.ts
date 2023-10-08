@@ -4,9 +4,9 @@ import { Variable } from "./variable";
 export class ImplicitVariable extends Variable {
 
   public getJSON(): string {
-    const mse: FamixJSONExporter = new FamixJSONExporter("ImplicitVariable", this);
-    this.addPropertiesToExporter(mse);
-    return mse.getJSON();
+    const json: FamixJSONExporter = new FamixJSONExporter("ImplicitVariable", this);
+    this.addPropertiesToExporter(json);
+    return json.getJSON();
   }
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {

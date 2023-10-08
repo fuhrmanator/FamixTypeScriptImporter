@@ -16,9 +16,9 @@ export class Namespace extends ScopingEntity {
 
 
   public getJSON(): string {
-    const mse: FamixJSONExporter = new FamixJSONExporter("Namespace", this);
-    this.addPropertiesToExporter(mse);
-    return mse.getJSON();
+    const json: FamixJSONExporter = new FamixJSONExporter("Namespace", this);
+    this.addPropertiesToExporter(json);
+    return json.getJSON();
   }
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
