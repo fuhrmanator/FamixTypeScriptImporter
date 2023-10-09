@@ -39,14 +39,19 @@ function globalFunc() {
         var bInFInGlobalFunc;
     }
 }
+
+// Variable Declaration space
+class Foo {};
+var someVar = Foo;
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
+const theEntityClass = fmxRep._getFamixClass("EntityClass");
+const theSubclass = fmxRep._getFamixClass("class2");
+const mNames = fmxRep._methodNamesAsSetFromClass("EntityClass");
+const setOfVariables = Array.from(fmxRep._getAllEntitiesWithType("Variable") as Set<Variable>);
 
 describe('Entities', () => {
-
-    const theEntityClass = fmxRep._getFamixClass("EntityClass");
-    const theSubclass = fmxRep._getFamixClass("class2");
 
     it("should contain an EntityClass", () => {
         expect(theEntityClass).toBeTruthy();
@@ -57,7 +62,6 @@ describe('Entities', () => {
     });
 
     it("should contain methods with correct names", () => {
-        const mNames = fmxRep._methodNamesAsSetFromClass("EntityClass");
         expect(mNames.has("move") &&
             mNames.has("move2") &&
             mNames.has("constructor")).toBe(true);
@@ -178,46 +182,34 @@ describe('Entities', () => {
     });
 
     it("should contain an EntityClass with one subclass", () => {
-        if (theEntityClass) {
-            expect(Array.from(theEntityClass.getSubInheritances()).length).toBe(1);
-        }
+        expect(Array.from(theEntityClass!.getSubInheritances()).length).toBe(1);
     });
 
     it("should contain an EntityClass with one subclass named 'class2'", () => {
-        if (theEntityClass) {
-            const theClassSubclass = Array.from(theEntityClass.getSubInheritances())[0].getSubclass();
-            expect(theClassSubclass.getName()).toBe("class2");
-            if (theSubclass) {
-                expect(theSubclass).toBe(theClassSubclass);
-            }
+        const theClassSubclass = Array.from(theEntityClass!.getSubInheritances())[0].getSubclass();
+        expect(theClassSubclass.getName()).toBe("class2");
+        if (theSubclass) {
+            expect(theSubclass).toBe(theClassSubclass);
         }
     });
 
     it("should contain a clsInNsp with a class-side method named 'aStaticMethod'", () => {
         const clsInNSP = fmxRep._getFamixClass("clsInNsp");
         expect(clsInNSP).toBeTruthy();
-        if (clsInNSP) {
-            const aStaticMethod = Array.from(clsInNSP.getMethods()).find(m => m.getName() === 'aStaticMethod');
-            expect(aStaticMethod).toBeTruthy();
-            if (aStaticMethod) {
-                expect(aStaticMethod.getIsClassSide()).toBe(true);
-            }
-        }
+        const aStaticMethod = Array.from(clsInNSP!.getMethods()).find(m => m.getName() === 'aStaticMethod');
+        expect(aStaticMethod).toBeTruthy();
+        expect(aStaticMethod!.getIsClassSide()).toBe(true);
     });
 
     it("should contain a private method named '#move3'", () => {
         const cls = fmxRep._getFamixClass("EntityClass");
         expect(cls).toBeTruthy();
-        if (cls) {
-            const aMethod = Array.from(cls.getMethods()).find(m => m.getName() === '#move3');
-            expect(aMethod).toBeTruthy();
-            if (aMethod) {
-                expect(aMethod.getIsPrivate()).toBe(true);
-                expect(aMethod.getIsProtected()).toBe(false);
-                expect(aMethod.getIsPublic()).toBe(false);
-                expect(aMethod.getIsClassSide()).toBe(false);
-            }
-        }
+        const aMethod = Array.from(cls!.getMethods()).find(m => m.getName() === '#move3');
+        expect(aMethod).toBeTruthy();
+        expect(aMethod!.getIsPrivate()).toBe(true);
+        expect(aMethod!.getIsProtected()).toBe(false);
+        expect(aMethod!.getIsPublic()).toBe(false);
+        expect(aMethod!.getIsClassSide()).toBe(false);
     });
 
     // global scope
@@ -229,18 +221,40 @@ describe('Entities', () => {
     });
 
     it("should contain a variable 'globalA'", () => {
-        const list = Array.from(fmxRep._getAllEntitiesWithType("Variable") as Set<Variable>);
-        expect(list).toBeTruthy();
-        const globalVar = list.find(p => p.getName() === "globalA");
+        expect(setOfVariables).toBeTruthy();
+        const globalVar = setOfVariables.find(p => p.getName() === "globalA");
         expect(globalVar).toBeTruthy();
     });
 
     it("should contain a variable 'aInGlobalFunc' contained in 'globalFunc'", () => {
-        const list = Array.from(fmxRep._getAllEntitiesWithType("Variable") as Set<Variable>);
-        expect(list).toBeTruthy();
-        const globalVar = list.find(p => p.getName() === "aInGlobalFunc");
+        expect(setOfVariables).toBeTruthy();
+        const globalVar = setOfVariables.find(p => p.getName() === "aInGlobalFunc");
         expect(globalVar).toBeTruthy();
         expect(globalVar?.getParentContainerEntity().getName()).toBe('globalFunc');
         expect(globalVar?.getJSON()).toMatch(/"parentBehaviouralEntity":{"ref":\d+}/);  // parentBehaviouralEntity is the name used in the Trait in Famix -- it is the parent container
+    });
+
+    it("should contain a variable 'bInFInGlobalFunc' contained in 'fInGlobalFunc'", () => {
+        expect(setOfVariables).toBeTruthy();
+        const globalVar = setOfVariables.find(p => p.getName() === "bInFInGlobalFunc");
+        expect(globalVar).toBeTruthy();
+        expect(globalVar?.getParentContainerEntity().getName()).toBe('fInGlobalFunc');
+        expect(globalVar?.getJSON()).toMatch(/"parentBehaviouralEntity":{"ref":\d+}/);  // parentBehaviouralEntity is the name used in the Trait in Famix -- it is the parent container
+    });
+
+    it("should contain a variable 'someVar' contained in the global scope", () => {
+        expect(setOfVariables).toBeTruthy();
+        const globalVar = setOfVariables.find(p => p.getName() === "someVar");
+        expect(globalVar).toBeTruthy();
+        expect(globalVar?.getParentContainerEntity().getName()).toBe('entities.ts');
+        expect(globalVar?.getJSON()).toMatch(/"parentBehaviouralEntity":{"ref":\d+}/);  // parentBehaviouralEntity is the name used in the Trait in Famix -- it is the parent container
+    });
+
+    // the type of someVar is Foo
+    it("should contain a variable 'someVar' with type Foo", () => {
+        expect(setOfVariables).toBeTruthy();
+        const someVar = setOfVariables.find(p => p.getName() === "someVar");
+        expect(someVar).toBeTruthy();
+        expect(someVar?.getDeclaredType().getName()).toBe('typeof Foo');
     });
 });
