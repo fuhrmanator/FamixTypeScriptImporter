@@ -3,7 +3,7 @@ import { Type } from "./type";
 import { ContainerEntity } from "./container_entity";
 import { Parameter } from "./parameter";
 import { Invocation } from "./invocation";
-import { TypeParameter } from "./type_parameter";
+import { ParameterType } from "./parameter_type";
 
 export class BehavioralEntity extends ContainerEntity {
 
@@ -74,13 +74,13 @@ export class BehavioralEntity extends ContainerEntity {
     declaredType.addBehavioralEntityWithDeclaredType(this);
   }
 
-  private typeParameters: Set<TypeParameter> = new Set();
+  private typeParameters: Set<ParameterType> = new Set();
 
-  public getTypeParameters(): Set<TypeParameter> {
+  public getParameterTypes(): Set<ParameterType> {
     return this.typeParameters;
   }
 
-  public addTypeParameter(typeParameter: TypeParameter): void {
+  public addParameterType(typeParameter: ParameterType): void {
     if (!this.typeParameters.has(typeParameter)) {
       this.typeParameters.add(typeParameter);
       typeParameter.setParentGeneric(this);
@@ -102,6 +102,6 @@ export class BehavioralEntity extends ContainerEntity {
     exporter.addProperty("numberOfParameters", this.getNumberOfParameters());
     exporter.addProperty("incomingInvocations", this.getIncomingInvocations());
     exporter.addProperty("declaredType", this.getDeclaredType());
-    exporter.addProperty("typeParameters", this.getTypeParameters());
+    exporter.addProperty("typeParameters", this.getParameterTypes());
   }
 }

@@ -1,6 +1,6 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import { ParameterizableClass, ParameterizableInterface, TypeParameter } from '../src/lib/famix/src/model/famix';
+import { ParameterizableClass, ParameterizableInterface, ParameterType } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project();
@@ -36,9 +36,9 @@ describe('Generics', () => {
         expect(pList).toBeTruthy();
         const myDao = pList.find(p => p.getName() === "MyDao");
         expect(myDao).toBeTruthy();
-        expect(myDao?.getTypeParameters().size).toBe(1);
+        expect(myDao?.getParameterTypes().size).toBe(1);
         if (myDao) {
-            expect((Array.from(myDao.getTypeParameters())[0] as TypeParameter).getName()).toBe("T");
+            expect((Array.from(myDao.getParameterTypes())[0] as ParameterType).getName()).toBe("T");
         }
     });
     
@@ -47,9 +47,9 @@ describe('Generics', () => {
         expect(pList).toBeTruthy();
         const myDaoInterface = pList.find(p => p.getName() === "MyDaoInterface");
         expect(myDaoInterface).toBeTruthy();
-        expect(myDaoInterface?.getTypeParameters().size).toBe(1);
+        expect(myDaoInterface?.getParameterTypes().size).toBe(1);
         if (myDaoInterface) {
-            expect((Array.from(myDaoInterface.getTypeParameters())[0] as TypeParameter).getName()).toBe("T");
+            expect((Array.from(myDaoInterface.getParameterTypes())[0] as ParameterType).getName()).toBe("T");
         }
     });
     

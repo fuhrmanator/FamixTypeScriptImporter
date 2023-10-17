@@ -236,7 +236,7 @@ function getSubTypeName(fmxNamedEntity: Famix.NamedEntity) {
                                                 fmxNamedEntity instanceof Famix.Parameter ? 'Parameter' :
                                                     fmxNamedEntity instanceof Famix.Property ? 'Property' :
                                                         'NamedEntity';
-    console.log(`getSubTypeName: ${name}`);
+    logger.debug(`${fmxNamedEntity.getName()} is of type ${name}`);
     return name;
 }
 

@@ -377,13 +377,13 @@ export class FamixFunctions {
      * @param tp A type parameter
      * @returns The Famix model of the type parameter
      */
-    public createFamixTypeParameter(tp: TypeParameterDeclaration): Famix.TypeParameter {
-        const fmxTypeParameter = new Famix.TypeParameter(this.famixRep);
-        fmxTypeParameter.setName(tp.getName());
+    public createFamixParameterType(tp: TypeParameterDeclaration): Famix.ParameterType {
+        const fmxParameterType = new Famix.ParameterType(this.famixRep);
+        fmxParameterType.setName(tp.getName());
 
-        this.famixFunctionsIndex.makeFamixIndexFileAnchor(tp, fmxTypeParameter);
+        this.famixFunctionsIndex.makeFamixIndexFileAnchor(tp, fmxParameterType);
 
-        return fmxTypeParameter;
+        return fmxParameterType;
     }
 
     /**

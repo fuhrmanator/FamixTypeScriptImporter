@@ -1,6 +1,6 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import { ParameterizableInterface, TypeParameter } from '../src/lib/famix/src/model/famix';
+import { ParameterizableInterface, ParameterType } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project();
@@ -34,9 +34,9 @@ describe('Tests for generic interface', () => {
         expect(pList).toBeTruthy();
         const MyInterface = pList.find(p => p.getName() === "MyInterface");
         expect(MyInterface).toBeTruthy();
-        expect(MyInterface?.getTypeParameters().size).toBe(1);
+        expect(MyInterface?.getParameterTypes().size).toBe(1);
         if (MyInterface) {
-            expect((Array.from(MyInterface.getTypeParameters())[0] as TypeParameter).getName()).toBe("T");
+            expect((Array.from(MyInterface.getParameterTypes())[0] as ParameterType).getName()).toBe("T");
         }
     });
 });
