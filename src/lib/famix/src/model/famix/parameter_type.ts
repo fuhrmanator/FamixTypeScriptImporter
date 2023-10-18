@@ -3,25 +3,25 @@ import { Type } from "./type";
 import { ParameterizableClass } from "./parameterizable_class";
 import { ParameterizableInterface } from "./parameterizable_interface";
 import { Method } from "./method";
-import { Function } from "./function";
+import { Function as FamixFunction } from "./function";
 import { Accessor } from "./accessor";
 
-export class TypeParameter extends Type {
+export class ParameterType extends Type {
 
-  private parentGeneric: ParameterizableClass | ParameterizableInterface | Method | Accessor | Function;
+  private parentGeneric: ParameterizableClass | ParameterizableInterface | Method | Accessor | FamixFunction;
 
-  public getParentGeneric(): ParameterizableClass | ParameterizableInterface | Method | Accessor | Function {
+  public getParentGeneric(): ParameterizableClass | ParameterizableInterface | Method | Accessor | FamixFunction {
     return this.parentGeneric;
   }
 
-  public setParentGeneric(parentGeneric: ParameterizableClass | ParameterizableInterface | Method | Accessor | Function): void {
+  public setParentGeneric(parentGeneric: ParameterizableClass | ParameterizableInterface | Method | Accessor | FamixFunction): void {
     this.parentGeneric = parentGeneric;
-    parentGeneric.addTypeParameter(this);
+    parentGeneric.addParameterType(this);
   }
 
 
   public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("TypeParameter", this);
+    const json: FamixJSONExporter = new FamixJSONExporter("ParameterType", this);
     this.addPropertiesToExporter(json);
     return json.getJSON();
   }
