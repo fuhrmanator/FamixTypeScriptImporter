@@ -59,7 +59,8 @@ export class Importer {
         const modules = this.processFiles.getModules();
         const exports = this.processFiles.getExports();
 
-        this.processImportClauses.processImportClauses(modules, exports);
+        this.processImportClauses.processImportClausesForImportEqualsDeclarations(project.getSourceFiles(), exports);
+        this.processImportClauses.processImportClausesForModules(modules, exports);
         this.processAccesses.processAccesses(accesses);
         this.processInvocations.processInvocations(methodsAndFunctionsWithId);
         this.processInheritances.processInheritances(classes, interfaces);
