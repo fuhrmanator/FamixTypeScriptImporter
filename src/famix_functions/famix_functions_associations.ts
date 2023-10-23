@@ -3,6 +3,7 @@ import * as Famix from "../lib/famix/src/model/famix";
 import { FamixRepository } from "../lib/famix/src/famix_repository";
 import { FQNFunctions } from "../fqn";
 import { FamixFunctionsIndex } from "./famix_functions_index";
+import { FamixFunctions } from "./famix_functions";
 import { logger } from "../analyze";
 
 /**
@@ -15,15 +16,18 @@ export class FamixFunctionsAssociations {
     private famixClassMap: Map<string, Famix.Class | Famix.ParameterizableClass>; // Maps the class names to their Famix model
     private famixInterfaceMap: Map<string, Famix.Interface | Famix.ParameterizableInterface>; // Maps the interface names to their Famix model
     private famixFunctionsIndex: FamixFunctionsIndex; // FamixFunctionsIndex object, it contains all the functions needed to create Famix index file anchors
+    private famixFunctions: FamixFunctions;
 
     /**
      * Initializes the FamixFunctionsAssociations object
      * @param famixRep The Famix repository
+     * @param famixFunctions The FamixFunctions object, it contains all the functions needed to create Famix entities
      * @param fmxClassMap The map of the class names and their Famix model
      * @param fmxInterfaceMap The map of the interface names and their Famix model
      */
-    constructor(famixRep: FamixRepository, fmxClassMap: Map<string, Famix.Class | Famix.ParameterizableClass>, fmxInterfaceMap: Map<string, Famix.Interface | Famix.ParameterizableInterface>) {
+    constructor(famixRep: FamixRepository, famixFunctions: FamixFunctions, fmxClassMap: Map<string, Famix.Class | Famix.ParameterizableClass>, fmxInterfaceMap: Map<string, Famix.Interface | Famix.ParameterizableInterface>) {
         this.famixRep = famixRep;
+        this.famixFunctions = famixFunctions;
         this.famixClassMap = fmxClassMap;
         this.famixInterfaceMap = fmxInterfaceMap;
         this.famixFunctionsIndex = new FamixFunctionsIndex(famixRep);
@@ -146,7 +150,7 @@ export class FamixFunctionsAssociations {
         logger.debug(`createFamixImportClause: Creating import clause:`);
         const fmxImportClause = new Famix.ImportClause(this.famixRep);
 
-        let importedEntity: Famix.NamedEntity;
+        let importedEntity: Famix.NamedEntity | Famix.StructuralEntity;
         let importedEntityName: string;
         let pathName = "\"" + moduleSpecifierFilePath + "\".";
         // Named imports, e.g. import { ClassW } from "./complexExportModule";
@@ -167,14 +171,17 @@ export class FamixFunctionsAssociations {
                 importedEntity.setFullyQualifiedName(pathName);
             }
         }
-        // handle import equals declarations, e.g. import ClassW = require("./complexExportModule");
+        // handle import equals declarations, e.g. import myModule = require("./complexExportModule");
+        // TypeScript can't determine the type of the imported module, so we create a Module entity
         else if (importDeclaration instanceof ImportEqualsDeclaration) {
             importedEntityName = importDeclaration?.getName();
             pathName = pathName + importedEntityName;
-            importedEntity = new Famix.NamedEntity(this.famixRep);
+            importedEntity = new Famix.StructuralEntity(this.famixRep);
             importedEntity.setName(importedEntityName);
             this.famixFunctionsIndex.makeFamixIndexFileAnchor(importElement, importedEntity);
             importedEntity.setFullyQualifiedName(pathName);
+            const anyType = this.famixFunctions.createOrGetFamixType('any', undefined);
+            (importedEntity as Famix.StructuralEntity).setDeclaredType(anyType);
         } else {  // default imports, e.g. import ClassW from "./complexExportModule";  
             importedEntityName = importElement.getText();
             pathName = pathName + (isDefaultExport ? "defaultExport" : "namespaceExport");

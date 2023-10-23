@@ -93,7 +93,6 @@ export class ProcessImportClauses {
                 }
             }); 
         });
-        logger.info(`\tImportEqualsDeclarations`);
 
     }
 

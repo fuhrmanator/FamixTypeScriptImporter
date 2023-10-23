@@ -1,10 +1,11 @@
 import { Project } from "ts-morph";
 import { Importer, logger } from "../src/analyze";
-import { Class, ImportClause, IndexedFileAnchor, Module, NamedEntity } from "../src/lib/famix/src/model/famix";
+import { Class, ImportClause, IndexedFileAnchor, Module, NamedEntity, StructuralEntity } from "../src/lib/famix/src/model/famix";
 import { getTextFromAnchor } from "./testUtils";
 
 const importer = new Importer();
 logger.settings.minLevel = 0; // all your messages are belong to us
+logger.settings.stylePrettyLogs = false; // no pretty logs (colors) for tests
 const project = new Project();
 
 project.createSourceFile("oneClassExporter.ts",
@@ -41,14 +42,14 @@ project.createSourceFile("reImporterModule.ts",
 project.createSourceFile("renameDefaultExportImporter.ts",
     `import myRenamedDefaultClassW from "./complexExportModule.ts";`);
 
-project.createSourceFile("lazyRequireModule.ts",
+project.createSourceFile("lazyRequireModuleCommonJS.ts",
     `import foo = require('foo');
-export function loadFoo() {
-    // This is lazy loading foo and using the original module *only* as a type annotation
-    require(['foo'], (_foo: typeof foo) => {
-        // Now use _foo as a variable instead of foo.
-    });
-}`); // see https://basarat.gitbook.io/typescript/project/modules/external-modules#use-case-lazy-loading
+
+    export function loadFoo() {
+        // This is lazy loading "foo" and using the original module *only* as a type annotation
+        var _foo: typeof foo = require('foo');
+        // Now use "_foo" as a variable instead of "foo".
+    }`); // see https://basarat.gitbook.io/typescript/project/modules/external-modules#use-case-lazy-loading
 
 const fmxRep = importer.famixRepFromProject(project);
 const NUMBER_OF_MODULES = 9,
@@ -163,20 +164,19 @@ describe('Tests for import clauses', () => {
         expect(getTextFromAnchor(fileAnchor, project)).toBe(`import myRenamedDefaultClassW from "./complexExportModule.ts";`);
     });
 
-    // should have an import clause for foo and lazy loaded _foo
-    it.skip("should have an import clause for require('foo') and lazy loaded _foo", () => {
+    it("should have an import clause for require('foo')", () => {
         // find the import clause for foo
         const importClause = importClauses.find(e => e.getImportedEntity()?.getName() === 'foo');
         expect(importClause).toBeTruthy();
-        // importing entity is lazyRequireModule.ts
+        // importing entity is lazyRequireModuleCommonJS.ts
         expect(importClause?.getImportingEntity()).toBeTruthy();
-        expect(importClause?.getImportingEntity()?.getName()).toBe("lazyRequireModule.ts");
-        // find the import clause for _foo
-        const importClause2 = importClauses.find(e => e.getImportedEntity()?.getName() === '_foo');
-        expect(importClause2).toBeTruthy();
-        // importing entity is lazyRequireModule.ts
-        expect(importClause2?.getImportingEntity()).toBeTruthy();
-        expect(importClause2?.getImportingEntity()?.getName()).toBe("lazyRequireModule.ts");
+        expect(importClause?.getImportingEntity()?.getName()).toBe("lazyRequireModuleCommonJS.ts");
+        const fileAnchor = importClause?.getSourceAnchor() as IndexedFileAnchor;
+        expect(getTextFromAnchor(fileAnchor, project)).toBe(`import foo = require('foo');`);
+        // expect the type of the importedEntity to be "StructuralEntity"
+        expect((importClause?.getImportedEntity().constructor.name)).toBe("StructuralEntity");
+        // expect the type of foo to be any
+        expect((importClause?.getImportedEntity() as StructuralEntity).getDeclaredType()?.getName()).toBe("any");
     });
 
 });

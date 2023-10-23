@@ -20,7 +20,7 @@ export class FamixFunctions {
     private fmxNamespaceMap = new Map<string, Famix.Namespace>(); // Maps the namespace names to their Famix model
     private fmxFileMap = new Map<string, Famix.ScriptEntity | Famix.Module>(); // Maps the source file names to their Famix model
     private famixFunctionsIndex = new FamixFunctionsIndex(this.famixRep); // FamixFunctionsIndex object, it contains all the functions needed to create Famix index file anchors
-    private famixFunctionsAssociations = new FamixFunctionsAssociations(this.famixRep, this.fmxClassMap, this.fmxInterfaceMap); // FamixFunctionsAssociations object, it contains all the functions needed to create Famix associations
+    private famixFunctionsAssociations = new FamixFunctionsAssociations(this.famixRep, this, this.fmxClassMap, this.fmxInterfaceMap); // FamixFunctionsAssociations object, it contains all the functions needed to create Famix associations
     private famixFunctionsTypes = new FamixFunctionsTypes(this.famixRep); // FamixFunctionsTypes object, it contains all the functions needed to create Famix types
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
 
@@ -494,7 +494,7 @@ export class FamixFunctions {
      * @param element A ts-morph element
      * @returns The Famix model of the type
      */
-    private createOrGetFamixType(typeName: string, element: TypeAliasDeclaration | PropertyDeclaration | PropertySignature | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | EnumMember): Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType {
+    public createOrGetFamixType(typeName: string, element: TypeAliasDeclaration | PropertyDeclaration | PropertySignature | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | EnumMember): Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType {
         return this.famixFunctionsTypes.createOrGetFamixType(typeName, element);
     }
 
