@@ -523,7 +523,7 @@ export class ProcessFiles {
     private processVariableStatement(v: VariableStatement): Array<Famix.Variable> {
         const fmxVariables = new Array<Famix.Variable>();
 
-        logger.debug(`Variable statement: ${v.getText()}, (${v.getType().getText()}), ${v.getDeclarationKindKeyword().getText()}`);
+        logger.debug(`Variable statement: ${v.getText()}, (${v.getType().getText()}), ${v.getDeclarationKindKeywords()}`);
 
         v.getDeclarations().forEach(variable => {
             const fmxVar = this.processVariable(variable);
