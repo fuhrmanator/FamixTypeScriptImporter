@@ -1,6 +1,6 @@
 # FamixTypeScriptImporter
 
-[![Node.js CI](https://github.com/fuhrmanator/FamixTypeScriptImporter/actions/workflows/node.js.yml/badge.svg)](https://github.com/fuhrmanator/FamixTypeScriptImporter/actions/workflows/node.js.yml)
+[![Node.js CI](https://github.com/fuhrmanator/FamixTypeScriptImporter/actions/workflows/ci-nodejs.yml/badge.svg)](https://github.com/fuhrmanator/FamixTypeScriptImporter/actions/workflows/ci-nodejs.yml)
 
 Create a [FamixTypeScript](https://github.com/fuhrmanator/FamixTypeScript) model in JSON of TypeScript files.
 
