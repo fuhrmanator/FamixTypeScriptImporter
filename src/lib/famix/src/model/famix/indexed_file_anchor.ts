@@ -23,6 +23,26 @@ export class IndexedFileAnchor extends SourceAnchor {
     this.endPos = endPos;
   }
 
+  private endLine: number;
+
+  public getEndLine(): number {
+    return this.endLine;
+  }
+
+  public setEndLine(sourceEndLine: number) {
+    this.endLine = sourceEndLine;
+  }
+
+  private startLine: number;
+
+  public getStartLine(): number {
+    return this.startLine;
+  }
+
+  public setStartLine(sourceStartLine: number) {
+    this.startLine = sourceStartLine;
+  }
+
   private fileName: string;
 
   public getFileName(): string {
@@ -44,6 +64,8 @@ export class IndexedFileAnchor extends SourceAnchor {
     super.addPropertiesToExporter(exporter);
     exporter.addProperty("startPos", this.getStartPos());
     exporter.addProperty("endPos", this.getEndPos());
+    exporter.addProperty("startLine", this.getStartLine());
+    exporter.addProperty("endLine", this.getEndLine());
     exporter.addProperty("fileName", this.getFileName());
   }
 }
