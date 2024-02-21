@@ -2,6 +2,9 @@
 # Gets latest plantuml
 rm -f plantuml.jar
 wget --no-verbose https://downloads.sourceforge.net/project/plantuml/plantuml.jar
+# echo the version
+echo "PlantUML version: $(java -jar plantuml.jar -version)"
+echo "tplant version: $(npx tplant --version)"
 # Builds metamodel plantuml from TypeScript sources
 npx tplant -i src/lib/famix/**/*.ts -o doc-metamodel/famix-typescript-model.puml
 sed -i 's/@startuml/& metamodel/' doc-metamodel/famix-typescript-model.puml
