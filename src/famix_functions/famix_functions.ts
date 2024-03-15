@@ -1,7 +1,7 @@
 import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration } from "ts-morph";
 import * as Famix from "../lib/famix/src/model/famix";
 import { FamixRepository } from "../lib/famix/src/famix_repository";
-import { FQNFunctions } from "../fqn";
+import * as FQNFunctions from "../fqn";
 import { FamixFunctionsIndex } from "./famix_functions_index";
 import { FamixFunctionsAssociations } from "./famix_functions_associations";
 import { FamixFunctionsTypes } from "./famix_functions_types";
@@ -13,7 +13,6 @@ import { logger } from "../analyze";
 export class FamixFunctions {
 
     private famixRep = new FamixRepository(); // The Famix repository
-    private FQNFunctions = new FQNFunctions(); // The fully qualified name functions
     private fmxAliasMap = new Map<string, Famix.Alias>(); // Maps the alias names to their Famix model
     private fmxClassMap = new Map<string, Famix.Class | Famix.ParameterizableClass>(); // Maps the fully qualifiedclass names to their Famix model
     private fmxInterfaceMap = new Map<string, Famix.Interface | Famix.ParameterizableInterface>(); // Maps the interface names to their Famix model
@@ -63,7 +62,7 @@ export class FamixFunctions {
         return fmxFile;
     }
 
-    /**
+    /** C bon
      * Creates or gets a Famix namespace
      * @param m A namespace
      * @returns The Famix model of the namespace
@@ -85,7 +84,7 @@ export class FamixFunctions {
         return fmxNamespace;
     }
 
-    /**
+    /** C bon
      * Creates a Famix alias
      * @param a An alias
      * @returns The Famix model of the alias
@@ -93,7 +92,7 @@ export class FamixFunctions {
     public createFamixAlias(a: TypeAliasDeclaration): Famix.Alias {
         let fmxAlias: Famix.Alias;
         const aliasName = a.getName();
-        const aliasFullyQualifiedName = a.getType().getText(); // this.FQNFunctions.getFQN(a);
+        const aliasFullyQualifiedName = a.getType().getText(); // FQNFunctions.getFQN(a);
         if (!this.fmxAliasMap.has(aliasFullyQualifiedName)) {
             fmxAlias = new Famix.Alias(this.famixRep);
             fmxAlias.setName(a.getName());
@@ -113,7 +112,7 @@ export class FamixFunctions {
         return fmxAlias;
     }
 
-    /**
+    /** C bon
      * Creates or gets a Famix class or parameterizable class
      * @param cls A class
      * @returns The Famix model of the class
@@ -121,7 +120,7 @@ export class FamixFunctions {
     public createOrGetFamixClass(cls: ClassDeclaration): Famix.Class | Famix.ParameterizableClass {
         let fmxClass: Famix.Class | Famix.ParameterizableClass;
         const isAbstract = cls.isAbstract();
-        const classFullyQualifiedName = this.FQNFunctions.getFQN(cls);
+        const classFullyQualifiedName = FQNFunctions.getFQN(cls);
         const clsName = cls.getName();
         if (!this.fmxClassMap.has(classFullyQualifiedName)) {
             const isGeneric = cls.getTypeParameters().length;
@@ -146,7 +145,7 @@ export class FamixFunctions {
         return fmxClass;
     }
 
-    /**
+    /** C bon
      * Creates or gets a Famix interface or parameterizable interface
      * @param inter An interface
      * @returns The Famix model of the interface
@@ -154,7 +153,7 @@ export class FamixFunctions {
     public createOrGetFamixInterface(inter: InterfaceDeclaration): Famix.Interface | Famix.ParameterizableInterface {
         let fmxInterface: Famix.Interface | Famix.ParameterizableInterface;
         const interName = inter.getName();
-        const interFullyQualifiedName = this.FQNFunctions.getFQN(inter);
+        const interFullyQualifiedName = FQNFunctions.getFQN(inter);
         if (!this.fmxInterfaceMap.has(interName)) {
             const isGeneric = inter.getTypeParameters().length;
             if (isGeneric) {
@@ -176,7 +175,7 @@ export class FamixFunctions {
         return fmxInterface;
     }
 
-    /**
+    /** C bon
      * Creates a Famix property
      * @param property A property
      * @returns The Famix model of the property
@@ -219,7 +218,7 @@ export class FamixFunctions {
         return fmxProperty;
     }
 
-    /**
+    /** C bon
      * Creates a Famix method or accessor
      * @param method A method or an accessor
      * @param currentCC The cyclomatic complexity metrics of the current source file
@@ -461,7 +460,7 @@ export class FamixFunctions {
 
         fmxDecorator.setName(decoratorName);
         fmxDecorator.setDecoratorExpression(decoratorExpression);
-        const decoratedEntityFullyQualifiedName = this.FQNFunctions.getFQN(decoratedEntity);
+        const decoratedEntityFullyQualifiedName = FQNFunctions.getFQN(decoratedEntity);
         const fmxDecoratedEntity = this.getFamixEntityByFullyQualifiedName(decoratedEntityFullyQualifiedName) as Famix.NamedEntity;
         fmxDecorator.setDecoratedEntity(fmxDecoratedEntity);
 

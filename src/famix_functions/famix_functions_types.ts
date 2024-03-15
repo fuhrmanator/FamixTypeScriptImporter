@@ -1,7 +1,7 @@
 import { ConstructorDeclaration, FunctionDeclaration, MethodDeclaration, MethodSignature, PropertyDeclaration, PropertySignature, VariableDeclaration, ParameterDeclaration, GetAccessorDeclaration, SetAccessorDeclaration, EnumMember, TypeAliasDeclaration, Node, SyntaxKind, FunctionExpression } from "ts-morph";
 import * as Famix from "../lib/famix/src/model/famix";
 import { FamixRepository } from "../lib/famix/src/famix_repository";
-import { FQNFunctions } from "../fqn";
+import * as FQNFunctions from "../fqn";
 import { FamixFunctionsIndex } from "./famix_functions_index";
 import { logger } from "../analyze";
 
@@ -11,7 +11,6 @@ import { logger } from "../analyze";
 export class FamixFunctionsTypes {
 
     private famixRep: FamixRepository; // The Famix repository
-    private FQNFunctions = new FQNFunctions(); // The fully qualified name functions
     private fmxTypeMap = new Map<string, Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType>(); // Maps the type names to their Famix model
     private famixFunctionsIndex: FamixFunctionsIndex; // FamixFunctionsIndex object, it contains all the functions needed to create Famix index file anchors
 
@@ -24,7 +23,7 @@ export class FamixFunctionsTypes {
         this.famixFunctionsIndex = new FamixFunctionsIndex(famixRep);
     }
 
-    /**
+    /** C bon
      * Creates or gets a Famix type
      * @param typeName A type name
      * @param element A ts-morph element
@@ -38,7 +37,7 @@ export class FamixFunctionsTypes {
         logger.debug("Creating (or getting) type: '" + typeName + "' of element: " + element.getText() + " of kind: " + element.getKindName());
 
         const typeAncestor = this.findTypeAncestor(element);
-        const ancestorFullyQualifiedName = this.FQNFunctions.getFQN(typeAncestor);
+        const ancestorFullyQualifiedName = FQNFunctions.getFQN(typeAncestor);
         const ancestor = this.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
         if (!ancestor) {
             throw new Error(`Ancestor ${ancestorFullyQualifiedName} not found.`);

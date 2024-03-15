@@ -1,7 +1,7 @@
 import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, SourceFile, GetAccessorDeclaration, SetAccessorDeclaration, Node, ImportSpecifier, SyntaxKind, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration } from "ts-morph";
 import * as Famix from "../lib/famix/src/model/famix";
 import { FamixRepository } from "../lib/famix/src/famix_repository";
-import { FQNFunctions } from "../fqn";
+import * as FQNFunctions from "../fqn";
 import { FamixFunctionsIndex } from "./famix_functions_index";
 import { logger } from "../analyze";
 
@@ -11,7 +11,6 @@ import { logger } from "../analyze";
 export class FamixFunctionsAssociations {
 
     private famixRep: FamixRepository; // The Famix repository
-    private FQNFunctions = new FQNFunctions(); // The fully qualified name functions
     private famixClassMap: Map<string, Famix.Class | Famix.ParameterizableClass>; // Maps the class names to their Famix model
     private famixInterfaceMap: Map<string, Famix.Interface | Famix.ParameterizableInterface>; // Maps the interface names to their Famix model
     private famixFunctionsIndex: FamixFunctionsIndex; // FamixFunctionsIndex object, it contains all the functions needed to create Famix index file anchors
@@ -37,7 +36,7 @@ export class FamixFunctionsAssociations {
     public createFamixAccess(node: Identifier, id: number): void {
         const fmxVar = this.famixRep.getFamixEntityById(id) as Famix.StructuralEntity;
         const nodeReferenceAncestor = this.findAncestor(node);
-        const ancestorFullyQualifiedName = this.FQNFunctions.getFQN(nodeReferenceAncestor);
+        const ancestorFullyQualifiedName = FQNFunctions.getFQN(nodeReferenceAncestor);
         const accessor = this.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
 
         const fmxAccess = new Famix.Access(this.famixRep);
@@ -56,9 +55,9 @@ export class FamixFunctionsAssociations {
     public createFamixInvocation(node: Identifier, m: MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression, id: number): void {
         const fmxMethodOrFunction = this.getFamixEntityById(id) as Famix.BehavioralEntity;
         const nodeReferenceAncestor = this.findAncestor(node);
-        const ancestorFullyQualifiedName = this.FQNFunctions.getFQN(nodeReferenceAncestor);
+        const ancestorFullyQualifiedName = FQNFunctions.getFQN(nodeReferenceAncestor);
         const sender = this.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
-        const receiverFullyQualifiedName = this.FQNFunctions.getFQN(m.getParent());
+        const receiverFullyQualifiedName = FQNFunctions.getFQN(m.getParent());
         const receiver = this.getFamixEntityByFullyQualifiedName(receiverFullyQualifiedName) as Famix.NamedEntity;
 
         const fmxInvocation = new Famix.Invocation(this.famixRep);
@@ -78,7 +77,7 @@ export class FamixFunctionsAssociations {
     public createFamixInheritance(cls: ClassDeclaration | InterfaceDeclaration, inhClass: ClassDeclaration | InterfaceDeclaration | ExpressionWithTypeArguments): void {
         const fmxInheritance = new Famix.Inheritance(this.famixRep);
         // const clsName = cls.getName();
-        const classFullyQualifiedName = this.FQNFunctions.getFQN(cls);
+        const classFullyQualifiedName = FQNFunctions.getFQN(cls);
         logger.debug(`createFamixInheritance: classFullyQualifiedName: class fqn = ${classFullyQualifiedName}`);
         let subClass: Famix.Class | Famix.Interface;
         if (cls instanceof ClassDeclaration) {
@@ -93,7 +92,7 @@ export class FamixFunctionsAssociations {
         let superClass: Famix.Class | Famix.Interface;
         if (inhClass instanceof ClassDeclaration || inhClass instanceof InterfaceDeclaration) {
             inhClassName = inhClass.getName();
-            inhClassFullyQualifiedName = this.FQNFunctions.getFQN(inhClass);
+            inhClassFullyQualifiedName = FQNFunctions.getFQN(inhClass);
             if (inhClass instanceof ClassDeclaration) {
                 superClass = this.famixClassMap.get(inhClassFullyQualifiedName);
             }
@@ -179,7 +178,7 @@ export class FamixFunctionsAssociations {
             importedEntity.setFullyQualifiedName(pathName);
         }
 
-        const importerFullyQualifiedName = this.FQNFunctions.getFQN(importer);
+        const importerFullyQualifiedName = FQNFunctions.getFQN(importer);
         const fmxImporter = this.getFamixEntityByFullyQualifiedName(importerFullyQualifiedName) as Famix.Module;
         fmxImportClause.setImportingEntity(fmxImporter);
         fmxImportClause.setImportedEntity(importedEntity);
@@ -221,6 +220,8 @@ export class FamixFunctionsAssociations {
         return node.getAncestors().find(a => a.getKind() === SyntaxKind.MethodDeclaration || a.getKind() === SyntaxKind.Constructor || a.getKind() === SyntaxKind.FunctionDeclaration || a.getKind() === SyntaxKind.FunctionExpression || a.getKind() === SyntaxKind.ModuleDeclaration || a.getKind() === SyntaxKind.SourceFile || a.getKindName() === "GetAccessor" || a.getKindName() === "SetAccessor" || a.getKind() === SyntaxKind.ClassDeclaration);
     }
 }
+
+/* C bon */
 function getSubTypeName(fmxNamedEntity: Famix.NamedEntity) {
     const name = fmxNamedEntity instanceof Famix.Class ? 'Class' :
         fmxNamedEntity instanceof Famix.Interface ? 'Interface' :
