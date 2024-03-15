@@ -1,21 +1,11 @@
 import { ClassDeclaration, InterfaceDeclaration, ExpressionWithTypeArguments } from "ts-morph";
-import { FamixFunctions } from "../famix_functions/famix_functions";
+import * as FamixFunctions from "../famix_functions/famix_object_creator";
 import { logger } from "../analyze";
 
 /**
  * This class is used to build a Famix model for the inheritances
  */
 export class ProcessInheritances {
-
-    private famixFunctions: FamixFunctions; // FamixFunctions object, it contains all the functions needed to create Famix entities
-
-    /**
-     * Initializes the ProcessInheritances object
-     * @param famixFunctions FamixFunctions object, it contains all the functions needed to create Famix entities
-     */
-    constructor(famixFunctions: FamixFunctions) {
-        this.famixFunctions = famixFunctions;
-    }
 
     /**
      * Builds a Famix model for the inheritances of the classes and interfaces of the source files
@@ -28,7 +18,7 @@ export class ProcessInheritances {
             logger.debug(`processInheritances: Checking class inheritance for ${cls.getName()}`);
             const extClass = cls.getBaseClass();
             if (extClass !== undefined) {
-                this.famixFunctions.createFamixInheritance(cls, extClass);
+                FamixFunctions.createFamixInheritance(cls, extClass);
                 
                 logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), extClass: ${extClass.getName()}, (${extClass.getType().getText()})`);
             }
@@ -36,7 +26,7 @@ export class ProcessInheritances {
             logger.debug(`processInheritances: Checking interface inheritance for ${cls.getName()}`);
             const implementedInterfaces = this.getImplementedOrExtendedInterfaces(interfaces, cls);
             implementedInterfaces.forEach(impInter => {
-                this.famixFunctions.createFamixInheritance(cls, impInter);
+                FamixFunctions.createFamixInheritance(cls, impInter);
 
                 logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), impInter: ${(impInter instanceof InterfaceDeclaration) ? impInter.getName() : impInter.getExpression().getText()}, (${(impInter instanceof InterfaceDeclaration) ? impInter.getType().getText() : impInter.getExpression().getText()})`);
             });
@@ -46,7 +36,7 @@ export class ProcessInheritances {
             logger.debug(`processInheritances: Checking interface inheritance for ${inter.getName()}`);
             const extendedInterfaces = this.getImplementedOrExtendedInterfaces(interfaces, inter);
             extendedInterfaces.forEach(extInter => {
-                this.famixFunctions.createFamixInheritance(inter, extInter);
+                FamixFunctions.createFamixInheritance(inter, extInter);
 
                 logger.debug(`processInheritances: inter: ${inter.getName()}, (${inter.getType().getText()}), extInter: ${(extInter instanceof InterfaceDeclaration) ? extInter.getName() : extInter.getExpression().getText()}, (${(extInter instanceof InterfaceDeclaration) ? extInter.getType().getText() : extInter.getExpression().getText()})`);
             });

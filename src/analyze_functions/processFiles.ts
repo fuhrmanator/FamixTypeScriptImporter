@@ -1,16 +1,15 @@
 import { ClassDeclaration, MethodDeclaration, VariableStatement, FunctionDeclaration, VariableDeclaration, InterfaceDeclaration, ParameterDeclaration, ConstructorDeclaration, MethodSignature, SourceFile, ModuleDeclaration, PropertyDeclaration, PropertySignature, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ExportedDeclarations, CommentRange, EnumDeclaration, EnumMember, TypeParameterDeclaration, TypeAliasDeclaration, SyntaxKind, FunctionExpression, Block } from "ts-morph";
 import * as Famix from "../lib/famix/src/model/famix";
-import { FamixFunctions } from "../famix_functions/famix_functions";
 import { calculate } from "../lib/ts-complex/cyclomatic-service";
 import * as fs from 'fs';
 import { logger } from "../analyze";
+import * as FamixFunctions from "../famix_functions/famix_object_creator";
 
 /**
  * This class is used to build a Famix model for an array of source files
  */
 export class ProcessFiles {
 
-    private famixFunctions: FamixFunctions; // FamixFunctions object, it contains all the functions needed to create Famix entities
     private methodsAndFunctionsWithId = new Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression>(); // Maps the Famix method, constructor, getter, setter and function ids to their ts-morph method, constructor, getter, setter or function object
     private accessMap = new Map<number, ParameterDeclaration | VariableDeclaration | PropertyDeclaration | EnumMember>(); // Maps the Famix parameter, variable, property and enum value ids to their ts-morph parameter, variable, property or enum member object
     private classes = new Array<ClassDeclaration>(); // Array of all the classes of the source files
@@ -18,14 +17,6 @@ export class ProcessFiles {
     private modules = new Array<SourceFile>(); // Array of all the source files which are modules
     private exports = new Array<ReadonlyMap<string, ExportedDeclarations[]>>(); // Array of all the exports
     private currentCC: unknown; // Stores the cyclomatic complexity metrics for the current source file
-
-    /**
-     * Initializes the ProcessFiles object
-     * @param famixFunctions FamixFunctions object, it contains all the functions needed to create Famix entities
-     */
-    constructor(famixFunctions: FamixFunctions) {
-        this.famixFunctions = famixFunctions;
-    }
 
     /**
      * Builds a Famix model for an array of source files
@@ -104,7 +95,7 @@ export class ProcessFiles {
             this.modules.push(f);
         }
 
-        const fmxFile = this.famixFunctions.createOrGetFamixFile(f, isModule);
+        const fmxFile = FamixFunctions.createOrGetFamixFile(f, isModule);
 
         logger.debug(`processFile: file: ${f.getBaseName()}, fqn = ${fmxFile.getFullyQualifiedName()}`);
 
@@ -131,7 +122,7 @@ export class ProcessFiles {
      * @returns A Famix.Namespace representing the namespace
      */
     private processNamespace(m: ModuleDeclaration): Famix.Namespace {
-        const fmxNamespace = this.famixFunctions.createOrGetFamixNamespace(m);
+        const fmxNamespace = FamixFunctions.createOrGetFamixNamespace(m);
 
         logger.debug(`processNamespace: namespace: ${m.getName()}, (${m.getType().getText()}), ${fmxNamespace.getFullyQualifiedName()}`);
 
@@ -253,7 +244,7 @@ export class ProcessFiles {
      * @returns A Famix.Alias representing the alias
      */
     private processAlias(a: TypeAliasDeclaration): Famix.Alias {
-        const fmxAlias = this.famixFunctions.createFamixAlias(a);
+        const fmxAlias = FamixFunctions.createFamixAlias(a);
 
         logger.debug(`Alias: ${a.getName()}, (${a.getType().getText()}), fqn = ${fmxAlias.getFullyQualifiedName()}`);
 
@@ -270,7 +261,7 @@ export class ProcessFiles {
     private processClass(c: ClassDeclaration): Famix.Class | Famix.ParameterizableClass {
         this.classes.push(c);
 
-        const fmxClass = this.famixFunctions.createOrGetFamixClass(c);
+        const fmxClass = FamixFunctions.createOrGetFamixClass(c);
 
         logger.debug(`Class: ${c.getName()}, (${c.getType().getText()}), fqn = ${fmxClass.getFullyQualifiedName()}`);
 
@@ -306,7 +297,7 @@ export class ProcessFiles {
     private processInterface(i: InterfaceDeclaration): Famix.Interface | Famix.ParameterizableInterface {
         this.interfaces.push(i);
 
-        const fmxInterface = this.famixFunctions.createOrGetFamixInterface(i);
+        const fmxInterface = FamixFunctions.createOrGetFamixInterface(i);
 
         logger.debug(`Interface: ${i.getName()}, (${i.getType().getText()}), fqn = ${fmxInterface.getFullyQualifiedName()}`);
 
@@ -345,7 +336,7 @@ export class ProcessFiles {
      * @returns A Famix.Property representing the property
      */
     private processProperty(p: PropertyDeclaration | PropertySignature): Famix.Property {
-        const fmxProperty = this.famixFunctions.createFamixProperty(p);
+        const fmxProperty = FamixFunctions.createFamixProperty(p);
 
         logger.debug(`property: ${p.getName()}, (${p.getType().getText()}), fqn = ${fmxProperty.getFullyQualifiedName()}`);
         logger.debug(` ---> It's a Property${(p instanceof PropertySignature) ? "Signature" : "Declaration"}!`);
@@ -372,7 +363,7 @@ export class ProcessFiles {
      * @returns A Famix.Method or a Famix.Accessor representing the method or the accessor
      */
     private processMethod(m: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration): Famix.Method | Famix.Accessor {
-        const fmxMethod = this.famixFunctions.createFamixMethod(m, this.currentCC);
+        const fmxMethod = FamixFunctions.createFamixMethod(m, this.currentCC);
 
         logger.debug(`Method: ${!(m instanceof ConstructorDeclaration) ? m.getName() : "constructor"}, (${m.getType().getText()}), parent: ${(m.getParent() as ClassDeclaration | InterfaceDeclaration).getName()}, fqn = ${fmxMethod.getFullyQualifiedName()}`);
 
@@ -409,7 +400,7 @@ export class ProcessFiles {
      * @returns A Famix.Function representing the function
      */
     private processFunction(f: FunctionDeclaration | FunctionExpression): Famix.Function {
-        const fmxFunction = this.famixFunctions.createFamixFunction(f, this.currentCC);
+        const fmxFunction = FamixFunctions.createFamixFunction(f, this.currentCC);
 
         logger.debug(`Function: ${(f.getName()) ? f.getName() : "anonymous"}, (${f.getType().getText()}), fqn = ${fmxFunction.getFullyQualifiedName()}`);
 
@@ -469,7 +460,7 @@ export class ProcessFiles {
      * @returns A Famix.Parameter representing the parameter
      */
     private processParameter(p: ParameterDeclaration): Famix.Parameter {
-        const fmxParam = this.famixFunctions.createFamixParameter(p);
+        const fmxParam = FamixFunctions.createFamixParameter(p);
 
         logger.debug(`parameter: ${p.getName()}, (${p.getType().getText()}), fqn = ${fmxParam.getFullyQualifiedName()}`);
 
@@ -506,7 +497,7 @@ export class ProcessFiles {
      * @returns A Famix.TypeParameter representing the type parameter
      */
     private processTypeParameter(tp: TypeParameterDeclaration): Famix.ParameterType {
-        const fmxTypeParameter = this.famixFunctions.createFamixParameterType(tp);
+        const fmxTypeParameter = FamixFunctions.createFamixParameterType(tp);
 
         logger.debug(`type parameter: ${tp.getName()}, (${tp.getType().getText()}), fqn = ${fmxTypeParameter.getFullyQualifiedName()}`);
 
@@ -540,7 +531,7 @@ export class ProcessFiles {
      * @returns A Famix.Variable representing the variable
      */
     private processVariable(v: VariableDeclaration): Famix.Variable {
-        const fmxVar = this.famixFunctions.createFamixVariable(v);
+        const fmxVar = FamixFunctions.createFamixVariable(v);
 
         logger.debug(`variable: ${v.getName()}, (${v.getType().getText()}), ${v.getInitializer() ? "initializer: " + v.getInitializer().getText() : "initializer: "}, fqn = ${fmxVar.getFullyQualifiedName()}`);
 
@@ -558,7 +549,7 @@ export class ProcessFiles {
      * @returns A Famix.Enum representing the enum
      */
     private processEnum(e: EnumDeclaration): Famix.Enum {
-        const fmxEnum = this.famixFunctions.createFamixEnum(e);
+        const fmxEnum = FamixFunctions.createFamixEnum(e);
 
         logger.debug(`enum: ${e.getName()}, (${e.getType().getText()}), fqn = ${fmxEnum.getFullyQualifiedName()}`);
 
@@ -578,7 +569,7 @@ export class ProcessFiles {
      * @returns A Famix.EnumValue representing the enum member
      */
     private processEnumValue(v: EnumMember): Famix.EnumValue {
-        const fmxEnumValue = this.famixFunctions.createFamixEnumValue(v);
+        const fmxEnumValue = FamixFunctions.createFamixEnumValue(v);
 
         logger.debug(`enum value: ${v.getName()}, (${v.getType().getText()}), fqn = ${fmxEnumValue.getFullyQualifiedName()}`);
 
@@ -610,7 +601,7 @@ export class ProcessFiles {
      * @returns A Famix.Decorator representing the decorator
      */
     private processDecorator(d: Decorator, e: ClassDeclaration | MethodDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | ParameterDeclaration | PropertyDeclaration): Famix.Decorator {
-        const fmxDec = this.famixFunctions.createOrGetFamixDecorator(d, e);
+        const fmxDec = FamixFunctions.createOrGetFamixDecorator(d, e);
 
         logger.debug(`decorator: ${d.getName()}, (${d.getType().getText()}), fqn = ${fmxDec.getFullyQualifiedName()}`);
 
@@ -647,7 +638,7 @@ export class ProcessFiles {
     private processComment(c: CommentRange, fmxScope: Famix.NamedEntity): Famix.Comment {
         const isJSDoc = c.getText().startsWith("/**");
         logger.debug(`processComment: comment: ${c.getText()}, isJSDoc = ${isJSDoc}`);
-        const fmxComment = this.famixFunctions.createFamixComment(c, fmxScope, isJSDoc);
+        const fmxComment = FamixFunctions.createFamixComment(c, fmxScope, isJSDoc);
 
         return fmxComment;
     }
