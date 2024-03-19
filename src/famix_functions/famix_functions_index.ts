@@ -33,10 +33,12 @@ export class FamixFunctionsIndex {
 
         if (sourceElement !== null) {
             fmxIndexFileAnchor.setFileName(sourceElement.getSourceFile().getFilePath());
-            let sourceStart, sourceEnd: number;
+            let sourceStart, sourceEnd, sourceLineStart, sourceLineEnd: number;
             if (!(sourceElement instanceof CommentRange)) {
                 sourceStart = sourceElement.getStart();
                 sourceEnd = sourceElement.getEnd();
+                sourceLineStart = sourceElement.getStartLineNumber();
+                sourceLineEnd = sourceElement.getEndLineNumber();
             } else {
                 sourceStart = sourceElement.getPos();
                 sourceEnd = sourceElement.getEnd();
@@ -71,6 +73,10 @@ export class FamixFunctionsIndex {
             // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
             fmxIndexFileAnchor.setStartPos(sourceStart + 1);
             fmxIndexFileAnchor.setEndPos(sourceEnd + 1);
+            if (!(sourceElement instanceof CommentRange)) {
+                fmxIndexFileAnchor.setStartLine(sourceLineStart);
+                fmxIndexFileAnchor.setEndLine(sourceLineEnd);    
+            }
 
             if (!(famixElement instanceof Famix.Association) && !(famixElement instanceof Famix.Comment) && !(sourceElement instanceof CommentRange) && !(sourceElement instanceof Identifier) && !(sourceElement instanceof ImportSpecifier) && !(sourceElement instanceof ExpressionWithTypeArguments)) {
                 (famixElement as Famix.NamedEntity).setFullyQualifiedName(this.FQNFunctions.getFQN(sourceElement));

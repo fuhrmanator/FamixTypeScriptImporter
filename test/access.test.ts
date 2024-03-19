@@ -32,13 +32,13 @@ describe('Accesses', () => {
         const expectedAttributeNames: Array<string> = ['privateAttribute', 'publicAttribute'];
         const expectedMethodNames: Array<string> = ['privateMethod', 'returnAccessName'];
         testAccessCls = parsedModel.filter(el => (el.FM3 === "FamixTypeScript.Class" && el.name === "AccessClassForTesting"))[0];
-        expect(testAccessCls.properties.length).toBe(expectedAttributeNames.length);
+        expect(testAccessCls.attributes.length).toBe(expectedAttributeNames.length);
         expect(testAccessCls.methods.length).toBe(expectedMethodNames.length);
         accessClsMethods = parsedModel.filter(e => testAccessCls.methods.some(m => m.ref === e.id));
         expect(accessClsMethods.length).toBeGreaterThan(0);
         const checkMethodName = accessClsMethods.every(m => expectedMethodNames.includes(m.name));
         expect(checkMethodName).toBe(true);
-        accessClsAttributes = parsedModel.filter(e => testAccessCls.properties.some(a => a.ref === e.id));
+        accessClsAttributes = parsedModel.filter(e => testAccessCls.attributes.some(a => a.ref === e.id));
         expect(accessClsAttributes.length).toBeGreaterThan(0);
         const checkAttributeName = accessClsAttributes.every(a => expectedAttributeNames.includes(a.name));
         expect(checkAttributeName).toBe(true);

@@ -1,19 +1,19 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { Class } from "./class";
-import { TypeParameter } from "./type_parameter";
+import { ParameterType } from "./parameter_type";
 
 export class ParameterizableClass extends Class {
 
-  private typeParameters: Set<TypeParameter> = new Set();
+  private parameterTypes: Set<ParameterType> = new Set();
 
-  public getTypeParameters(): Set<TypeParameter> {
-    return this.typeParameters;
+  public getParameterTypes(): Set<ParameterType> {
+    return this.parameterTypes;
   }
 
-  public addTypeParameter(typeParameter: TypeParameter): void {
-    if (!this.typeParameters.has(typeParameter)) {
-      this.typeParameters.add(typeParameter);
-      typeParameter.setParentGeneric(this);
+  public addParameterType(parameterType: ParameterType): void {
+    if (!this.parameterTypes.has(parameterType)) {
+      this.parameterTypes.add(parameterType);
+      parameterType.setParentGeneric(this);
     }
   }
 
@@ -26,6 +26,6 @@ export class ParameterizableClass extends Class {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("typeParameters", this.getTypeParameters());
+    exporter.addProperty("parameterTypes", this.getParameterTypes());
   }
 }

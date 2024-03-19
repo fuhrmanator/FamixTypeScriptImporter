@@ -496,7 +496,7 @@ export class ProcessFiles {
         logger.debug(`Finding Type Parameters:`);
         e.getTypeParameters().forEach(tp => {
             const fmxParam = this.processTypeParameter(tp);
-            fmxScope.addTypeParameter(fmxParam);
+            fmxScope.addParameterType(fmxParam);
         });
     }
 
@@ -505,8 +505,8 @@ export class ProcessFiles {
      * @param tp A type parameter
      * @returns A Famix.TypeParameter representing the type parameter
      */
-    private processTypeParameter(tp: TypeParameterDeclaration): Famix.TypeParameter {
-        const fmxTypeParameter = this.famixFunctions.createFamixTypeParameter(tp);
+    private processTypeParameter(tp: TypeParameterDeclaration): Famix.ParameterType {
+        const fmxTypeParameter = this.famixFunctions.createFamixParameterType(tp);
 
         logger.debug(`type parameter: ${tp.getName()}, (${tp.getType().getText()}), fqn = ${fmxTypeParameter.getFullyQualifiedName()}`);
 
@@ -523,7 +523,7 @@ export class ProcessFiles {
     private processVariableStatement(v: VariableStatement): Array<Famix.Variable> {
         const fmxVariables = new Array<Famix.Variable>();
 
-        logger.debug(`Variable statement: ${v.getText()}, (${v.getType().getText()}), ${v.getDeclarationKindKeywords()}`);
+        logger.debug(`Variable statement: ${v.getText()}, (${v.getType().getText()}), ${v.getDeclarationKindKeywords()[0]}, fqn = ${v.getDeclarations()[0].getName()}`);
 
         v.getDeclarations().forEach(variable => {
             const fmxVar = this.processVariable(variable);

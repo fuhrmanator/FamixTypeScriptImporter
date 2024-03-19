@@ -1,6 +1,6 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import { ParameterizableClass, TypeParameter } from '../src/lib/famix/src/model/famix';
+import { ParameterizableClass, ParameterType } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project();
@@ -31,10 +31,10 @@ describe('Tests for generic class', () => {
         expect(pList).toBeTruthy();
         const MyClass = pList.find(p => p.getName() === "MyClass");
         expect(MyClass).toBeTruthy();
-        expect(MyClass?.getTypeParameters().size).toBe(1);
+        expect(MyClass?.getParameterTypes().size).toBe(1);
         if (MyClass) {
-            expect((Array.from(MyClass.getTypeParameters())[0] as TypeParameter).getName()).toBe("T");
-            expect((Array.from(MyClass.getTypeParameters())[0] as TypeParameter).getParentGeneric()).toBe(MyClass);
+            expect((Array.from(MyClass.getParameterTypes())[0] as ParameterType).getName()).toBe("T");
+            expect((Array.from(MyClass.getParameterTypes())[0] as ParameterType).getParentGeneric()).toBe(MyClass);
         }
     });
 

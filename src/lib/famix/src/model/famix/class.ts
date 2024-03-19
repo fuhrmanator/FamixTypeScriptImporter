@@ -78,7 +78,7 @@ export class Class extends Type {
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
     exporter.addProperty("isAbstract", this.getIsAbstract());
-    exporter.addProperty("properties", this.getProperties());
+    exporter.addProperty("attributes", this.getProperties()); // Moose (10) codes them as attributes
     exporter.addProperty("methods", this.getMethods());
     exporter.addProperty("superInheritances", this.getSuperInheritances());
     exporter.addProperty("subInheritances", this.getSubInheritances());  
