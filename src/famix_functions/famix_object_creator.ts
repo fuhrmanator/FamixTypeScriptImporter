@@ -28,7 +28,19 @@ export function makeFamixIndexFileAnchor(sourceElement: ImportDeclaration | Sour
     fmxIndexFileAnchor.setElement(famixElement);
 
     if (sourceElement !== null) {
-        fmxIndexFileAnchor.setFileName(sourceElement.getSourceFile().getFilePath());
+        const absolutePathProject = famixRep.getAbsolutePath();
+    
+        const path = require('path');
+
+        const absolutePath = path.normalize(sourceElement.getSourceFile().getFilePath());
+
+        let pathInProject: string = absolutePath.replace(absolutePathProject, "");
+
+        pathInProject = pathInProject.slice(1)
+
+        console.log(pathInProject)
+
+        fmxIndexFileAnchor.setFileName(pathInProject);
         let sourceStart, sourceEnd, sourceLineStart, sourceLineEnd: number;
         if (!(sourceElement instanceof CommentRange)) {
             sourceStart = sourceElement.getStart();

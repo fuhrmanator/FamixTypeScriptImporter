@@ -6,14 +6,14 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
+            baseUrl: "./test_src"
         }
     }
 );
 
 // Note: metrics test is tricky because we must create the file on disk
 
-const sourcePath = "test_src/metrics.ts";
+const sourcePath = "./test_src/metrics.ts";
 // remove file if it already exists
 if (fs.existsSync(sourcePath)) {
     // Delete the existing file
