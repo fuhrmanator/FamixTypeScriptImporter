@@ -5,8 +5,14 @@ import { Parameter } from '../src/lib/famix/src/model/famix/parameter';
 import { Variable } from '../src/lib/famix/src/model/famix/variable';
 
 const importer = new Importer();
-const project = new Project();
-project.createSourceFile('accesses.ts',
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
+project.createSourceFile('./src/accesses.ts',
 `var b = 2;
 
 var x = b;
@@ -18,7 +24,7 @@ class P {
     }
 }
 `);
-project.createSourceFile('accesses2.ts',
+project.createSourceFile('./src/accesses2.ts',
 `class AAA {
     public method(): void {}
 }
@@ -36,7 +42,7 @@ describe('Tests for accesses', () => {
 
     const accessFile1 = fmxRep._getFamixFile("accesses.ts");
     const accessFile2 = fmxRep._getFamixFile("accesses2.ts");
-    const theMethod = fmxRep._getFamixMethod("m");
+    const theMethod = fmxRep._getFamixMethod("{accesses.ts}.P.m");
 
     it("should contain one access to 'b'", () => {
         const theVariable = Array.from(fmxRep._getAllEntitiesWithType("Variable") as Set<Variable>).find(v => v.getName() === "b");

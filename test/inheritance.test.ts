@@ -2,9 +2,15 @@ import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("inheritance.ts",
+project.createSourceFile("./src/inheritance.ts",
 `class Animal {}
 class Fish extends Animal {}
 interface Flyable {}

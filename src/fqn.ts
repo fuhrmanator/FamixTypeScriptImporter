@@ -1,4 +1,5 @@
 import * as ts from "ts-morph";
+import * as FamixFunctions from "./famix_functions/famix_object_creator";
 
 /**
  * Gets the fully qualified name of a node, if it has one
@@ -6,8 +7,18 @@ import * as ts from "ts-morph";
  * @returns The fully qualified name of the node, or undefined if it doesn't have one
  */
 export function getFQN(node: ts.Node): string {
+    const absolutePathProject = FamixFunctions.famixRep.getAbsolutePath();
+    
+    const path = require('path');
+
     if (node instanceof ts.SourceFile) {
-        return `"${node.getFilePath()}"`;
+        const absolutePath = path.normalize(node.getFilePath());
+
+        let pathInProject: string = absolutePath.replace(absolutePathProject, "");
+
+        pathInProject = pathInProject.slice(1)
+
+        return pathInProject;
     }
 
     const symbol = node.getSymbol();
@@ -25,12 +36,16 @@ export function getFQN(node: ts.Node): string {
         return undefined;
     }
 
-    const sourceFilePath = sourceFile.getFilePath();
-    const sourceFileDirectory = sourceFilePath.substring(0, sourceFilePath.lastIndexOf("/"));
+    const absolutePath = path.normalize(sourceFile.getFilePath());
+
+    let pathInProject: string = absolutePath.replace(absolutePathProject, "");
+
+    pathInProject = pathInProject.slice(1)
 
     const qualifiedNameParts: Array<string> = [];
 
     const nodeName = this.getNameOfNode(node);
+
     if (nodeName) qualifiedNameParts.push(nodeName);
 
     const ancestors = node.getAncestors();
@@ -39,8 +54,10 @@ export function getFQN(node: ts.Node): string {
         if (partName) qualifiedNameParts.push(partName);
     });
 
+    qualifiedNameParts.pop();
+
     if (qualifiedNameParts.length > 0) {
-        return `"${sourceFileDirectory}/${qualifiedNameParts.pop()}".${qualifiedNameParts.reverse().join(".")}`;
+        return `{${pathInProject}}.${qualifiedNameParts.reverse().join(".")}`;
     } 
     else {
         return undefined;

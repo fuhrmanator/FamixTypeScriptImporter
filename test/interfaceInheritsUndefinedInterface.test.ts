@@ -3,9 +3,15 @@ import { Importer } from '../src/analyze';
 import { Interface } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("interfaceInheritsUndefinedInterface.ts",
+project.createSourceFile("./src/interfaceInheritsUndefinedInterface.ts",
 `import {FileSystemHost} from "ts-morph";
 
 interface MyInterface extends FileSystemHost {}

@@ -3,9 +3,15 @@ import { Importer } from '../src/analyze';
 import { Function as FamixFunctionEntity } from "../src/lib/famix/src/model/famix/function";
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("functionReturnsFunction.ts",
+project.createSourceFile("./src/functionReturnsFunction.ts",
 `export function deco() {
     function fct() {
         return function logMethod(target: any, propertyKey: string, descriptor: PropertyDescriptor) {

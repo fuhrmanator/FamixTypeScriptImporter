@@ -18,7 +18,13 @@ export const config = { "expectGraphemes": false };
  */
 export class Importer {
 
-    private project = new Project(); // The project containing the source files to analyze
+    private project = new Project(
+        {
+            compilerOptions: {
+                baseUrl: "./test_src"
+            }
+        }
+    ); // The project containing the source files to analyze
     private processFiles = new ProcessFiles(); // ProcessFiles object, it contains all the functions needed to process the source files
     private processAccesses = new ProcessAccesses(); // ProcessAccesses object, it contains all the functions needed to process the accesses
     private processInvocations = new ProcessInvocations(); // ProcessInvocations object, it contains all the functions needed to process the invocations
@@ -35,6 +41,19 @@ export class Importer {
 //        try {
         logger.debug(`famixRepFromPaths: paths: ${paths}`);
         this.project.addSourceFilesAtPaths(paths);
+
+        // get compiler options
+        const compilerOptions = this.project.getCompilerOptions();
+
+        // get baseUrl
+        const baseUrl = compilerOptions.baseUrl;
+
+        const path = require('path');
+    
+        const absoluteBaseUrl = path.resolve(baseUrl);
+
+        FamixFunctions.famixRep.setAbsolutePath(absoluteBaseUrl);
+
         this.processEntities(this.project);
 
         const famixRep = FamixFunctions.famixRep;
@@ -91,6 +110,19 @@ export class Importer {
         //const sourceFileNames = project.getSourceFiles().map(f => f.getFilePath()) as Array<string>;
 
         //const famixRep = this.famixRepFromPaths(sourceFileNames);
+        
+        // get compiler options
+        const compilerOptions = project.getCompilerOptions();
+
+        // get baseUrl
+        const baseUrl = compilerOptions.baseUrl;
+
+        const path = require('path');
+
+        const absoluteBaseUrl = path.resolve(baseUrl);
+
+        FamixFunctions.famixRep.setAbsolutePath(path.normalize(absoluteBaseUrl));
+    
         this.processEntities(project);
 
         return FamixFunctions.famixRep;

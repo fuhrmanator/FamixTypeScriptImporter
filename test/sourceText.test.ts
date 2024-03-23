@@ -4,9 +4,15 @@ import { IndexedFileAnchor, Method, Module, ScriptEntity } from "../src/lib/fami
 import GraphemeSplitter from "grapheme-splitter";
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./test_src"
+        }
+    }
+);
 
-project.createSourceFile("test_src/simple.ts",
+project.createSourceFile("./test_src/simple.ts",
     `let a: number = 1;
 export class A {
     /**
@@ -20,7 +26,7 @@ export class A {
 }`, { overwrite: true }).saveSync();
 
 // multi-code point emoji is handled differently in JavaScript () and Pharo (one character)
-project.createSourceFile("test_src/a-b.ts", `let c = "💷", d = 5;`);
+project.createSourceFile("./test_src/a-b.ts", `let c = "💷", d = 5;`);
 
 config.expectGraphemes = true;
 const fmxRep = importer.famixRepFromProject(project);
@@ -28,7 +34,7 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Tests for source text', () => {
 
     it("should have a class 'A' with the proper source text", () => {
-        const theClass = fmxRep._getFamixClass("A");
+        const theClass = fmxRep._getFamixClass("{simple.ts}.A");
         const sourceAnchor = theClass?.getSourceAnchor() as IndexedFileAnchor;
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.getStartPos()).toBe(19 + 1);

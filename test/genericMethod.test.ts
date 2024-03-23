@@ -5,9 +5,15 @@ import { Method } from "../src/lib/famix/src/model/famix/method";
 import { Parameter } from "../src/lib/famix/src/model/famix/parameter";
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("genericMethod.ts",
+project.createSourceFile("./src/genericMethod.ts",
 `class AA {
     public i<T> (j: T): void {}
 }
@@ -17,7 +23,7 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for generics', () => {
 
-    const theClass = fmxRep._getFamixClass("AA");
+    const theClass = fmxRep._getFamixClass("{genericMethod.ts}.AA");
 
     it("should parse generics", () => {
         expect(fmxRep).toBeTruthy();

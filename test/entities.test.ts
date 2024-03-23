@@ -3,9 +3,15 @@ import { Importer } from '../src/analyze';
 import { Method, Function as FamixFunctionEntity, Variable} from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("entities.ts",
+project.createSourceFile("./src/entities.ts",
 `namespace MyNamespace {
     
     class EntityClass {
@@ -44,10 +50,10 @@ function globalFunc() {
 const fmxRep = importer.famixRepFromProject(project);
 
 describe('Entities', () => {
-
-    const theEntityClass = fmxRep._getFamixClass("EntityClass");
-    const theSubclass = fmxRep._getFamixClass("class2");
-
+    
+    const theEntityClass = fmxRep._getFamixClass("{entities.ts}.MyNamespace.EntityClass");
+    const theSubclass = fmxRep._getFamixClass("{entities.ts}.MyNamespace.class2");
+    
     it("should contain an EntityClass", () => {
         expect(theEntityClass).toBeTruthy();
     });
@@ -57,7 +63,7 @@ describe('Entities', () => {
     });
 
     it("should contain methods with correct names", () => {
-        const mNames = fmxRep._methodNamesAsSetFromClass("EntityClass");
+        const mNames = fmxRep._methodNamesAsSetFromClass("{entities.ts}.MyNamespace.EntityClass");
         expect(mNames.has("move") &&
             mNames.has("move2") &&
             mNames.has("constructor")).toBe(true);
@@ -65,7 +71,7 @@ describe('Entities', () => {
 
     it("should contain a private method named move2 that returns void", () => {
         if (theEntityClass) {
-            const move2Method = fmxRep._getFamixMethod("move2");
+            const move2Method = fmxRep._getFamixMethod("{entities.ts}.MyNamespace.EntityClass.move2");
             expect(move2Method).toBeTruthy();
             if (move2Method) {
                 expect(move2Method.getIsPrivate()).toBe(true);
@@ -75,7 +81,7 @@ describe('Entities', () => {
    
     it("should contain a private method named move2 with a signature 'private move2(family: string): void'", () => {
         if (theEntityClass) {
-            const move2Method = fmxRep._getFamixMethod("move2");
+            const move2Method = fmxRep._getFamixMethod("{entities.ts}.MyNamespace.EntityClass.move2");
             expect(move2Method).toBeTruthy();
             if (move2Method) {
                 expect(move2Method.getSignature()).toBe('private move2(family: string): void');
@@ -84,14 +90,14 @@ describe('Entities', () => {
     });
 
     it("should contain a constructor in EntityClass", () => {
-        const theConstructor = fmxRep._getFamixMethod("constructor") as Method;
+        const theConstructor = fmxRep._getFamixMethod("{entities.ts}.MyNamespace.EntityClass.constructor") as Method;
         expect(theConstructor).toBeTruthy();
         expect(theConstructor.getKind()).toBe("constructor");
     });
 
     it("should have a parent relationship between EntityClass and its methods", () => {
         if (theEntityClass) { 
-            const mParents = fmxRep._methodParentsAsSetFromClass("EntityClass");
+            const mParents = fmxRep._methodParentsAsSetFromClass("{entities.ts}.MyNamespace.EntityClass");
             expect(mParents.size).toBe(1);
             expect(Array.from(mParents)[0]).toEqual(theEntityClass);
         }
@@ -194,7 +200,7 @@ describe('Entities', () => {
     });
 
     it("should contain a clsInNsp with a class-side method named 'aStaticMethod'", () => {
-        const clsInNSP = fmxRep._getFamixClass("clsInNsp");
+        const clsInNSP = fmxRep._getFamixClass("{entities.ts}.MyNamespace.clsInNsp");
         expect(clsInNSP).toBeTruthy();
         if (clsInNSP) {
             const aStaticMethod = Array.from(clsInNSP.getMethods()).find(m => m.getName() === 'aStaticMethod');
@@ -206,7 +212,7 @@ describe('Entities', () => {
     });
 
     it("should contain a private method named '#move3'", () => {
-        const cls = fmxRep._getFamixClass("EntityClass");
+        const cls = fmxRep._getFamixClass("{entities.ts}.MyNamespace.EntityClass");
         expect(cls).toBeTruthy();
         if (cls) {
             const aMethod = Array.from(cls.getMethods()).find(m => m.getName() === '#move3');
@@ -222,7 +228,7 @@ describe('Entities', () => {
 
     // global scope
     it("should contain a function 'globalFunc' with global scope", () => {
-        const globalFunc = fmxRep._getFamixFunction('globalFunc') as FamixFunctionEntity;
+        const globalFunc = fmxRep._getFamixFunction('{entities.ts}.globalFunc') as FamixFunctionEntity;
         expect(globalFunc).toBeTruthy();
         expect(globalFunc.getName()).toBe('globalFunc');
         expect(globalFunc.getParentContainerEntity().getName()).toBe('entities.ts');

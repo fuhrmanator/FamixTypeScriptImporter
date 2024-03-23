@@ -3,9 +3,15 @@ import { Importer } from '../src/analyze';
 import { Decorator } from '../src/lib/famix/src/model/famix/decorator';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("classWithDecorators.ts",
+project.createSourceFile("./src/classWithDecorators.ts",
 `function sealed(constructor: Function) { // function can't take other parameters with constructor
     Object.seal(constructor);
     Object.seal(constructor.prototype);
@@ -53,7 +59,7 @@ describe('Tests for class with decorators', () => {
         expect(fmxRep._getAllEntitiesWithType("Decorator").size).toBe(4);
     });
 
-    const theClass = fmxRep._getFamixClass("BugReport");
+    const theClass = fmxRep._getFamixClass("{classWithDecorators.ts}.BugReport");
     const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@c");
     const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@d");
     const d3 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@sealed");

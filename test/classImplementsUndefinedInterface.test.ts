@@ -4,9 +4,15 @@ import { Class } from '../src/lib/famix/src/model/famix/class';
 import { Interface } from '../src/lib/famix/src/model/famix/interface';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("classImplementsUndefinedInterface.ts",
+project.createSourceFile("./src/classImplementsUndefinedInterface.ts",
 `import {FileSystemHost} from "ts-morph";
 
 class myClass implements FileSystemHost {}

@@ -3,8 +3,14 @@ import { Importer } from '../src/analyze';
 import { Method } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
-const project = new Project();
-project.createSourceFile("entities_json.ts",
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
+project.createSourceFile("./src/entities_json.ts",
 `class EntityClass {
     constructor() {}
     public move() {}

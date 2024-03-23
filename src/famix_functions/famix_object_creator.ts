@@ -724,7 +724,18 @@ export function createFamixImportClause(importClauseInfo: {importDeclaration?: I
 
     let importedEntity: Famix.NamedEntity;
     let importedEntityName: string;
-    let pathName = "\"" + moduleSpecifierFilePath + "\".";
+
+    const absolutePathProject = this.famixRep.getAbsolutePath();
+    
+    const path = require('path');
+
+    const absolutePath = path.normalize(moduleSpecifierFilePath);
+
+    let pathInProject: string = absolutePath.replace(absolutePathProject, "");
+
+    pathInProject = pathInProject.slice(1)
+
+    let pathName = "{" + pathInProject + "}.";
     if (importElement instanceof ImportSpecifier) {
         importedEntityName = importElement.getName();
         pathName = pathName + importedEntityName;

@@ -4,10 +4,15 @@ import { Alias } from '../src/lib/famix/src/model/famix';
 import { Type } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-
-project.createSourceFile("alias.ts", 
+project.createSourceFile("./src/alias.ts", 
 `type Point = {
     x: number;
     y: number;
@@ -30,7 +35,7 @@ describe('Tests for alias', () => {
     it("should contain a type Point", () => {
         expect(theType.getName()).toBe("Point");
     });
-
+    
     const theFile = fmxRep._getFamixFile("alias.ts");
     it("should contain an alias on type Point", () => {
         expect(theFile?.getAliases().size).toBe(1);

@@ -3,9 +3,15 @@ import { Importer } from '../src/analyze';
 import { Function as FamixFunctionEntity } from "../src/lib/famix/src/model/famix/function";
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("functionWithParameters.ts",
+project.createSourceFile("./src/functionWithParameters.ts",
 `function fct(i: number, x: string): number {
     return 0;
 }
