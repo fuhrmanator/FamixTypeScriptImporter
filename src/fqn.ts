@@ -1,5 +1,6 @@
 import * as ts from "ts-morph";
 import * as FamixFunctions from "./famix_functions/famix_object_creator";
+import path from "path";
 
 /**
  * Gets the fully qualified name of a node, if it has one
@@ -9,17 +10,9 @@ import * as FamixFunctions from "./famix_functions/famix_object_creator";
 export function getFQN(node: ts.Node): string {
     const absolutePathProject = FamixFunctions.famixRep.getAbsolutePath();
     
-    const path = require('path');
-
     if (node instanceof ts.SourceFile) {
-        const absolutePath = path.normalize(node.getFilePath());
-
-        const positionNodeModules = absolutePath.indexOf('node_modules');
-
-        let pathInProject: string = absolutePath.replace(absolutePathProject, "");
-        pathInProject = pathInProject.slice(1)
-
-        return pathInProject;
+        return FamixFunctions.convertToRelativePath(path.normalize(node.getFilePath()), 
+            absolutePathProject).replace(/\\/g, "/");
     }
 
     const symbol = node.getSymbol();
@@ -38,27 +31,19 @@ export function getFQN(node: ts.Node): string {
     }
 
     const absolutePath = path.normalize(sourceFile.getFilePath());
-
     const positionNodeModules = absolutePath.indexOf('node_modules');
-
-    var pathInProject: string = "";
+    let pathInProject: string = "";
 
     if (positionNodeModules !== -1) {
-
         const pathFromNodeModules = absolutePath.substring(positionNodeModules);
-
-        pathInProject = pathFromNodeModules
+        pathInProject = pathFromNodeModules;
     } else {
-
-        pathInProject = absolutePath.replace(absolutePathProject, "");
-
-        pathInProject = pathInProject.slice(1);     
+        pathInProject = FamixFunctions.convertToRelativePath(absolutePath, absolutePathProject).replace(/\\/g, "/");     
     }
 
     const qualifiedNameParts: Array<string> = [];
 
     const nodeName = this.getNameOfNode(node);
-
     if (nodeName) qualifiedNameParts.push(nodeName);
 
     const ancestors = node.getAncestors();
