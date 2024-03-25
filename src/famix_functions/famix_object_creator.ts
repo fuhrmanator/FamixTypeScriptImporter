@@ -34,11 +34,23 @@ export function makeFamixIndexFileAnchor(sourceElement: ImportDeclaration | Sour
 
         const absolutePath = path.normalize(sourceElement.getSourceFile().getFilePath());
 
-        let pathInProject: string = absolutePath.replace(absolutePathProject, "");
+        const positionNodeModules = absolutePath.indexOf('node_modules');
 
-        pathInProject = pathInProject.slice(1)
+        var pathInProject: string = "";
 
-        console.log(pathInProject)
+        if (positionNodeModules !== -1) {
+
+            const pathFromNodeModules = absolutePath.substring(positionNodeModules);
+
+            pathInProject = pathFromNodeModules
+
+        } else {
+
+            pathInProject = absolutePath.replace(absolutePathProject, "");
+
+            pathInProject = pathInProject.slice(1);    
+        
+        }
 
         fmxIndexFileAnchor.setFileName(pathInProject);
         let sourceStart, sourceEnd, sourceLineStart, sourceLineEnd: number;

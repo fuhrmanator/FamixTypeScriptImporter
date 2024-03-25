@@ -14,8 +14,9 @@ export function getFQN(node: ts.Node): string {
     if (node instanceof ts.SourceFile) {
         const absolutePath = path.normalize(node.getFilePath());
 
-        let pathInProject: string = absolutePath.replace(absolutePathProject, "");
+        const positionNodeModules = absolutePath.indexOf('node_modules');
 
+        let pathInProject: string = absolutePath.replace(absolutePathProject, "");
         pathInProject = pathInProject.slice(1)
 
         return pathInProject;
@@ -38,9 +39,21 @@ export function getFQN(node: ts.Node): string {
 
     const absolutePath = path.normalize(sourceFile.getFilePath());
 
-    let pathInProject: string = absolutePath.replace(absolutePathProject, "");
+    const positionNodeModules = absolutePath.indexOf('node_modules');
 
-    pathInProject = pathInProject.slice(1)
+    var pathInProject: string = "";
+
+    if (positionNodeModules !== -1) {
+
+        const pathFromNodeModules = absolutePath.substring(positionNodeModules);
+
+        pathInProject = pathFromNodeModules
+    } else {
+
+        pathInProject = absolutePath.replace(absolutePathProject, "");
+
+        pathInProject = pathInProject.slice(1);     
+    }
 
     const qualifiedNameParts: Array<string> = [];
 
