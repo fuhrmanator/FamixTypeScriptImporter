@@ -5,6 +5,7 @@ import GraphemeSplitter from "grapheme-splitter";
 import * as Helpers from "./helpers_creation";
 import * as FQNFunctions from "../fqn";
 import { FamixRepository } from "../lib/famix/src/famix_repository";
+import path from "path";
 
 // Famix repository instance
 export const famixRep = new FamixRepository();
@@ -30,27 +31,21 @@ export function makeFamixIndexFileAnchor(sourceElement: ImportDeclaration | Sour
     if (sourceElement !== null) {
         const absolutePathProject = famixRep.getAbsolutePath();
     
-        const path = require('path');
-
         const absolutePath = path.normalize(sourceElement.getSourceFile().getFilePath());
 
         const positionNodeModules = absolutePath.indexOf('node_modules');
 
-        var pathInProject: string = "";
+        let pathInProject: string = "";
 
         if (positionNodeModules !== -1) {
-
             const pathFromNodeModules = absolutePath.substring(positionNodeModules);
-
-            pathInProject = pathFromNodeModules
-
+            pathInProject = pathFromNodeModules;
         } else {
-
-            pathInProject = absolutePath.replace(absolutePathProject, "");
-
-            pathInProject = pathInProject.slice(1);    
-        
+            pathInProject = convertToRelativePath(absolutePath, absolutePathProject);
         }
+
+        // revert any backslashes to forward slashes (path.normalize on windows introduces them)
+        pathInProject = pathInProject.replace(/\\/g, "/");
 
         fmxIndexFileAnchor.setFileName(pathInProject);
         let sourceStart, sourceEnd, sourceLineStart, sourceLineEnd: number;
@@ -751,13 +746,9 @@ export function createFamixImportClause(importClauseInfo: {importDeclaration?: I
 
     const absolutePathProject = this.famixRep.getAbsolutePath();
     
-    const path = require('path');
-
     const absolutePath = path.normalize(moduleSpecifierFilePath);
-
-    let pathInProject: string = absolutePath.replace(absolutePathProject, "");
-
-    pathInProject = pathInProject.slice(1)
+    // convert the path and remove any windows backslashes introduced by path.normalize
+    const pathInProject: string = convertToRelativePath(absolutePath, absolutePathProject).replace(/\\/g, "/");
 
     let pathName = "{" + pathInProject + "}.";
     if (importElement instanceof ImportSpecifier) {
@@ -803,4 +794,8 @@ export function createFamixImportClause(importClauseInfo: {importDeclaration?: I
     makeFamixIndexFileAnchor(importDeclaration, fmxImportClause);
 
     fmxImporter.addOutgoingImport(fmxImportClause);
+}
+
+export function convertToRelativePath(absolutePath: string, absolutePathProject: string) {
+    return absolutePath.replace(absolutePathProject, "").slice(1);
 }

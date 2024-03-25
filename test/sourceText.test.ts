@@ -7,7 +7,7 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./test_src"
+            baseUrl: "."
         }
     }
 );
@@ -33,15 +33,16 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for source text', () => {
 
-    it("should have a class 'A' with the proper source text", () => {
-        const theClass = fmxRep._getFamixClass("{simple.ts}.A");
+    it("should have a class '{test_src/simple.ts}.A' with the proper source text", () => {
+        const theClass = fmxRep._getFamixClass("{test_src/simple.ts}.A");
+        expect(theClass).toBeDefined();
         const sourceAnchor = theClass?.getSourceAnchor() as IndexedFileAnchor;
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.getStartPos()).toBe(19 + 1);
         expect(sourceAnchor.getEndPos()).toBe(402 + 1);
         expect(sourceAnchor.getStartLine()).toBe(2);
         expect(sourceAnchor.getEndLine()).toBe(11);
-        expect(sourceAnchor.getFileName().endsWith("simple.ts")).toBe(true);
+        expect(sourceAnchor.getFileName()).toBe("test_src/simple.ts");
         expect(project.getSourceFileOrThrow(
             sourceAnchor.getFileName()).getFullText().substring(
                 sourceAnchor.getStartPos() - 1, sourceAnchor.getEndPos() - 1))
@@ -66,7 +67,7 @@ describe('Tests for source text', () => {
         expect(sourceAnchor.getEndPos()).toBe(400 + 1);
         expect(sourceAnchor.getStartLine()).toBe(8);
         expect(sourceAnchor.getEndLine()).toBe(10);
-        expect(sourceAnchor.getFileName().endsWith("simple.ts")).toBe(true);
+        expect(sourceAnchor.getFileName()).toBe("test_src/simple.ts");
         expect(project.getSourceFileOrThrow(
             sourceAnchor.getFileName()).getFullText().substring(
                 sourceAnchor.getStartPos() - 1, sourceAnchor.getEndPos() - 1))
@@ -86,7 +87,7 @@ describe('Tests for source text', () => {
         expect(sourceAnchor.getEndPos()).toBe(17 + 1);
         expect(sourceAnchor.getStartLine()).toBe(1);
         expect(sourceAnchor.getEndLine()).toBe(1);
-        expect(sourceAnchor.getFileName().endsWith("simple.ts")).toBe(true);
+        expect(sourceAnchor.getFileName()).toBe("test_src/simple.ts");
         expect(project.getSourceFileOrThrow(
             sourceAnchor.getFileName()).getFullText().substring(
                 sourceAnchor.getStartPos() - 1, sourceAnchor.getEndPos() - 1))
@@ -102,7 +103,7 @@ describe('Tests for source text', () => {
         expect(sourceAnchor.getEndPos()).toBe(393 + 1);
         expect(sourceAnchor.getStartLine()).toBe(9);
         expect(sourceAnchor.getEndLine()).toBe(9);
-        expect(sourceAnchor.getFileName().endsWith("simple.ts")).toBe(true);
+        expect(sourceAnchor.getFileName()).toBe("test_src/simple.ts");
         expect(project.getSourceFileOrThrow(
             sourceAnchor.getFileName()).getFullText().substring(
                 sourceAnchor.getStartPos() - 1, sourceAnchor.getEndPos() - 1))
@@ -123,7 +124,7 @@ describe('Tests for source text', () => {
         expect(sourceAnchor.getEndPos()).toBe(4 + testSourceWithGraphemes.length + 1);
         expect(sourceAnchor.getStartLine()).toBe(1);
         expect(sourceAnchor.getEndLine()).toBe(1);
-        expect(sourceAnchor.getFileName().endsWith("a-b.ts")).toBe(true);
+        expect(sourceAnchor.getFileName()).toBe("test_src/a-b.ts");
         const sourceFileTextWithGraphemes = splitter.splitGraphemes(project.getSourceFileOrThrow(sourceAnchor.getFileName()).getFullText());
         expect(sourceFileTextWithGraphemes.slice(sourceAnchor.getStartPos() - 1, sourceAnchor.getEndPos() - 1)).toEqual(testSourceWithGraphemes);
     });
@@ -136,7 +137,7 @@ describe('Tests for source text', () => {
         expect(sourceAnchor.getEndPos()).toBe(18 + 1);
         expect(sourceAnchor.getStartLine()).toBe(1);
         expect(sourceAnchor.getEndLine()).toBe(1);
-        expect(sourceAnchor.getFileName().endsWith("a-b.ts")).toBe(true);
+        expect(sourceAnchor.getFileName()).toBe("test_src/a-b.ts");
         const sourceFileTextWithGraphemes = splitter.splitGraphemes(project.getSourceFileOrThrow(sourceAnchor.getFileName()).getFullText());
         const testSourceWithGraphemes = splitter.splitGraphemes('d = 5');
         expect(sourceFileTextWithGraphemes.slice(sourceAnchor.getStartPos() - 1, sourceAnchor.getEndPos() - 1)).toEqual(testSourceWithGraphemes);    });
