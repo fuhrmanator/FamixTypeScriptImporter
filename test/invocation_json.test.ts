@@ -2,9 +2,15 @@ import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("invocation.ts",
+project.createSourceFile("./src/invocation.ts",
 `class Class1 {
     public returnHi() {}
 }

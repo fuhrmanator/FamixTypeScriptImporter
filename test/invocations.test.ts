@@ -3,9 +3,15 @@ import { Importer } from '../src/analyze';
 import { Invocation, Method } from "../src/lib/famix/src/model/famix";
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("invocations.ts",
+project.createSourceFile("./src/invocations.ts",
 `class Class1 {
     public returnHi(): string {
         return "Hi";
@@ -34,7 +40,7 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Invocations', () => {
 
     it("should contain method returnHi in Class1", () => {
-        const clsName = "Class1";
+        const clsName = "{invocations.ts}.Class1";
         const mName = "returnHi";
         const theClass = fmxRep._getFamixClass(clsName);
         expect(theClass).toBeTruthy();
@@ -47,7 +53,7 @@ describe('Invocations', () => {
     });
 
     it("should contain method returnName in Class2", () => {
-        const clsName = "Class2";
+        const clsName = "{invocations.ts}.Class2";
         const mName = "returnName";
         const theClass = fmxRep._getFamixClass(clsName);
         expect(theClass).toBeTruthy();
@@ -60,7 +66,7 @@ describe('Invocations', () => {
     });
 
     it("should contain method getString in Class3", () => {
-        const clsName = "Class3";
+        const clsName = "{invocations.ts}.Class3";
         const mName = "getString";
         const theClass = fmxRep._getFamixClass(clsName);
         expect(theClass).toBeTruthy();
@@ -73,7 +79,7 @@ describe('Invocations', () => {
     });
 
     it("should contain an invocation for returnHi", () => {
-        const clsName = "Class1";
+        const clsName = "{invocations.ts}.Class1";
         const theClass = fmxRep._getFamixClass(clsName);
         expect(theClass).toBeTruthy();
         if (theClass) {
@@ -92,7 +98,7 @@ describe('Invocations', () => {
     });
 
     it("should contain an invocation for returnHi with a receiver of 'Class1'", () => {
-        const clsName = "Class1";
+        const clsName = "{invocations.ts}.Class1";
         const theClass = fmxRep._getFamixClass(clsName);
         expect(theClass).toBeTruthy();
         if (theClass) {
@@ -103,12 +109,12 @@ describe('Invocations', () => {
             expect(invocations).toBeTruthy();
             expect(invocations.length).toBeTruthy();
             expect((invocations[0] as Invocation).getReceiver()).toBeTruthy();
-            expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("Class1"));
+            expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{invocations.ts}.Class1"));
         }
     });
 
     it("should contain an invocation for returnHi with a signature 'public returnHi(): string'", () => {
-        const clsName = "Class1";
+        const clsName = "{invocations.ts}.Class1";
         const theClass = fmxRep._getFamixClass(clsName);
         expect(theClass).toBeTruthy();
         if (theClass) {
@@ -124,7 +130,7 @@ describe('Invocations', () => {
     });
 
     it("should contain an invocation for a function 'a'", () => {
-        const theFunction = fmxRep._getFamixFunction("a");
+        const theFunction = fmxRep._getFamixFunction("{invocations.ts}.a");
         expect(theFunction).toBeTruthy();
         const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
         expect(invocations).toBeTruthy();

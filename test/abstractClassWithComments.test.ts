@@ -4,8 +4,14 @@ import { Comment } from '../src/lib/famix/src/model/famix/comment';
 import { getCommentTextFromCommentViaAnchor } from './testUtils';
 
 const importer = new Importer();
-const project = new Project();
-project.createSourceFile("abstractClassWithComments.ts", `// before
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
+project.createSourceFile("./src/abstractClassWithComments.ts", `// before
 abstract class MyAbstractClass {} // a comment
 // after
 /* test */
@@ -22,7 +28,8 @@ describe('Tests for abstract class with comments', () => {
         expect(fmxRep._getAllEntitiesWithType("Class").size).toBe(1);
     });
 
-    const theAbstractClass = fmxRep._getFamixClass("MyAbstractClass");
+    const theAbstractClass = fmxRep._getFamixClass("{abstractClassWithComments.ts}.MyAbstractClass");
+
     it("should contain an abstract class MyAbstractClass", () => {
         expect(theAbstractClass).toBeTruthy();
         if (theAbstractClass) {
@@ -43,7 +50,8 @@ describe('Tests for abstract class with comments', () => {
         expect(fmxRep._getAllEntitiesWithType("Function").size).toBe(1);
     });
 
-    const theFunction = fmxRep._getFamixFunction("tst");
+    const theFunction = fmxRep._getFamixFunction("{abstractClassWithComments.ts}.tst");
+
     it("should have three comments for the function", () => {
         expect(theFunction?.getComments().size).toBe(3);
         const comments = Array.from(theFunction?.getComments() as Set<Comment>);

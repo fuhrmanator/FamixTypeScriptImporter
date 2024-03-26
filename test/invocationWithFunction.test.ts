@@ -5,9 +5,15 @@ import { Invocation } from "../src/lib/famix/src/model/famix/invocation";
 import { Project } from 'ts-morph';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("invocationWithFunction.ts", 
+project.createSourceFile("./src/invocationWithFunction.ts", 
 `function func(): void {}
 const x1 = func();`);
 
@@ -33,7 +39,7 @@ describe('Tests for invocation with function', () => {
         expect(x1).toBeTruthy();
     });
     
-    const theFunction = fmxRep._getFamixFunction("func") as FamixFunctionEntity;
+    const theFunction = fmxRep._getFamixFunction("{invocationWithFunction.ts}.func") as FamixFunctionEntity;
     const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
     
     it("should contain one invocation", () => {

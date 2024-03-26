@@ -5,15 +5,21 @@ import { getTextFromAnchor } from "./testUtils";
 
 const importer = new Importer();
 logger.settings.minLevel = 0; // all your messages are belong to us
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./test_src"
+        }
+    }
+);
 
-project.createSourceFile("oneClassExporter.ts",
+project.createSourceFile("./test_src/oneClassExporter.ts",
     `export class ExportedClass {}`);
 
-project.createSourceFile("oneClassImporter.ts",
+project.createSourceFile("./test_src/oneClassImporter.ts",
     `import {ExportedClass} from "./oneClassExport";`);
 
-project.createSourceFile("complexExportModule.ts",
+project.createSourceFile("./test_src/complexExportModule.ts",
     `class ClassZ {}
 class ClassY {}
 export class ClassX {}
@@ -26,19 +32,19 @@ export default class ClassW {}
 export namespace Nsp {}
 `);
 
-project.createSourceFile("defaultImporterModule.ts",
+project.createSourceFile("./test_src/defaultImporterModule.ts",
     `import * as test from "./complexExportModule.ts";`);
 
-project.createSourceFile("multipleClassImporterModule.ts",
+project.createSourceFile("./test_src/multipleClassImporterModule.ts",
     `import { ClassZ } from "./complexExportModule.ts";`);
 
-project.createSourceFile("reExporterModule.ts",
+project.createSourceFile("./test_src/reExporterModule.ts",
     `export * from "./complexExportModule.ts";`);
 
-project.createSourceFile("reImporterModule.ts",
+project.createSourceFile("./test_src/reImporterModule.ts",
     `import { ClassX } from "./reExporterModule.ts";`);
 
-project.createSourceFile("renameDefaultExportImporter.ts",
+project.createSourceFile("./test_src/renameDefaultExportImporter.ts",
     `import myRenamedDefaultClassW from "./complexExportModule.ts";`);
 
 

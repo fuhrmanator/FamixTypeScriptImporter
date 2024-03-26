@@ -4,8 +4,14 @@ import { Decorator } from '../src/lib/famix/src/model/famix/decorator';
 import { Property } from '../src/lib/famix/src/model/famix/property';
 
 const importer = new Importer();
-const project = new Project();
-project.createSourceFile("propertyWithDecorators.ts",
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
+project.createSourceFile("./src/propertyWithDecorators.ts",
 `import "reflect-metadata";
 
 const formatMetadataKey = Symbol("format");
@@ -57,7 +63,7 @@ describe('Tests for property with decorators', () => {
 
     it("should contain a property 'greeting'", () => {
         expect(fmxRep._getAllEntitiesWithType("Property").size).toBe(1);
-        const theProperty = (Array.from(fmxRep._getFamixClass("Greeter")?.getProperties() as Set<Property>) as Array<Property>).find((f) => f.getName() === "greeting");
+        const theProperty = (Array.from(fmxRep._getFamixClass("{propertyWithDecorators.ts}.Greeter")?.getProperties() as Set<Property>) as Array<Property>).find((f) => f.getName() === "greeting");
         expect(theProperty).toBeTruthy();
     });
 
@@ -65,7 +71,7 @@ describe('Tests for property with decorators', () => {
         expect(fmxRep._getAllEntitiesWithType("Decorator").size).toBe(5);
     });
 
-    const theProperty = (Array.from(fmxRep._getFamixClass("Greeter")?.getProperties() as Set<Property>) as Array<Property>).find((f) => f.getName() === "greeting");
+    const theProperty = (Array.from(fmxRep._getFamixClass("{propertyWithDecorators.ts}.Greeter")?.getProperties() as Set<Property>) as Array<Property>).find((f) => f.getName() === "greeting");
     const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@deco");
     const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@h");
     const d3 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@o");

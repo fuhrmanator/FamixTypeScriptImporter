@@ -1,21 +1,11 @@
 import { MethodDeclaration, FunctionDeclaration, Identifier, ConstructorDeclaration, GetAccessorDeclaration, SetAccessorDeclaration, FunctionExpression } from "ts-morph";
-import { FamixFunctions } from "../famix_functions/famix_functions";
+import * as FamixFunctions from "../famix_functions/famix_object_creator";
 import { logger } from "../analyze";
 
 /**
  * This class is used to build a Famix model for the invocations
  */
 export class ProcessInvocations {
-
-    private famixFunctions: FamixFunctions; // FamixFunctions object, it contains all the functions needed to create Famix entities
-
-    /**
-     * Initializes the ProcessInvocations object
-     * @param famixFunctions FamixFunctions object, it contains all the functions needed to create Famix entities
-     */
-    constructor(famixFunctions: FamixFunctions) {
-        this.famixFunctions = famixFunctions;
-    }
 
     /**
      * Builds a Famix model for the invocations of the methods and functions of the source files
@@ -42,7 +32,7 @@ export class ProcessInvocations {
      */
     private processNodeForInvocations(n: Identifier, m: MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression, id: number): void {
         try {
-            this.famixFunctions.createFamixInvocation(n, m, id);
+            FamixFunctions.createFamixInvocation(n, m, id);
 
             logger.debug(`node: node, (${n.getType().getText()})`);
         } catch (error) {

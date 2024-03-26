@@ -1,21 +1,11 @@
 import { ImportDeclaration, SourceFile, ExportedDeclarations } from "ts-morph";
-import { FamixFunctions } from "../famix_functions/famix_functions";
+import * as FamixFunctions from "../famix_functions/famix_object_creator";
 import { logger } from "../analyze";
 
 /**
  * This class is used to build a Famix model for the import clauses
  */
 export class ProcessImportClauses {
-
-    private famixFunctions: FamixFunctions; // FamixFunctions object, it contains all the functions needed to create Famix entities
-
-    /**
-     * Initializes the ProcessImportClauses object
-     * @param famixFunctions FamixFunctions object, it contains all the functions needed to create Famix entities
-     */
-    constructor(famixFunctions: FamixFunctions) {
-        this.famixFunctions = famixFunctions;
-    }
 
     /**
      * Builds a Famix model for the import clauses of the source files which are modules
@@ -37,7 +27,7 @@ export class ProcessImportClauses {
                             importFoundInExports = true;
                         }
                     });
-                    this.famixFunctions.createFamixImportClause({importDeclaration: impDecl,
+                    FamixFunctions.createFamixImportClause({importDeclaration: impDecl,
                         importer: module, 
                         moduleSpecifierFilePath: path, 
                         importElement: namedImport, 
@@ -49,7 +39,7 @@ export class ProcessImportClauses {
                 if (defaultImport !== undefined) {
                     logger.debug(`processImportClauses: Importing (default) ${defaultImport.getText()} from ${impDecl.getModuleSpecifierValue()}`);
                     // call with module, impDecl.getModuleSpecifierValue(), path, defaultImport, false, true
-                    this.famixFunctions.createFamixImportClause({importDeclaration: impDecl,
+                    FamixFunctions.createFamixImportClause({importDeclaration: impDecl,
                         importer: module,
                         moduleSpecifierFilePath: path,
                         importElement: defaultImport,
@@ -60,7 +50,7 @@ export class ProcessImportClauses {
                 const namespaceImport = impDecl.getNamespaceImport();
                 if (namespaceImport !== undefined) {
                     logger.debug(`processImportClauses: Importing (namespace) ${namespaceImport.getText()} from ${impDecl.getModuleSpecifierValue()}`);
-                    this.famixFunctions.createFamixImportClause({importDeclaration: impDecl,
+                    FamixFunctions.createFamixImportClause({importDeclaration: impDecl,
                         importer: module, 
                         moduleSpecifierFilePath: path, 
                         importElement: namespaceImport, 

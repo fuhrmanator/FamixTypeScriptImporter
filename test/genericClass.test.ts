@@ -3,9 +3,15 @@ import { Importer } from '../src/analyze';
 import { ParameterizableClass, ParameterType } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("genericClass.ts",
+project.createSourceFile("./src/genericClass.ts",
 `class MyClass<T> {}
 `);
 
@@ -38,7 +44,7 @@ describe('Tests for generic class', () => {
         }
     });
 
-    const theClass = fmxRep._getFamixClass("MyClass");
+    const theClass = fmxRep._getFamixClass("{genericClass.ts}.MyClass");
     it ("should not be an abstract class", () => {
         expect(theClass).toBeTruthy();
         if (theClass) expect(theClass.getIsAbstract()).toBe(false);

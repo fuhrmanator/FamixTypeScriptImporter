@@ -3,9 +3,15 @@ import { Importer } from '../src/analyze';
 import { Function as FamixFunctionEntity } from "../src/lib/famix/src/model/famix/function";
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("functionsInMethod.ts",
+project.createSourceFile("./src/functionsInMethod.ts",
 `class F {
     m() {
         function fct2() {
@@ -21,9 +27,9 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for functions in method', () => {
     
-    const theMethod = fmxRep._getFamixMethod("m");
-    const theFunction2 = fmxRep._getFamixFunction("fct2");
-    const theFunction3 = fmxRep._getFamixFunction("fct3");
+    const theMethod = fmxRep._getFamixMethod("{functionsInMethod.ts}.F.m");
+    const theFunction2 = fmxRep._getFamixFunction("{functionsInMethod.ts}.F.m.fct2");
+    const theFunction3 = fmxRep._getFamixFunction("{functionsInMethod.ts}.F.m.fct2.fct3");
 
     it("should have one method 'm' with a function 'fct2'", () => {
         expect(theMethod).toBeTruthy();

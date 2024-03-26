@@ -3,8 +3,14 @@ import { Importer } from '../src/analyze';
 import { Property, Method } from "../src/lib/famix/src/model/famix";
 
 const importer = new Importer();
-const project = new Project();
-project.createSourceFile("access.ts",
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
+project.createSourceFile("./src/access.ts",
 `class AccessClassForTesting {
     private privateAttribute;
     public publicAttribute;

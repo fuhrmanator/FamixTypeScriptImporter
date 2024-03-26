@@ -3,7 +3,13 @@ import { Importer } from '../src/analyze';
 import * as fs from 'fs';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./test_src"
+        }
+    }
+);
 
 // Note: metrics test is tricky because we must create the file on disk
 

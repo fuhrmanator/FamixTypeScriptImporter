@@ -1,21 +1,11 @@
 import { Identifier, ParameterDeclaration, VariableDeclaration, PropertyDeclaration, EnumMember } from "ts-morph";
-import { FamixFunctions } from "../famix_functions/famix_functions";
+import * as FamixFunctions from "../famix_functions/famix_object_creator";
 import { logger } from "../analyze";
 
 /**
  * This class is used to build a Famix model for the accesses
  */
 export class ProcessAccesses {
-
-    private famixFunctions: FamixFunctions; // FamixFunctions object, it contains all the functions needed to create Famix entities
-
-    /**
-     * Initializes the ProcessAccesses object
-     * @param famixFunctions FamixFunctions object, it contains all the functions needed to create Famix entities
-     */
-    constructor(famixFunctions: FamixFunctions) {
-        this.famixFunctions = famixFunctions;
-    }
 
     /**
      * Builds a Famix model for the accesses on the parameters, variables, properties and enum members of the source files
@@ -49,7 +39,7 @@ export class ProcessAccesses {
                 logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})'s first ancestor is a PropertyDeclaration. Skipping...`);
                 return;
             }
-            this.famixFunctions.createFamixAccess(n, id);
+            FamixFunctions.createFamixAccess(n, id);
             logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})`);
         } catch (error) {
             logger.error(`> WARNING: got exception ${error}. ScopeDeclaration invalid for ${n.getSymbol().getFullyQualifiedName()}. Continuing...`);

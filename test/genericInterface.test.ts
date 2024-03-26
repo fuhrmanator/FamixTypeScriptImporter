@@ -3,9 +3,15 @@ import { Importer } from '../src/analyze';
 import { ParameterizableInterface, ParameterType } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("genericInterface.ts",
+project.createSourceFile("./src/genericInterface.ts",
 `interface MyInterface<T> {
     myProperty;
     myMethod();

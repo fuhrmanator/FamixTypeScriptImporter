@@ -3,9 +3,15 @@ import { Importer } from "../src/analyze";
 import { SourceLanguage } from "../src/lib/famix/src/model/famix";
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("simple.ts",
+project.createSourceFile("./src/simple.ts",
     `let a: number = 1;`);
 const fmxRep = importer.famixRepFromProject(project);
 

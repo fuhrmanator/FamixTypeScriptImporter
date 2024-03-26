@@ -5,10 +5,16 @@ import { Invocation } from "../src/lib/famix/src/model/famix/invocation";
 import { Project } from 'ts-morph';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
 
-project.createSourceFile("invocation.ts",
+project.createSourceFile("./src/invocation.ts",
 `class A {
     public x(): void {}
 }
@@ -24,7 +30,7 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for invocation', () => {
 
-    const theMethod = fmxRep._getFamixMethod("x") as Method;
+    const theMethod = fmxRep._getFamixMethod("{invocation.ts}.A.x") as Method;
 
     it("should contain two class", () => {
         expect(fmxRep._getAllEntitiesWithType("Class").size).toBe(2);
@@ -76,7 +82,7 @@ describe('Tests for invocation', () => {
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
         expect((invocations[0] as Invocation).getSender()).toBeTruthy();
-        expect((invocations[0] as Invocation).getSender()).toBe(fmxRep._getFamixMethod("y"));
+        expect((invocations[0] as Invocation).getSender()).toBe(fmxRep._getFamixMethod("{invocation.ts}.B.y"));
     });
 
     it("should contain an invocation for x with a receiver 'A'", () => {
@@ -85,7 +91,7 @@ describe('Tests for invocation', () => {
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
         expect((invocations[0] as Invocation).getReceiver()).toBeTruthy();
-        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("A"));
+        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{invocation.ts}.A"));
     });
 
     it("should contain an invocation for x with a signature 'public x(): void'", () => {
