@@ -42,17 +42,7 @@ export class Importer {
         logger.debug(`famixRepFromPaths: paths: ${paths}`);
         this.project.addSourceFilesAtPaths(paths);
 
-        // get compiler options
-        const compilerOptions = this.project.getCompilerOptions();
-
-        // get baseUrl
-        const baseUrl = compilerOptions.baseUrl;
-
-        const path = require('path');
-    
-        const absoluteBaseUrl = path.resolve(baseUrl);
-
-        FamixFunctions.famixRep.setAbsolutePath(absoluteBaseUrl);
+        initFamixRep(this.project)
 
         this.processEntities(this.project);
 
@@ -110,7 +100,18 @@ export class Importer {
         //const sourceFileNames = project.getSourceFiles().map(f => f.getFilePath()) as Array<string>;
 
         //const famixRep = this.famixRepFromPaths(sourceFileNames);
+
+        initFamixRep(project)
         
+        this.processEntities(project);
+
+        return FamixFunctions.famixRep;
+    }
+
+}
+
+function initFamixRep(project :Project ): void {
+    
         // get compiler options
         const compilerOptions = project.getCompilerOptions();
 
@@ -122,10 +123,4 @@ export class Importer {
         const absoluteBaseUrl = path.resolve(baseUrl);
 
         FamixFunctions.famixRep.setAbsolutePath(path.normalize(absoluteBaseUrl));
-    
-        this.processEntities(project);
-
-        return FamixFunctions.famixRep;
-    }
-
 }
