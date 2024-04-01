@@ -112,11 +112,11 @@ export class FamixRepository {
   }
 
 
-/**
- * Gets a Famix variable by name
- * @param name A variable name
- * @returns The Famix variable corresponding to the name or undefined if it doesn't exist
- */
+  /**
+   * Gets a Famix variable by name
+   * @param name A variable name
+   * @returns The Famix variable corresponding to the name or undefined if it doesn't exist
+   */
   public _getFamixVariable(fullyQualifiedName: string): Variable | undefined {
     return Array.from(this.famixVariables.values()).find(v => v.getFullyQualifiedName() === fullyQualifiedName);
   }

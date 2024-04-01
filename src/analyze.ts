@@ -2,13 +2,9 @@ import { Project } from "ts-morph";
 import * as fs from 'fs';
 import { FamixRepository } from "./lib/famix/src/famix_repository";
 import * as FamixFunctions from "./famix_functions/famix_object_creator";
-import { ProcessFiles } from "./analyze_functions/processFiles";
-import { ProcessAccesses } from "./analyze_functions/processAccesses";
-import { ProcessInvocations } from "./analyze_functions/processInvocations";
-import { ProcessInheritances } from "./analyze_functions/processInheritances";
-import { ProcessImportClauses } from "./analyze_functions/processImportClauses";
-
+import path from "path";
 import { Logger } from "tslog";
+import * as processFunctions from "./analyze_functions/process_functions";
 
 export const logger = new Logger({ name: "ts2famix", minLevel: 3});
 export const config = { "expectGraphemes": false };
@@ -25,12 +21,7 @@ export class Importer {
             }
         }
     ); // The project containing the source files to analyze
-    private processFiles = new ProcessFiles(); // ProcessFiles object, it contains all the functions needed to process the source files
-    private processAccesses = new ProcessAccesses(); // ProcessAccesses object, it contains all the functions needed to process the accesses
-    private processInvocations = new ProcessInvocations(); // ProcessInvocations object, it contains all the functions needed to process the invocations
-    private processInheritances = new ProcessInheritances(); // ProcessInheritances object, it contains all the functions needed to process the inheritances
-    private processImportClauses = new ProcessImportClauses(); // ProcessImportClauses object, it contains all the functions needed to process the import clauses
-
+    
     /**
      * Main method
      * @param paths An array of paths to the source files to analyze
@@ -59,18 +50,18 @@ export class Importer {
     }
 
     private processEntities(project) {
-        this.processFiles.processFiles(project.getSourceFiles());
-        const accesses = this.processFiles.getAccesses();
-        const methodsAndFunctionsWithId = this.processFiles.getMethodsAndFunctionsWithId();
-        const classes = this.processFiles.getClasses();
-        const interfaces = this.processFiles.getInterfaces();
-        const modules = this.processFiles.getModules();
-        const exports = this.processFiles.getExports();
+        processFunctions.processFiles(project.getSourceFiles());
+        const accesses = processFunctions.accessMap;
+        const methodsAndFunctionsWithId = processFunctions.methodsAndFunctionsWithId;
+        const classes = processFunctions.classes;
+        const interfaces = processFunctions.interfaces;
+        const modules = processFunctions.modules;
+        const exports = processFunctions.exportedMap;
 
-        this.processImportClauses.processImportClauses(modules, exports);
-        this.processAccesses.processAccesses(accesses);
-        this.processInvocations.processInvocations(methodsAndFunctionsWithId);
-        this.processInheritances.processInheritances(classes, interfaces);
+        processFunctions.processImportClauses(modules, exports);
+        processFunctions.processAccesses(accesses);
+        processFunctions.processInvocations(methodsAndFunctionsWithId);
+        processFunctions.processInheritances(classes, interfaces);
     }
 
     /**
@@ -117,8 +108,6 @@ function initFamixRep(project :Project ): void {
 
         // get baseUrl
         const baseUrl = compilerOptions.baseUrl;
-
-        const path = require('path');
 
         const absoluteBaseUrl = path.resolve(baseUrl);
 
