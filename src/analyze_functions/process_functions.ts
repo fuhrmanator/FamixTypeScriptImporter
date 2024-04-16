@@ -2,8 +2,7 @@ import { ClassDeclaration, MethodDeclaration, VariableStatement, FunctionDeclara
 import * as Famix from "../lib/famix/src/model/famix";
 import { calculate } from "../lib/ts-complex/cyclomatic-service";
 import * as fs from 'fs';
-import { logger } from "../analyze";
-import * as FamixFunctions from "../famix_functions/famix_object_creator";
+import { logger , entityDictionary } from "../analyze";
 import * as Helpers from "./helpers_process";
 
 export const methodsAndFunctionsWithId = new Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression>(); // Maps the Famix method, constructor, getter, setter and function ids to their ts-morph method, constructor, getter, setter or function object
@@ -44,7 +43,7 @@ function processFile(f: SourceFile): void {
         exportedMap.push(f.getExportedDeclarations());
     }
 
-    const fmxFile = FamixFunctions.createOrGetFamixFile(f, isModule);
+    const fmxFile = entityDictionary.createOrGetFamixFile(f, isModule);
 
     logger.debug(`processFile: file: ${f.getBaseName()}, fqn = ${fmxFile.getFullyQualifiedName()}`);
 
@@ -71,7 +70,7 @@ function processFile(f: SourceFile): void {
  * @returns A Famix.Namespace representing the namespace
  */
 function processNamespace(m: ModuleDeclaration): Famix.Namespace {
-    const fmxNamespace = FamixFunctions.createOrGetFamixNamespace(m);
+    const fmxNamespace = entityDictionary.createOrGetFamixNamespace(m);
 
     logger.debug(`processNamespace: namespace: ${m.getName()}, (${m.getType().getText()}), ${fmxNamespace.getFullyQualifiedName()}`);
 
@@ -193,7 +192,7 @@ function processNamespaces(m: SourceFile | ModuleDeclaration, fmxScope: Famix.Sc
  * @returns A Famix.Alias representing the alias
  */
 function processAlias(a: TypeAliasDeclaration): Famix.Alias {
-    const fmxAlias = FamixFunctions.createFamixAlias(a);
+    const fmxAlias = entityDictionary.createFamixAlias(a);
 
     logger.debug(`Alias: ${a.getName()}, (${a.getType().getText()}), fqn = ${fmxAlias.getFullyQualifiedName()}`);
 
@@ -210,7 +209,7 @@ function processAlias(a: TypeAliasDeclaration): Famix.Alias {
 function processClass(c: ClassDeclaration): Famix.Class | Famix.ParameterizableClass {
     classes.push(c);
 
-    const fmxClass = FamixFunctions.createOrGetFamixClass(c);
+    const fmxClass = entityDictionary.createOrGetFamixClass(c);
 
     logger.debug(`Class: ${c.getName()}, (${c.getType().getText()}), fqn = ${fmxClass.getFullyQualifiedName()}`);
 
@@ -246,7 +245,7 @@ function processClass(c: ClassDeclaration): Famix.Class | Famix.ParameterizableC
 function processInterface(i: InterfaceDeclaration): Famix.Interface | Famix.ParameterizableInterface {
     interfaces.push(i);
 
-    const fmxInterface = FamixFunctions.createOrGetFamixInterface(i);
+    const fmxInterface = entityDictionary.createOrGetFamixInterface(i);
 
     logger.debug(`Interface: ${i.getName()}, (${i.getType().getText()}), fqn = ${fmxInterface.getFullyQualifiedName()}`);
 
@@ -285,7 +284,7 @@ function processStructuredType(c: ClassDeclaration | InterfaceDeclaration, fmxSc
  * @returns A Famix.Property representing the property
  */
 function processProperty(p: PropertyDeclaration | PropertySignature): Famix.Property {
-    const fmxProperty = FamixFunctions.createFamixProperty(p);
+    const fmxProperty = entityDictionary.createFamixProperty(p);
 
     logger.debug(`property: ${p.getName()}, (${p.getType().getText()}), fqn = ${fmxProperty.getFullyQualifiedName()}`);
     logger.debug(` ---> It's a Property${(p instanceof PropertySignature) ? "Signature" : "Declaration"}!`);
@@ -312,7 +311,7 @@ function processProperty(p: PropertyDeclaration | PropertySignature): Famix.Prop
      * @returns A Famix.Method or a Famix.Accessor representing the method or the accessor
      */
 function processMethod(m: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration): Famix.Method | Famix.Accessor {
-    const fmxMethod = FamixFunctions.createFamixMethod(m, currentCC);
+    const fmxMethod = entityDictionary.createFamixMethod(m, currentCC);
 
     logger.debug(`Method: ${!(m instanceof ConstructorDeclaration) ? m.getName() : "constructor"}, (${m.getType().getText()}), parent: ${(m.getParent() as ClassDeclaration | InterfaceDeclaration).getName()}, fqn = ${fmxMethod.getFullyQualifiedName()}`);
 
@@ -349,7 +348,7 @@ function processMethod(m: MethodDeclaration | ConstructorDeclaration | MethodSig
  * @returns A Famix.Function representing the function
  */
 function processFunction(f: FunctionDeclaration | FunctionExpression): Famix.Function {
-    const fmxFunction = FamixFunctions.createFamixFunction(f, currentCC);
+    const fmxFunction = entityDictionary.createFamixFunction(f, currentCC);
 
     logger.debug(`Function: ${(f.getName()) ? f.getName() : "anonymous"}, (${f.getType().getText()}), fqn = ${fmxFunction.getFullyQualifiedName()}`);
 
@@ -409,7 +408,7 @@ function processParameters(m: MethodDeclaration | ConstructorDeclaration | Metho
  * @returns A Famix.Parameter representing the parameter
  */
 function processParameter(p: ParameterDeclaration): Famix.Parameter {
-    const fmxParam = FamixFunctions.createFamixParameter(p);
+    const fmxParam = entityDictionary.createFamixParameter(p);
 
     logger.debug(`parameter: ${p.getName()}, (${p.getType().getText()}), fqn = ${fmxParam.getFullyQualifiedName()}`);
 
@@ -446,7 +445,7 @@ function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | Meth
  * @returns A Famix.TypeParameter representing the type parameter
  */
 function processTypeParameter(tp: TypeParameterDeclaration): Famix.ParameterType {
-    const fmxTypeParameter = FamixFunctions.createFamixParameterType(tp);
+    const fmxTypeParameter = entityDictionary.createFamixParameterType(tp);
 
     logger.debug(`type parameter: ${tp.getName()}, (${tp.getType().getText()}), fqn = ${fmxTypeParameter.getFullyQualifiedName()}`);
 
@@ -480,7 +479,7 @@ function processVariableStatement(v: VariableStatement): Array<Famix.Variable> {
  * @returns A Famix.Variable representing the variable
  */
 function processVariable(v: VariableDeclaration): Famix.Variable {
-    const fmxVar = FamixFunctions.createFamixVariable(v);
+    const fmxVar = entityDictionary.createFamixVariable(v);
 
     logger.debug(`variable: ${v.getName()}, (${v.getType().getText()}), ${v.getInitializer() ? "initializer: " + v.getInitializer().getText() : "initializer: "}, fqn = ${fmxVar.getFullyQualifiedName()}`);
 
@@ -498,7 +497,7 @@ function processVariable(v: VariableDeclaration): Famix.Variable {
  * @returns A Famix.Enum representing the enum
  */
 function processEnum(e: EnumDeclaration): Famix.Enum {
-    const fmxEnum = FamixFunctions.createFamixEnum(e);
+    const fmxEnum = entityDictionary.createFamixEnum(e);
 
     logger.debug(`enum: ${e.getName()}, (${e.getType().getText()}), fqn = ${fmxEnum.getFullyQualifiedName()}`);
 
@@ -518,7 +517,7 @@ function processEnum(e: EnumDeclaration): Famix.Enum {
  * @returns A Famix.EnumValue representing the enum member
  */
 function processEnumValue(v: EnumMember): Famix.EnumValue {
-    const fmxEnumValue = FamixFunctions.createFamixEnumValue(v);
+    const fmxEnumValue = entityDictionary.createFamixEnumValue(v);
 
     logger.debug(`enum value: ${v.getName()}, (${v.getType().getText()}), fqn = ${fmxEnumValue.getFullyQualifiedName()}`);
 
@@ -550,7 +549,7 @@ function processDecorators(e: ClassDeclaration | MethodDeclaration | GetAccessor
  * @returns A Famix.Decorator representing the decorator
  */
 function processDecorator(d: Decorator, e: ClassDeclaration | MethodDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | ParameterDeclaration | PropertyDeclaration): Famix.Decorator {
-    const fmxDec = FamixFunctions.createOrGetFamixDecorator(d, e);
+    const fmxDec = entityDictionary.createOrGetFamixDecorator(d, e);
 
     logger.debug(`decorator: ${d.getName()}, (${d.getType().getText()}), fqn = ${fmxDec.getFullyQualifiedName()}`);
 
@@ -587,7 +586,7 @@ function processComments(e: SourceFile | ModuleDeclaration | ClassDeclaration | 
 function processComment(c: CommentRange, fmxScope: Famix.NamedEntity): Famix.Comment {
     const isJSDoc = c.getText().startsWith("/**");
     logger.debug(`processComment: comment: ${c.getText()}, isJSDoc = ${isJSDoc}`);
-    const fmxComment = FamixFunctions.createFamixComment(c, fmxScope, isJSDoc);
+    const fmxComment = entityDictionary.createFamixComment(c, fmxScope, isJSDoc);
 
     return fmxComment;
 }
@@ -624,7 +623,7 @@ function processNodeForAccesses(n: Identifier, id: number): void {
             logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})'s first ancestor is a PropertyDeclaration. Skipping...`);
             return;
         }
-        FamixFunctions.createFamixAccess(n, id);
+        entityDictionary.createFamixAccess(n, id);
         logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})`);
     } catch (error) {
         logger.error(`> WARNING: got exception ${error}. ScopeDeclaration invalid for ${n.getSymbol().getFullyQualifiedName()}. Continuing...`);
@@ -651,7 +650,7 @@ export function processImportClauses(modules: Array<SourceFile>, exports: Array<
                         importFoundInExports = true;
                     }
                 });
-                FamixFunctions.createFamixImportClause({importDeclaration: impDecl,
+                entityDictionary.createFamixImportClause({importDeclaration: impDecl,
                     importer: module, 
                     moduleSpecifierFilePath: path, 
                     importElement: namedImport, 
@@ -663,7 +662,7 @@ export function processImportClauses(modules: Array<SourceFile>, exports: Array<
             if (defaultImport !== undefined) {
                 logger.debug(`processImportClauses: Importing (default) ${defaultImport.getText()} from ${impDecl.getModuleSpecifierValue()}`);
                 // call with module, impDecl.getModuleSpecifierValue(), path, defaultImport, false, true
-                FamixFunctions.createFamixImportClause({importDeclaration: impDecl,
+                entityDictionary.createFamixImportClause({importDeclaration: impDecl,
                     importer: module,
                     moduleSpecifierFilePath: path,
                     importElement: defaultImport,
@@ -674,13 +673,13 @@ export function processImportClauses(modules: Array<SourceFile>, exports: Array<
             const namespaceImport = impDecl.getNamespaceImport();
             if (namespaceImport !== undefined) {
                 logger.debug(`processImportClauses: Importing (namespace) ${namespaceImport.getText()} from ${impDecl.getModuleSpecifierValue()}`);
-                FamixFunctions.createFamixImportClause({importDeclaration: impDecl,
+                entityDictionary.createFamixImportClause({importDeclaration: impDecl,
                     importer: module, 
                     moduleSpecifierFilePath: path, 
                     importElement: namespaceImport, 
                     isInExports: false, 
                     isDefaultExport: false});
-                // famixFunctions.createFamixImportClause(module, impDecl.getModuleSpecifierValue(), path, namespaceImport, false, false);
+                // entityDictionary.createFamixImportClause(module, impDecl.getModuleSpecifierValue(), path, namespaceImport, false, false);
             }
         }); 
     });
@@ -697,7 +696,7 @@ export function processInheritances(classes: ClassDeclaration[], interfaces: Int
         logger.debug(`processInheritances: Checking class inheritance for ${cls.getName()}`);
         const extClass = cls.getBaseClass();
         if (extClass !== undefined) {
-            FamixFunctions.createFamixInheritance(cls, extClass);
+            entityDictionary.createFamixInheritance(cls, extClass);
             
             logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), extClass: ${extClass.getName()}, (${extClass.getType().getText()})`);
         }
@@ -705,7 +704,7 @@ export function processInheritances(classes: ClassDeclaration[], interfaces: Int
         logger.debug(`processInheritances: Checking interface inheritance for ${cls.getName()}`);
         const implementedInterfaces = Helpers.getImplementedOrExtendedInterfaces(interfaces, cls);
         implementedInterfaces.forEach(impInter => {
-            FamixFunctions.createFamixInheritance(cls, impInter);
+            entityDictionary.createFamixInheritance(cls, impInter);
 
             logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), impInter: ${(impInter instanceof InterfaceDeclaration) ? impInter.getName() : impInter.getExpression().getText()}, (${(impInter instanceof InterfaceDeclaration) ? impInter.getType().getText() : impInter.getExpression().getText()})`);
         });
@@ -715,7 +714,7 @@ export function processInheritances(classes: ClassDeclaration[], interfaces: Int
         logger.debug(`processInheritances: Checking interface inheritance for ${inter.getName()}`);
         const extendedInterfaces = Helpers.getImplementedOrExtendedInterfaces(interfaces, inter);
         extendedInterfaces.forEach(extInter => {
-            FamixFunctions.createFamixInheritance(inter, extInter);
+            entityDictionary.createFamixInheritance(inter, extInter);
 
             logger.debug(`processInheritances: inter: ${inter.getName()}, (${inter.getType().getText()}), extInter: ${(extInter instanceof InterfaceDeclaration) ? extInter.getName() : extInter.getExpression().getText()}, (${(extInter instanceof InterfaceDeclaration) ? extInter.getType().getText() : extInter.getExpression().getText()})`);
         });
@@ -747,7 +746,7 @@ export function processInvocations(methodsAndFunctionsWithId: Map<number, Method
  */
 function processNodeForInvocations(n: Identifier, m: MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression, id: number): void {
     try {
-        FamixFunctions.createFamixInvocation(n, m, id);
+        entityDictionary.createFamixInvocation(n, m, id);
 
         logger.debug(`node: node, (${n.getType().getText()})`);
     } catch (error) {

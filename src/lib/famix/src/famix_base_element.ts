@@ -1,12 +1,15 @@
 import { FamixJSONExporter } from "./famix_JSON_exporter";
-import { FamixRepository } from "./famix_repository";
+// import { FamixRepository } from "./famix_repository";
 
 export abstract class FamixBaseElement {
 
   public id: number;
 
-  constructor(repo: FamixRepository) {
-    repo.addElement(this);
+  // constructor(repo: FamixRepository) {
+  //   repo.addElement(this);
+  // }
+
+  constructor(){
   }
 
   public abstract getJSON(): string;

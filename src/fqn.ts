@@ -1,5 +1,5 @@
 import * as ts from "ts-morph";
-import * as FamixFunctions from "./famix_functions/famix_object_creator";
+import { entityDictionary } from "./analyze";
 import path from "path";
 
 /**
@@ -8,11 +8,11 @@ import path from "path";
  * @returns The fully qualified name of the node, or undefined if it doesn't have one
  */
 export function getFQN(node: ts.Node): string {
-    const absolutePathProject = FamixFunctions.famixRep.getAbsolutePath();
+    const absolutePathProject = entityDictionary.famixRep.getAbsolutePath();
     
     if (node instanceof ts.SourceFile) {
-        return FamixFunctions.convertToRelativePath(path.normalize(node.getFilePath()), 
-            absolutePathProject).replace(/\\/g, "/");
+        return entityDictionary.convertToRelativePath(path.normalize(node.getFilePath()), 
+            absolutePathProject).replace(/\\/sg, "/");
     }
 
     const symbol = node.getSymbol();
@@ -38,7 +38,7 @@ export function getFQN(node: ts.Node): string {
         const pathFromNodeModules = absolutePath.substring(positionNodeModules);
         pathInProject = pathFromNodeModules;
     } else {
-        pathInProject = FamixFunctions.convertToRelativePath(absolutePath, absolutePathProject).replace(/\\/g, "/");     
+        pathInProject = entityDictionary.convertToRelativePath(absolutePath, absolutePathProject).replace(/\\/g, "/");     
     }
 
     const qualifiedNameParts: Array<string> = [];

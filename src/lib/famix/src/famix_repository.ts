@@ -17,7 +17,7 @@ export class FamixRepository {
   private absolutePath: string = "";
 
   constructor() {
-    this.addElement(new SourceLanguage(this));  // add the source language entity (TypeScript)
+    this.addElement(new SourceLanguage());  // add the source language entity (TypeScript)
   }
 
   public getAbsolutePath() : string {

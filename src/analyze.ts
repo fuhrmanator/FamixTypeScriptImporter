@@ -1,13 +1,14 @@
 import { Project } from "ts-morph";
 import * as fs from 'fs';
 import { FamixRepository } from "./lib/famix/src/famix_repository";
-import * as FamixFunctions from "./famix_functions/famix_object_creator";
+import { EntityDictionary } from "./famix_functions/EntityDictionary";
 import path from "path";
 import { Logger } from "tslog";
 import * as processFunctions from "./analyze_functions/process_functions";
 
 export const logger = new Logger({ name: "ts2famix", minLevel: 3});
 export const config = { "expectGraphemes": false };
+export const entityDictionary = new EntityDictionary();
 
 /**
  * This class is used to build a Famix model from a TypeScript source code
@@ -37,7 +38,7 @@ export class Importer {
 
         this.processEntities(this.project);
 
-        const famixRep = FamixFunctions.famixRep;
+        const famixRep = entityDictionary.famixRep;
 //        }
 //        catch (error) {
             // logger.error(`> ERROR: got exception ${error}. Exiting...`);
@@ -96,7 +97,7 @@ export class Importer {
         
         this.processEntities(project);
 
-        return FamixFunctions.famixRep;
+        return entityDictionary.famixRep;
     }
 
 }
@@ -111,5 +112,5 @@ function initFamixRep(project :Project ): void {
 
         const absoluteBaseUrl = path.resolve(baseUrl);
 
-        FamixFunctions.famixRep.setAbsolutePath(path.normalize(absoluteBaseUrl));
+        entityDictionary.famixRep.setAbsolutePath(path.normalize(absoluteBaseUrl));
 }
