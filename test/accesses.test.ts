@@ -53,10 +53,7 @@ describe('Tests for accesses', () => {
 
     it("should contain one access to 'param'", () => {
         const theParam = Array.from(fmxRep._getAllEntitiesWithType("Parameter") as Set<Parameter>).find(v => v.getName() === "param");
-        console.log(theParam)
         const theAccess = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>).find(a => a.getVariable() === theParam && a.getAccessor() === theMethod);
-        console.log(theMethod)
-        console.log(theAccess)
         expect(theAccess).toBeTruthy();
         expect(theAccess?.getIsWrite()).toBe(undefined);
     });

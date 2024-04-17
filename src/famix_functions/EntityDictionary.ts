@@ -17,7 +17,8 @@ export class EntityDictionary {
     private fmxFileMap = new Map<string, Famix.ScriptEntity | Famix.Module>(); // Maps the source file names to their Famix model
     private fmxTypeMap = new Map<string, Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType>(); // Maps the type names to their Famix model
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
-
+    private fmxElementObjectMap = new Map<ImportDeclaration | SourceFile | ModuleDeclaration | ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | TypeParameterDeclaration | Identifier | Decorator | GetAccessorDeclaration | SetAccessorDeclaration | ImportSpecifier | CommentRange | EnumDeclaration | EnumMember | TypeAliasDeclaration | ExpressionWithTypeArguments,Famix.Entity>();
+            
     constructor() {
     }
 
@@ -30,6 +31,7 @@ export class EntityDictionary {
         logger.debug("making index file anchor for '" + sourceElement?.getText() + "' with famixElement " + famixElement.getJSON());
         const fmxIndexFileAnchor = new Famix.IndexedFileAnchor();
         fmxIndexFileAnchor.setElement(famixElement);
+        this.fmxElementObjectMap.set(sourceElement,famixElement);
 
         if (sourceElement !== null) {
             const absolutePathProject = this.famixRep.getAbsolutePath();
@@ -118,6 +120,7 @@ export class EntityDictionary {
      */
     public createOrGetFamixFile(f: SourceFile, isModule: boolean): Famix.ScriptEntity | Famix.Module {
         let fmxFile: Famix.ScriptEntity | Famix.Module;
+
         const fileName = f.getBaseName();
         const fullyQualifiedFilename = f.getFilePath();
         if (!this.fmxFileMap.has(fullyQualifiedFilename)) {
@@ -139,7 +142,8 @@ export class EntityDictionary {
         else {
             fmxFile = this.fmxFileMap.get(fullyQualifiedFilename);
         }
-        
+
+        this.fmxElementObjectMap.set(f,fmxFile);
         return fmxFile;
     }
 
@@ -164,7 +168,8 @@ export class EntityDictionary {
         else {
             fmxNamespace = this.fmxNamespaceMap.get(namespaceName);
         }
-        
+
+        this.fmxElementObjectMap.set(m,fmxNamespace);
         return fmxNamespace;
     }
 
@@ -195,6 +200,7 @@ export class EntityDictionary {
         else {
             fmxAlias = this.fmxAliasMap.get(aliasFullyQualifiedName);
         }
+        this.fmxElementObjectMap.set(a,fmxAlias);
 
         return fmxAlias;
     }
@@ -233,6 +239,8 @@ export class EntityDictionary {
             fmxClass = this.fmxClassMap.get(classFullyQualifiedName) as (Famix.Class | Famix.ParameterizableClass);
         }
 
+        this.fmxElementObjectMap.set(cls,fmxClass);
+
         return fmxClass;
     }
 
@@ -266,6 +274,7 @@ export class EntityDictionary {
             fmxInterface = this.fmxInterfaceMap.get(interName) as (Famix.Interface | Famix.ParameterizableInterface);
         }
 
+        this.fmxElementObjectMap.set(inter,fmxInterface);
         return fmxInterface;
     }
 
@@ -310,6 +319,8 @@ export class EntityDictionary {
         this.makeFamixIndexFileAnchor(property, fmxProperty);
 
         this.famixRep.addElement(fmxProperty)
+
+        this.fmxElementObjectMap.set(property,fmxProperty);
 
         return fmxProperty;
     }
@@ -403,6 +414,8 @@ export class EntityDictionary {
         }
         
         this.makeFamixIndexFileAnchor(method, fmxMethod);
+
+        this.fmxElementObjectMap.set(method,fmxMethod);
         
         return fmxMethod;
     }
@@ -444,6 +457,8 @@ export class EntityDictionary {
 
         this.famixRep.addElement(fmxFunction)
 
+        this.fmxElementObjectMap.set(func,fmxFunction);
+
         return fmxFunction;
     }
 
@@ -470,6 +485,8 @@ export class EntityDictionary {
 
         this.famixRep.addElement(fmxParam)
 
+        this.fmxElementObjectMap.set(param,fmxParam);
+
         return fmxParam;
     }
 
@@ -485,6 +502,8 @@ export class EntityDictionary {
         this.makeFamixIndexFileAnchor(tp, fmxParameterType);
 
         this.famixRep.addElement(fmxParameterType)
+
+        this.fmxElementObjectMap.set(tp,fmxParameterType);
 
         return fmxParameterType;
     }
@@ -512,6 +531,8 @@ export class EntityDictionary {
 
         this.famixRep.addElement(fmxVariable)
 
+        this.fmxElementObjectMap.set(variable,fmxVariable);
+
         return fmxVariable;
     }
 
@@ -527,6 +548,8 @@ export class EntityDictionary {
         this.makeFamixIndexFileAnchor(enumEntity, fmxEnum);
 
         this.famixRep.addElement(fmxEnum)
+
+        this.fmxElementObjectMap.set(enumEntity,fmxEnum);
 
         return fmxEnum;
     }
@@ -554,6 +577,8 @@ export class EntityDictionary {
 
         this.famixRep.addElement(fmxEnumValue)
 
+        this.fmxElementObjectMap.set(enumMember,fmxEnumValue);
+
         return fmxEnumValue;
     }
 
@@ -578,6 +603,8 @@ export class EntityDictionary {
 
         this.famixRep.addElement(fmxDecorator)
 
+        this.fmxElementObjectMap.set(decorator,fmxDecorator);
+
         return fmxDecorator;
     }
 
@@ -597,6 +624,8 @@ export class EntityDictionary {
         this.makeFamixIndexFileAnchor(comment, fmxComment);
 
         this.famixRep.addElement(fmxComment);
+
+        this.fmxElementObjectMap.set(comment,fmxComment);
 
         return fmxComment;
     }
@@ -662,6 +691,8 @@ export class EntityDictionary {
             fmxType = this.fmxTypeMap.get(typeName);
         }
 
+        this.fmxElementObjectMap.set(element,fmxType);
+
         return fmxType;
     }
 
@@ -684,6 +715,7 @@ export class EntityDictionary {
 
         this.famixRep.addElement(fmxAccess);
 
+        this.fmxElementObjectMap.set(node,fmxAccess);
     }
 
     /**
@@ -709,6 +741,8 @@ export class EntityDictionary {
         this.makeFamixIndexFileAnchor(node, fmxInvocation);
 
         this.famixRep.addElement(fmxInvocation);
+
+        this.fmxElementObjectMap.set(node,fmxInvocation);
     }
 
     /**
@@ -759,6 +793,8 @@ export class EntityDictionary {
                 this.fmxInterfaceMap.set(inhClassFullyQualifiedName, superClass);
             }
 
+            this.fmxElementObjectMap.set(inhClass,superClass);
+
             superClass.setName(inhClassName);
             superClass.setFullyQualifiedName(inhClassFullyQualifiedName);
             superClass.setIsStub(true);
@@ -774,6 +810,9 @@ export class EntityDictionary {
         this.makeFamixIndexFileAnchor(null, fmxInheritance);
 
         this.famixRep.addElement(fmxInheritance);
+
+        this.fmxElementObjectMap.set(null,fmxInheritance);
+
     }
 
     /**
@@ -847,6 +886,8 @@ export class EntityDictionary {
         fmxImporter.addOutgoingImport(fmxImportClause);
 
         this.famixRep.addElement(fmxImportClause);
+
+        this.fmxElementObjectMap.set(importDeclaration,fmxImportClause);
     }
 
     public convertToRelativePath(absolutePath: string, absolutePathProject: string) {

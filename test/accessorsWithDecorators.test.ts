@@ -90,8 +90,6 @@ describe('Tests for accessors with decorators', () => {
         expect(theMethod2?.getKind()).toBe("getter");
         const theAccess1 = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>).find(a => a.getVariable() === theProperty && a.getAccessor() === theMethod1);
         const theAccess2 = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>).find(a => a.getVariable() === theProperty && a.getAccessor() === theMethod2);
-        console.log(theAccess1);
-
         expect(theAccess1).toBeTruthy();
         expect(theAccess2).toBeTruthy();
     });
