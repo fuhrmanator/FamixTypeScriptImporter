@@ -75,7 +75,13 @@ const calculateFromSource = (ctx) => {
   return output;
 };
 
+var i = 0;
 export const calculate = (filePath) => {
+  if (i == 0){
+    console.log(filePath)
+    i = i+1
+  }
+  console.log("nour")
   if (!existsSync(filePath)) {
     throw new Error(`File "${filePath}" does not exists`);
   }

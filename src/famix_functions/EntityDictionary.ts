@@ -20,7 +20,8 @@ export class EntityDictionary {
     public fmxElementObjectMap = new Map<Famix.Entity,ImportDeclaration | SourceFile | ModuleDeclaration | ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | TypeParameterDeclaration | Identifier | Decorator | GetAccessorDeclaration | SetAccessorDeclaration | ImportSpecifier | CommentRange | EnumDeclaration | EnumMember | TypeAliasDeclaration | ExpressionWithTypeArguments>();
             
     constructor() {
-        this.famixRep.setFmxElementObjectMap(this.fmxElementObjectMap)
+        this.famixRep.setFmxElementObjectMap(this.fmxElementObjectMap);
+        
     }
 
     /**
@@ -333,6 +334,9 @@ export class EntityDictionary {
      * @returns The Famix model of the method or the accessor
      */
     public createFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: unknown): Famix.Method | Famix.Accessor {
+        if (method instanceof ConstructorDeclaration) {
+            console.log(currentCC)
+        }
         let fmxMethod: Famix.Method | Famix.Accessor;
         if (method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) {
             fmxMethod = new Famix.Accessor();

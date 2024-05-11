@@ -8,7 +8,7 @@ const project = new Project(
             baseUrl: "./src"
         }
     }
-)
+);
 
 project.createSourceFile("./src/famixMorphObject.ts",
 `
