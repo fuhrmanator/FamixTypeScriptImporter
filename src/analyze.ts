@@ -4,7 +4,7 @@ import { FamixRepository } from "./lib/famix/src/famix_repository";
 import path from "path";
 import { Logger } from "tslog";
 import * as processFunctions from "./analyze_functions/process_functions";
-import { EntityDictionary } from "./famix_functions/entityDictionary";
+import { EntityDictionary } from "./famix_functions/EntityDictionary";
 
 export const logger = new Logger({ name: "ts2famix", minLevel: 3});
 export const config = { "expectGraphemes": false };
