@@ -10,7 +10,7 @@ const project = new Project(
   }
 );
 
-const sourceFile = project.createSourceFile("./src/simple.ts",
+const sourceFile = project.createSourceFile("./src/entityDictionaryUnit.ts",
 `
 namespace MyNamespace {
     
