@@ -11,7 +11,7 @@ export const classes = new Array<ClassDeclaration>(); // Array of all the classe
 export const interfaces = new Array<InterfaceDeclaration>(); // Array of all the interfaces of the source files
 export const modules = new Array<SourceFile>(); // Array of all the source files which are modules
 export const exportedMap = new Array<ReadonlyMap<string, ExportedDeclarations[]>>(); // Array of all the exports
-export var currentCC: unknown; // Stores the cyclomatic complexity metrics for the current source file
+export let currentCC: unknown; // Stores the cyclomatic complexity metrics for the current source file
 
 /**
  * Builds a Famix model for an array of source files
