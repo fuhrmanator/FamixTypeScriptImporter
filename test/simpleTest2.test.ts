@@ -5,8 +5,14 @@ import { ScriptEntity } from '../src/lib/famix/src/model/famix/script_entity';
 import { Variable } from '../src/lib/famix/src/model/famix/variable';
 
 const importer = new Importer();
-const project = new Project();
-project.createSourceFile("simpleTest2.ts",
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
+project.createSourceFile("./src/simpleTest2.ts",
 `var a: number = 10;
     
 console.log(a);

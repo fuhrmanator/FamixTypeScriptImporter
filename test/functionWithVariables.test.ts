@@ -6,9 +6,15 @@ import { IndexedFileAnchor } from '../src/lib/famix/src/model/famix/indexed_file
 import { getCommentTextFromCommentViaAnchor } from './testUtils';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("functionWithVariables.ts",
+project.createSourceFile("./src/functionWithVariables.ts",
 `function fct(): number {
     // comment 1
     let i: number /*comment 2*/, j: number; // comment 3

@@ -6,8 +6,14 @@ import { Type } from '../src/lib/famix/src/model/famix/type';
 import { IndexedFileAnchor } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
-const project = new Project();
-project.createSourceFile("types.ts",
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
+project.createSourceFile("./src/types.ts",
 `const aString: string = "one";
 const aBoolean: boolean = false;
 const aNumber: number = 3;
@@ -68,7 +74,7 @@ describe('Tests for types', () => {
     });
 
     it("should contain a variable 'a' of type 'A'", () => {
-        const aVariable = fmxRep._getFamixVariable("a");
+        const aVariable = fmxRep._getFamixVariable("{types.ts}.a");
         expect(aVariable).toBeTruthy();
         expect(aVariable?.getDeclaredType()).toBeTruthy();
         expect(aVariable?.getDeclaredType()?.getName()).toBe("A");

@@ -5,9 +5,15 @@ import { Invocation } from "../src/lib/famix/src/model/famix/invocation";
 import { Project } from 'ts-morph';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("genericWithInvocation.ts",
+project.createSourceFile("./src/genericWithInvocation.ts",
 `class AA {
     public i<T> (j: T): void {}
 }
@@ -20,7 +26,7 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for generics', () => {
 
-    const theMethod = fmxRep._getFamixMethod("i") as Method;
+    const theMethod = fmxRep._getFamixMethod("{genericWithInvocation.ts}.AA.i") as Method;
 
     it("should parse generics", () => {
         expect(fmxRep).toBeTruthy();
@@ -61,7 +67,7 @@ describe('Tests for generics', () => {
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
         expect((invocations[0] as Invocation).getReceiver()).toBeTruthy();
-        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("AA"));
+        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{genericWithInvocation.ts}.AA"));
     });
 
     it("should contain an invocation for i with a signature 'public i<T> (j: T): void'", () => {

@@ -1,7 +1,7 @@
 import { Project } from "ts-morph";
 import * as fs from 'fs';
 import { FamixRepository } from "./lib/famix/src/famix_repository";
-import { FamixFunctions } from "./famix_functions/famix_functions";
+import * as FamixFunctions from "./famix_functions/famix_object_creator";
 import { ProcessFiles } from "./analyze_functions/processFiles";
 import { ProcessAccesses } from "./analyze_functions/processAccesses";
 import { ProcessInvocations } from "./analyze_functions/processInvocations";
@@ -9,6 +9,7 @@ import { ProcessInheritances } from "./analyze_functions/processInheritances";
 import { ProcessImportClauses } from "./analyze_functions/processImportClauses";
 
 import { Logger } from "tslog";
+import path from "path";
 
 export const logger = new Logger({ name: "ts2famix", minLevel: 3});
 export const config = { "expectGraphemes": false };
@@ -18,13 +19,18 @@ export const config = { "expectGraphemes": false };
  */
 export class Importer {
 
-    private project = new Project(); // The project containing the source files to analyze
-    private famixFunctions = new FamixFunctions(); // FamixFunctions object, it contains all the functions needed to create Famix entities
-    private processFiles = new ProcessFiles(this.famixFunctions); // ProcessFiles object, it contains all the functions needed to process the source files
-    private processAccesses = new ProcessAccesses(this.famixFunctions); // ProcessAccesses object, it contains all the functions needed to process the accesses
-    private processInvocations = new ProcessInvocations(this.famixFunctions); // ProcessInvocations object, it contains all the functions needed to process the invocations
-    private processInheritances = new ProcessInheritances(this.famixFunctions); // ProcessInheritances object, it contains all the functions needed to process the inheritances
-    private processImportClauses = new ProcessImportClauses(this.famixFunctions); // ProcessImportClauses object, it contains all the functions needed to process the import clauses
+    private project = new Project(
+        {
+            compilerOptions: {
+                baseUrl: "./test_src"
+            }
+        }
+    ); // The project containing the source files to analyze
+    private processFiles = new ProcessFiles(); // ProcessFiles object, it contains all the functions needed to process the source files
+    private processAccesses = new ProcessAccesses(); // ProcessAccesses object, it contains all the functions needed to process the accesses
+    private processInvocations = new ProcessInvocations(); // ProcessInvocations object, it contains all the functions needed to process the invocations
+    private processInheritances = new ProcessInheritances(); // ProcessInheritances object, it contains all the functions needed to process the inheritances
+    private processImportClauses = new ProcessImportClauses(); // ProcessImportClauses object, it contains all the functions needed to process the import clauses
 
     /**
      * Main method
@@ -36,9 +42,20 @@ export class Importer {
 //        try {
         logger.debug(`famixRepFromPaths: paths: ${paths}`);
         this.project.addSourceFilesAtPaths(paths);
+
+        // get compiler options
+        const compilerOptions = this.project.getCompilerOptions();
+
+        // get baseUrl
+        const baseUrl = compilerOptions.baseUrl;
+    
+        const absoluteBaseUrl = path.resolve(baseUrl);
+
+        FamixFunctions.famixRep.setAbsolutePath(absoluteBaseUrl);
+
         this.processEntities(this.project);
 
-        const famixRep = this.famixFunctions.getFamixRepository();
+        const famixRep = FamixFunctions.famixRep;
 //        }
 //        catch (error) {
             // logger.error(`> ERROR: got exception ${error}. Exiting...`);
@@ -93,9 +110,20 @@ export class Importer {
         //const sourceFileNames = project.getSourceFiles().map(f => f.getFilePath()) as Array<string>;
 
         //const famixRep = this.famixRepFromPaths(sourceFileNames);
+        
+        // get compiler options
+        const compilerOptions = project.getCompilerOptions();
+
+        // get baseUrl
+        const baseUrl = compilerOptions.baseUrl;
+
+        const absoluteBaseUrl = path.resolve(baseUrl);
+
+        FamixFunctions.famixRep.setAbsolutePath(path.normalize(absoluteBaseUrl));
+    
         this.processEntities(project);
 
-        return this.famixFunctions.getFamixRepository();
+        return FamixFunctions.famixRep;
     }
 
 }

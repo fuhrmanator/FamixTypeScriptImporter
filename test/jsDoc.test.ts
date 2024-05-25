@@ -6,9 +6,15 @@ import { get } from 'http';
 import { getCommentTextFromCommentViaAnchor } from './testUtils';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("jsDoc.ts",
+project.createSourceFile("./src/jsDoc.ts",
 `/**
  * Gets the name.
  * @param person - Person to get the name from.
@@ -25,7 +31,7 @@ describe('Tests for JS doc', () => {
         expect(fmxRep._getAllEntitiesWithType("Comment").size).toBe(1);
     });
 
-    const theFunction = fmxRep._getFamixFunction("getName");
+    const theFunction = fmxRep._getFamixFunction("{jsDoc.ts}.getName");
     const theJSDoc = Array.from(fmxRep._getAllEntitiesWithType("Comment") as Set<Comment>)[0];
 
     it("should have one comment for the function", () => {

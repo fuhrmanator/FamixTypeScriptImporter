@@ -37,6 +37,7 @@ if ((argv.input as string).endsWith('tsconfig.json')) {
         tsConfigFilePath
       }); 
     famixRep = importer.famixRepFromProject(project);
+
 } else {
     const paths = new Array<string>();
     paths.push(argv.input as string);

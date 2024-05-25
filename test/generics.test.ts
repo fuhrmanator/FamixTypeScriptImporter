@@ -3,9 +3,15 @@ import { Importer } from '../src/analyze';
 import { ParameterizableClass, ParameterizableInterface, ParameterType } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("generics.ts",
+project.createSourceFile("./src/generics.ts",
 `interface MyDaoInterface<T> {}
 
 class MyDao<T> implements MyDaoInterface<T> {}

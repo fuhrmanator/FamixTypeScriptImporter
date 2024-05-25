@@ -3,8 +3,14 @@ import { Importer } from '../src/analyze';
 import { Function as FamixFunctionEntity } from "../src/lib/famix/src/model/famix/function";
 
 const importer = new Importer();
-const project = new Project();
-project.createSourceFile("simpleFunction.ts",
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
+project.createSourceFile("./src/simpleFunction.ts",
 `function fct(): number {
     return 0;
 }

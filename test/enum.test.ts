@@ -8,9 +8,15 @@ import { getCommentTextFromCommentViaAnchor } from './testUtils';
 
 const importer = new Importer();
 logger.settings.minLevel = 0;   // see all messages in testing
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("enum.ts",
+project.createSourceFile("./src/enum.ts",
 `// comment before
 enum Weekday {
     // just another manic Monday

@@ -3,9 +3,15 @@ import { Importer } from '../src/analyze';
 import { Method } from "../src/lib/famix/src/model/famix/method";
 
 const importer = new Importer();
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
 
-project.createSourceFile("methods.ts",
+project.createSourceFile("./src/methods.ts",
 `class AAA {
     public method(): void {}
 }

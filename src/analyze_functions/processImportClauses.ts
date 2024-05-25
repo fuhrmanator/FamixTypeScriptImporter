@@ -1,5 +1,5 @@
 import { ImportDeclaration, SourceFile, ExportedDeclarations, Node } from "ts-morph";
-import { FamixFunctions } from "../famix_functions/famix_functions";
+import * as FamixFunctions from "../famix_functions/famix_object_creator";
 import { logger } from "../analyze";
 
 /**
@@ -7,27 +7,17 @@ import { logger } from "../analyze";
  */
 export class ProcessImportClauses {
 
-    private famixFunctions: FamixFunctions; // FamixFunctions object, it contains all the functions needed to create Famix entities
-
-    /**
-     * Initializes the ProcessImportClauses object
-     * @param famixFunctions FamixFunctions object, it contains all the functions needed to create Famix entities
-     */
-    constructor(famixFunctions: FamixFunctions) {
-        this.famixFunctions = famixFunctions;
-    }
-
     public processImportClausesForImportEqualsDeclarations(sourceFiles: Array<SourceFile>, exports: Array<ReadonlyMap<string, ExportedDeclarations[]>>): void {
         logger.info(`Creating import clauses from ImportEqualsDeclarations in source files:`);
         sourceFiles.forEach(sourceFile => {
             sourceFile.forEachDescendant(node => {
                 if (Node.isImportEqualsDeclaration(node)) {
                     // You've found an ImportEqualsDeclaration
-                    console.log("Declaration Name:", node.getName());
-                    console.log("Module Reference Text:", node.getModuleReference().getText());
+                    logger.info("Declaration Name:", node.getName());
+                    logger.info("Module Reference Text:", node.getModuleReference().getText());
                     // create a famix import clause
                     const namedImport = node.getNameNode();
-                    this.famixFunctions.createFamixImportClause({importDeclaration: node,
+                    FamixFunctions.createFamixImportClause({importDeclaration: node,
                         importer: sourceFile, 
                         moduleSpecifierFilePath: node.getModuleReference().getText(), 
                         importElement: namedImport, 
@@ -60,7 +50,7 @@ export class ProcessImportClauses {
                             importFoundInExports = true;
                         }
                     });
-                    this.famixFunctions.createFamixImportClause({importDeclaration: impDecl,
+                    FamixFunctions.createFamixImportClause({importDeclaration: impDecl,
                         importer: module, 
                         moduleSpecifierFilePath: path, 
                         importElement: namedImport, 
@@ -72,7 +62,7 @@ export class ProcessImportClauses {
                 if (defaultImport !== undefined) {
                     logger.debug(`Importing (default) ${defaultImport.getText()} from ${impDecl.getModuleSpecifierValue()}`);
                     // call with module, impDecl.getModuleSpecifierValue(), path, defaultImport, false, true
-                    this.famixFunctions.createFamixImportClause({importDeclaration: impDecl,
+                    FamixFunctions.createFamixImportClause({importDeclaration: impDecl,
                         importer: module,
                         moduleSpecifierFilePath: path,
                         importElement: defaultImport,
@@ -83,7 +73,7 @@ export class ProcessImportClauses {
                 const namespaceImport = impDecl.getNamespaceImport();
                 if (namespaceImport !== undefined) {
                     logger.debug(`Importing (namespace) ${namespaceImport.getText()} from ${impDecl.getModuleSpecifierValue()}`);
-                    this.famixFunctions.createFamixImportClause({importDeclaration: impDecl,
+                    FamixFunctions.createFamixImportClause({importDeclaration: impDecl,
                         importer: module, 
                         moduleSpecifierFilePath: path, 
                         importElement: namespaceImport, 

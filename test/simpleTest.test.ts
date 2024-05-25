@@ -3,8 +3,14 @@ import { Importer } from '../src/analyze';
 import { ScriptEntity } from '../src/lib/famix/src/model/famix/script_entity';
 
 const importer = new Importer();
-const project = new Project();
-project.createSourceFile("simpleTest.ts",
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
+project.createSourceFile("./src/simpleTest.ts",
 `console.log("Hello");
 `);
 

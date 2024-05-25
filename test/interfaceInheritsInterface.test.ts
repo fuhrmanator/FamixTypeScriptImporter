@@ -4,8 +4,14 @@ import { Project } from 'ts-morph';
 
 const importer = new Importer();
 
-const project = new Project();
-project.createSourceFile("interfaceInheritsInterface.ts",
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "./src"
+        }
+    }
+);
+project.createSourceFile("./src/interfaceInheritsInterface.ts",
 `interface MyInterface1 {}
 interface MyInterface2 extends MyInterface1 {}`);
 
