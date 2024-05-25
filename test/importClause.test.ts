@@ -1,6 +1,6 @@
 import { Project } from "ts-morph";
 import { Importer, logger } from "../src/analyze";
-import { Class, ImportClause, IndexedFileAnchor, Module, NamedEntity } from "../src/lib/famix/src/model/famix";
+import { Class, ImportClause, IndexedFileAnchor, Module, NamedEntity, StructuralEntity } from "../src/lib/famix/src/model/famix";
 import { getTextFromAnchor } from "./testUtils";
 
 const importer = new Importer();
@@ -8,7 +8,7 @@ logger.settings.minLevel = 0; // all your messages are belong to us
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./test_src"
+            baseUrl: "."
         }
     }
 );
@@ -47,10 +47,18 @@ project.createSourceFile("./test_src/reImporterModule.ts",
 project.createSourceFile("./test_src/renameDefaultExportImporter.ts",
     `import myRenamedDefaultClassW from "./complexExportModule.ts";`);
 
+project.createSourceFile("lazyRequireModuleCommonJS.ts",
+    `import foo = require('foo');
+
+    export function loadFoo() {
+        // This is lazy loading "foo" and using the original module *only* as a type annotation
+        var _foo: typeof foo = require('foo');
+        // Now use "_foo" as a variable instead of "foo".
+    }`); // see https://basarat.gitbook.io/typescript/project/modules/external-modules#use-case-lazy-loading
 
 const fmxRep = importer.famixRepFromProject(project);
-const NUMBER_OF_MODULES = 8,
-      NUMBER_OF_IMPORT_CLAUSES = 5;
+const NUMBER_OF_MODULES = 9,
+      NUMBER_OF_IMPORT_CLAUSES = 6;
 
 const importClauses = Array.from(fmxRep._getAllEntitiesWithType("ImportClause")) as Array<ImportClause>;
 const moduleList = Array.from(fmxRep._getAllEntitiesWithType('Module')) as Array<Module>;
@@ -116,7 +124,6 @@ describe('Tests for import clauses', () => {
 
     it("should have a default import clause for test", () => {
         expect(importClauses).toBeTruthy();
-        expect(importClauses.length).toBe(NUMBER_OF_IMPORT_CLAUSES);
         // find the import clause for ClassW
         const importClause = importClauses.find(e => e.getImportedEntity()?.getName() === 'test');
         expect(importClause).toBeTruthy();
@@ -127,7 +134,6 @@ describe('Tests for import clauses', () => {
 
     it("should contain an import clause for ExportedClass", () => {
         expect(importClauses).toBeTruthy();
-        expect(importClauses.length).toBe(NUMBER_OF_IMPORT_CLAUSES);
         const importClause = importClauses.find(e => e.getImportedEntity()?.getName() === 'test');
         expect(importClause).toBeTruthy();
         // importing entity is oneClassImporter.ts
@@ -162,4 +168,20 @@ describe('Tests for import clauses', () => {
         // expect the text from the file anchor to be ""
         expect(getTextFromAnchor(fileAnchor, project)).toBe(`import myRenamedDefaultClassW from "./complexExportModule.ts";`);
     });
+
+    it("should have an import clause for require('foo')", () => {
+        // find the import clause for foo
+        const importClause = importClauses.find(e => e.getImportedEntity()?.getName() === 'foo');
+        expect(importClause).toBeTruthy();
+        // importing entity is lazyRequireModuleCommonJS.ts
+        expect(importClause?.getImportingEntity()).toBeTruthy();
+        expect(importClause?.getImportingEntity()?.getName()).toBe("lazyRequireModuleCommonJS.ts");
+        const fileAnchor = importClause?.getSourceAnchor() as IndexedFileAnchor;
+        expect(getTextFromAnchor(fileAnchor, project)).toBe(`import foo = require('foo');`);
+        // expect the type of the importedEntity to be "StructuralEntity"
+        expect((importClause?.getImportedEntity().constructor.name)).toBe("StructuralEntity");
+        // expect the type of foo to be any
+        expect((importClause?.getImportedEntity() as StructuralEntity).getDeclaredType()?.getName()).toBe("any");
+    });
+
 });

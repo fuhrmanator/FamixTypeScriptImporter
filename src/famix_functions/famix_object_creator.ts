@@ -1,4 +1,4 @@
-import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration } from "ts-morph";
+import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration } from "ts-morph";
 import * as Famix from "../lib/famix/src/model/famix";
 import { logger, config } from "../analyze";
 import GraphemeSplitter from "grapheme-splitter";
@@ -23,7 +23,7 @@ const UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when
  * @param sourceElement A source element
  * @param famixElement The Famix model of the source element
  */
-export function makeFamixIndexFileAnchor(sourceElement: ImportDeclaration | SourceFile | ModuleDeclaration | ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | TypeParameterDeclaration | Identifier | Decorator | GetAccessorDeclaration | SetAccessorDeclaration | ImportSpecifier | CommentRange | EnumDeclaration | EnumMember | TypeAliasDeclaration | ExpressionWithTypeArguments, famixElement: Famix.SourcedEntity): void {
+export function makeFamixIndexFileAnchor(sourceElement: ImportDeclaration | ImportEqualsDeclaration | ImportEqualsDeclaration | SourceFile | ModuleDeclaration | ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | TypeParameterDeclaration | Identifier | Decorator | GetAccessorDeclaration | SetAccessorDeclaration | ImportSpecifier | CommentRange | EnumDeclaration | EnumMember | TypeAliasDeclaration | ExpressionWithTypeArguments, famixElement: Famix.SourcedEntity): void {
     logger.debug("making index file anchor for '" + sourceElement?.getText() + "' with famixElement " + famixElement.getJSON());
     const fmxIndexFileAnchor = new Famix.IndexedFileAnchor(famixRep);
     fmxIndexFileAnchor.setElement(famixElement);
@@ -573,13 +573,15 @@ export function createOrGetFamixType(typeName: string, element: TypeAliasDeclara
     let isPrimitiveType = false;
     let isParameterizedType = false;
 
-    logger.debug("Creating (or getting) type: '" + typeName + "' of element: " + element.getText() + " of kind: " + element.getKindName());
-
-    const typeAncestor = Helpers.findTypeAncestor(element);
-    const ancestorFullyQualifiedName = FQNFunctions.getFQN(typeAncestor);
-    const ancestor = famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
-    if (!ancestor) {
-        throw new Error(`Ancestor ${ancestorFullyQualifiedName} not found.`);
+    logger.debug("Creating (or getting) type: '" + typeName + "' of element: " + element?.getText() + " of kind: " + element?.getKindName());
+    let ancestor: Famix.ContainerEntity;
+    if (element !== undefined) {
+        const typeAncestor = Helpers.findTypeAncestor(element);
+        const ancestorFullyQualifiedName = FQNFunctions.getFQN(typeAncestor);
+        ancestor = famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
+        if (!ancestor) {
+            throw new Error(`Ancestor ${ancestorFullyQualifiedName} not found.`);
+        }
     }
 
     if (typeName === "number" || typeName === "string" || typeName === "boolean" || typeName === "bigint" || typeName === "symbol" || typeName === "undefined" || typeName === "null" || typeName === "any" || typeName === "unknown" || typeName === "never" || typeName === "void") {
@@ -736,12 +738,12 @@ export function createFamixInheritance(cls: ClassDeclaration | InterfaceDeclarat
  * @param isInExports A boolean indicating if the imported entity is in the exports
  * @param isDefaultExport A boolean indicating if the imported entity is a default export
  */
-export function createFamixImportClause(importClauseInfo: {importDeclaration?: ImportDeclaration, importer: SourceFile, moduleSpecifierFilePath: string, importElement: ImportSpecifier | Identifier, isInExports: boolean, isDefaultExport: boolean}): void {
+export function createFamixImportClause(importClauseInfo: {importDeclaration?: ImportDeclaration | ImportEqualsDeclaration, importer: SourceFile, moduleSpecifierFilePath: string, importElement: ImportSpecifier | Identifier, isInExports: boolean, isDefaultExport: boolean}): void {
     const {importDeclaration, importer, moduleSpecifierFilePath, importElement, isInExports, isDefaultExport} = importClauseInfo;
     logger.debug(`createFamixImportClause: Creating import clause:`);
     const fmxImportClause = new Famix.ImportClause(famixRep);
 
-    let importedEntity: Famix.NamedEntity;
+    let importedEntity: Famix.NamedEntity | Famix.StructuralEntity;
     let importedEntityName: string;
 
     const absolutePathProject = this.famixRep.getAbsolutePath();
@@ -751,7 +753,10 @@ export function createFamixImportClause(importClauseInfo: {importDeclaration?: I
     const pathInProject: string = convertToRelativePath(absolutePath, absolutePathProject).replace(/\\/g, "/");
 
     let pathName = "{" + pathInProject + "}.";
-    if (importElement instanceof ImportSpecifier) {
+
+    // Named imports, e.g. import { ClassW } from "./complexExportModule";
+    if (importDeclaration instanceof ImportDeclaration 
+        && importElement instanceof ImportSpecifier) { 
         importedEntityName = importElement.getName();
         pathName = pathName + importedEntityName;
         if (isInExports) {
@@ -767,14 +772,20 @@ export function createFamixImportClause(importClauseInfo: {importDeclaration?: I
             importedEntity.setFullyQualifiedName(pathName);
         }
     }
-    else {
+    // handle import equals declarations, e.g. import myModule = require("./complexExportModule");
+    // TypeScript can't determine the type of the imported module, so we create a Module entity
+    else if (importDeclaration instanceof ImportEqualsDeclaration) {
+        importedEntityName = importDeclaration?.getName();
+        pathName = pathName + importedEntityName;
+        importedEntity = new Famix.StructuralEntity(this.famixRep);
+        importedEntity.setName(importedEntityName);
+        makeFamixIndexFileAnchor(importElement, importedEntity);
+        importedEntity.setFullyQualifiedName(pathName);
+        const anyType = createOrGetFamixType('any', undefined);
+        (importedEntity as Famix.StructuralEntity).setDeclaredType(anyType);
+    } else {  // default imports, e.g. import ClassW from "./complexExportModule";  
         importedEntityName = importElement.getText();
-        if (isDefaultExport) {
-            pathName = pathName + "defaultExport";
-        }
-        else {
-            pathName = pathName + "namespaceExport";
-        }
+        pathName = pathName + (isDefaultExport ? "defaultExport" : "namespaceExport");
         importedEntity = new Famix.NamedEntity(famixRep);
         importedEntity.setName(importedEntityName);
         makeFamixIndexFileAnchor(importElement, importedEntity);
@@ -785,7 +796,11 @@ export function createFamixImportClause(importClauseInfo: {importDeclaration?: I
     const fmxImporter = famixRep.getFamixEntityByFullyQualifiedName(importerFullyQualifiedName) as Famix.Module;
     fmxImportClause.setImportingEntity(fmxImporter);
     fmxImportClause.setImportedEntity(importedEntity);
-    fmxImportClause.setModuleSpecifier(importDeclaration?.getModuleSpecifierValue() as string);
+    if (importDeclaration instanceof ImportEqualsDeclaration) {
+        fmxImportClause.setModuleSpecifier(importDeclaration?.getModuleReference().getText() as string);
+    } else {
+        fmxImportClause.setModuleSpecifier(importDeclaration?.getModuleSpecifierValue() as string);
+    }
 
     logger.debug(`createFamixImportClause: ${fmxImportClause.getImportedEntity()?.getName()} (of type ${
         Helpers.getSubTypeName(fmxImportClause.getImportedEntity())}) is imported by ${fmxImportClause.getImportingEntity()?.getName()}`);

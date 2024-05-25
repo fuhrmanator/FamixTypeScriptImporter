@@ -9,6 +9,7 @@ import { ProcessInheritances } from "./analyze_functions/processInheritances";
 import { ProcessImportClauses } from "./analyze_functions/processImportClauses";
 
 import { Logger } from "tslog";
+import path from "path";
 
 export const logger = new Logger({ name: "ts2famix", minLevel: 3});
 export const config = { "expectGraphemes": false };
@@ -47,8 +48,6 @@ export class Importer {
 
         // get baseUrl
         const baseUrl = compilerOptions.baseUrl;
-
-        const path = require('path');
     
         const absoluteBaseUrl = path.resolve(baseUrl);
 
@@ -77,7 +76,8 @@ export class Importer {
         const modules = this.processFiles.getModules();
         const exports = this.processFiles.getExports();
 
-        this.processImportClauses.processImportClauses(modules, exports);
+        this.processImportClauses.processImportClausesForImportEqualsDeclarations(project.getSourceFiles(), exports);
+        this.processImportClauses.processImportClausesForModules(modules, exports);
         this.processAccesses.processAccesses(accesses);
         this.processInvocations.processInvocations(methodsAndFunctionsWithId);
         this.processInheritances.processInheritances(classes, interfaces);
@@ -116,8 +116,6 @@ export class Importer {
 
         // get baseUrl
         const baseUrl = compilerOptions.baseUrl;
-
-        const path = require('path');
 
         const absoluteBaseUrl = path.resolve(baseUrl);
 
