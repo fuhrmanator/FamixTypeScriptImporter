@@ -5,7 +5,13 @@ import { getTextFromAnchor } from "./testUtils";
 
 const importer = new Importer();
 logger.settings.minLevel = 0; // all your messages are belong to us
-const project = new Project();
+const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: "."
+        }
+    }
+);
 
 project.createSourceFile("./test_src/oneClassExporter.ts",
     `export class ExportedClass {}`);
