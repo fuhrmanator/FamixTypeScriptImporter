@@ -1,6 +1,8 @@
 import { FamixBaseElement } from "./famix_base_element";
 import { Class, Interface, Namespace, Variable, Method, Function as FamixFunctionEntity, Type, NamedEntity, ScriptEntity, Module, SourceLanguage } from "./model/famix";
-
+// import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration } from "ts-morph";
+import * as Famix from "./model/famix";
+import { TSMorphObjectType } from "../../../famix_functions/EntityDictionary";
 /**
  * This class is used to store all Famix elements
  */
@@ -15,9 +17,18 @@ export class FamixRepository {
   private famixFiles = new Set<ScriptEntity | Module>(); // All Famix files
   private idCounter = 1; // Id counter
   private absolutePath: string = "";
+  private fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
 
   constructor() {
-    this.addElement(new SourceLanguage(this));  // add the source language entity (TypeScript)
+    this.addElement(new SourceLanguage());  // add the source language entity (TypeScript)
+  }
+
+  public setFmxElementObjectMap(fmxElementObjectMap: Map<Famix.Entity,TSMorphObjectType>){
+    this.fmxElementObjectMap = fmxElementObjectMap;
+  }
+
+  public getFmxElementObjectMap(){
+    return this.fmxElementObjectMap;
   }
 
   public getAbsolutePath() : string {
@@ -52,6 +63,8 @@ export class FamixRepository {
   export(arg0: { format: string; }) {
     if(arg0.format === "json") {
       return this.getJSON();
+    } else {
+      throw new Error("Unsupported format");
     }
   }
 
@@ -72,7 +85,7 @@ export class FamixRepository {
    * @returns All Famix entities of the given type
    */
   public _getAllEntitiesWithType(theType: string): Set<FamixBaseElement> {
-    return new Set(Array.from(this.elements.values()).filter(e => (e as any).constructor.name === theType));
+    return new Set(Array.from(this.elements.values()).filter(e => (e as FamixBaseElement).constructor.name === theType));
   }
 
   /**
@@ -112,11 +125,11 @@ export class FamixRepository {
   }
 
 
-/**
- * Gets a Famix variable by name
- * @param name A variable name
- * @returns The Famix variable corresponding to the name or undefined if it doesn't exist
- */
+  /**
+   * Gets a Famix variable by name
+   * @param name A variable name
+   * @returns The Famix variable corresponding to the name or undefined if it doesn't exist
+   */
   public _getFamixVariable(fullyQualifiedName: string): Variable | undefined {
     return Array.from(this.famixVariables.values()).find(v => v.getFullyQualifiedName() === fullyQualifiedName);
   }
@@ -181,7 +194,7 @@ export class FamixRepository {
    * @returns The map of Famix element ids and their Famix element from the JSON model
    */
   public _initMapFromModel(model: string): Map<number, unknown> {
-    const parsedModel: Array<any> = JSON.parse(model);
+    const parsedModel: Array<FamixBaseElement> = JSON.parse(model);
     const idToElementMap: Map<number, unknown> = new Map();
     parsedModel.forEach(element => {
         idToElementMap.set(element.id, element);
