@@ -14,8 +14,6 @@ export abstract class FamixBaseElement {
 
   public abstract getJSON(): string;
 
-  // @ts-ignore
-  // tslint:disable-next-line:no-empty
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public addPropertiesToExporter(exporter: FamixJSONExporter): void {}
 }

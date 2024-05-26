@@ -1,8 +1,8 @@
 import { FamixBaseElement } from "./famix_base_element";
 import { Class, Interface, Namespace, Variable, Method, Function as FamixFunctionEntity, Type, NamedEntity, ScriptEntity, Module, SourceLanguage } from "./model/famix";
-import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration } from "ts-morph";
+// import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration } from "ts-morph";
 import * as Famix from "./model/famix";
-
+import { TSMorphObjectType } from "../../../famix_functions/EntityDictionary";
 /**
  * This class is used to store all Famix elements
  */
@@ -17,13 +17,13 @@ export class FamixRepository {
   private famixFiles = new Set<ScriptEntity | Module>(); // All Famix files
   private idCounter = 1; // Id counter
   private absolutePath: string = "";
-  private fmxElementObjectMap = new Map<Famix.Entity,ImportDeclaration | ImportEqualsDeclaration | SourceFile | ModuleDeclaration | ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | TypeParameterDeclaration | Identifier | Decorator | GetAccessorDeclaration | SetAccessorDeclaration | ImportSpecifier | CommentRange | EnumDeclaration | EnumMember | TypeAliasDeclaration | ExpressionWithTypeArguments>();
+  private fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
 
   constructor() {
     this.addElement(new SourceLanguage());  // add the source language entity (TypeScript)
   }
 
-  public setFmxElementObjectMap(fmxElementObjectMap: Map<Famix.Entity,ImportDeclaration | ImportEqualsDeclaration | SourceFile | ModuleDeclaration | ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | TypeParameterDeclaration | Identifier | Decorator | GetAccessorDeclaration | SetAccessorDeclaration | ImportSpecifier | CommentRange | EnumDeclaration | EnumMember | TypeAliasDeclaration | ExpressionWithTypeArguments>){
+  public setFmxElementObjectMap(fmxElementObjectMap: Map<Famix.Entity,TSMorphObjectType>){
     this.fmxElementObjectMap = fmxElementObjectMap;
   }
 
