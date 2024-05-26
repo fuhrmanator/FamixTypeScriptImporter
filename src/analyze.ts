@@ -32,6 +32,7 @@ export class Importer {
 
 //        try {
         logger.debug(`famixRepFromPaths: paths: ${paths}`);
+
         this.project.addSourceFilesAtPaths(paths);
 
         initFamixRep(this.project);
@@ -51,7 +52,8 @@ export class Importer {
     }
 
     private processEntities(project) {
-        processFunctions.processFiles(project.getSourceFiles());
+        const onlyTypeScriptFiles = project.getSourceFiles().filter(f => f.getFilePath().endsWith('.ts'));
+        processFunctions.processFiles(onlyTypeScriptFiles);
         const accesses = processFunctions.accessMap;
         const methodsAndFunctionsWithId = processFunctions.methodsAndFunctionsWithId;
         const classes = processFunctions.classes;
