@@ -1,6 +1,6 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import { ParameterType, ParameterizableClass } from '../src/lib/famix/src/model/famix';
+import { ParameterizableClass } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project(
@@ -26,7 +26,7 @@ describe('Tests for concrete and generic parameter', () => {
         const classA = Array.from(fmxRep._getAllEntitiesWithType("ParameterizableClass") as Set<ParameterizableClass>).find(v => v.getName() === "ClassA");
         expect(classA).toBeTruthy();
         const param = classA?.getParameterTypes();
-        let firstParameter = param?.values().next().value;
+        const firstParameter = param?.values().next().value;
         expect(firstParameter?.getName()).toBe('V');
     });
 
