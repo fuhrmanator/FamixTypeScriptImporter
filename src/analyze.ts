@@ -1,10 +1,10 @@
 import { Project } from "ts-morph";
 import * as fs from 'fs';
 import { FamixRepository } from "./lib/famix/src/famix_repository";
-import path from "path";
 import { Logger } from "tslog";
 import * as processFunctions from "./analyze_functions/process_functions";
 import { EntityDictionary } from "./famix_functions/EntityDictionary";
+import path from "path";
 
 export const logger = new Logger({ name: "ts2famix", minLevel: 3});
 export const config = { "expectGraphemes": false };
@@ -34,7 +34,7 @@ export class Importer {
         logger.debug(`famixRepFromPaths: paths: ${paths}`);
         this.project.addSourceFilesAtPaths(paths);
 
-        initFamixRep(this.project)
+        initFamixRep(this.project);
 
         this.processEntities(this.project);
 
@@ -59,7 +59,8 @@ export class Importer {
         const modules = processFunctions.modules;
         const exports = processFunctions.exportedMap;
 
-        processFunctions.processImportClauses(modules, exports);
+        processFunctions.processImportClausesForImportEqualsDeclarations(project.getSourceFiles(), exports);
+        processFunctions.processImportClausesForModules(modules, exports);
         processFunctions.processAccesses(accesses);
         processFunctions.processInvocations(methodsAndFunctionsWithId);
         processFunctions.processInheritances(classes, interfaces);
@@ -93,7 +94,7 @@ export class Importer {
 
         //const famixRep = this.famixRepFromPaths(sourceFileNames);
 
-        initFamixRep(project)
+        initFamixRep(project);
         
         this.processEntities(project);
 
