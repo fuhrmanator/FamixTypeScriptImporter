@@ -142,7 +142,6 @@ test_src/*
 plantuml.jar
 doc-metamodel/*
 !doc-metamodel/skins.include.puml
-doc-uml/*
 
 # Models
 JSONModels/*
