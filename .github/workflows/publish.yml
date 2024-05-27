@@ -1,4 +1,4 @@
-name: Publish Documentation (github) and Package (npmjs)
+name: Publish Package (npmjs)
 
 on:
   release:
@@ -18,26 +18,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm run build
-
-      # Generate UML diagrams
-      - run: npm run uml
-      - name: Init new repo in doc-uml folder and commit generated documentation
-        run: |
-          cd doc-uml/
-          git init
-          git add -A
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git commit -m 'update doc'
-
-      - name: Force push committed files to destination documentation branch on GitHub
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          force: true
-          branch: v1/doc
-          # We have to push from the folder where files were generated.
-          directory: ./doc-uml
 
       # Publish to npm
       - run: npm publish --access=public
