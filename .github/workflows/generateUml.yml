@@ -26,7 +26,7 @@ jobs:
       run: npm install
 
     - name: Install tplant
-      run: npm install -g tplant@3.1.2
+      run: npm install -g tplant@3.1.0
 
     - name: Generate PlantUML class diagram from source
       run: tplant -i src/lib/famix/**/*.ts -o doc-metamodel/famix-typescript-model.puml
