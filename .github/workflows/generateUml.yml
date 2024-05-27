@@ -36,8 +36,14 @@ jobs:
       with:
         args: -v -config "doc-metamodel/skins.include.cfg" -tsvg doc-uml/famix-typescript-model.puml
 
-    - name: Upload UML diagrams as artifacts
+    - name: Upload PlantUML file
       uses: actions/upload-artifact@v4
       with:
-        name: doc-uml
-        path: doc-uml
+        name: famix-typescript-model.puml
+        path: doc-uml/famix-typescript-model.puml
+
+    - name: Upload SVG file
+      uses: actions/upload-artifact@v4
+      with:
+        name: famix-typescript-model.svg
+        path: doc-uml/famix-typescript-model.svg
