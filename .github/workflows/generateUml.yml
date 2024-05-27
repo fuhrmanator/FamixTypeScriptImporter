@@ -1,0 +1,43 @@
+name: Generate UML Diagrams
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+
+jobs:
+  generate-uml:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '16'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Install tplant
+      run: npm install -g tplant
+
+    - name: Generate PlantUML class diagram from source
+      run: tplant -i src/lib/famix/**/*.ts -o doc-metamodel/famix-typescript-model.puml
+
+    - name: Generate SVG Diagram from PlantUML
+      uses: Timmy/plantuml-action@v1
+      with:
+        args: -v -config "doc-metamodel/skins.include.puml" -tsvg doc-metamodel/
+
+    - name: Upload UML diagrams as artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: doc-uml
+        path: doc-uml
