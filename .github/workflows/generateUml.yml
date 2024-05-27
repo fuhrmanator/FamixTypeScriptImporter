@@ -34,7 +34,7 @@ jobs:
     - name: Generate SVG Diagram from PlantUML
       uses: Timmy/plantuml-action@v1
       with:
-        args: -v -config "doc-metamodel/skins.include.puml" -tsvg doc-metamodel/famix-typescript-model.puml
+        args: -v -config "doc-metamodel/skins.include.cfg" -tsvg doc-metamodel/famix-typescript-model.puml
 
     - name: Upload UML diagrams as artifacts
       uses: actions/upload-artifact@v3
