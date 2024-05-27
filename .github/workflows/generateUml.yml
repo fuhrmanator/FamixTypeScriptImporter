@@ -29,15 +29,15 @@ jobs:
       run: npm install -g tplant@3.1.0
 
     - name: Generate PlantUML class diagram from source
-      run: tplant -i src/lib/famix/**/*.ts -o doc-metamodel/famix-typescript-model.puml
+      run: tplant -i src/lib/famix/**/*.ts -o doc-uml/famix-typescript-model.puml
 
     - name: Generate SVG Diagram from PlantUML
       uses: Timmy/plantuml-action@v1
       with:
-        args: -v -config "doc-metamodel/skins.include.cfg" -tsvg doc-metamodel/famix-typescript-model.puml
+        args: -v -config "doc-metamodel/skins.include.cfg" -tsvg doc-uml/famix-typescript-model.puml
 
     - name: Upload UML diagrams as artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: doc-uml
         path: doc-uml
