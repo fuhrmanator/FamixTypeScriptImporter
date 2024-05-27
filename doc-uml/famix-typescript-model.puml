@@ -1,0 +1,559 @@
+@startuml
+class Entity extends FamixBaseElement {
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class SourceLanguage extends Entity {
+    -sourcedEntities: Set<SourcedEntity>
+    +name: string
+    +getSourcedEntities(): Set<SourcedEntity>
+    +addSourcedEntity(sourcedEntity: SourcedEntity): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Comment extends SourcedEntity {
+    -isJSDoc: boolean
+    +getIsJSDoc(): boolean
+    +setIsJSDoc(isJSDoc: boolean): void
+    -container: SourcedEntity
+    +getContainer(): SourcedEntity
+    +setContainer(container: SourcedEntity): void
+    -content: string
+    +getContent(): string
+    +setContent(content: string): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class SourceAnchor extends Entity {
+    -element: SourcedEntity
+    +getElement(): SourcedEntity
+    +setElement(element: SourcedEntity): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class SourcedEntity extends Entity {
+    -isStub: boolean
+    +getIsStub(): boolean
+    +setIsStub(isStub: boolean): void
+    -sourceAnchor: SourceAnchor
+    +getSourceAnchor(): SourceAnchor
+    +setSourceAnchor(sourceAnchor: SourceAnchor): void
+    -comments: Set<Comment>
+    +getComments(): Set<Comment>
+    +addComment(comment: Comment): void
+    -declaredSourceLanguage: SourceLanguage
+    +getDeclaredSourceLanguage(): SourceLanguage
+    +setDeclaredSourceLanguage(declaredSourceLanguage: SourceLanguage): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Association extends SourcedEntity {
+    -next: Association
+    +getNext(): Association
+    +setNext(next: Association): void
+    -previous: Association
+    +getPrevious(): Association
+    +setPrevious(previous: Association): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Namespace extends ScopingEntity {
+    -parentScope: ScopingEntity
+    +getParentScope(): ScopingEntity
+    +setParentScope(parentScope: ScopingEntity): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ScopingEntity extends ContainerEntity {
+    -childrenNamespaces: Set<Namespace>
+    +getNamespaces(): Set<Namespace>
+    +addNamespace(childNamespace: Namespace): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ScriptEntity extends ScopingEntity {
+    -numberOfLinesOfText: number
+    +getNumberOfLinesOfText(): number
+    +setNumberOfLinesOfText(numberOfLinesOfText: number): void
+    -numberOfCharacters: number
+    +getNumberOfCharacters(): number
+    +setNumberOfCharacters(numberOfCharacters: number): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Module extends ScriptEntity {
+    -outgoingImports: Set<ImportClause>
+    +getOutgoingImports(): Set<ImportClause>
+    +addOutgoingImport(importClause: ImportClause): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ImportClause extends Association {
+    -importingEntity: Module
+    +getImportingEntity(): Module
+    +setImportingEntity(importer: Module): void
+    -importedEntity: NamedEntity
+    +getImportedEntity(): NamedEntity
+    +setImportedEntity(importedEntity: NamedEntity): void
+    -moduleSpecifier: string
+    +getModuleSpecifier(): string
+    +setModuleSpecifier(moduleSpecifier: string): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Alias extends NamedEntity {
+    -parentEntity: NamedEntity
+    +getParentEntity(): NamedEntity
+    +setParentEntity(parentEntity: NamedEntity): void
+    -aliasedEntity: Type
+    +getAliasedEntity(): Type
+    +setAliasedEntity(aliasedEntity: Type): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Decorator extends NamedEntity {
+    -decoratorExpression: string
+    +getDecoratorExpression(): string
+    +setDecoratorExpression(decoratorExpression: string): void
+    -decoratedEntity: NamedEntity
+    +getDecoratedEntity(): NamedEntity
+    +setDecoratedEntity(decoratedEntity: NamedEntity): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class NamedEntity extends SourcedEntity {
+    -fullyQualifiedName: string
+    +getFullyQualifiedName(): string
+    +setFullyQualifiedName(fullyQualifiedName: string): void
+    -receivedInvocations: Set<Invocation>
+    +getReceivedInvocations(): Set<Invocation>
+    +addReceivedInvocation(receivedInvocation: Invocation): void
+    -incomingImports: Set<ImportClause>
+    +getIncomingImports(): Set<ImportClause>
+    +addIncomingImport(anImport: ImportClause): void
+    -name: string
+    +getName(): string
+    +setName(name: string): void
+    -aliases: Set<Alias>
+    +getAliases(): Set<Alias>
+    +addAlias(alias: Alias): void
+    -decorators: Set<Decorator>
+    +getDecorators(): Set<Decorator>
+    +addDecorator(decorator: Decorator): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Parameter extends StructuralEntity {
+    -parentEntity: BehavioralEntity
+    +getParentEntity(): BehavioralEntity
+    +setParentEntity(parentEntity: BehavioralEntity): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Property extends StructuralEntity {
+    -isClassSide: boolean
+    +getIsClassSide(): boolean
+    +setIsClassSide(isClassSide: boolean): void
+    -parentEntity: Class | Interface
+    +getParentEntity(): Class | Interface
+    +setParentEntity(parentEntity: Class | Interface): void
+    -modifiers: Set<string>
+    +getModifiers(): Set<string>
+    +addModifier(modifier: string): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Inheritance extends Association {
+    -superclass: Class | Interface
+    +getSuperclass(): Class | Interface
+    +setSuperclass(superclass: Class | Interface): void
+    -subclass: Class | Interface
+    +getSubclass(): Class | Interface
+    +setSubclass(subclass: Class | Interface): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Interface extends Type {
+    -properties: Set<Property>
+    +getProperties(): Set<Property>
+    +addProperty(property: Property): void
+    -methods: Set<Method>
+    +getMethods(): Set<Method>
+    +addMethod(method: Method): void
+    -superInheritances: Set<Inheritance>
+    +getSuperInheritances(): Set<Inheritance>
+    +addSuperInheritance(superInheritance: Inheritance): void
+    -subInheritances: Set<Inheritance>
+    +getSubInheritances(): Set<Inheritance>
+    +addSubInheritance(subInheritance: Inheritance): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Method extends BehavioralEntity {
+    -parentEntity: Class | Interface
+    +getParentEntity(): Class | Interface
+    +setParentEntity(parentEntity: Class | Interface): void
+    -kind: string
+    +getKind(): string
+    +setKind(kind: string): void
+    -isAbstract: boolean
+    +getIsAbstract(): boolean
+    +setIsAbstract(isAbstract: boolean): void
+    -isClassSide: boolean
+    +getIsClassSide(): boolean
+    +setIsClassSide(isClassSide: boolean): void
+    -isPrivate: boolean
+    +getIsPrivate(): boolean
+    +setIsPrivate(isPrivate: boolean): void
+    -isPublic: boolean
+    +getIsPublic(): boolean
+    +setIsPublic(isPublic: boolean): void
+    -isProtected: boolean
+    +getIsProtected(): boolean
+    +setIsProtected(isProtected: boolean): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Class extends Type {
+    -isAbstract: boolean
+    +getIsAbstract(): boolean
+    +setIsAbstract(isAbstract: boolean): void
+    -properties: Set<Property>
+    +getProperties(): Set<Property>
+    +addProperty(property: Property): void
+    -methods: Set<Method>
+    +getMethods(): Set<Method>
+    +addMethod(method: Method): void
+    -superInheritances: Set<Inheritance>
+    +getSuperInheritances(): Set<Inheritance>
+    +addSuperInheritance(superInheritance: Inheritance): void
+    -subInheritances: Set<Inheritance>
+    +getSubInheritances(): Set<Inheritance>
+    +addSubInheritance(subInheritance: Inheritance): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ParameterizableClass extends Class {
+    -parameterTypes: Set<ParameterType>
+    +getParameterTypes(): Set<ParameterType>
+    +addParameterType(parameterType: ParameterType): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ParameterizableInterface extends Interface {
+    -parameterTypes: Set<ParameterType>
+    +getParameterTypes(): Set<ParameterType>
+    +addParameterType(parameterType: ParameterType): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Function extends BehavioralEntity {
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Accessor extends Method {
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ParameterType extends Type {
+    -parentGeneric: Method | ParameterizableClass | ParameterizableInterface | Accessor | FamixFunction
+    +getParentGeneric(): Method | ParameterizableClass | ParameterizableInterface | Accessor | FamixFunction
+    +setParentGeneric(parentGeneric: Method | ParameterizableClass | ParameterizableInterface | Accessor | FamixFunction): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class BehavioralEntity extends ContainerEntity {
+    -isGeneric: boolean
+    +getIsGeneric(): boolean
+    +setIsGeneric(isGeneric: boolean): void
+    -signature: string
+    +getSignature(): string
+    +setSignature(signature: string): void
+    -parameters: Set<Parameter>
+    +getParameters(): Set<Parameter>
+    +addParameter(parameter: Parameter): void
+    -numberOfParameters: number
+    +getNumberOfParameters(): number
+    +setNumberOfParameters(numberOfParameters: number): void
+    -incomingInvocations: Set<Invocation>
+    +getIncomingInvocations(): Set<Invocation>
+    +addIncomingInvocation(incomingInvocation: Invocation): void
+    -declaredType: Type
+    +getDeclaredType(): Type
+    +setDeclaredType(declaredType: Type): void
+    -typeParameters: Set<ParameterType>
+    +getParameterTypes(): Set<ParameterType>
+    +addParameterType(typeParameter: ParameterType): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Invocation extends Association {
+    -candidates: Set<BehavioralEntity>
+    +getCandidates(): Set<BehavioralEntity>
+    +addCandidate(candidate: BehavioralEntity): void
+    -receiver: NamedEntity
+    +getReceiver(): NamedEntity
+    +setReceiver(receiver: NamedEntity): void
+    -sender: ContainerEntity
+    +getSender(): ContainerEntity
+    +setSender(sender: ContainerEntity): void
+    -signature: string
+    +getSignature(): string
+    +setSignature(signature: string): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Reference extends Association {
+    -source: ContainerEntity
+    +getSource(): ContainerEntity
+    +setSource(source: ContainerEntity): void
+    -target: Type
+    +getTarget(): Type
+    +setTarget(target: Type): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Variable extends StructuralEntity {
+    -parentContainerEntity: ContainerEntity
+    +getParentContainerEntity(): ContainerEntity
+    +setParentContainerEntity(parentContainerEntity: ContainerEntity): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ContainerEntity extends NamedEntity {
+    -parentContainerEntity: ContainerEntity
+    +getParentContainerEntity(): ContainerEntity
+    +setParentContainerEntity(parentContainerEntity: ContainerEntity): void
+    -childrenContainerEntities: Set<ContainerEntity>
+    +getChildrenContainerEntities(): Set<ContainerEntity>
+    +addChildContainerEntity(childContainerEntity: ContainerEntity): void
+    -cyclomaticComplexity: number
+    +getCyclomaticComplexity(): number
+    +setCyclomaticComplexity(cyclomaticComplexity: number): void
+    -numberOfStatements: number
+    +getNumberOfStatements(): number
+    +setNumberOfStatements(numberOfStatements: number): void
+    -outgoingReferences: Set<Reference>
+    +getOutgoingReferences(): Set<Reference>
+    +addOutgoingReference(outgoingReference: Reference): void
+    -numberOfLinesOfCode: number
+    +getNumberOfLinesOfCode(): number
+    +setNumberOfLinesOfCode(numberOfLinesOfCode: number): void
+    -outgoingInvocations: Set<Invocation>
+    +getOutgoingInvocations(): Set<Invocation>
+    +addOutgoingInvocation(outgoingInvocation: Invocation): void
+    -accesses: Set<Access>
+    +getAccesses(): Set<Access>
+    +addAccess(access: Access): void
+    -childrenTypes: Set<Type>
+    +getTypes(): Set<Type>
+    +addType(childType: Type): void
+    -childrenFunctions: Set<FamixFunctionEntity>
+    +getFunctions(): Set<FamixFunctionEntity>
+    +addFunction(childFunction: FamixFunctionEntity): void
+    -variables: Set<Variable>
+    +getVariables(): Set<Variable>
+    +addVariable(variable: Variable): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Type extends ContainerEntity {
+    -container: ContainerEntity
+    +getContainer(): ContainerEntity
+    +setContainer(container: ContainerEntity): void
+    -typeAliases: Set<Alias>
+    +getTypeAliases(): Set<Alias>
+    +addTypeAlias(typeAlias: Alias): void
+    -structuresWithDeclaredType: Set<StructuralEntity>
+    +getStructuresWithDeclaredType(): Set<StructuralEntity>
+    +addStructureWithDeclaredType(structureWithDeclaredType: StructuralEntity): void
+    -behavioralEntitiesWithDeclaredType: Set<BehavioralEntity>
+    +getBehavioralEntitiesWithDeclaredType(): Set<BehavioralEntity>
+    +addBehavioralEntityWithDeclaredType(behavioralEntityWithDeclaredType: BehavioralEntity): void
+    -incomingReferences: Set<Reference>
+    +getIncomingReferences(): Set<Reference>
+    +addIncomingReference(incomingReference: Reference): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class StructuralEntity extends NamedEntity {
+    -incomingAccesses: Set<Access>
+    +getIncomingAccesses(): Set<Access>
+    +addIncomingAccess(incomingAccess: Access): void
+    -declaredType: Type
+    +getDeclaredType(): Type
+    +setDeclaredType(declaredType: Type): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Access extends Association {
+    -accessor: ContainerEntity
+    +getAccessor(): ContainerEntity
+    +setAccessor(accessor: ContainerEntity): void
+    -variable: StructuralEntity
+    +getVariable(): StructuralEntity
+    +setVariable(variable: StructuralEntity): void
+    -isWrite: boolean
+    +getIsWrite(): boolean
+    +setIsWrite(isWrite: boolean): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Enum extends Type {
+    -values: Set<EnumValue>
+    +getValues(): Set<EnumValue>
+    +addValue(value: EnumValue): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class EnumValue extends StructuralEntity {
+    -parentEntity: Enum
+    +getParentEntity(): Enum
+    +setParentEntity(parentEntity: Enum): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ImplicitVariable extends Variable {
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class IndexedFileAnchor extends SourceAnchor {
+    -startPos: number
+    +getStartPos(): number
+    +setStartPos(startPos: number): void
+    -endPos: number
+    +getEndPos(): number
+    +setEndPos(endPos: number): void
+    -endLine: number
+    +getEndLine(): number
+    +setEndLine(sourceEndLine: number): void
+    -startLine: number
+    +getStartLine(): number
+    +setStartLine(sourceStartLine: number): void
+    -fileName: string
+    +getFileName(): string
+    +setFileName(fileName: string): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ParameterizedType extends Type {
+    -baseType: Type
+    +getBaseType(): Type
+    +setBaseType(baseType: Type): void
+    -arguments: Set<Type>
+    +getArguments(): Set<Type>
+    +addArgument(argument: Type): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class PrimitiveType extends Type {
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class TextAnchor extends SourceAnchor {
+    -startPos: number
+    +getStartPos(): number
+    +setStartPos(startPos: number): void
+    -endPos: number
+    +getEndPos(): number
+    +setEndPos(endPos: number): void
+    -fileName: string
+    +getFileName(): string
+    +setFileName(fileName: string): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+interface SearchParameters {
+    +searchArray: string[]
+    +targetArray: string[]
+    +start?: number
+}
+class EntityDictionary {
+    +famixRep: FamixRepository
+    -fmxAliasMap: Map<string, Famix.Alias>
+    -fmxClassMap: Map<string, Famix.Class | Famix.ParameterizableClass>
+    -fmxInterfaceMap: Map<string, Famix.Interface | Famix.ParameterizableInterface>
+    -fmxNamespaceMap: Map<string, Famix.Namespace>
+    -fmxFileMap: Map<string, Famix.Module | Famix.ScriptEntity>
+    -fmxTypeMap: Map<string, Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType>
+    -UNKNOWN_VALUE: string
+    +fmxElementObjectMap: Map<Famix.Entity, TSMorphObjectType>
+    +makeFamixIndexFileAnchor(sourceElement: TSMorphObjectType, famixElement: Famix.SourcedEntity): void
+    +createOrGetFamixFile(f: SourceFile, isModule: boolean): Famix.Module | Famix.ScriptEntity
+    +createOrGetFamixNamespace(m: ModuleDeclaration): Famix.Namespace
+    +createFamixAlias(a: TypeAliasDeclaration): Famix.Alias
+    +createOrGetFamixClass(cls: ClassDeclaration): Famix.Class | Famix.ParameterizableClass
+    +createOrGetFamixInterface(inter: InterfaceDeclaration): Famix.Interface | Famix.ParameterizableInterface
+    +createFamixProperty(property: PropertyDeclaration | PropertySignature): Famix.Property
+    +createFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: unknown): Famix.Method | Famix.Accessor
+    +createFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: unknown): Famix.Function
+    +createFamixParameter(param: ParameterDeclaration): Famix.Parameter
+    +createFamixParameterType(tp: TypeParameterDeclaration): Famix.ParameterType
+    +createFamixVariable(variable: VariableDeclaration): Famix.Variable
+    +createFamixEnum(enumEntity: EnumDeclaration): Famix.Enum
+    +createFamixEnumValue(enumMember: EnumMember): Famix.EnumValue
+    +createOrGetFamixDecorator(decorator: Decorator, decoratedEntity: ClassDeclaration | MethodDeclaration | ParameterDeclaration | PropertyDeclaration | GetAccessorDeclaration | SetAccessorDeclaration): Famix.Decorator
+    +createFamixComment(comment: CommentRange, fmxScope: Famix.NamedEntity, isJSDoc: boolean): Famix.Comment
+    +createOrGetFamixType(typeName: string, element: MethodDeclaration | ConstructorDeclaration | MethodSignature | FunctionDeclaration | ... 8 more ... | TypeAliasDeclaration): Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType
+    +createFamixAccess(node: Identifier, id: number): void
+    +createFamixInvocation(node: Identifier, m: MethodDeclaration | ConstructorDeclaration | FunctionDeclaration | FunctionExpression | GetAccessorDeclaration | SetAccessorDeclaration, id: number): void
+    +createFamixInheritance(cls: ClassDeclaration | InterfaceDeclaration, inhClass: ClassDeclaration | InterfaceDeclaration | ExpressionWithTypeArguments): void
+    +createFamixImportClause(importClauseInfo: { importDeclaration?: ImportDeclaration | ImportEqualsDeclaration; importer: SourceFile; moduleSpecifierFilePath: string; importElement: ImportSpecifier | Identifier; isInExports: boolean; isDefaultExport: boolean; }): void
+    +convertToRelativePath(absolutePath: string, absolutePathProject: string): string
+}
+class FamixRepository {
+    -elements: Set<FamixBaseElement>
+    -famixClasses: Set<Class>
+    -famixInterfaces: Set<Interface>
+    -famixNamespaces: Set<Namespace>
+    -famixMethods: Set<Method>
+    -famixVariables: Set<Variable>
+    -famixFunctions: Set<FamixFunctionEntity>
+    -famixFiles: Set<Module | ScriptEntity>
+    -idCounter: number
+    -absolutePath: string
+    -fmxElementObjectMap: Map<Famix.Entity, TSMorphObjectType>
+    +setFmxElementObjectMap(fmxElementObjectMap: Map<Famix.Entity, TSMorphObjectType>): void
+    +getFmxElementObjectMap(): Map<Famix.Entity, TSMorphObjectType>
+    +getAbsolutePath(): string
+    +setAbsolutePath(path: string): void
+    +getFamixEntityById(id: number): FamixBaseElement
+    +getFamixEntityByFullyQualifiedName(fullyQualifiedName: string): FamixBaseElement
+    +export(arg0: { format: string; }): string
+    +_getAllEntities(): Set<FamixBaseElement>
+    +_getAllEntitiesWithType(theType: string): Set<FamixBaseElement>
+    +_getFamixClass(fullyQualifiedName: string): Class
+    +_getFamixInterface(fullyQualifiedName: string): Interface
+    +_getFamixMethod(fullyQualifiedName: string): Method
+    +_getFamixFunction(fullyQualifiedName: string): FamixFunctionEntity
+    +_getFamixVariable(fullyQualifiedName: string): Variable
+    +_getFamixNamespace(fullyQualifiedName: string): Namespace
+    +_getFamixNamespaces(): Set<Namespace>
+    +_getFamixFile(fullyQualifiedName: string): Module | ScriptEntity
+    +_getFamixFiles(): Set<Module | ScriptEntity>
+    +_methodNamesAsSetFromClass(className: string): Set<string>
+    +_methodParentsAsSetFromClass(className: string): Set<Type>
+    +_initMapFromModel(model: string): Map<number, unknown>
+    +addElement(element: FamixBaseElement): void
+    +getJSON(): string
+}
+class Importer {
+    -project: Project
+    +famixRepFromPaths(paths: string[]): FamixRepository
+    -processEntities(project: any): void
+    +famixRepFromSource(filename: string, source: string): FamixRepository
+    +famixRepFromProject(project: Project): FamixRepository
+}
+abstract class FamixBaseElement {
+    +id: number
+    +{abstract} getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class FamixJSONExporter {
+    -element: FamixBaseElement
+    -bufferArray: any
+    -FamixPrefix: string
+    +addProperty(name: string, prop: unknown): void
+    +getJSON(): string
+}
+@enduml
