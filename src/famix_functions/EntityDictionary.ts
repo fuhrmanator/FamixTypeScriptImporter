@@ -13,8 +13,8 @@ export class EntityDictionary {
     
     public famixRep = new FamixRepository();
     private fmxAliasMap = new Map<string, Famix.Alias>(); // Maps the alias names to their Famix model
-    private fmxClassMap = new Map<string, Famix.Class | Famix.ParameterizableClass>(); // Maps the fully qualified class names to their Famix model
-    private fmxInterfaceMap = new Map<string, Famix.Interface | Famix.ParameterizableInterface>(); // Maps the interface names to their Famix model
+    private fmxClassMap = new Map<string, Famix.Class | Famix.ParametricClass>(); // Maps the fully qualified class names to their Famix model
+    private fmxInterfaceMap = new Map<string, Famix.Interface | Famix.ParametricInterface>(); // Maps the interface names to their Famix model
     private fmxNamespaceMap = new Map<string, Famix.Namespace>(); // Maps the namespace names to their Famix model
     private fmxFileMap = new Map<string, Famix.ScriptEntity | Famix.Module>(); // Maps the source file names to their Famix model
     private fmxTypeMap = new Map<string, Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType>(); // Maps the type names to their Famix model
@@ -214,15 +214,15 @@ export class EntityDictionary {
      * @param cls A class
      * @returns The Famix model of the class
      */
-    public createOrGetFamixClass(cls: ClassDeclaration): Famix.Class | Famix.ParameterizableClass {
-        let fmxClass: Famix.Class | Famix.ParameterizableClass;
+    public createOrGetFamixClass(cls: ClassDeclaration): Famix.Class | Famix.ParametricClass {
+        let fmxClass: Famix.Class | Famix.ParametricClass;
         const isAbstract = cls.isAbstract();
         const classFullyQualifiedName = FQNFunctions.getFQN(cls);
         const clsName = cls.getName();
         if (!this.fmxClassMap.has(classFullyQualifiedName)) {
             const isGeneric = cls.getTypeParameters().length;
             if (isGeneric) {
-                fmxClass = new Famix.ParameterizableClass();
+                fmxClass = new Famix.ParametricClass();
             }
             else {
                 fmxClass = new Famix.Class();
@@ -240,7 +240,7 @@ export class EntityDictionary {
 
         }
         else {
-            fmxClass = this.fmxClassMap.get(classFullyQualifiedName) as (Famix.Class | Famix.ParameterizableClass);
+            fmxClass = this.fmxClassMap.get(classFullyQualifiedName) as (Famix.Class | Famix.ParametricClass);
         }
 
         this.fmxElementObjectMap.set(fmxClass,cls);
@@ -253,14 +253,14 @@ export class EntityDictionary {
      * @param inter An interface
      * @returns The Famix model of the interface
      */
-    public createOrGetFamixInterface(inter: InterfaceDeclaration): Famix.Interface | Famix.ParameterizableInterface {
-        let fmxInterface: Famix.Interface | Famix.ParameterizableInterface;
+    public createOrGetFamixInterface(inter: InterfaceDeclaration): Famix.Interface | Famix.ParametricInterface {
+        let fmxInterface: Famix.Interface | Famix.ParametricInterface;
         const interName = inter.getName();
         const interFullyQualifiedName = FQNFunctions.getFQN(inter);
         if (!this.fmxInterfaceMap.has(interName)) {
             const isGeneric = inter.getTypeParameters().length;
             if (isGeneric) {
-                fmxInterface = new Famix.ParameterizableInterface();
+                fmxInterface = new Famix.ParametricInterface();
             }
             else {
                 fmxInterface = new Famix.Interface();
@@ -275,7 +275,7 @@ export class EntityDictionary {
             this.famixRep.addElement(fmxInterface);
         }
         else {
-            fmxInterface = this.fmxInterfaceMap.get(interName) as (Famix.Interface | Famix.ParameterizableInterface);
+            fmxInterface = this.fmxInterfaceMap.get(interName) as (Famix.Interface | Famix.ParametricInterface);
         }
 
         this.fmxElementObjectMap.set(fmxInterface,inter);
@@ -335,8 +335,10 @@ export class EntityDictionary {
      * @param currentCC The cyclomatic complexity metrics of the current source file
      * @returns The Famix model of the method or the accessor
      */
-    public createFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: unknown): Famix.Method | Famix.Accessor {
-        let fmxMethod: Famix.Method | Famix.Accessor;
+    public createFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: unknown): Famix.Method | Famix.Accessor | Famix.ParametricMethod {
+        let fmxMethod: Famix.Method | Famix.Accessor | Famix.ParametricMethod;
+        const isGeneric = method.getTypeParameters().length > 0;
+
         if (method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) {
             fmxMethod = new Famix.Accessor();
             const isGetter = method instanceof GetAccessorDeclaration;
@@ -346,12 +348,16 @@ export class EntityDictionary {
             this.famixRep.addElement(fmxMethod);
         }
         else {
-            fmxMethod = new Famix.Method();
+            if (isGeneric) {
+                fmxMethod = new Famix.ParametricMethod();
+            }
+            else {
+                fmxMethod = new Famix.Method();
+            }
             this.famixRep.addElement(fmxMethod);
         }
         const isConstructor = method instanceof ConstructorDeclaration;
         const isSignature = method instanceof MethodSignature;
-        const isGeneric = method.getTypeParameters().length > 0;
         fmxMethod.setIsGeneric(isGeneric);
 
         let isAbstract = false;
@@ -430,8 +436,18 @@ export class EntityDictionary {
      * @param currentCC The cyclomatic complexity metrics of the current source file
      * @returns The Famix model of the function
      */
-    public createFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: unknown): Famix.Function {
-        const fmxFunction = new Famix.Function();
+    public createFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: unknown): Famix.Function | Famix.ParametricFunction {
+        let fmxFunction: Famix.Function | Famix.ParametricFunction;
+
+        const isGeneric = func.getTypeParameters().length > 0;
+
+        if (isGeneric) {
+            fmxFunction = new Famix.ParametricFunction();
+        }
+        else {
+            fmxFunction = new Famix.Function();
+        }
+
         if (func.getName()) {
             fmxFunction.setName(func.getName());
         }
@@ -440,7 +456,6 @@ export class EntityDictionary {
         }
         fmxFunction.setSignature(Helpers.computeSignature(func.getText()));
         fmxFunction.setCyclomaticComplexity(currentCC[fmxFunction.getName()]);
-        const isGeneric = func.getTypeParameters().length > 0;
         fmxFunction.setIsGeneric(isGeneric);
 
         let functionTypeName = this.UNKNOWN_VALUE;

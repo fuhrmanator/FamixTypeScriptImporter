@@ -49,7 +49,7 @@ describe('EntityDictionary', () => {
   test('should get a class and add it to the map', () => {
     
     //Create a type class declaration   
-    const classe : Famix.Class | Famix.ParameterizableClass = entityDictionary.createOrGetFamixClass(classes[0]);
+    const classe : Famix.Class | Famix.ParametricClass = entityDictionary.createOrGetFamixClass(classes[0]);
     expect(classes[0]).toBe(entityDictionary.fmxElementObjectMap.get(classe));  
   
   });

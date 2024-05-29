@@ -263,9 +263,9 @@ function processAlias(a: TypeAliasDeclaration): Famix.Alias {
 /**
  * Builds a Famix model for a class
  * @param c A class
- * @returns A Famix.Class or a Famix.ParameterizableClass representing the class
+ * @returns A Famix.Class or a Famix.ParametricClass representing the class
  */
-function processClass(c: ClassDeclaration): Famix.Class | Famix.ParameterizableClass {
+function processClass(c: ClassDeclaration): Famix.Class | Famix.ParametricClass {
     classes.push(c);
 
     const fmxClass = entityDictionary.createOrGetFamixClass(c);
@@ -299,9 +299,9 @@ function processClass(c: ClassDeclaration): Famix.Class | Famix.ParameterizableC
 /**
  * Builds a Famix model for an interface
  * @param i An interface
- * @returns A Famix.Interface or a Famix.ParameterizableInterface representing the interface
+ * @returns A Famix.Interface or a Famix.ParametricInterface representing the interface
  */
-function processInterface(i: InterfaceDeclaration): Famix.Interface | Famix.ParameterizableInterface {
+function processInterface(i: InterfaceDeclaration): Famix.Interface | Famix.ParametricInterface {
     interfaces.push(i);
 
     const fmxInterface = entityDictionary.createOrGetFamixInterface(i);
@@ -320,9 +320,9 @@ function processInterface(i: InterfaceDeclaration): Famix.Interface | Famix.Para
  * @param c A structured type (a class or an interface)
  * @param fmxScope The Famix model of the structured type
  */
-function processStructuredType(c: ClassDeclaration | InterfaceDeclaration, fmxScope: Famix.Class | Famix.ParameterizableClass | Famix.Interface | Famix.ParameterizableInterface): void {
+function processStructuredType(c: ClassDeclaration | InterfaceDeclaration, fmxScope: Famix.Class | Famix.ParametricClass | Famix.Interface | Famix.ParametricInterface): void {
     logger.debug(`Finding Properties and Methods:`);
-    if (fmxScope instanceof Famix.ParameterizableClass || fmxScope instanceof Famix.ParameterizableInterface) {
+    if (fmxScope instanceof Famix.ParametricClass || fmxScope instanceof Famix.ParametricInterface) {
         processTypeParameters(c, fmxScope);
     }
 
@@ -490,7 +490,7 @@ function processParameter(p: ParameterDeclaration): Famix.Parameter {
  * @param e A class, an interface, a method or a function
  * @param fmxScope The Famix model of the class, the interface, the method or the function
  */
-function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression, fmxScope: Famix.ParameterizableClass | Famix.ParameterizableInterface | Famix.Method | Famix.Accessor | Famix.Function): void {
+function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression, fmxScope: Famix.ParametricClass | Famix.ParametricInterface | Famix.Method | Famix.Accessor | Famix.Function): void {
     logger.debug(`Finding Type Parameters:`);
     e.getTypeParameters().forEach(tp => {
         const fmxParam = processTypeParameter(tp);
@@ -593,7 +593,7 @@ function processEnumValue(v: EnumMember): Famix.EnumValue {
  * @param e A class, a method, a parameter or a property
  * @param fmxScope The Famix model of the class, the method, the parameter or the property
  */
-function processDecorators(e: ClassDeclaration | MethodDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | ParameterDeclaration | PropertyDeclaration, fmxScope: Famix.Class | Famix.ParameterizableClass | Famix.Method | Famix.Accessor | Famix.Parameter | Famix.Property): void {
+function processDecorators(e: ClassDeclaration | MethodDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | ParameterDeclaration | PropertyDeclaration, fmxScope: Famix.Class | Famix.ParametricClass | Famix.Method | Famix.Accessor | Famix.Parameter | Famix.Property): void {
     logger.debug(`Finding Decorators:`);
     e.getDecorators().forEach(dec => {
         const fmxDec = processDecorator(dec, e);

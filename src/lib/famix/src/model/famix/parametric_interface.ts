@@ -1,8 +1,8 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
-import { Class } from "./class";
+import { Interface } from "./interface";
 import { ParameterType } from "./parameter_type";
 
-export class ParameterizableClass extends Class {
+export class ParametricInterface extends Interface {
 
   private parameterTypes: Set<ParameterType> = new Set();
 
@@ -19,7 +19,7 @@ export class ParameterizableClass extends Class {
 
 
   public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("ParameterizableClass", this);
+    const json: FamixJSONExporter = new FamixJSONExporter("ParametricInterface", this);
     this.addPropertiesToExporter(json);
     return json.getJSON();
   }

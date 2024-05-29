@@ -1,8 +1,8 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 import { Class } from "../src/lib/famix/src/model/famix/class";
-import { Method } from "../src/lib/famix/src/model/famix/method";
 import { Parameter } from "../src/lib/famix/src/model/famix/parameter";
+import { ParametricMethod } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project(
@@ -59,7 +59,7 @@ describe('Tests for generics', () => {
     });
 
     it("should contain a public method i", () => {
-        const pList = Array.from(fmxRep._getAllEntitiesWithType("Method") as Set<Method>);
+        const pList = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod") as Set<ParametricMethod>);
         expect(pList).toBeTruthy();
         const i = pList.find(p => p.getName() === "i");
         expect(i).toBeTruthy();
