@@ -1,9 +1,9 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
-import { Association } from "./association";
+import { Entity } from "./entity";
 import { Module } from "./module";
 import { NamedEntity } from "./named_entity";
 
-export class ImportClause extends Association {
+export class ImportClause extends Entity {
 
   private importingEntity: Module;
 

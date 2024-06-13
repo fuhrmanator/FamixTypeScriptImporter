@@ -102,7 +102,7 @@ export class EntityDictionary {
                 fmxIndexFileAnchor.setEndLine(sourceLineEnd);    
             }
 
-            if (!(famixElement instanceof Famix.Association) && !(famixElement instanceof Famix.Comment) && !(sourceElement instanceof CommentRange) && !(sourceElement instanceof Identifier) && !(sourceElement instanceof ImportSpecifier) && !(sourceElement instanceof ExpressionWithTypeArguments)) {
+            if (!(famixElement instanceof Famix.ImportClause || famixElement instanceof Famix.Access || famixElement instanceof Famix.Reference || famixElement instanceof Famix.Invocation || famixElement instanceof Famix.Inheritance) && !(famixElement instanceof Famix.Comment) && !(sourceElement instanceof CommentRange) && !(sourceElement instanceof Identifier) && !(sourceElement instanceof ImportSpecifier) && !(sourceElement instanceof ExpressionWithTypeArguments)) {
                 (famixElement as Famix.NamedEntity).setFullyQualifiedName(FQNFunctions.getFQN(sourceElement));
             }
         } else {
@@ -732,7 +732,7 @@ export class EntityDictionary {
         fmxAccess.setAccessor(accessor);
         fmxAccess.setVariable(fmxVar);
 
-        this.makeFamixIndexFileAnchor(node, fmxAccess);
+        //this.makeFamixIndexFileAnchor(node, fmxAccess);
 
         this.famixRep.addElement(fmxAccess);
 
@@ -759,7 +759,7 @@ export class EntityDictionary {
         fmxInvocation.addCandidate(fmxMethodOrFunction);
         fmxInvocation.setSignature(fmxMethodOrFunction.getSignature());
 
-        this.makeFamixIndexFileAnchor(node, fmxInvocation);
+        //this.makeFamixIndexFileAnchor(node, fmxInvocation);
 
         this.famixRep.addElement(fmxInvocation);
 
@@ -828,7 +828,7 @@ export class EntityDictionary {
         fmxInheritance.setSubclass(subClass);
         fmxInheritance.setSuperclass(superClass);
 
-        this.makeFamixIndexFileAnchor(null, fmxInheritance);
+        //this.makeFamixIndexFileAnchor(null, fmxInheritance);
 
         this.famixRep.addElement(fmxInheritance);
 
@@ -915,7 +915,7 @@ export class EntityDictionary {
             Helpers.getSubTypeName(fmxImportClause.getImportedEntity())}) is imported by ${fmxImportClause.getImportingEntity()?.getName()}`);
 
         // make an index file anchor for the import clause
-        this.makeFamixIndexFileAnchor(importDeclaration, fmxImportClause);
+        //this.makeFamixIndexFileAnchor(importDeclaration, fmxImportClause);
 
         fmxImporter.addOutgoingImport(fmxImportClause);
 

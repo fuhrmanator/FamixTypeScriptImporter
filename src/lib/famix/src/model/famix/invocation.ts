@@ -1,10 +1,10 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { NamedEntity } from "./named_entity";
-import { Association } from "./association";
 import { BehavioralEntity } from "./behavioral_entity";
 import { ContainerEntity } from "./container_entity";
+import { Entity } from "./entity";
 
-export class Invocation extends Association {
+export class Invocation extends Entity {
 
   private candidates: Set<BehavioralEntity> = new Set();
 
