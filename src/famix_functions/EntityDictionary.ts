@@ -1,4 +1,4 @@
-import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration } from "ts-morph";
+import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration, SyntaxKind, Expression } from "ts-morph";
 import * as Famix from "../lib/famix/src/model/famix";
 import { logger, config } from "../analyze";
 import GraphemeSplitter from "grapheme-splitter";
@@ -22,8 +22,7 @@ export class EntityDictionary {
     public fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
             
     constructor() {
-        this.famixRep.setFmxElementObjectMap(this.fmxElementObjectMap);
-        
+        this.famixRep.setFmxElementObjectMap(this.fmxElementObjectMap);      
     }
 
     /**
@@ -219,8 +218,8 @@ export class EntityDictionary {
         const isAbstract = cls.isAbstract();
         const classFullyQualifiedName = FQNFunctions.getFQN(cls);
         const clsName = cls.getName();
+        const isGeneric = cls.getTypeParameters().length;
         if (!this.fmxClassMap.has(classFullyQualifiedName)) {
-            const isGeneric = cls.getTypeParameters().length;
             if (isGeneric) {
                 fmxClass = new Famix.ParametricClass();
             }
@@ -440,13 +439,16 @@ export class EntityDictionary {
         let fmxFunction: Famix.Function | Famix.ParametricFunction;
 
         const isGeneric = func.getTypeParameters().length > 0;
-
-        if (isGeneric) {
-            fmxFunction = new Famix.ParametricFunction();
-        }
-        else {
-            fmxFunction = new Famix.Function();
-        }
+       
+            if (isGeneric) {
+                console.log("-----")
+                fmxFunction = new Famix.ParametricFunction();
+            }
+            else {
+                console.log("-----")
+                fmxFunction = new Famix.Function();
+            }
+        
 
         if (func.getName()) {
             fmxFunction.setName(func.getName());
@@ -534,24 +536,24 @@ export class EntityDictionary {
      */
     public createFamixVariable(variable: VariableDeclaration): Famix.Variable {
         const fmxVariable = new Famix.Variable();
-
+    
         let variableTypeName = this.UNKNOWN_VALUE;
         try {
             variableTypeName = variable.getType().getText().trim();
         } catch (error) {
             logger.error(`> WARNING: got exception ${error}. Failed to get usable name for variable: ${variable.getName()}. Continuing...`);
         }
-
+    
         const fmxType = this.createOrGetFamixType(variableTypeName, variable);
         fmxVariable.setDeclaredType(fmxType);
         fmxVariable.setName(variable.getName());
-
+    
         this.makeFamixIndexFileAnchor(variable, fmxVariable);
-
+    
         this.famixRep.addElement(fmxVariable);
-
+    
         this.fmxElementObjectMap.set(fmxVariable,variable);
-
+    
         return fmxVariable;
     }
 
@@ -732,8 +734,6 @@ export class EntityDictionary {
         fmxAccess.setAccessor(accessor);
         fmxAccess.setVariable(fmxVar);
 
-        //this.makeFamixIndexFileAnchor(node, fmxAccess);
-
         this.famixRep.addElement(fmxAccess);
 
         this.fmxElementObjectMap.set(fmxAccess,node);
@@ -758,8 +758,6 @@ export class EntityDictionary {
         fmxInvocation.setReceiver(receiver);
         fmxInvocation.addCandidate(fmxMethodOrFunction);
         fmxInvocation.setSignature(fmxMethodOrFunction.getSignature());
-
-        //this.makeFamixIndexFileAnchor(node, fmxInvocation);
 
         this.famixRep.addElement(fmxInvocation);
 
@@ -827,8 +825,6 @@ export class EntityDictionary {
 
         fmxInheritance.setSubclass(subClass);
         fmxInheritance.setSuperclass(superClass);
-
-        //this.makeFamixIndexFileAnchor(null, fmxInheritance);
 
         this.famixRep.addElement(fmxInheritance);
 
@@ -914,9 +910,6 @@ export class EntityDictionary {
         logger.debug(`createFamixImportClause: ${fmxImportClause.getImportedEntity()?.getName()} (of type ${
             Helpers.getSubTypeName(fmxImportClause.getImportedEntity())}) is imported by ${fmxImportClause.getImportingEntity()?.getName()}`);
 
-        // make an index file anchor for the import clause
-        //this.makeFamixIndexFileAnchor(importDeclaration, fmxImportClause);
-
         fmxImporter.addOutgoingImport(fmxImportClause);
 
         this.famixRep.addElement(fmxImportClause);
@@ -924,7 +917,68 @@ export class EntityDictionary {
         this.fmxElementObjectMap.set(fmxImportClause,importDeclaration);
     }
 
+    /**
+     * Creates a Famix Arrow Function
+     * @param arrowExpression An Expression
+     * @returns The Famix model of the variable
+     */
+    public createFamixArrowFunction(arrowExpression: Expression ,currentCC: unknown): Famix.ArrowFunction | Famix.ParametricArrowFunction {
+        
+        let fmxArrowFunction: Famix.ArrowFunction | Famix.ParametricArrowFunction;
+
+        const arrowFunction = arrowExpression.asKindOrThrow(SyntaxKind.ArrowFunction);
+
+        const isGeneric = arrowFunction.getTypeParameters().length > 0;
+
+        if (isGeneric) {
+            fmxArrowFunction = new Famix.ParametricArrowFunction();
+        }
+        else {
+            fmxArrowFunction = new Famix.ArrowFunction();
+        }
+
+        // Get the parent of the arrow function (the variable declaration)
+        const parent = arrowFunction.getParentIfKindOrThrow(SyntaxKind.VariableDeclaration);
+
+        // Get the name of the variable
+        const functionName = parent.getName();
+
+        if (functionName) {
+            fmxArrowFunction.setName(functionName);
+        }
+        else {
+            fmxArrowFunction.setName("anonymous");
+        }
+
+        fmxArrowFunction.setSignature(Helpers.computeSignature(arrowFunction.getBodyText()));
+        fmxArrowFunction.setCyclomaticComplexity(currentCC[fmxArrowFunction.getName()]);
+        fmxArrowFunction.setIsGeneric(isGeneric);
+
+        let functionTypeName = this.UNKNOWN_VALUE;
+        try {
+            functionTypeName = arrowFunction.getReturnType().getText().trim();
+            console.log(functionTypeName)
+        } catch (error) {
+            logger.error(`> WARNING: got exception ${error}. Failed to get usable name for return type of function: ${functionName}. Continuing...`);
+        }
+
+        const fmxType = this.createOrGetFamixType(functionTypeName, arrowFunction as unknown as FunctionDeclaration);
+        fmxArrowFunction.setDeclaredType(fmxType);
+        fmxArrowFunction.setNumberOfLinesOfCode(arrowFunction.getEndLineNumber() - arrowFunction.getStartLineNumber());
+        const parameters = arrowFunction.getParameters();
+        fmxArrowFunction.setNumberOfParameters(parameters.length);
+        fmxArrowFunction.setNumberOfStatements(arrowFunction.getStatements().length);
+
+        this.makeFamixIndexFileAnchor(arrowExpression as unknown as TSMorphObjectType, fmxArrowFunction);
+        this.famixRep.addElement(fmxArrowFunction);
+        this.fmxElementObjectMap.set(fmxArrowFunction,arrowFunction as unknown as TSMorphObjectType);
+
+        console.log(fmxArrowFunction)
+        return fmxArrowFunction;
+    }
+
     public convertToRelativePath(absolutePath: string, absolutePathProject: string) {
         return absolutePath.replace(absolutePathProject, "").slice(1);
     }
+
 }

@@ -47,7 +47,7 @@ describe('Tests for generics', () => {
         const cList = Array.from(fmxRep._getAllEntitiesWithType("Class") as Set<Class>);
         expect(cList).toBeTruthy();
         const AA = cList.find(c => c.getName() === "AA");
-        const mList = Array.from(AA?.getMethods() as Set<Method>);
+        const mList = Array.from(AA?.getMethods() as Set<ParametricMethod>);
         const i = mList?.find(m => m.getName() === "i");
         expect(i).toBeTruthy();
         expect(i?.getDeclaredType().getName()).toBe("void");

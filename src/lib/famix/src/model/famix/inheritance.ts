@@ -27,7 +27,6 @@ export class Inheritance extends Entity {
     subclass.addSuperInheritance(this);
   }
 
-
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("Inheritance", this);
     this.addPropertiesToExporter(json);

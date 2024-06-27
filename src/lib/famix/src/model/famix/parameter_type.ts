@@ -7,16 +7,18 @@ import { Function as FamixFunction } from "./function";
 import { Accessor } from "./accessor";
 import { ParametricMethod } from "./parametric_method";
 import { ParametricFunction } from "./parametric_function";
+import { ArrowFunction } from "./arrowFunction";
+import { ParametricArrowFunction } from "./parametricArrowFunction";
 
 export class ParameterType extends Type {
 
-  private parentGeneric: ParametricClass | ParametricInterface | Method | ParametricMethod | Accessor | FamixFunction | ParametricFunction;
+  private parentGeneric: ParametricClass | ParametricInterface | Method | ParametricMethod | Accessor | FamixFunction | ParametricFunction | ArrowFunction | ParametricArrowFunction;
 
-  public getParentGeneric(): ParametricClass | ParametricInterface | Method | ParametricMethod | Accessor | FamixFunction | ParametricFunction {
+  public getParentGeneric(): ParametricClass | ParametricInterface | Method | ParametricMethod | Accessor | FamixFunction | ParametricFunction | ArrowFunction | ParametricArrowFunction {
     return this.parentGeneric;
   }
 
-  public setParentGeneric(parentGeneric: ParametricClass | ParametricInterface | Method | ParametricMethod | Accessor | FamixFunction | ParametricFunction): void {
+  public setParentGeneric(parentGeneric: ParametricClass | ParametricInterface | Method | ParametricMethod | Accessor | FamixFunction | ParametricFunction | ArrowFunction | ParametricArrowFunction): void {
     this.parentGeneric = parentGeneric;
     parentGeneric.addParameterType(this);
   }

@@ -1,8 +1,8 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
-import { Class } from "./class";
+import { ArrowFunction } from "./arrowFunction";
 import { ParameterType } from "./parameter_type";
 
-export class ParametricClass extends Class {
+export class ParametricArrowFunction extends ArrowFunction {
 
   private parameterTypes: Set<ParameterType> = new Set();
 
@@ -18,7 +18,7 @@ export class ParametricClass extends Class {
   }
 
   public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("ParametricClass", this);
+    const json: FamixJSONExporter = new FamixJSONExporter("ParametricArrowFunction", this);
     this.addPropertiesToExporter(json);
     return json.getJSON();
   }

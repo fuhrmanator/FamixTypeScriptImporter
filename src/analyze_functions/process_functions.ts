@@ -1,10 +1,10 @@
-import { ClassDeclaration, MethodDeclaration, VariableStatement, FunctionDeclaration, VariableDeclaration, InterfaceDeclaration, ParameterDeclaration, ConstructorDeclaration, MethodSignature, SourceFile, ModuleDeclaration, PropertyDeclaration, PropertySignature, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ExportedDeclarations, CommentRange, EnumDeclaration, EnumMember, TypeParameterDeclaration, TypeAliasDeclaration, SyntaxKind, FunctionExpression, Block, Identifier, ExpressionWithTypeArguments, ImportDeclaration, Node } from "ts-morph";
+import { ClassDeclaration, MethodDeclaration, VariableStatement, FunctionDeclaration, VariableDeclaration, InterfaceDeclaration, ParameterDeclaration, ConstructorDeclaration, MethodSignature, SourceFile, ModuleDeclaration, PropertyDeclaration, PropertySignature, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ExportedDeclarations, CommentRange, EnumDeclaration, EnumMember, TypeParameterDeclaration, TypeAliasDeclaration, SyntaxKind, FunctionExpression, Block, Identifier, ExpressionWithTypeArguments, ImportDeclaration, Node, ArrowFunction } from "ts-morph";
 import * as Famix from "../lib/famix/src/model/famix";
 import { calculate } from "../lib/ts-complex/cyclomatic-service";
 import * as fs from 'fs';
 import { logger , entityDictionary } from "../analyze";
 
-export const methodsAndFunctionsWithId = new Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression>(); // Maps the Famix method, constructor, getter, setter and function ids to their ts-morph method, constructor, getter, setter or function object
+export const methodsAndFunctionsWithId = new Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction>(); // Maps the Famix method, constructor, getter, setter and function ids to their ts-morph method, constructor, getter, setter or function object
 export const accessMap = new Map<number, ParameterDeclaration | VariableDeclaration | PropertyDeclaration | EnumMember>(); // Maps the Famix parameter, variable, property and enum value ids to their ts-morph parameter, variable, property or enum member object
 export const classes = new Array<ClassDeclaration>(); // Array of all the classes of the source files
 export const interfaces = new Array<InterfaceDeclaration>(); // Array of all the interfaces of the source files
@@ -157,7 +157,7 @@ function processNamespace(m: ModuleDeclaration): Famix.Namespace {
  * @param m A container (a source file, a namespace, a function or a method)
  * @param fmxScope The Famix model of the container
  */
-function processAliases(m: SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace | Famix.Function | Famix.Method | Famix.Accessor): void {
+function processAliases(m: SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | ArrowFunction, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace | Famix.Function | Famix.Method | Famix.Accessor): void {
     logger.debug(`processAliases: ---------- Finding Aliases:`);
     m.getTypeAliases().forEach(a => {
         const fmxAlias = processAlias(a);
@@ -196,7 +196,7 @@ function processInterfaces(m: SourceFile | ModuleDeclaration, fmxScope: Famix.Sc
  * @param m A container (a source file, a namespace, a function or a method)
  * @param fmxScope The Famix model of the container
  */
-function processVariables(m: SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace | Famix.Function | Famix.Method | Famix.Accessor): void {
+function processVariables(m: SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration |ArrowFunction, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace | Famix.Function | Famix.Method | Famix.Accessor): void {
     logger.debug(`processVariables: ---------- Finding Variables:`);
     m.getVariableStatements().forEach(v => {
         const fmxVariables = processVariableStatement(v);
@@ -211,7 +211,7 @@ function processVariables(m: SourceFile | ModuleDeclaration | FunctionDeclaratio
  * @param m A container (a source file, a namespace, a function or a method)
  * @param fmxScope The Famix model of the container
  */
-function processEnums(m: SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace | Famix.Function | Famix.Method | Famix.Accessor): void {
+function processEnums(m: SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | ArrowFunction, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace | Famix.Function | Famix.Method | Famix.Accessor): void {
     logger.debug(`processEnums: ---------- Finding Enums:`);
     m.getEnums().forEach(e => {
         const fmxEnum = processEnum(e);
@@ -224,12 +224,20 @@ function processEnums(m: SourceFile | ModuleDeclaration | FunctionDeclaration | 
  * @param m A container (a source file, a namespace, a function or a method)
  * @param fmxScope The Famix model of the container
  */
-function processFunctions(m: SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace | Famix.Function | Famix.Method | Famix.Accessor): void {
+function processFunctions(m: SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | ArrowFunction, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace | Famix.Function | Famix.Method | Famix.Accessor): void {
     logger.debug(`Finding Functions:`);
     m.getFunctions().forEach(f => {
         const fmxFunction = processFunction(f);
         fmxScope.addFunction(fmxFunction);
     });
+
+    //find arrow functions
+    logger.debug(`Finding Functions:`);
+    const arrowFunctions = m.getDescendantsOfKind(SyntaxKind.ArrowFunction);
+    arrowFunctions.forEach(af => {
+        const fmxFunction = processFunction(af);
+        fmxScope.addFunction(fmxFunction);
+    })
 }
 
 /**
@@ -406,10 +414,16 @@ function processMethod(m: MethodDeclaration | ConstructorDeclaration | MethodSig
  * @param f A function
  * @returns A Famix.Function representing the function
  */
-function processFunction(f: FunctionDeclaration | FunctionExpression): Famix.Function {
-    const fmxFunction = entityDictionary.createFamixFunction(f, currentCC);
+function processFunction(f: FunctionDeclaration | FunctionExpression | ArrowFunction): Famix.Function {
+    
+    let fmxFunction;
+    if( f instanceof ArrowFunction) {
+        fmxFunction = entityDictionary.createFamixArrowFunction(f, currentCC);
+    } else {
+        fmxFunction = entityDictionary.createFamixFunction(f, currentCC);
+    }
 
-    logger.debug(`Function: ${(f.getName()) ? f.getName() : "anonymous"}, (${f.getType().getText()}), fqn = ${fmxFunction.getFullyQualifiedName()}`);
+    //logger.debug(`Function: ${(f.getName()) ? f.getName() : "anonymous"}, (${f.getType().getText()}), fqn = ${fmxFunction.getFullyQualifiedName()}`);
 
     processComments(f, fmxFunction);
 
@@ -453,7 +467,7 @@ function processFunctionExpressions(f: FunctionDeclaration | MethodDeclaration |
  * @param m A method or a function
  * @param fmxScope The Famix model of the method or the function
  */
-function processParameters(m: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression, fmxScope: Famix.Method | Famix.Accessor | Famix.Function): void {
+function processParameters(m: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction, fmxScope: Famix.Method | Famix.Accessor | Famix.Function): void {
     logger.debug(`Finding Parameters:`);
     m.getParameters().forEach(param => {
         const fmxParam = processParameter(param);
@@ -490,7 +504,7 @@ function processParameter(p: ParameterDeclaration): Famix.Parameter {
  * @param e A class, an interface, a method or a function
  * @param fmxScope The Famix model of the class, the interface, the method or the function
  */
-function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression, fmxScope: Famix.ParametricClass | Famix.ParametricInterface | Famix.Method | Famix.Accessor | Famix.Function): void {
+function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression |ArrowFunction, fmxScope: Famix.ParametricClass | Famix.ParametricInterface | Famix.Method | Famix.Accessor | Famix.Function | Famix.ArrowFunction): void {
     logger.debug(`Finding Type Parameters:`);
     e.getTypeParameters().forEach(tp => {
         const fmxParam = processTypeParameter(tp);
@@ -622,7 +636,7 @@ function processDecorator(d: Decorator, e: ClassDeclaration | MethodDeclaration 
  * @param e A ts-morph element
  * @param fmxScope The Famix model of the named entity
  */
-function processComments(e: SourceFile | ModuleDeclaration | ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | Decorator | EnumDeclaration | EnumMember | TypeParameterDeclaration | VariableStatement | TypeAliasDeclaration, fmxScope: Famix.NamedEntity): void {
+function processComments(e: SourceFile | ModuleDeclaration | ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | Decorator | EnumDeclaration | EnumMember | TypeParameterDeclaration | VariableStatement | TypeAliasDeclaration | ArrowFunction, fmxScope: Famix.NamedEntity): void {
     logger.debug(`Process comments:`);
     e.getLeadingCommentRanges().forEach(c => {
         const fmxComment = processComment(c, fmxScope);
@@ -709,14 +723,13 @@ export function processImportClausesForImportEqualsDeclarations(sourceFiles: Arr
         });
     }
     );
-
 }
 
 /**
-     * Builds a Famix model for the import clauses of the source files which are modules
-     * @param modules An array of modules
-     * @param exports An array of maps of exported declarations
-     */
+ * Builds a Famix model for the import clauses of the source files which are modules
+ * @param modules An array of modules
+ * @param exports An array of maps of exported declarations
+ */
 export function processImportClausesForModules(modules: Array<SourceFile>, exports: Array<ReadonlyMap<string, ExportedDeclarations[]>>): void {
     logger.info(`Creating import clauses from ${modules.length} modules:`);
     modules.forEach(module => {
@@ -769,10 +782,10 @@ export function processImportClausesForModules(modules: Array<SourceFile>, expor
 }
 
 /**
-     * Builds a Famix model for the inheritances of the classes and interfaces of the source files
-     * @param classes An array of classes
-     * @param interfaces An array of interfaces
-     */
+ * Builds a Famix model for the inheritances of the classes and interfaces of the source files
+ * @param classes An array of classes
+ * @param interfaces An array of interfaces
+ */
 export function processInheritances(classes: ClassDeclaration[], interfaces: InterfaceDeclaration[]): void {
     logger.info(`processInheritances: Creating inheritances:`);
     classes.forEach(cls => {
@@ -808,15 +821,17 @@ export function processInheritances(classes: ClassDeclaration[], interfaces: Int
  * Builds a Famix model for the invocations of the methods and functions of the source files
  * @param methodsAndFunctionsWithId A map of methods and functions with their id
  */
-export function processInvocations(methodsAndFunctionsWithId: Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression>): void {
+export function processInvocations(methodsAndFunctionsWithId: Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction>): void {
     logger.info(`Creating invocations:`);
     methodsAndFunctionsWithId.forEach((m, id) => {
-        logger.debug(`Invocations to ${(m instanceof MethodDeclaration || m instanceof GetAccessorDeclaration || m instanceof SetAccessorDeclaration || m instanceof FunctionDeclaration) ? m.getName() : ((m instanceof ConstructorDeclaration) ? 'constructor' : (m.getName() ? m.getName() : 'anonymous'))}`);
-        try {
-            const temp_nodes = m.findReferencesAsNodes() as Array<Identifier>;
-            temp_nodes.forEach(node => processNodeForInvocations(node, m, id));
-        } catch (error) {
-            logger.error(`> WARNING: got exception ${error}. Continuing...`);
+        if (!(m instanceof ArrowFunction)) {
+            logger.debug(`Invocations to ${(m instanceof MethodDeclaration || m instanceof GetAccessorDeclaration || m instanceof SetAccessorDeclaration || m instanceof FunctionDeclaration) ? m.getName() : ((m instanceof ConstructorDeclaration) ? 'constructor' : (m.getName() ? m.getName() : 'anonymous'))}`);
+            try {
+                const temp_nodes = m.findReferencesAsNodes() as Array<Identifier>;
+                temp_nodes.forEach(node => processNodeForInvocations(node, m, id));
+            } catch (error) {
+                logger.error(`> WARNING: got exception ${error}. Continuing...`);
+            }
         }
     });
 }
