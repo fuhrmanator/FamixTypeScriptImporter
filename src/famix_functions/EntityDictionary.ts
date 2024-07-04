@@ -259,9 +259,7 @@ export class EntityDictionary {
         const fmxClass = new Famix.ParametricClass();
         const isAbstract = cls.isAbstract();
         const classFullyQualifiedName = FQNFunctions.getFQN(cls);
-        console.log(classFullyQualifiedName)
         const clsName = cls.getName();
-        console.log(clsName)
 
         fmxClass.setName(clsName);
         fmxClass.setFullyQualifiedName(classFullyQualifiedName);
@@ -271,8 +269,6 @@ export class EntityDictionary {
         this.famixRep.addElement(fmxClass);
         
         this.fmxElementObjectMap.set(fmxClass,cls);
-
-        console.log(fmxClass.getName())
 
         return fmxClass;
     }
@@ -1031,11 +1027,16 @@ export class EntityDictionary {
                     typeParameterDeclarations.map((param) => {
                         const typeParameterDeclaration = param.getSymbol()?.getDeclarations()[0] as TypeParameterDeclaration;
                         const parameterTypeName = param.getText();
-                        let fmxParameterType: Famix.PrimitiveType;
+                        let fmxParameterType: Famix.Type;
+                        if (!this.fmxTypeMap.has(parameterTypeName)) {   
+                           
+                            if (parameterTypeName === "number" || parameterTypeName === "string" || parameterTypeName === "boolean" || parameterTypeName === "bigint" || parameterTypeName === "symbol" || parameterTypeName === "undefined" || parameterTypeName === "null" || parameterTypeName === "any" || parameterTypeName === "unknown" || parameterTypeName === "never" || parameterTypeName === "void") {
+                                fmxParameterType = new Famix.PrimitiveType();
+                                fmxParameterType.setIsStub(true);
+                            } else {
+                                fmxParameterType = new Famix.ParameterType();
+                            } 
 
-                        if (!this.fmxTypeMap.has(parameterTypeName)) {    
-                            fmxParameterType = new Famix.PrimitiveType();
-                            fmxParameterType.setIsStub(true);
                             fmxParameterType.setName(parameterTypeName);
                             this.famixRep.addElement(fmxParameterType);
                             this.fmxTypeMap.set(parameterTypeName, fmxParameterType);
@@ -1049,7 +1050,6 @@ export class EntityDictionary {
                             fmxParameterType.setName(param.getText());     
                             this.famixRep.addElement(fmxParameterType);
                             this.fmxElementObjectMap.set(fmxParameterType,typeParameterDeclaration);
-                            // this.makeFamixIndexFileAnchor(typeParameterDeclaration, fmxParameterType);
                             this.famixRep.addElement(fmxParameterType);
                             this.fmxTypeMap.set(param.getText(), fmxParameterType);
                             this.fmxElementObjectMap.set(fmxParameterType,typeParameterDeclaration);

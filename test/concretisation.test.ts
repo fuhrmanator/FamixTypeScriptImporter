@@ -67,4 +67,8 @@ describe('Tests for concretisation', () => {
         expect(concParameter.getName()).toBe("string");
     });
 
+    it("it should contain one primitive type string", () => {
+        expect(fmxRep._getAllEntitiesWithType("PrimitiveType").size).toBe(1);
+    });
+
 });
