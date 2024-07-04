@@ -2,6 +2,7 @@
   "collectCoverage": false,
   "coverageDirectory": "coverage",
   "coverageProvider": "babel",
+  "maxWorkers": "50%",
   "transform": {
     "^.+\\.tsx?$": ["ts-jest", { "isolatedModules": true }]
   },
