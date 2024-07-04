@@ -20,7 +20,7 @@ export class EntityDictionary {
     private fmxNamespaceMap = new Map<string, Famix.Namespace>(); // Maps the namespace names to their Famix model
     private fmxFileMap = new Map<string, Famix.ScriptEntity | Famix.Module>(); // Maps the source file names to their Famix model
     private fmxParameterTypeMap = new Map<string, Famix.ParameterType>();
-    private fmxTypeMap = new Map<string, Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType>(); // Maps the type names to their Famix model
+    private fmxTypeMap = new Map<string, Famix.Type | Famix.PrimitiveType | Famix.ParameterType>(); // Maps the type names to their Famix model
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
     public fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
             
@@ -685,10 +685,10 @@ export class EntityDictionary {
      * @param element A ts-morph element
      * @returns The Famix model of the type
      */
-    public createOrGetFamixType(typeName: string, element: TypeDeclaration): Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType {
-        let fmxType: Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType;
+    public createOrGetFamixType(typeName: string, element: TypeDeclaration): Famix.Type | Famix.PrimitiveType | Famix.ParameterType {
+        let fmxType: Famix.Type | Famix.PrimitiveType | Famix.ParameterType;
         let isPrimitiveType = false;
-        let isParameterizedType = false;
+        let isParameterType = false;
 
         logger.debug("Creating (or getting) type: '" + typeName + "' of element: " + element?.getText() + " of kind: " + element?.getKindName());
         let ancestor: Famix.ContainerEntity;
@@ -706,7 +706,7 @@ export class EntityDictionary {
         }
 
         if(!isPrimitiveType && typeName.includes("<") && typeName.includes(">") && !(typeName.includes("=>"))) {
-            isParameterizedType = true;
+            isParameterType = true;
         }
 
         if (!this.fmxTypeMap.has(typeName)) {
@@ -714,16 +714,16 @@ export class EntityDictionary {
                 fmxType = new Famix.PrimitiveType();
                 fmxType.setIsStub(true);
             }
-            else if (isParameterizedType) {
-                fmxType = new Famix.ParameterizedType();
+            else if (isParameterType) {
+                fmxType = new Famix.ParameterType();
                 const parameterTypeNames = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">")).split(",").map(s => s.trim());
                 const baseTypeName = typeName.substring(0, typeName.indexOf("<")).trim();
                 parameterTypeNames.forEach(parameterTypeName => {
                     const fmxParameterType = this.createOrGetFamixType(parameterTypeName, element);
-                    (fmxType as Famix.ParameterizedType).addArgument(fmxParameterType);
+                    (fmxType as Famix.ParameterType).addArgument(fmxParameterType);
                 });
                 const fmxBaseType = this.createOrGetFamixType(baseTypeName, element);
-                (fmxType as Famix.ParameterizedType).setBaseType(fmxBaseType);
+                (fmxType as Famix.ParameterType).setBaseType(fmxBaseType);
             }
             else {
                 fmxType = new Famix.Type();

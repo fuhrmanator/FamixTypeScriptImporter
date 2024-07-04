@@ -26,7 +26,6 @@ export { ParameterType } from "./parameter_type";
 export { Parameter } from "./parameter";
 export { ParametricClass } from "./parametric_class";
 export { ParametricInterface } from "./parametric_interface";
-export { ParameterizedType } from "./parameterized_type";
 export { PrimitiveType } from "./primitive_type";
 export { Reference } from "./reference";
 export { ScopingEntity } from "./scoping_entity";
