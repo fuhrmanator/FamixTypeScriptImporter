@@ -41,7 +41,7 @@ describe('Tests for generics', () => {
         expect(listOfNames).toContain("ClassParametric");
     });
 
-    const theClass = fmxRep._getFamixClass("{parametricMethod.ts}.ClassParametric");
+    const theClass = fmxRep._getFamixClass("{parametricMethod.ts}.ClassParametric<T>");
 
     it("should not be an abstract class", () => {
         expect(theClass).toBeTruthy();

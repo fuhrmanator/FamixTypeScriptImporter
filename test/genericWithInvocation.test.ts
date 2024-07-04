@@ -3,6 +3,7 @@ import { Method } from "../src/lib/famix/src/model/famix/method";
 import { Variable } from "../src/lib/famix/src/model/famix/variable";
 import { Invocation } from "../src/lib/famix/src/model/famix/invocation";
 import { Project } from 'ts-morph';
+import { Class } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project(
@@ -26,7 +27,13 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for generics', () => {
 
-    const theMethod = fmxRep._getFamixMethod("{genericWithInvocation.ts}.AA.i") as Method;
+    const theMethod = fmxRep._getFamixMethod("{genericWithInvocation.ts}.AA.i<T>") as Method;
+    const entities = fmxRep._getAllEntities();
+    entities.forEach(entity => {
+
+        console.log(entity);
+      });
+    const classe = fmxRep._getFamixClass("{genericWithInvocation.ts}.AA") as Class;
 
     it("should parse generics", () => {
         expect(fmxRep).toBeTruthy();

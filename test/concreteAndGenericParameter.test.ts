@@ -14,11 +14,9 @@ const project = new Project(
 project.createSourceFile("./src/parametrizableClass.ts",
 `class ClassA<V> {}
 
-class ClassB extends ClassA<string>
+class ClassB extends ClassA<string>{}
 
-class ClassC<U> extends ClassA<U> {
-}
-
+class ClassC<U> extends ClassA<U> {}
 `);
 
 const fmxRep = importer.famixRepFromProject(project);

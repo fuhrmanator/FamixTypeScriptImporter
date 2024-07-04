@@ -82,3 +82,8 @@ export function arraysAreEqual(array1: string[], array2: string[]): boolean {
         return array1.length === array2.length && array1.every((value, index) => value === array2[index]);
     }
 }
+
+export function remplacerTypeGenerique(chaine: string, nouveauType: string): string {
+    // Utiliser une expression régulière pour capturer le contenu entre '<' et '>'
+    return chaine.replace(/<[^>]*>/, `<${nouveauType}>`);
+}

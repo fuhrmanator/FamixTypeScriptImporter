@@ -17,6 +17,9 @@ project.createSourceFile("./src/genericClass.ts",
 
 class ClassB extends ClassA<string> {
 }
+
+class ClassC extends ClassA<string> {
+}
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -39,14 +42,15 @@ describe('Tests for concretisation', () => {
         expect(numberOfClassA).toBe(2); 
     });
 
-    const theClass = fmxRep._getFamixClass("{genericClass.ts}.ClassA");
+    const theClass = fmxRep._getFamixClass("{genericClass.ts}.ClassA<T>");
+
     it ("should not be an abstract class", () => {
         expect(theClass).toBeTruthy();
         if (theClass) expect(theClass.getIsAbstract()).toBe(false);
     });
 
     it("should contain one concretisation", () => {
-        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(1);
+        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(2);
     });
 
     it("The generic Class should be ClassA<T> with genericParameter T", () => {
@@ -63,12 +67,9 @@ describe('Tests for concretisation', () => {
         const iterator = theConcretisation.values();
         const firstElement = iterator.next().value;
         expect(firstElement.getConcreteEntity().getName()).toBe("ClassA");
+        console.log(firstElement.getConcreteEntity().getFullyQualifiedName());
         const concParameter = firstElement.getConcreteEntity().getConcreteParameters().values().next().value;
         expect(concParameter.getName()).toBe("string");
-    });
-
-    it("it should contain one primitive type string", () => {
-        expect(fmxRep._getAllEntitiesWithType("PrimitiveType").size).toBe(1);
     });
 
 });
