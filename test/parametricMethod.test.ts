@@ -70,7 +70,7 @@ describe('Tests for generics', () => {
         const pmList = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod") as Set<ParametricMethod>)
         expect(pmList).toBeTruthy();
         const parametricMethod = pmList.find(m => m.getName() === "methodParametric");
-        const parameterTypes = parametricMethod?.getParameterTypes();
+        const parameterTypes = parametricMethod?.getGenericParameters();
         expect(parameterTypes?.values().next().value.getName()).toBe('V')
     });
 

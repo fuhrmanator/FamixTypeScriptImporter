@@ -20,7 +20,7 @@ export class ParameterType extends Type {
 
   public setParentGeneric(parentGeneric: ParametricClass | ParametricInterface | Method | ParametricMethod | Accessor | FamixFunction | ParametricFunction | ArrowFunction | ParametricArrowFunction): void {
     this.parentGeneric = parentGeneric;
-    parentGeneric.addParameterType(this);
+    parentGeneric.addGenericParameter(this);
   }
 
 

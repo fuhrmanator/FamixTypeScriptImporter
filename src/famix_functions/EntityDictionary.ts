@@ -1,4 +1,4 @@
-import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration, SyntaxKind, Expression } from "ts-morph";
+import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration, SyntaxKind, Expression, TypeNode, Node } from "ts-morph";
 import * as Famix from "../lib/famix/src/model/famix";
 import { logger, config } from "../analyze";
 import GraphemeSplitter from "grapheme-splitter";
@@ -6,6 +6,8 @@ import * as Helpers from "./helpers_creation";
 import * as FQNFunctions from "../fqn";
 import { FamixRepository } from "../lib/famix/src/famix_repository";
 import path from "path";
+import _ from 'lodash';
+
 
 export type TSMorphObjectType = ImportDeclaration | ImportEqualsDeclaration | SourceFile | ModuleDeclaration | ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | TypeParameterDeclaration | Identifier | Decorator | GetAccessorDeclaration | SetAccessorDeclaration | ImportSpecifier | CommentRange | EnumDeclaration | EnumMember | TypeAliasDeclaration | ExpressionWithTypeArguments;
 
@@ -17,6 +19,7 @@ export class EntityDictionary {
     private fmxInterfaceMap = new Map<string, Famix.Interface | Famix.ParametricInterface>(); // Maps the interface names to their Famix model
     private fmxNamespaceMap = new Map<string, Famix.Namespace>(); // Maps the namespace names to their Famix model
     private fmxFileMap = new Map<string, Famix.ScriptEntity | Famix.Module>(); // Maps the source file names to their Famix model
+    private fmxParameterTypeMap = new Map<string, Famix.ParameterType>();
     private fmxTypeMap = new Map<string, Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType>(); // Maps the type names to their Famix model
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
     public fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
@@ -517,8 +520,10 @@ export class EntityDictionary {
      * @returns The Famix model of the type parameter
      */
     public createFamixParameterType(tp: TypeParameterDeclaration): Famix.ParameterType {
+        
         const fmxParameterType = new Famix.ParameterType();
-        fmxParameterType.setName(tp.getName());
+   
+        fmxParameterType.setName(tp.getName());      
 
         this.makeFamixIndexFileAnchor(tp, fmxParameterType);
 
@@ -977,8 +982,124 @@ export class EntityDictionary {
         return fmxArrowFunction;
     }
 
+    /**
+     * Creates a Famix concretisation
+     * @param cls A class
+     */
+    public createFamixConcretisation(cls: ClassDeclaration): void {
+        
+        const genClass = this.createOrGetFamixClass(cls) as Famix.ParametricClass;
+        const genParams = cls.getTypeParameters().map((param) => param.getText());
+        
+        //Find the classes that extend this generic class
+        const derivedClasses = cls.getDerivedClasses();
+        
+        derivedClasses.forEach(derivedClass => {
+            const conParams = derivedClass.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments().map((param) => param.getText());
+            if (!Helpers.arraysAreEqual(conParams,genParams)) {
+                const fmxConcretisation = new Famix.Concretisation();
+                //this.createFamixParameterType()
+                const types = derivedClass.getHeritageClauses()[0].getTypeNodes();
+                if (types.length > 0) {
+
+                    //Cretae a copy of the generic class
+                    const conClass = _.cloneDeep(genClass);
+                    //Delete typeParameters
+                    conClass.clearParameterTypes();
+
+                    const typeParameterDeclarations = derivedClass.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments();
+                    typeParameterDeclarations.map((param) => {
+
+                        const typeParameterDeclaration = param.getSymbol()?.getDeclarations()[0] as TypeParameterDeclaration;
+                        const parameterTypeName = param.getText();
+
+                        let fmxParameterType: Famix.PrimitiveType;
+
+                        if (!this.fmxTypeMap.has(parameterTypeName)) {    
+                            fmxParameterType = new Famix.PrimitiveType();
+                            fmxParameterType.setIsStub(true);
+                        
+                            fmxParameterType.setName(parameterTypeName);
+                            
+                            this.famixRep.addElement(fmxParameterType);
+                
+                            this.fmxTypeMap.set(parameterTypeName, fmxParameterType);
+                        }
+                        else {
+                            fmxParameterType = this.fmxTypeMap.get(parameterTypeName);
+                        }
+
+                        if (!this.fmxParameterTypeMap.has(parameterTypeName)) {    
+                            fmxParameterType = new Famix.ParameterType(); 
+                            
+                            fmxParameterType.setName(param.getText());      
+
+                            this.famixRep.addElement(fmxParameterType);
+
+                            this.fmxElementObjectMap.set(fmxParameterType,typeParameterDeclaration);
+            
+                            // this.makeFamixIndexFileAnchor(typeParameterDeclaration, fmxParameterType);
+
+                            this.famixRep.addElement(fmxParameterType);
+
+                            this.fmxTypeMap.set(param.getText(), fmxParameterType);
+
+                            this.fmxElementObjectMap.set(fmxParameterType,typeParameterDeclaration);
+                        }
+                        else {
+                            fmxParameterType = this.fmxParameterTypeMap.get(parameterTypeName);
+                        }
+   
+                        conClass.addConcreteParameter(fmxParameterType);
+                    });
+                                            
+                    fmxConcretisation.setConcreteEntity(conClass);
+                    fmxConcretisation.setGenericEntity(genClass);
+                    this.fmxElementObjectMap.set(fmxConcretisation,null);
+                    this.famixRep.addElement(conClass);
+                    this.fmxElementObjectMap.set(conClass,cls);
+                    this.famixRep.addElement(fmxConcretisation);
+                    console.log(conClass.getGenericParameters())
+                    conClass.getGenericParameters().forEach(type => {
+                        console.log(type.getName());
+                    });
+                    genClass.getGenericParameters().forEach(type => {
+                        console.log(type.getName());
+                    });
+                    this.createFamixParameterConcrestisation(conClass,genClass);
+                }
+            }
+        })
+    }
+
+    public createFamixParameterConcrestisation(conClass: Famix.ParametricClass, genClass: Famix.ParametricClass):void {
+
+        const concreteParameters = conClass.getConcreteParameters();
+        const genericParameters = genClass.getGenericParameters();
+
+        let conClassTypeParametersIterator = concreteParameters.values();
+        let genClassTypeParametersIterator = genericParameters.values();
+
+        for (let i = 0; i < genericParameters.size; i++) {
+
+            const conClassTypeParameter = conClassTypeParametersIterator.next().value;
+            const genClassTypeParameter = genClassTypeParametersIterator.next().value;
+    
+            if(conClassTypeParameter.getName() != genClassTypeParameter.getName()){
+                const parameterConcretisation = new Famix.ParameterConcretisation();
+                parameterConcretisation.setGenericParameter(genClassTypeParameter);
+                parameterConcretisation.setConcreteParameter(conClassTypeParameter);
+                this.fmxElementObjectMap.set(parameterConcretisation,null);
+            }
+        }
+    }
+
     public convertToRelativePath(absolutePath: string, absolutePathProject: string) {
         return absolutePath.replace(absolutePathProject, "").slice(1);
     }
 
+    public clone<T>(obj: T): T {
+        const cloneObj = Object.create(Object.getPrototypeOf(obj));
+        return Object.assign(cloneObj, obj);
+    }
 }

@@ -41,7 +41,7 @@ describe('ArrowFunctions', () => {
     });
 
     it("should contain a type parameter T", () => {
-        expect(theFunction?.getParameterTypes()?.values().next().value.getName()).toBe('T')
+        expect(theFunction?.getGenericParameters()?.values().next().value.getName()).toBe('T')
     });
 
 });

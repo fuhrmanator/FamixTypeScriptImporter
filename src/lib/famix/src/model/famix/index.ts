@@ -42,3 +42,4 @@ export { ParametricFunction } from "./parametric_function";
 export { ParametricMethod } from "./parametric_method";
 export { ArrowFunction } from "./arrowFunction";
 export { ParametricArrowFunction } from "./parametricArrowFunction";
+export { ParameterConcretisation } from "./parameterConcretisation";

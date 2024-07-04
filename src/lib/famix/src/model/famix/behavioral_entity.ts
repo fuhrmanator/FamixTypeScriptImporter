@@ -74,19 +74,18 @@ export class BehavioralEntity extends ContainerEntity {
     declaredType.addBehavioralEntityWithDeclaredType(this);
   }
 
-  private typeParameters: Set<ParameterType> = new Set();
+  private genericParameters: Set<ParameterType> = new Set();
 
-  public getParameterTypes(): Set<ParameterType> {
-    return this.typeParameters;
+  public getGenericParameters(): Set<ParameterType> {
+    return this.genericParameters;
   }
 
-  public addParameterType(typeParameter: ParameterType): void {
-    if (!this.typeParameters.has(typeParameter)) {
-      this.typeParameters.add(typeParameter);
-      typeParameter.setParentGeneric(this);
+  public addGenericParameter(genericParameter: ParameterType): void {
+    if (!this.genericParameters.has(genericParameter)) {
+      this.genericParameters.add(genericParameter);
+      genericParameter.setParentGeneric(this);
     }
   }
-
 
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("BehavioralEntity", this);
@@ -102,6 +101,6 @@ export class BehavioralEntity extends ContainerEntity {
     exporter.addProperty("numberOfParameters", this.getNumberOfParameters());
     exporter.addProperty("incomingInvocations", this.getIncomingInvocations());
     exporter.addProperty("declaredType", this.getDeclaredType());
-    exporter.addProperty("typeParameters", this.getParameterTypes());
+    exporter.addProperty("genericParameters", this.getGenericParameters());
   }
 }

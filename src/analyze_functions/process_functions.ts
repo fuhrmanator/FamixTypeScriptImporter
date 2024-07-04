@@ -508,7 +508,7 @@ function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | Meth
     logger.debug(`Finding Type Parameters:`);
     e.getTypeParameters().forEach(tp => {
         const fmxParam = processTypeParameter(tp);
-        fmxScope.addParameterType(fmxParam);
+        fmxScope.addGenericParameter(fmxParam);
     });
 }
 
@@ -850,4 +850,20 @@ function processNodeForInvocations(n: Identifier, m: MethodDeclaration | Constru
     } catch (error) {
         logger.error(`> WARNING: got exception ${error}. ScopeDeclaration invalid for ${n.getSymbol().getFullyQualifiedName()}. Continuing...`);
     }
+}
+
+/**
+ * Builds a Famix model for the inheritances of the classes and interfaces of the source files
+ * @param classes An array of classes
+ * @param interfaces An array of interfaces
+ */
+export function processConcretisations(classes: ClassDeclaration[]): void {
+    logger.info(`processConcretisations: Creating concretisations:`);
+    classes.forEach(cls => {
+        logger.debug(`processConcretisations: Checking class concretisation for ${cls.getName()}`);
+        const isGeneric = cls.getTypeParameters().length>0;
+        if (isGeneric) {
+            entityDictionary.createFamixConcretisation(cls);
+        }
+    });
 }

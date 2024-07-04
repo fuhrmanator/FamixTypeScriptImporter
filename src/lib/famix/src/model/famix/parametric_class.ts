@@ -1,22 +1,39 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { Class } from "./class";
 import { ParameterType } from "./parameter_type";
+import { PrimitiveType } from "./primitive_type";
 
 export class ParametricClass extends Class {
 
-  private parameterTypes: Set<ParameterType> = new Set();
+  private genericParameters: Set<ParameterType> = new Set();
 
-  public getParameterTypes(): Set<ParameterType> {
-    return this.parameterTypes;
+  public getGenericParameters(): Set<ParameterType> {
+    return this.genericParameters;
   }
 
-  public addParameterType(parameterType: ParameterType): void {
-    if (!this.parameterTypes.has(parameterType)) {
-      this.parameterTypes.add(parameterType);
-      parameterType.setParentGeneric(this);
+  public addGenericParameter(genericParameter: ParameterType): void {
+    if (!this.genericParameters.has(genericParameter)) {
+      this.genericParameters.add(genericParameter);
+      genericParameter.setParentGeneric(this);
     }
   }
 
+  private concreteParameters: Set<PrimitiveType> = new Set();
+
+  public getConcreteParameters(): Set<PrimitiveType> {
+    return this.concreteParameters;
+  }
+
+  public addConcreteParameter(concreteParameter: PrimitiveType): void {
+    if (!this.concreteParameters.has(concreteParameter)) {
+      this.concreteParameters.add(concreteParameter);
+    }
+  }
+
+  public clearParameterTypes(): void {
+    this.genericParameters.clear();
+  }
+  
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("ParametricClass", this);
     this.addPropertiesToExporter(json);
@@ -25,6 +42,8 @@ export class ParametricClass extends Class {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("parameterTypes", this.getParameterTypes());
+    exporter.addProperty("genericParameters", this.getGenericParameters());
+    exporter.addProperty("concreteParameters", this.getConcreteParameters());
+
   }
 }

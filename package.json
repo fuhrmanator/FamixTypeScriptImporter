@@ -39,7 +39,9 @@
     "typedoc": "^0.25.8"
   },
   "dependencies": {
+    "@types/lodash": "^4.17.6",
     "grapheme-splitter": "^1.0.4",
+    "lodash": "^4.17.21",
     "ts-morph": "^22.0.0",
     "tslog": "^4.9.2",
     "tsutils": "^3.21.0",

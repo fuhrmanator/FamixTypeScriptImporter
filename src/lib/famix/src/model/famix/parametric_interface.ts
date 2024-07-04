@@ -4,19 +4,18 @@ import { ParameterType } from "./parameter_type";
 
 export class ParametricInterface extends Interface {
 
-  private parameterTypes: Set<ParameterType> = new Set();
+  private genericParameters: Set<ParameterType> = new Set();
 
-  public getParameterTypes(): Set<ParameterType> {
-    return this.parameterTypes;
+  public getGenericParameters(): Set<ParameterType> {
+    return this.genericParameters;
   }
 
-  public addParameterType(parameterType: ParameterType): void {
-    if (!this.parameterTypes.has(parameterType)) {
-      this.parameterTypes.add(parameterType);
-      parameterType.setParentGeneric(this);
+  public addGenericParameter(genericParameter: ParameterType): void {
+    if (!this.genericParameters.has(genericParameter)) {
+      this.genericParameters.add(genericParameter);
+      genericParameter.setParentGeneric(this);
     }
   }
-
 
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("ParametricInterface", this);
@@ -26,6 +25,6 @@ export class ParametricInterface extends Interface {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("parameterTypes", this.getParameterTypes());
+    exporter.addProperty("genericParameters", this.getGenericParameters());
   }
 }
