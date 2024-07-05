@@ -23,6 +23,12 @@ class ClassC extends ClassA<string> {
 
 class ClassD<U> extends ClassA<U> {
 }
+
+class ClassE<T> {
+}
+
+class ClassF extends ClassE<string> {
+}
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -34,7 +40,7 @@ describe('Tests for concretisation', () => {
     });
 
     it("should contain two generic classes", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParametricClass").size).toBe(4);
+        expect(fmxRep._getAllEntitiesWithType("ParametricClass").size).toBe(6);
     });
 
     it("should contain generic classes named ClassA", () => {
@@ -53,7 +59,7 @@ describe('Tests for concretisation', () => {
     });
 
     it("should contain one concretisation", () => {
-        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(2);
+        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(3);
     });
 
     it("The generic Class should be ClassA<T> with genericParameter T", () => {
@@ -70,9 +76,12 @@ describe('Tests for concretisation', () => {
         const iterator = theConcretisation.values();
         const firstElement = iterator.next().value;
         expect(firstElement.getConcreteEntity().getName()).toBe("ClassA");
-        console.log(firstElement.getConcreteEntity().getFullyQualifiedName());
         const concParameter = firstElement.getConcreteEntity().getConcreteParameters().values().next().value;
         expect(concParameter.getName()).toBe("string");
+    });
+
+    it("should contain two parameter concretisation", () => {
+        expect(fmxRep._getAllEntitiesWithType("ParameterConcretisation").size).toBe(2);
     });
 
 });
