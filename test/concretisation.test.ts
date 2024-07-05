@@ -20,6 +20,9 @@ class ClassB extends ClassA<string> {
 
 class ClassC extends ClassA<string> {
 }
+
+class ClassD<U> extends ClassA<U> {
+}
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -31,7 +34,7 @@ describe('Tests for concretisation', () => {
     });
 
     it("should contain two generic classes", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParametricClass").size).toBe(2);
+        expect(fmxRep._getAllEntitiesWithType("ParametricClass").size).toBe(4);
     });
 
     it("should contain generic classes named ClassA", () => {
@@ -39,7 +42,7 @@ describe('Tests for concretisation', () => {
         expect(listOfNames).toContain("ClassA");
 
         const numberOfClassA = listOfNames.filter(name => name === "ClassA").length;
-        expect(numberOfClassA).toBe(2); 
+        expect(numberOfClassA).toBe(3); 
     });
 
     const theClass = fmxRep._getFamixClass("{genericClass.ts}.ClassA<T>");
@@ -50,7 +53,7 @@ describe('Tests for concretisation', () => {
     });
 
     it("should contain one concretisation", () => {
-        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(2);
+        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(3);
     });
 
     it("The generic Class should be ClassA<T> with genericParameter T", () => {

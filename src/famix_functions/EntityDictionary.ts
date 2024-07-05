@@ -254,13 +254,13 @@ export class EntityDictionary {
      * @param cls A class
      * @returns The Famix model of the class
      */
-    public createOrGetFamixConcreteClass(node: ClassDeclaration): Famix.ParametricClass {
+    public createOrGetFamixConcreteClass(cls: ClassDeclaration): Famix.ParametricClass {
         
         let fmxClass : Famix.ParametricClass;
         
-        const conClassDeclaration = node.getHeritageClauses()[0].getTypeNodes()[0].getType().getSymbol().getDeclarations()[0] as ClassDeclaration;
+        const conClassDeclaration = cls.getHeritageClauses()[0].getTypeNodes()[0].getType().getSymbol().getDeclarations()[0] as ClassDeclaration;
         
-        const typeParameterDeclarations = node.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments();
+        const typeParameterDeclarations = cls.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments();
         
         let params = "";
         typeParameterDeclarations.map((param) => {
@@ -283,12 +283,18 @@ export class EntityDictionary {
             fmxClass.setIsAbstract(isAbstract);
             this.fmxClassMap.set(classFullyQualifiedName, fmxClass);
             this.famixRep.addElement(fmxClass);
+            this.fmxElementObjectMap.set(fmxClass,conClassDeclaration);
+
+            const typeParameterDeclarations = cls.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments();
+            typeParameterDeclarations.map((param) => {
+                const parameter = this.createOrGetFamixConcreteType(param);
+                fmxClass.addConcreteParameter(parameter);
+            })
+        
         }
         else {
             fmxClass = this.fmxClassMap.get(classFullyQualifiedName) as (Famix.ParametricClass);
         }
-        this.fmxElementObjectMap.set(fmxClass,conClassDeclaration);
-
         return fmxClass;
     }
 
@@ -572,6 +578,35 @@ export class EntityDictionary {
         this.famixRep.addElement(fmxParameterType);
 
         this.fmxElementObjectMap.set(fmxParameterType,tp);
+
+        return fmxParameterType;
+    }
+
+    /**
+     * Creates a Famix type parameter
+     * @param tp A type parameter
+     * @returns The Famix model of the type parameter
+     */
+    public createOrGetFamixConcreteType(param: TypeNode): Famix.ParameterType | Famix.PrimitiveType {
+        const typeParameterDeclaration = param.getSymbol()?.getDeclarations()[0] as TypeParameterDeclaration;
+        const parameterTypeName = param.getText();
+        let fmxParameterType: Famix.Type;
+        if (!this.fmxTypeMap.has(parameterTypeName)) {           
+            if (parameterTypeName === "number" || parameterTypeName === "string" || parameterTypeName === "boolean" || parameterTypeName === "bigint" || parameterTypeName === "symbol" || parameterTypeName === "undefined" || parameterTypeName === "null" || parameterTypeName === "any" || parameterTypeName === "unknown" || parameterTypeName === "never" || parameterTypeName === "void") {
+                fmxParameterType = new Famix.PrimitiveType();
+                fmxParameterType.setIsStub(true);
+            } else {
+                fmxParameterType = new Famix.ParameterType();
+            } 
+
+            fmxParameterType.setName(parameterTypeName);
+            this.famixRep.addElement(fmxParameterType);
+            this.fmxTypeMap.set(parameterTypeName, fmxParameterType);
+            this.fmxElementObjectMap.set(fmxParameterType,typeParameterDeclaration);
+        }
+        else {
+            fmxParameterType = this.fmxTypeMap.get(parameterTypeName);
+        }
 
         return fmxParameterType;
     }
@@ -1036,51 +1071,22 @@ export class EntityDictionary {
         derivedClasses.forEach(derivedClass => {
             const conParams = derivedClass.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments().map((param) => param.getText());
             if (!Helpers.arraysAreEqual(conParams,genParams)) {
-                const fmxConcretisation = new Famix.Concretisation();
                 const types = derivedClass.getHeritageClauses()[0].getTypeNodes();
                 if (types.length > 0) {
-                    //Create a copy of the generic class
+                    //Get the generic Class
                     const conClass = this.createOrGetFamixConcreteClass(derivedClass);
-                    //conClassDeclaration as ClassDeclaration
-                    const typeParameterDeclarations = derivedClass.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments();
-                    typeParameterDeclarations.map((param) => {
-                        const typeParameterDeclaration = param.getSymbol()?.getDeclarations()[0] as TypeParameterDeclaration;
-                        const parameterTypeName = param.getText();
-                        let fmxParameterType: Famix.Type;
-                        if (!this.fmxTypeMap.has(parameterTypeName)) {   
-                           
-                            if (parameterTypeName === "number" || parameterTypeName === "string" || parameterTypeName === "boolean" || parameterTypeName === "bigint" || parameterTypeName === "symbol" || parameterTypeName === "undefined" || parameterTypeName === "null" || parameterTypeName === "any" || parameterTypeName === "unknown" || parameterTypeName === "never" || parameterTypeName === "void") {
-                                fmxParameterType = new Famix.PrimitiveType();
-                                fmxParameterType.setIsStub(true);
-                            } else {
-                                fmxParameterType = new Famix.ParameterType();
-                            } 
-
-                            fmxParameterType.setName(parameterTypeName);
-                            this.famixRep.addElement(fmxParameterType);
-                            this.fmxTypeMap.set(parameterTypeName, fmxParameterType);
-                            this.fmxElementObjectMap.set(fmxParameterType,typeParameterDeclaration);
-                        }
-                        else {
-                            fmxParameterType = this.fmxTypeMap.get(parameterTypeName);
-                        }
-
-                        conClass.addConcreteParameter(fmxParameterType);
-                    });
-                                            
+                    const fmxConcretisation = new Famix.Concretisation();              
                     fmxConcretisation.setConcreteEntity(conClass);
                     fmxConcretisation.setGenericEntity(genClass);
                     this.fmxElementObjectMap.set(fmxConcretisation,null);
                     this.famixRep.addElement(fmxConcretisation);
 
-                    this.famixRep.addElement(conClass);
-                    this.fmxElementObjectMap.set(conClass,cls);
                     this.createFamixParameterConcrestisation(conClass,genClass);
                 }
             }
-        })
+        });
     }
-
+ 
     public createFamixParameterConcrestisation(conClass: Famix.ParametricClass, genClass: Famix.ParametricClass):void {
 
         const concreteParameters = conClass.getConcreteParameters();
