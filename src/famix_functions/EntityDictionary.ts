@@ -1114,12 +1114,13 @@ export class EntityDictionary {
                     if (conClassTypeParameter.getName() == param.getConcreteParameter().getName() && genClassTypeParameter.getName() == param.getGenericParameter().getName()) {
                         createParameterConcretisation = false;
                         fmxParameterConcretisation = param;
-                    }    
+                    }
                 })
                 if (createParameterConcretisation) {
                     fmxParameterConcretisation = new Famix.ParameterConcretisation();
                     fmxParameterConcretisation.setGenericParameter(genClassTypeParameter);
                     fmxParameterConcretisation.setConcreteParameter(conClassTypeParameter);
+                    fmxParameterConcretisation.addConcretisation(concretisation);
                     this.fmxElementObjectMap.set(fmxParameterConcretisation,null);
                 } else {
                     fmxParameterConcretisation.addConcretisation(concretisation);

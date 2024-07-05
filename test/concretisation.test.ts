@@ -84,4 +84,16 @@ describe('Tests for concretisation', () => {
         expect(fmxRep._getAllEntitiesWithType("ParameterConcretisation").size).toBe(2);
     });
 
+    it("The first parameter concretisation should contain two concretisations", () => {
+        const theConcretisation = fmxRep._getAllEntitiesWithType("ParameterConcretisation");
+        const iterator = theConcretisation.values();
+        const firstElement = iterator.next().value;
+        const genericParameter = firstElement.getGenericParameter();
+        const concParameter = firstElement.getConcreteParameter();
+        const concretisations = firstElement.getConcretisations();
+        expect(genericParameter.getName()).toBe("T");
+        expect(concParameter.getName()).toBe("string");
+        expect(firstElement.getConcretisations().size).toBe(2);
+    });
+
 });
