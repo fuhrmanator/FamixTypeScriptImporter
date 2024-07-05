@@ -275,8 +275,10 @@ export class EntityDictionary {
         classFullyQualifiedName = Helpers.remplacerTypeGenerique(classFullyQualifiedName,params);
                 
         const clsName = conClassDeclaration.getName();
+        console.log(classFullyQualifiedName)
 
         if (!this.fmxClassMap.has(classFullyQualifiedName)) {
+            console.log(classFullyQualifiedName)
             fmxClass = new Famix.ParametricClass();
             fmxClass.setName(clsName);
             fmxClass.setFullyQualifiedName(classFullyQualifiedName);
@@ -285,16 +287,16 @@ export class EntityDictionary {
             this.famixRep.addElement(fmxClass);
             this.fmxElementObjectMap.set(fmxClass,conClassDeclaration);
 
-            const typeParameterDeclarations = cls.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments();
             typeParameterDeclarations.map((param) => {
                 const parameter = this.createOrGetFamixConcreteType(param);
                 fmxClass.addConcreteParameter(parameter);
             })
-        
         }
         else {
             fmxClass = this.fmxClassMap.get(classFullyQualifiedName) as (Famix.ParametricClass);
+            console.log(fmxClass.getFullyQualifiedName())
         }
+        console.log(fmxClass.getFullyQualifiedName())
         return fmxClass;
     }
 
@@ -590,6 +592,7 @@ export class EntityDictionary {
     public createOrGetFamixConcreteType(param: TypeNode): Famix.ParameterType | Famix.PrimitiveType {
         const typeParameterDeclaration = param.getSymbol()?.getDeclarations()[0] as TypeParameterDeclaration;
         const parameterTypeName = param.getText();
+
         let fmxParameterType: Famix.Type;
         if (!this.fmxTypeMap.has(parameterTypeName)) {           
             if (parameterTypeName === "number" || parameterTypeName === "string" || parameterTypeName === "boolean" || parameterTypeName === "bigint" || parameterTypeName === "symbol" || parameterTypeName === "undefined" || parameterTypeName === "null" || parameterTypeName === "any" || parameterTypeName === "unknown" || parameterTypeName === "never" || parameterTypeName === "void") {
@@ -1075,13 +1078,25 @@ export class EntityDictionary {
                 if (types.length > 0) {
                     //Get the generic Class
                     const conClass = this.createOrGetFamixConcreteClass(derivedClass);
-                    const fmxConcretisation = new Famix.Concretisation();              
-                    fmxConcretisation.setConcreteEntity(conClass);
-                    fmxConcretisation.setGenericEntity(genClass);
-                    this.fmxElementObjectMap.set(fmxConcretisation,null);
-                    this.famixRep.addElement(fmxConcretisation);
+                    console.log(conClass.getFullyQualifiedName())
+                    
+                    const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
+                    console.log(concretisations)
+                    let createConcretisation : boolean = true;
+                    concretisations.forEach((conc : Famix.Concretisation) => {
+                        if (genClass.getFullyQualifiedName() == conc.getGenericEntity().getFullyQualifiedName() && conc.getConcreteEntity().getFullyQualifiedName() == conClass.getFullyQualifiedName()){
+                            createConcretisation = false;
+                        }
+                    });
 
-                    this.createFamixParameterConcrestisation(conClass,genClass);
+                    if (createConcretisation) {
+                        const fmxConcretisation = new Famix.Concretisation();              
+                        fmxConcretisation.setConcreteEntity(conClass);
+                        fmxConcretisation.setGenericEntity(genClass);
+                        this.fmxElementObjectMap.set(fmxConcretisation,null);
+                        this.famixRep.addElement(fmxConcretisation);    
+                        this.createFamixParameterConcrestisation(conClass,genClass);
+                    }
                 }
             }
         });

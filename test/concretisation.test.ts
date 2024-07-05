@@ -53,7 +53,7 @@ describe('Tests for concretisation', () => {
     });
 
     it("should contain one concretisation", () => {
-        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(3);
+        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(2);
     });
 
     it("The generic Class should be ClassA<T> with genericParameter T", () => {
