@@ -1,4 +1,5 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
+import { Concretisation } from "./concretisation";
 import { Entity } from "./entity";
 import { ParameterType } from "./parameter_type";
 import { PrimitiveType } from "./primitive_type";
@@ -24,6 +25,18 @@ export class ParameterConcretisation extends Entity {
     public setConcreteParameter(concreteParameter: PrimitiveType): void {
       this.concreteParameter = concreteParameter;
     }
+
+    private concretisations: Set<Concretisation> = new Set();
+
+    public getConcretisations(): Set<Concretisation> {
+      return this.concretisations;
+    }
+
+    public addConcretisation(concretisation: Concretisation): void {
+      if (!this.concretisations.has(concretisation)) {
+        this.concretisations.add(concretisation);
+      }
+    }
   
     public getJSON(): string {
       const json: FamixJSONExporter = new FamixJSONExporter("ParameterConcretisation", this);
@@ -35,6 +48,7 @@ export class ParameterConcretisation extends Entity {
       super.addPropertiesToExporter(exporter);
       exporter.addProperty("genericEntity", this.getGenericParameter());
       exporter.addProperty("concreteEntity", this.getConcreteParameter());
+      exporter.addProperty("concretisations", this.getConcretisations());
     }
 
 }

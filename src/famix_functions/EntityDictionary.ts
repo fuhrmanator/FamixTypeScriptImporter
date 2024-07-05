@@ -1078,10 +1078,7 @@ export class EntityDictionary {
                 if (types.length > 0) {
                     //Get the generic Class
                     const conClass = this.createOrGetFamixConcreteClass(derivedClass);
-                    console.log(conClass.getFullyQualifiedName())
-                    
                     const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
-                    console.log(concretisations)
                     let createConcretisation : boolean = true;
                     concretisations.forEach((conc : Famix.Concretisation) => {
                         if (genClass.getFullyQualifiedName() == conc.getGenericEntity().getFullyQualifiedName() && conc.getConcreteEntity().getFullyQualifiedName() == conClass.getFullyQualifiedName()){
