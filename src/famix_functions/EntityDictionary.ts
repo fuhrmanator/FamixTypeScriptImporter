@@ -1017,10 +1017,13 @@ export class EntityDictionary {
         }
 
         // Get the parent of the arrow function (the variable declaration)
-        const parent = arrowFunction.getParentIfKindOrThrow(SyntaxKind.VariableDeclaration);
+        const parent = arrowFunction.getParentIfKind(SyntaxKind.VariableDeclaration);
+        let functionName = '(NO_NAME)';
 
-        // Get the name of the variable
-        const functionName = parent.getName();
+        if (parent && parent instanceof VariableDeclaration) {
+            // Get the name of the variable
+            functionName = parent.getName();
+        }
 
         if (functionName) {
             fmxArrowFunction.setName(functionName);
