@@ -17,7 +17,7 @@ export class EntityDictionary {
     private fmxAliasMap = new Map<string, Famix.Alias>(); // Maps the alias names to their Famix model
     private fmxClassMap = new Map<string, Famix.Class | Famix.ParametricClass>(); // Maps the fully qualified class names to their Famix model
     private fmxInterfaceMap = new Map<string, Famix.Interface | Famix.ParametricInterface>(); // Maps the interface names to their Famix model
-    private fmxNamespaceMap = new Map<string, Famix.Namespace>(); // Maps the namespace names to their Famix model
+    private fmxModuleMap = new Map<string, Famix.Module>(); // Maps the namespace names to their Famix model
     private fmxFileMap = new Map<string, Famix.ScriptEntity | Famix.Module>(); // Maps the source file names to their Famix model
     private fmxTypeMap = new Map<string, Famix.Type | Famix.PrimitiveType | Famix.ParameterType>(); // Maps the type names to their Famix model
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
@@ -157,25 +157,25 @@ export class EntityDictionary {
      * @param m A namespace
      * @returns The Famix model of the namespace
      */
-    public createOrGetFamixNamespace(m: ModuleDeclaration): Famix.Namespace {
-        let fmxNamespace: Famix.Namespace;
+    public createOrGetFamixModule(m: ModuleDeclaration): Famix.Module {
+        let fmxModule: Famix.Module;
         const namespaceName = m.getName();
-        if (!this.fmxNamespaceMap.has(namespaceName)) {
-            fmxNamespace = new Famix.Namespace();
-            fmxNamespace.setName(namespaceName);
+        if (!this.fmxModuleMap.has(namespaceName)) {
+            fmxModule = new Famix.Module();
+            fmxModule.setName(namespaceName);
 
-            this.makeFamixIndexFileAnchor(m, fmxNamespace);
+            this.makeFamixIndexFileAnchor(m, fmxModule);
 
-            this.fmxNamespaceMap.set(namespaceName, fmxNamespace);
+            this.fmxModuleMap.set(namespaceName, fmxModule);
 
-            this.famixRep.addElement(fmxNamespace);
+            this.famixRep.addElement(fmxModule);
         }
         else {
-            fmxNamespace = this.fmxNamespaceMap.get(namespaceName);
+            fmxModule = this.fmxModuleMap.get(namespaceName);
         }
 
-        this.fmxElementObjectMap.set(fmxNamespace,m);
-        return fmxNamespace;
+        this.fmxElementObjectMap.set(fmxModule,m);
+        return fmxModule;
     }
 
     /**

@@ -21,7 +21,6 @@ export { Invocation } from "./invocation";
 export { Method } from "./method";
 export { Module } from "./module";
 export { NamedEntity } from "./named_entity";
-export { Namespace } from "./namespace";
 export { ParameterType } from "./parameter_type";
 export { Parameter } from "./parameter";
 export { ParametricClass } from "./parametric_class";

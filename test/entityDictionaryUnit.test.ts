@@ -34,17 +34,17 @@ namespace MyNamespace {
 
 describe('EntityDictionary', () => {
 
-  const namespaces = sourceFile.getModules();
+  const modules = sourceFile.getModules();
 
-  test('should get a namespace and add it to the map', () => {
+  test('should get a module/namespace and add it to the map', () => {
     
     //Create a type namespace declaration
-    const namespace : Famix.Namespace = entityDictionary.createOrGetFamixNamespace(namespaces[0]);
-    expect(namespaces[0]).toBe(entityDictionary.fmxElementObjectMap.get(namespace));  
+    const namespace : Famix.Module = entityDictionary.createOrGetFamixModule(modules[0]);
+    expect(modules[0]).toBe(entityDictionary.fmxElementObjectMap.get(namespace));  
   
   });
 
-  const classes = namespaces[0].getClasses();
+  const classes = modules[0].getClasses();
 
   test('should get a class and add it to the map', () => {
     
@@ -84,7 +84,7 @@ describe('EntityDictionary', () => {
   
   });
 
-  const functions = namespaces[0].getFunctions();
+  const functions = modules[0].getFunctions();
 
   test('should get a function and add it to the map', () => {
     

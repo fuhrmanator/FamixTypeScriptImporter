@@ -31,11 +31,11 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Tests for namespaces and classes', () => {
     
     it("should contain two namespaces", () => {
-        expect(fmxRep._getFamixNamespaces().size).toBe(2);
+        expect(fmxRep._getFamixModules().size).toBe(2);
     });
 
     const theFile = fmxRep._getFamixFile("namespacesAndClasses.ts");
-    const theNamespace1 = fmxRep._getFamixNamespace("{namespacesAndClasses.ts}.MyNamespace");
+    const theNamespace1 = fmxRep._getFamixModule("{namespacesAndClasses.ts}.MyNamespace");
     it("should contain a namespace MyNamespace", () => {
         expect(theNamespace1).toBeTruthy();
         expect(theNamespace1?.getParentScope()).toBe(theFile);
@@ -45,7 +45,7 @@ describe('Tests for namespaces and classes', () => {
         expect(Array.from(theNamespace1?.getTypes() as Set<Type>).filter(t => (t instanceof Class)).length).toBe(2);
     });
 
-    const theNamespace2 = fmxRep._getFamixNamespace("{namespacesAndClasses.ts}.Nsp3");
+    const theNamespace2 = fmxRep._getFamixModule("{namespacesAndClasses.ts}.Nsp3");
     it("should contain a namespace Nsp3", () => {
         expect(theNamespace2).toBeTruthy();
         expect(theNamespace2?.getParentScope()).toBe(theFile);
