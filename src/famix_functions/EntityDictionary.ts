@@ -9,6 +9,8 @@ import path from "path";
 
 export type TSMorphObjectType = ImportDeclaration | ImportEqualsDeclaration | SourceFile | ModuleDeclaration | ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | TypeParameterDeclaration | Identifier | Decorator | GetAccessorDeclaration | SetAccessorDeclaration | ImportSpecifier | CommentRange | EnumDeclaration | EnumMember | TypeAliasDeclaration | ExpressionWithTypeArguments;
 
+export type TSMorphContainers = TypeAliasDeclaration | ImportEqualsDeclaration | PropertyDeclaration | PropertySignature | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | EnumMember;
+
 export class EntityDictionary {
     
     public famixRep = new FamixRepository();
@@ -637,18 +639,18 @@ export class EntityDictionary {
     /**
      * Creates or gets a Famix type
      * @param typeName A type name
-     * @param element A ts-morph element
+     * @param container A ts-morph element
      * @returns The Famix model of the type
      */
-    public createOrGetFamixType(typeName: string, element: TypeAliasDeclaration | PropertyDeclaration | PropertySignature | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | EnumMember): Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType {
+    public createOrGetFamixType(typeName: string, container: TSMorphContainers): Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType {
         let fmxType: Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType;
         let isPrimitiveType = false;
         let isParameterizedType = false;
 
-        logger.debug("Creating (or getting) type: '" + typeName + "' of element: " + element?.getText() + " of kind: " + element?.getKindName());
+        logger.debug("Creating (or getting) type: '" + typeName + "' of element: " + container?.getText() + " of kind: " + container?.getKindName());
         let ancestor: Famix.ContainerEntity;
-        if (element !== undefined) {
-            const typeAncestor = Helpers.findTypeAncestor(element);
+        if (container !== undefined) {
+            const typeAncestor = Helpers.findTypeAncestor(container);
             const ancestorFullyQualifiedName = FQNFunctions.getFQN(typeAncestor);
             ancestor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
             if (!ancestor) {
@@ -674,10 +676,10 @@ export class EntityDictionary {
                 const parameterTypeNames = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">")).split(",").map(s => s.trim());
                 const baseTypeName = typeName.substring(0, typeName.indexOf("<")).trim();
                 parameterTypeNames.forEach(parameterTypeName => {
-                    const fmxParameterType = this.createOrGetFamixType(parameterTypeName, element);
+                    const fmxParameterType = this.createOrGetFamixType(parameterTypeName, container);
                     (fmxType as Famix.ParameterizedType).addArgument(fmxParameterType);
                 });
-                const fmxBaseType = this.createOrGetFamixType(baseTypeName, element);
+                const fmxBaseType = this.createOrGetFamixType(baseTypeName, container);
                 (fmxType as Famix.ParameterizedType).setBaseType(fmxBaseType);
             }
             else {
@@ -685,9 +687,9 @@ export class EntityDictionary {
             }
 
             fmxType.setName(typeName);
-            fmxType.setContainer(ancestor);
+            if (!isPrimitiveType) fmxType.setContainer(ancestor);
             
-            this.makeFamixIndexFileAnchor(element, fmxType);
+            this.makeFamixIndexFileAnchor(container, fmxType);
 
             this.famixRep.addElement(fmxType);
 
@@ -697,7 +699,7 @@ export class EntityDictionary {
             fmxType = this.fmxTypeMap.get(typeName);
         }
 
-        this.fmxElementObjectMap.set(fmxType,element);
+        this.fmxElementObjectMap.set(fmxType,container);
 
         return fmxType;
     }
@@ -831,7 +833,7 @@ export class EntityDictionary {
      * @param isInExports A boolean indicating if the imported entity is in the exports
      * @param isDefaultExport A boolean indicating if the imported entity is a default export
      */
-    public createFamixImportClause(importClauseInfo: {importDeclaration?: ImportDeclaration | ImportEqualsDeclaration, importer: SourceFile, moduleSpecifierFilePath: string, importElement: ImportSpecifier | Identifier, isInExports: boolean, isDefaultExport: boolean}): void {
+    public createFamixImportClause(importClauseInfo: {importDeclaration?: ImportDeclaration | ImportEqualsDeclaration, importer: SourceFile | ModuleDeclaration, moduleSpecifierFilePath: string, importElement: ImportSpecifier | Identifier, isInExports: boolean, isDefaultExport: boolean}): void {
         const {importDeclaration, importer, moduleSpecifierFilePath, importElement, isInExports, isDefaultExport} = importClauseInfo;
         logger.debug(`createFamixImportClause: Creating import clause:`);
         const fmxImportClause = new Famix.ImportClause();
@@ -874,7 +876,7 @@ export class EntityDictionary {
             importedEntity.setName(importedEntityName);
             this.makeFamixIndexFileAnchor(importElement, importedEntity);
             importedEntity.setFullyQualifiedName(pathName);
-            const anyType = this.createOrGetFamixType('any', undefined);
+            const anyType = this.createOrGetFamixType('any', importDeclaration);
             (importedEntity as Famix.StructuralEntity).setDeclaredType(anyType);
         } else {  // default imports, e.g. import ClassW from "./complexExportModule";  
             importedEntityName = importElement.getText();

@@ -129,9 +129,11 @@ function processFile(f: SourceFile): void {
  * @returns A Famix.Namespace representing the namespace
  */
 function processNamespace(m: ModuleDeclaration): Famix.Namespace {
+    logger.debug(`namespace: ${m.getName()}`);
+
     const fmxNamespace = entityDictionary.createOrGetFamixNamespace(m);
 
-    logger.debug(`processNamespace: namespace: ${m.getName()}, (${m.getType().getText()}), ${fmxNamespace.getFullyQualifiedName()}`);
+    logger.debug(`Famix Namespace fqn = ${fmxNamespace.getFullyQualifiedName()}`);
 
     processComments(m, fmxNamespace);
 
@@ -238,7 +240,7 @@ function processFunctions(m: SourceFile | ModuleDeclaration | FunctionDeclaratio
  * @param fmxScope The Famix model of the container
  */
 function processNamespaces(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace): void {
-    logger.debug(`Finding Namespaces:`);
+    logger.debug(`Finding Namespaces in ${m ? m.constructor.name : 'undefined'} "${m instanceof SourceFile ? m.getBaseName() : m.getName()}":`);
     m.getModules().forEach(md => {
         const fmxNsp = processNamespace(md);
         fmxScope.addNamespace(fmxNsp);
@@ -697,10 +699,13 @@ export function processImportClausesForImportEqualsDeclarations(sourceFiles: Arr
                 // You've found an ImportEqualsDeclaration
                 logger.info("Declaration Name:", node.getName());
                 logger.info("Module Reference Text:", node.getModuleReference().getText());
+
+                const scope = node.getAncestors().find(ancestor => Node.isModuleDeclaration(ancestor) || Node.isSourceFile(ancestor));
+
                 // create a famix import clause
                 const namedImport = node.getNameNode();
                 entityDictionary.createFamixImportClause({importDeclaration: node,
-                    importer: sourceFile, 
+                    importer: scope, 
                     moduleSpecifierFilePath: node.getModuleReference().getText(), 
                     importElement: namedImport, 
                     isInExports: exports.find(e => e.has(namedImport.getText())) !== undefined, 
