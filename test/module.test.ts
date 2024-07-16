@@ -8,6 +8,7 @@ const filePaths = new Array<string>();
 filePaths.push("test_src/sampleForModule.ts");
 filePaths.push("test_src/sampleForModule2.ts");
 filePaths.push("test_src/sampleForModule3.ts");
+filePaths.push("test_src/sampleOfDeclaredModule.ts");
 
 const fmxRep = importer.famixRepFromPaths(filePaths);
 
@@ -17,18 +18,20 @@ describe('Tests for module', () => {
     const theFile = moduleList.find(e => e.getName() === 'sampleForModule.ts');
     const theFile2 = moduleList.find(e => e.getName() === 'sampleForModule2.ts');
     const theFile3 = moduleList.find(e => e.getName() === 'sampleForModule3.ts');
-    it("should have three modules", () => {
-        expect(moduleList?.length).toBe(3);
+    const theFile4 = moduleList.find(e => e.getName() === 'sampleOfDeclaredModule.ts');
+    it("should have four modules", () => {
+        expect(moduleList?.length).toBe(4);
         expect(theFile).toBeTruthy();
         expect(theFile2).toBeTruthy();
         expect(theFile3).toBeTruthy();
+        expect(theFile4).toBeTruthy();
     });
 
     const theClass = fmxRep._getFamixClass('{sampleForModule.ts}.ClassZ');
     const importClauseList = Array.from(fmxRep._getAllEntitiesWithType('ImportClause')) as Array<ImportClause>;
 
-    it("should have ten import clauses", () => {
-        expect(importClauseList?.length).toBe(10);
+    it("should have eleven import clauses", () => {
+        expect(importClauseList?.length).toBe(11);
         expect(theFile2?.getOutgoingImports().size).toBe(8);
         expect(theFile3?.getOutgoingImports().size).toBe(2);
 

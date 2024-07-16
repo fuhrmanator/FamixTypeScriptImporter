@@ -28,6 +28,15 @@ export class EntityDictionary {
         
     }
 
+    public fmxEntity(searchedValue: TSMorphObjectType): Famix.Entity {
+        for (const [key, value] of this.fmxElementObjectMap.entries()) {
+            if (value === searchedValue) {
+                return key; // Return the first matching key
+            }
+        }
+        throw new Error(`> ERROR: could not find Famix entity for ${searchedValue.getText()}`);
+    }
+
     /**
      * Makes a Famix index file anchor
      * @param sourceElement A source element
@@ -888,8 +897,12 @@ export class EntityDictionary {
         }
 
         this.famixRep.addElement(importedEntity);
-        const importerFullyQualifiedName = FQNFunctions.getFQN(importer);
-        const fmxImporter = this.famixRep.getFamixEntityByFullyQualifiedName(importerFullyQualifiedName) as Famix.Module;
+        // const importerFullyQualifiedName = FQNFunctions.getFQN(importer);
+        const fmxImporter = this.fmxEntity(importer) as Famix.Module;
+        if (fmxImporter.constructor.name !== "Module") {
+            throw new Error(`Importer ${fmxImporter.getName()} is not a module; it's a ${fmxImporter.constructor.name}.`);
+        }
+        // const fmxImporter = this.famixRep.getFamixEntityByFullyQualifiedName(importerFullyQualifiedName) as Famix.Module;
         fmxImportClause.setImportingEntity(fmxImporter);
         fmxImportClause.setImportedEntity(importedEntity);
         if (importDeclaration instanceof ImportEqualsDeclaration) {
