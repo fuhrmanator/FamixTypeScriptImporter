@@ -1,6 +1,7 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { Interface } from "./interface";
 import { ParameterType } from "./parameter_type";
+import { PrimitiveType } from "./primitive_type";
 
 export class ParametricInterface extends Interface {
 
@@ -14,6 +15,18 @@ export class ParametricInterface extends Interface {
     if (!this.genericParameters.has(genericParameter)) {
       this.genericParameters.add(genericParameter);
       genericParameter.setParentGeneric(this);
+    }
+  }
+
+  private concreteParameters: Set<PrimitiveType> = new Set();
+
+  public getConcreteParameters(): Set<PrimitiveType> {
+    return this.concreteParameters;
+  }
+
+  public addConcreteParameter(concreteParameter: PrimitiveType): void {
+    if (!this.concreteParameters.has(concreteParameter)) {
+      this.concreteParameters.add(concreteParameter);
     }
   }
 
