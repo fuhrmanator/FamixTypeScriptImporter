@@ -1,4 +1,5 @@
 import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration, SyntaxKind, Expression, TypeNode, Node } from "ts-morph";
+import { isAmbient, isNamespace } from "../analyze_functions/process_functions";
 import * as Famix from "../lib/famix/src/model/famix";
 import { logger, config } from "../analyze";
 import GraphemeSplitter from "grapheme-splitter";
@@ -6,7 +7,6 @@ import * as Helpers from "./helpers_creation";
 import * as FQNFunctions from "../fqn";
 import { FamixRepository } from "../lib/famix/src/famix_repository";
 import path from "path";
-import { isAmbient, isNamespace } from "src/analyze_functions/process_functions";
 
 export type TSMorphObjectType = ImportDeclaration | ImportEqualsDeclaration | SourceFile | ModuleDeclaration | ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | TypeParameterDeclaration | Identifier | Decorator | GetAccessorDeclaration | SetAccessorDeclaration | ImportSpecifier | CommentRange | EnumDeclaration | EnumMember | TypeAliasDeclaration | ExpressionWithTypeArguments;
 

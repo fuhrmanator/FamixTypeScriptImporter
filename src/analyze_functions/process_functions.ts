@@ -129,11 +129,10 @@ export function isAmbient(node: ModuleDeclaration): boolean {
 }
 
 export function isNamespace(node: ModuleDeclaration): boolean {
-    // A namespace is not ambient and has the Namespace flag.
-    // Note: The Namespace flag is set for both traditional namespaces and for module declarations that are not ambient.
-    return !isAmbient(node) && node.hasModifier(SyntaxKind.ModuleKeyword);
+    // Check if the module declaration has a namespace keyword.
+    // This approach uses the getChildren() method to inspect the syntax directly.
+    return node.getChildrenOfKind(SyntaxKind.NamespaceKeyword).length > 0;
 }
-
 
 /**
  * Builds a Famix model for a module (also namespace)
