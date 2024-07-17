@@ -861,13 +861,14 @@ function processNodeForInvocations(n: Identifier, m: MethodDeclaration | Constru
  * @param classes An array of classes
  * @param interfaces An array of interfaces
  */
-export function processConcretisations(classes: ClassDeclaration[]): void {
+export function processConcretisations(classes: ClassDeclaration[], interfaces: InterfaceDeclaration[]): void {
     logger.info(`processConcretisations: Creating concretisations:`);
     classes.forEach(cls => {
         logger.debug(`processConcretisations: Checking class concretisation for ${cls.getName()}`);
-        const hasSuperClass = cls.getHeritageClauses().length>0;
-        if (hasSuperClass) {
-            entityDictionary.createFamixConcretisation(cls);
-        }
+        entityDictionary.createFamixConcretisation(cls);
+    });
+    interfaces.forEach(inter => {
+        logger.debug(`processConcretisations: Checking class concretisation for ${inter.getName()}`);
+        entityDictionary.createFamixConcretisation(inter);
     });
 }

@@ -35,6 +35,9 @@ interface InterfaceA<T> {
 
 class ClassG implements InterfaceA<number> {
 }
+
+interface InterfaceB extends InterfaceA<boolean> {
+}
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -64,8 +67,8 @@ describe('Tests for concretisation', () => {
         if (theClass) expect(theClass.getIsAbstract()).toBe(false);
     });
 
-    it("should contain one concretisation", () => {
-        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(4);
+    it("should contain 5 concretisations", () => {
+        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(5);
     });
 
     it("The generic Class should be ClassA<T> with genericParameter T", () => {
