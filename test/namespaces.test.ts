@@ -35,46 +35,46 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for namespaces', () => {
     
-    it("should contain six namespaces", () => {
-        expect(fmxRep._getFamixNamespaces().size).toBe(8);
+    it("should contain the exact number of namespaces", () => {
+        expect(fmxRep._getFamixModules().size).toBe(9);
     });
 
-    const theNamespace1 = fmxRep._getFamixNamespace("{namespaces.ts}.MyNamespace");
+    const theNamespace1 = fmxRep._getFamixModule("{namespaces.ts}.MyNamespace");
     it("should contain a namespace MyNamespace", () => {
         expect(theNamespace1).toBeTruthy();
     });
 
-    const theNamespace2 = fmxRep._getFamixNamespace("{namespaces.ts}.MyModule");
+    const theNamespace2 = fmxRep._getFamixModule("{namespaces.ts}.MyModule");
     it("should contain a namespace MyModule", () => {
         expect(theNamespace2).toBeTruthy();
     });
 
-    const theNamespace3 = fmxRep._getFamixNamespace("{namespaces.ts}.aModule");
+    const theNamespace3 = fmxRep._getFamixModule("{namespaces.ts}.aModule");
     it("should contain a namespace aModule", () => {
         expect(theNamespace3).toBeTruthy();
     });
 
-    const theNamespace4 = fmxRep._getFamixNamespace("{namespaces.ts}.\"someModule\"");
+    const theNamespace4 = fmxRep._getFamixModule("{namespaces.ts}.\"someModule\"");
     it("should contain a namespace \"someModule\"", () => {
         expect(theNamespace4).toBeTruthy();
     });
 
-    const theNamespace5 = fmxRep._getFamixNamespace("{namespaces.ts}.\"otherModule\"");
+    const theNamespace5 = fmxRep._getFamixModule("{namespaces.ts}.\"otherModule\"");
     it("should contain a namespace \"otherModule\"", () => {
         expect(theNamespace5).toBeTruthy();
     });
 
-    const theNamespace6 = fmxRep._getFamixNamespace("{namespaces.ts}.MyNamespace2");
+    const theNamespace6 = fmxRep._getFamixModule("{namespaces.ts}.MyNamespace2");
     it("should contain a namespace MyNamespace2", () => {
         expect(theNamespace6).toBeTruthy();
     });
 
-    const theNamespace7 = fmxRep._getFamixNamespace("{namespaces.ts}.ToolbarConstants");
+    const theNamespace7 = fmxRep._getFamixModule("{namespaces.ts}.ToolbarConstants");
     it("should contain a namespace ToolbarConstants", () => {
         expect(theNamespace7).toBeTruthy();
     });
 
-    const theNamespace8 = fmxRep._getFamixNamespace("{namespaces.ts}.ToolbarConstants.Actions");
+    const theNamespace8 = fmxRep._getFamixModule("{namespaces.ts}.ToolbarConstants.Actions");
     it("should contain a namespace ToolbarConstants", () => {
         expect(theNamespace8).toBeTruthy();
     });
@@ -87,4 +87,13 @@ describe('Tests for namespaces', () => {
     it("should have CREATE_ACTION nested in Actions", () => {
         expect(theVariable?.getParentContainerEntity()).toBe(theNamespace8);
     });
+
+    // fmxRep._getFamixModules().forEach(m => { console.log(m.getFullyQualifiedName()) });
+
+    // the main file is a module because it exports/imports
+    const theNamespace9 = fmxRep._getFamixModule("namespaces.ts");
+    it("should contain a module for the main file", () => {
+        expect(theNamespace9).toBeTruthy();
+    });
+
 });

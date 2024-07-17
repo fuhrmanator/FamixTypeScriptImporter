@@ -17,7 +17,7 @@ export let currentCC: unknown; // Stores the cyclomatic complexity metrics for t
  * @param sourceFile A source file
  * @returns A boolean indicating if the file is a module
  */
-function ismodule(sourceFile: SourceFile): boolean {
+function isSourceFileAModule(sourceFile: SourceFile): boolean {
     return sourceFile.getImportDeclarations().length > 0 || sourceFile.getExportedDeclarations().size > 0;
 }
 
@@ -95,7 +95,7 @@ export function processFiles(sourceFiles: Array<SourceFile>): void {
  * @param f A source file
  */
 function processFile(f: SourceFile): void {
-    const isModule = ismodule(f);
+    const isModule = isSourceFileAModule(f);
 
     if (isModule) {
         modules.push(f);
@@ -120,44 +120,48 @@ function processFile(f: SourceFile): void {
 
     processFunctions(f, fmxFile);
 
-    processNamespaces(f, fmxFile);
+    processModules(f, fmxFile);
 }
 
 /**
- * Builds a Famix model for a namespace
+ * Builds a Famix model for a module (also namespace)
  * @param m A namespace
- * @returns A Famix.Namespace representing the namespace
+ * @returns A Famix.Module representing the module
  */
-function processNamespace(m: ModuleDeclaration): Famix.Namespace {
-    const fmxNamespace = entityDictionary.createOrGetFamixNamespace(m);
+function processModule(m: ModuleDeclaration): Famix.Module {
+    const fmxModule = entityDictionary.createOrGetFamixModule(m);
 
-    logger.debug(`processNamespace: namespace: ${m.getName()}, (${m.getType().getText()}), ${fmxNamespace.getFullyQualifiedName()}`);
+    logger.debug(`namespace: ${m.getName()}, (${m.getType().getText()}), ${fmxModule.getFullyQualifiedName()}`);
 
-    processComments(m, fmxNamespace);
+    processComments(m, fmxModule);
 
-    processAliases(m, fmxNamespace);
+    processAliases(m, fmxModule);
 
-    processClasses(m, fmxNamespace);
+    processClasses(m, fmxModule);
 
-    processInterfaces(m, fmxNamespace);
+    processInterfaces(m, fmxModule);
 
-    processVariables(m, fmxNamespace);
+    processVariables(m, fmxModule);
 
-    processEnums(m, fmxNamespace);
+    processEnums(m, fmxModule);
     
-    processFunctions(m, fmxNamespace);
+    processFunctions(m, fmxModule);
 
-    processNamespaces(m, fmxNamespace);
+    processModules(m, fmxModule);
 
-    return fmxNamespace;
+    return fmxModule;
 }
+
+type ContainerTypes = SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | ArrowFunction;
+
+type ScopedTypes = Famix.ScriptEntity | Famix.Module | Famix.Function | Famix.Method | Famix.Accessor;
 
 /**
  * Builds a Famix model for the aliases of a container
  * @param m A container (a source file, a namespace, a function or a method)
  * @param fmxScope The Famix model of the container
  */
-function processAliases(m: SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | ArrowFunction, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace | Famix.Function | Famix.Method | Famix.Accessor): void {
+function processAliases(m: ContainerTypes, fmxScope: ScopedTypes): void {
     logger.debug(`processAliases: ---------- Finding Aliases:`);
     m.getTypeAliases().forEach(a => {
         const fmxAlias = processAlias(a);
@@ -170,7 +174,7 @@ function processAliases(m: SourceFile | ModuleDeclaration | FunctionDeclaration 
  * @param m A container (a source file or a namespace)
  * @param fmxScope The Famix model of the container
  */
-function processClasses(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace): void {
+function processClasses(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module ): void {
     logger.debug(`processClasses: ---------- Finding Classes:`);
     m.getClasses().forEach(c => {
         const fmxClass = processClass(c);
@@ -183,7 +187,7 @@ function processClasses(m: SourceFile | ModuleDeclaration, fmxScope: Famix.Scrip
  * @param m A container (a source file or a namespace)
  * @param fmxScope The Famix model of the container
  */
-function processInterfaces(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace): void {
+function processInterfaces(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module ): void {
     logger.debug(`processInterfaces: ---------- Finding Interfaces:`);
     m.getInterfaces().forEach(i => {
         const fmxInterface = processInterface(i);
@@ -196,7 +200,7 @@ function processInterfaces(m: SourceFile | ModuleDeclaration, fmxScope: Famix.Sc
  * @param m A container (a source file, a namespace, a function or a method)
  * @param fmxScope The Famix model of the container
  */
-function processVariables(m: SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration |ArrowFunction, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace | Famix.Function | Famix.Method | Famix.Accessor): void {
+function processVariables(m: ContainerTypes, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Function | Famix.Method | Famix.Accessor): void {
     logger.debug(`processVariables: ---------- Finding Variables:`);
     m.getVariableStatements().forEach(v => {
         const fmxVariables = processVariableStatement(v);
@@ -211,7 +215,7 @@ function processVariables(m: SourceFile | ModuleDeclaration | FunctionDeclaratio
  * @param m A container (a source file, a namespace, a function or a method)
  * @param fmxScope The Famix model of the container
  */
-function processEnums(m: SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | ArrowFunction, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace | Famix.Function | Famix.Method | Famix.Accessor): void {
+function processEnums(m: ContainerTypes, fmxScope: ScopedTypes): void {
     logger.debug(`processEnums: ---------- Finding Enums:`);
     m.getEnums().forEach(e => {
         const fmxEnum = processEnum(e);
@@ -224,7 +228,7 @@ function processEnums(m: SourceFile | ModuleDeclaration | FunctionDeclaration | 
  * @param m A container (a source file, a namespace, a function or a method)
  * @param fmxScope The Famix model of the container
  */
-function processFunctions(m: SourceFile | ModuleDeclaration | FunctionDeclaration | FunctionExpression | MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | ArrowFunction, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace | Famix.Function | Famix.Method | Famix.Accessor): void {
+function processFunctions(m: ContainerTypes, fmxScope: ScopedTypes): void {
     logger.debug(`Finding Functions:`);
     m.getFunctions().forEach(f => {
         const fmxFunction = processFunction(f);
@@ -241,15 +245,15 @@ function processFunctions(m: SourceFile | ModuleDeclaration | FunctionDeclaratio
 }
 
 /**
- * Builds a Famix model for the namespaces of a container
+ * Builds a Famix model for the modules of a container.
  * @param m A container (a source file or a namespace)
  * @param fmxScope The Famix model of the container
  */
-function processNamespaces(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module | Famix.Namespace): void {
-    logger.debug(`Finding Namespaces:`);
+function processModules(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module ): void {
+    logger.debug(`Finding Modules:`);
     m.getModules().forEach(md => {
-        const fmxNsp = processNamespace(md);
-        fmxScope.addNamespace(fmxNsp);
+        const fmxModule = processModule(md);
+        fmxScope.addModule(fmxModule);
     });
 }
 

@@ -57,7 +57,7 @@ project.createSourceFile("lazyRequireModuleCommonJS.ts",
     }`); // see https://basarat.gitbook.io/typescript/project/modules/external-modules#use-case-lazy-loading
 
 const fmxRep = importer.famixRepFromProject(project);
-const NUMBER_OF_MODULES = 9,
+const NUMBER_OF_MODULES = 10,
       NUMBER_OF_IMPORT_CLAUSES = 6;
 
 const importClauses = Array.from(fmxRep._getAllEntitiesWithType("ImportClause")) as Array<ImportClause>;
@@ -84,6 +84,8 @@ describe('Tests for import clauses', () => {
         expect(reImporterModule).toBeTruthy();
         const renameDefaultExportImporter = moduleList.find(e => e.getName() === 'renameDefaultExportImporter.ts');
         expect(renameDefaultExportImporter).toBeTruthy();
+        // const ambientModule = moduleList.find(e => e.getName() === 'renameDefaultExportImporter.ts');
+        // expect(renameDefaultExportImporter).toBeTruthy();
     });
 
     it(`should have ${NUMBER_OF_IMPORT_CLAUSES} import clauses`, () => {

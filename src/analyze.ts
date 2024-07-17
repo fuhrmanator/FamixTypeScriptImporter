@@ -113,7 +113,7 @@ function initFamixRep(project :Project ): void {
         const compilerOptions = project.getCompilerOptions();
 
         // get baseUrl
-        const baseUrl = compilerOptions.baseUrl;
+        const baseUrl = compilerOptions.baseUrl || ".";
 
         const absoluteBaseUrl = path.resolve(baseUrl);
 
