@@ -30,10 +30,6 @@ export class ParametricClass extends Class {
     }
   }
 
-  public clearParameterTypes(): void {
-    this.genericParameters.clear();
-  }
-  
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("ParametricClass", this);
     this.addPropertiesToExporter(json);

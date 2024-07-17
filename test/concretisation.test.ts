@@ -29,6 +29,12 @@ class ClassE<T> {
 
 class ClassF extends ClassE<string> {
 }
+
+interface InterfaceA<T> {
+}
+
+class ClassG implements InterfaceA<number> {
+}
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -59,7 +65,7 @@ describe('Tests for concretisation', () => {
     });
 
     it("should contain one concretisation", () => {
-        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(3);
+        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(4);
     });
 
     it("The generic Class should be ClassA<T> with genericParameter T", () => {

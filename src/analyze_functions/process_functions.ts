@@ -876,8 +876,8 @@ export function processConcretisations(classes: ClassDeclaration[]): void {
     logger.info(`processConcretisations: Creating concretisations:`);
     classes.forEach(cls => {
         logger.debug(`processConcretisations: Checking class concretisation for ${cls.getName()}`);
-        const isGeneric = cls.getTypeParameters().length>0;
-        if (isGeneric) {
+        const hasSuperClass = cls.getHeritageClauses().length>0;
+        if (hasSuperClass) {
             entityDictionary.createFamixConcretisation(cls);
         }
     });
