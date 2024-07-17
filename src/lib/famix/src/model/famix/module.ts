@@ -5,6 +5,60 @@ import { ScriptEntity } from "./script_entity";
 
 export class Module extends ScriptEntity {
 
+
+    /**
+     * Getter $isAmbient
+     * @return {boolean }
+     */
+	public get $isAmbient(): boolean  {
+		return this.isAmbient;
+	}
+
+    /**
+     * Setter $isAmbient
+     * @param {boolean } value
+     */
+	public set $isAmbient(value: boolean ) {
+		this.isAmbient = value;
+	}
+
+  private isAmbient: boolean = false;
+
+    /**
+     * Getter $isNamespace
+     * @return {boolean }
+     */
+	public get $isNamespace(): boolean  {
+		return this.isNamespace;
+	}
+
+    /**
+     * Setter $isNamespace
+     * @param {boolean } value
+     */
+	public set $isNamespace(value: boolean ) {
+		this.isNamespace = value;
+	}
+  private isNamespace: boolean = false;
+
+    /**
+     * Getter $isModule
+     * @return {boolean }
+     */
+	public get $isModule(): boolean  {
+		return this.isModule;
+	}
+
+    /**
+     * Setter $isModule
+     * @param {boolean } value
+     */
+	public set $isModule(value: boolean ) {
+		this.isModule = value;
+	}
+  
+  private isModule: boolean = true;
+
   private parentScope: ScopingEntity;
 
   public getParentScope(): ScopingEntity {
