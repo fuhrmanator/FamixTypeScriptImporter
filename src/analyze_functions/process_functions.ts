@@ -123,6 +123,17 @@ function processFile(f: SourceFile): void {
     processModules(f, fmxFile);
 }
 
+export function isAmbient(node: ModuleDeclaration): boolean {
+    // An ambient module has the DeclareKeyword modifier.
+    return (node.getModifiers()?.some(modifier => modifier.getKind() === SyntaxKind.DeclareKeyword)) ?? false;
+}
+
+export function isNamespace(node: ModuleDeclaration): boolean {
+    // Check if the module declaration has a namespace keyword.
+    // This approach uses the getChildren() method to inspect the syntax directly.
+    return node.getChildrenOfKind(SyntaxKind.NamespaceKeyword).length > 0;
+}
+
 /**
  * Builds a Famix model for a module (also namespace)
  * @param m A namespace
@@ -131,7 +142,7 @@ function processFile(f: SourceFile): void {
 function processModule(m: ModuleDeclaration): Famix.Module {
     const fmxModule = entityDictionary.createOrGetFamixModule(m);
 
-    logger.debug(`namespace: ${m.getName()}, (${m.getType().getText()}), ${fmxModule.getFullyQualifiedName()}`);
+    logger.debug(`module: ${m.getName()}, (${m.getType().getText()}), ${fmxModule.getFullyQualifiedName()}`);
 
     processComments(m, fmxModule);
 

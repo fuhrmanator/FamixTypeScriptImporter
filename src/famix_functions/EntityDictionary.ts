@@ -1,4 +1,5 @@
 import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration, SyntaxKind, Expression, TypeNode, Node, ts } from "ts-morph";
+import { isAmbient, isNamespace } from "../analyze_functions/process_functions";
 import * as Famix from "../lib/famix/src/model/famix";
 import { logger, config } from "../analyze";
 import GraphemeSplitter from "grapheme-splitter";
@@ -124,13 +125,13 @@ export class EntityDictionary {
      * @returns The Famix model of the source file
      */
     public createOrGetFamixFile(f: SourceFile, isModule: boolean): Famix.ScriptEntity | Famix.Module {
-        let fmxFile: Famix.ScriptEntity | Famix.Module;
+        let fmxFile: Famix.ScriptEntity; // | Famix.Module;
 
         const fileName = f.getBaseName();
         const fullyQualifiedFilename = f.getFilePath();
         if (!this.fmxFileMap.has(fullyQualifiedFilename)) {
             if (isModule) {
-                fmxFile = new Famix.Module(); 
+                fmxFile = new Famix.Module();
             }
             else {
                 fmxFile = new Famix.ScriptEntity();
@@ -153,25 +154,28 @@ export class EntityDictionary {
     }
 
     /**
-     * Creates or gets a Famix namespace
-     * @param m A namespace
-     * @returns The Famix model of the namespace
+     * Creates or gets a Famix Module
+     * @param m A module
+     * @returns The Famix model of the module
      */
     public createOrGetFamixModule(m: ModuleDeclaration): Famix.Module {
         let fmxModule: Famix.Module;
-        const namespaceName = m.getName();
-        if (!this.fmxModuleMap.has(namespaceName)) {
+        const moduleName = m.getName();
+        if (!this.fmxModuleMap.has(moduleName)) {
             fmxModule = new Famix.Module();
-            fmxModule.setName(namespaceName);
+            fmxModule.setName(moduleName);
+            fmxModule.$isAmbient = isAmbient(m);
+            fmxModule.$isNamespace = isNamespace(m);
+            fmxModule.$isModule = !fmxModule.$isNamespace && !fmxModule.$isAmbient;
 
             this.makeFamixIndexFileAnchor(m, fmxModule);
 
-            this.fmxModuleMap.set(namespaceName, fmxModule);
+            this.fmxModuleMap.set(moduleName, fmxModule);
 
             this.famixRep.addElement(fmxModule);
         }
         else {
-            fmxModule = this.fmxModuleMap.get(namespaceName);
+            fmxModule = this.fmxModuleMap.get(moduleName);
         }
 
         this.fmxElementObjectMap.set(fmxModule,m);

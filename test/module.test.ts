@@ -71,4 +71,31 @@ describe('Tests for module', () => {
         expect(exportedNsp).toBeTruthy();
     });
 
+    it("should have a module with isAmbient property set to true", () => {
+        expect(ambientModule?.$isAmbient).toBeTruthy();
+        expect(ambientModule?.$isModule).toBeFalsy();
+        expect(ambientModule?.$isNamespace).toBeFalsy();
+    });
+
+    it("should have a module with isNamespace property set to true", () => {
+        expect(exportedNsp?.$isNamespace).toBeTruthy();
+        expect(exportedNsp?.$isModule).toBeFalsy();
+        expect(exportedNsp?.$isAmbient).toBeFalsy();
+    });
+
+    it("should have modules with isModule property set to true", () => {
+        expect(moduleBecauseExports?.$isModule).toBeTruthy();
+        expect(moduleBecauseExports?.$isAmbient).toBeFalsy();
+        expect(moduleBecauseExports?.$isNamespace).toBeFalsy();
+
+        expect(moduleBecauseImports?.$isModule).toBeTruthy();
+        expect(moduleBecauseImports?.$isAmbient).toBeFalsy();
+        expect(moduleBecauseImports?.$isNamespace).toBeFalsy();
+
+        expect(moduleImportFromFileWithExtension?.$isModule).toBeTruthy();
+        expect(moduleImportFromFileWithExtension?.$isAmbient).toBeFalsy();
+        expect(moduleImportFromFileWithExtension?.$isNamespace).toBeFalsy();
+
+    });
+
 });
