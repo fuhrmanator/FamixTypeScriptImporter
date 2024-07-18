@@ -1147,6 +1147,40 @@ export class EntityDictionary {
         let fmxConcretisation : Famix.Concretisation;
 
         if (cls instanceof ClassDeclaration){
+            const instances = cls.getSourceFile().getDescendantsOfKind(ts.SyntaxKind.NewExpression)
+                .filter(newExpr => {
+                    const expression = newExpr.getExpression();
+                    return expression.getText() === cls.getName();
+                });
+
+            instances.forEach(instance => {
+                const conParams = instance.getTypeArguments().map((param) => param.getText());
+                const genEntity = this.createOrGetFamixClass(cls) as Famix.ParametricClass;
+                const genParams = cls.getTypeParameters().map((param) => param.getText());
+                console.log(conParams)
+                console.log(genParams)
+                if (!Helpers.arraysAreEqual(conParams,genParams)) {
+                    let conEntity;
+                    conEntity = this.createOrGetFamixConcreteClass(instance);
+                    const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
+                    let createConcretisation : boolean = true;
+                    concretisations.forEach((conc : Famix.Concretisation) => {
+                        if (genEntity.getFullyQualifiedName() == conc.getGenericEntity().getFullyQualifiedName() && conc.getConcreteEntity().getFullyQualifiedName() == conEntity.getFullyQualifiedName()){
+                            createConcretisation = false;
+                        }
+                    });
+    
+                    if (createConcretisation) {
+                        fmxConcretisation = new Famix.Concretisation();              
+                        fmxConcretisation.setConcreteEntity(conEntity);
+                        fmxConcretisation.setGenericEntity(genEntity);
+                        this.fmxElementObjectMap.set(fmxConcretisation,null);
+                        this.famixRep.addElement(fmxConcretisation);    
+                        const parameterConcretisation = this.createFamixParameterConcrestisation(fmxConcretisation);
+                    }
+                }
+            })
+
             const superInterfaces = cls.getImplements();
             superInterfaces.forEach(interfaceType => {
                 const interfaceIsGeneric = interfaceType.getTypeArguments().length>0;

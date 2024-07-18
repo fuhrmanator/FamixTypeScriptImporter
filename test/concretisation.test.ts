@@ -30,7 +30,7 @@ class ClassE<T> {
 class ClassF extends ClassE<string> {
 }
 
-interface InterfaceA<T> {
+interface InterfaceA<V> {
 }
 
 class ClassG implements InterfaceA<number> {
