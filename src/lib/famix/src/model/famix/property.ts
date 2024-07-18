@@ -7,6 +7,23 @@ export class Property extends StructuralEntity {
 
   private isClassSide: boolean;
 
+    /**
+     * Getter $readOnly
+     * @return {boolean}
+     */
+	public get readOnly(): boolean {
+		return this._readOnly;
+	}
+
+    /**
+     * Setter $readOnly
+     * @param {boolean} value
+     */
+	public set readOnly(value: boolean) {
+		this._readOnly = value;
+	}
+  private _readOnly: boolean;
+
   public getIsClassSide(): boolean {
     return this.isClassSide;
   }
