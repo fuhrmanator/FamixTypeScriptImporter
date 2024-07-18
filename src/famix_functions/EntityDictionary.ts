@@ -243,12 +243,11 @@ export class EntityDictionary {
 
             this.famixRep.addElement(fmxClass);
 
+            this.fmxElementObjectMap.set(fmxClass,cls);
         }
         else {
             fmxClass = this.fmxClassMap.get(classFullyQualifiedName) as (Famix.Class | Famix.ParametricClass);
         }
-
-        this.fmxElementObjectMap.set(fmxClass,cls);
 
         return fmxClass;
     }
@@ -343,7 +342,7 @@ export class EntityDictionary {
         let fmxInterface: Famix.Interface | Famix.ParametricInterface;
         const interName = inter.getName();
         const interFullyQualifiedName = FQNFunctions.getFQN(inter);
-        if (!this.fmxInterfaceMap.has(interName)) {
+        if (!this.fmxInterfaceMap.has(interFullyQualifiedName)) {
             const isGeneric = inter.getTypeParameters().length;
             if (isGeneric) {
                 fmxInterface = new Famix.ParametricInterface();
@@ -359,12 +358,12 @@ export class EntityDictionary {
             this.fmxInterfaceMap.set(interFullyQualifiedName, fmxInterface);
 
             this.famixRep.addElement(fmxInterface);
+
+            this.fmxElementObjectMap.set(fmxInterface,inter);
         }
         else {
-            fmxInterface = this.fmxInterfaceMap.get(interName) as (Famix.Interface | Famix.ParametricInterface);
+            fmxInterface = this.fmxInterfaceMap.get(interFullyQualifiedName) as (Famix.Interface | Famix.ParametricInterface);
         }
-
-        this.fmxElementObjectMap.set(fmxInterface,inter);
         return fmxInterface;
     }
 
@@ -390,10 +389,9 @@ export class EntityDictionary {
         let interfaceFullyQualifiedName = FQNFunctions.getFQN(conInterfaceDeclaration);
         
         interfaceFullyQualifiedName = Helpers.remplacerTypeGenerique(interfaceFullyQualifiedName,params);
-                
         const clsName = conInterfaceDeclaration.getName();
 
-        if (!this.fmxClassMap.has(interfaceFullyQualifiedName)) {
+        if (!this.fmxInterfaceMap.has(interfaceFullyQualifiedName)) {
             fmxInterface = new Famix.ParametricInterface();
             fmxInterface.setName(clsName);
             fmxInterface.setFullyQualifiedName(interfaceFullyQualifiedName);
@@ -407,6 +405,7 @@ export class EntityDictionary {
             })
         }
         else {
+            console.log("existe")
             fmxInterface = this.fmxInterfaceMap.get(interfaceFullyQualifiedName) as (Famix.ParametricInterface);
         }
         return fmxInterface;
@@ -1218,7 +1217,7 @@ export class EntityDictionary {
             superEntityArray = Array.isArray(superEntity) ? superEntity : [superEntity];
         }
 
-        if (superEntityArray) {
+        if (superEntityArray && superEntityArray.length > 0) {
             superEntityArray.forEach(entity => {
                 let entityIsGeneric;
                 const superEntitySymbol = entity.getExpression().getSymbolOrThrow();
@@ -1235,11 +1234,14 @@ export class EntityDictionary {
                     let EntityDeclaration;
                     let genEntity;
                     if (superEntity instanceof ExpressionWithTypeArguments) {
+                        console.log('aaaa')
                         EntityDeclaration = entity.getExpression().getSymbol().getDeclarations()[0] as ClassDeclaration;
                         genEntity = this.createOrGetFamixClass(EntityDeclaration) as Famix.ParametricClass;
                     } else {
+                        console.log('bbbb')
                         EntityDeclaration = entity.getExpression().getSymbol().getDeclarations()[0] as InterfaceDeclaration;
                         genEntity = this.createOrGetFamixInterface(EntityDeclaration) as Famix.ParametricInterface;
+                        console.log(genEntity)
                     }
                     const genParams = EntityDeclaration.getTypeParameters().map((param) => param.getText());
                     const conParams = cls.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments().map((param) => param.getText());
@@ -1261,6 +1263,8 @@ export class EntityDictionary {
                         if (createConcretisation) {
                             fmxConcretisation = new Famix.Concretisation();              
                             fmxConcretisation.setConcreteEntity(conEntity);
+                            console.log(conEntity)
+                            console.log(genEntity)
                             fmxConcretisation.setGenericEntity(genEntity);
                             this.fmxElementObjectMap.set(fmxConcretisation,null);
                             this.famixRep.addElement(fmxConcretisation);    
@@ -1278,6 +1282,7 @@ export class EntityDictionary {
     public createFamixParameterConcrestisation(concretisation: Famix.Concretisation): Famix.ParameterConcretisation {
         const conClass = concretisation.getConcreteEntity();
         const genClass = concretisation.getGenericEntity();
+        console.log(genClass)
         const parameterConcretisations = this.famixRep._getAllEntitiesWithType("ParameterConcretisation");
         const concreteParameters = conClass.getConcreteParameters();
         const genericParameters = genClass.getGenericParameters();

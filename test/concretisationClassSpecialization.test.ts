@@ -11,7 +11,7 @@ const project = new Project(
     }
 );
 
-project.createSourceFile("./src/genericClass.ts",
+project.createSourceFile("./src/concretisationClassSpecialization.ts",
 `class ClassA<T> {
 }
 
@@ -29,15 +29,6 @@ class ClassE<T> {
 
 class ClassF extends ClassE<string> {
 }
-
-interface InterfaceA<V> {
-}
-
-class ClassG implements InterfaceA<number> {
-}
-
-interface InterfaceB extends InterfaceA<boolean> {
-}
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -48,7 +39,7 @@ describe('Tests for concretisation', () => {
         expect(fmxRep).toBeTruthy();
     });
 
-    it("should contain two generic classes", () => {
+    it("should contain 6 generic classes", () => {
         expect(fmxRep._getAllEntitiesWithType("ParametricClass").size).toBe(6);
     });
 
@@ -60,15 +51,15 @@ describe('Tests for concretisation', () => {
         expect(numberOfClassA).toBe(3); 
     });
 
-    const theClass = fmxRep._getFamixClass("{genericClass.ts}.ClassA<T>");
+    const theClass = fmxRep._getFamixClass("{concretisationClassSpecialization.ts}.ClassA<T>");
 
     it ("should not be an abstract class", () => {
         expect(theClass).toBeTruthy();
         if (theClass) expect(theClass.getIsAbstract()).toBe(false);
     });
 
-    it("should contain 5 concretisations", () => {
-        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(5);
+    it("should contain 3 concretisations", () => {
+        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(3);
     });
 
     it("The generic Class should be ClassA<T> with genericParameter T", () => {
@@ -99,7 +90,6 @@ describe('Tests for concretisation', () => {
         const firstElement = iterator.next().value;
         const genericParameter = firstElement.getGenericParameter();
         const concParameter = firstElement.getConcreteParameter();
-        const concretisations = firstElement.getConcretisations();
         expect(genericParameter.getName()).toBe("T");
         expect(concParameter.getName()).toBe("string");
         expect(firstElement.getConcretisations().size).toBe(2);
