@@ -1,4 +1,4 @@
-import { ClassDeclaration, MethodDeclaration, VariableStatement, FunctionDeclaration, VariableDeclaration, InterfaceDeclaration, ParameterDeclaration, ConstructorDeclaration, MethodSignature, SourceFile, ModuleDeclaration, PropertyDeclaration, PropertySignature, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ExportedDeclarations, CommentRange, EnumDeclaration, EnumMember, TypeParameterDeclaration, TypeAliasDeclaration, SyntaxKind, FunctionExpression, Block, Identifier, ExpressionWithTypeArguments, ImportDeclaration, Node, ArrowFunction } from "ts-morph";
+import { ClassDeclaration, MethodDeclaration, VariableStatement, FunctionDeclaration, VariableDeclaration, InterfaceDeclaration, ParameterDeclaration, ConstructorDeclaration, MethodSignature, SourceFile, ModuleDeclaration, PropertyDeclaration, PropertySignature, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ExportedDeclarations, CommentRange, EnumDeclaration, EnumMember, TypeParameterDeclaration, TypeAliasDeclaration, SyntaxKind, FunctionExpression, Block, Identifier, ExpressionWithTypeArguments, ImportDeclaration, Node, ArrowFunction, Scope, ClassExpression } from "ts-morph";
 import * as Famix from "../lib/famix/src/model/famix";
 import { calculate } from "../lib/ts-complex/cyclomatic-service";
 import * as fs from 'fs';
@@ -487,7 +487,77 @@ function processParameters(m: MethodDeclaration | ConstructorDeclaration | Metho
     m.getParameters().forEach(param => {
         const fmxParam = processParameter(param);
         fmxScope.addParameter(fmxParam);
+        // Additional handling for Parameter Properties in constructors
+        if (m instanceof ConstructorDeclaration) {
+            // Check if the parameter has any visibility modifier
+            if (param.hasModifier(SyntaxKind.PrivateKeyword) || param.hasModifier(SyntaxKind.PublicKeyword) || param.hasModifier(SyntaxKind.ProtectedKeyword) || param.hasModifier(SyntaxKind.ReadonlyKeyword)) {
+                const classOfConstructor = m.getParent();
+                logger.info(`Parameter Property ${param.getName()} in constructor of ${classOfConstructor.getName()}.`);
+                // Treat the parameter as a property and add it to the class
+                const fmxProperty = processParameterAsProperty(param, classOfConstructor);
+                fmxProperty.readOnly = param.hasModifier(SyntaxKind.ReadonlyKeyword);
+            }
+        }
+
     });
+}
+
+// This function should create a Famix.Property model from a ParameterDeclaration
+// You'll need to implement it according to your Famix model structure
+function processParameterAsProperty(param: ParameterDeclaration, c: ClassDeclaration | ClassExpression): Famix.Property {
+    // Convert the parameter into a Property
+    const propertyRepresentation = convertParameterToPropertyRepresentation(param);
+
+    // Add the property to the class so we can have a PropertyDeclaration object
+    c.addProperty(propertyRepresentation);
+
+    const p = c.getProperty(propertyRepresentation.name);
+    const fmxProperty = entityDictionary.createFamixProperty(p);
+    if (c instanceof ClassDeclaration) {
+        const fmxClass = entityDictionary.createOrGetFamixClass(c);
+        fmxClass.addProperty(fmxProperty);
+    } else { 
+        throw new Error("Unexpected type ClassExpression.");
+    }
+
+    processComments(p, fmxProperty);
+
+    // remove the property from the class
+    p.remove();
+
+    return fmxProperty;
+
+}
+
+function convertParameterToPropertyRepresentation(param: ParameterDeclaration) {
+    // Extract name
+    const paramName = param.getName();
+
+    // Extract type
+    const paramType = param.getType().getText(param);
+
+    // Determine visibility
+    let visibility: 'private' | 'protected' | 'public' | undefined;
+    if (param.hasModifier(SyntaxKind.PrivateKeyword)) {
+        visibility = 'private';
+    } else if (param.hasModifier(SyntaxKind.ProtectedKeyword)) {
+        visibility = 'protected';
+    } else if (param.hasModifier(SyntaxKind.PublicKeyword)) {
+        visibility = 'public';
+    }
+
+    // Determine if readonly
+    const isReadonly = param.hasModifier(SyntaxKind.ReadonlyKeyword);
+
+    // Create a representation of the property
+    const propertyRepresentation = {
+        name: paramName,
+        type: paramType,
+        visibility: visibility,
+        isReadonly: isReadonly,
+    };
+
+    return propertyRepresentation;
 }
 
 /**
