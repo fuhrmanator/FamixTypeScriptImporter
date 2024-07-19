@@ -445,7 +445,13 @@ export class EntityDictionary {
                     break;
                 case Scope.Private:
                     fmxProperty.visibility = "private";
-                    break;                    
+                    break;
+                case "static":
+                    fmxProperty.setIsClassSide(true);
+                    break;
+                case "readonly":
+                    fmxProperty.readOnly = true;
+                    break;
                 default:
                     break;
             }
@@ -459,13 +465,6 @@ export class EntityDictionary {
         }
         if (property.getName().substring(0, 1) === "#") {
             fmxProperty.addModifier("#");
-        }
-
-        if (fmxProperty.getModifiers().has("static")) {
-            fmxProperty.setIsClassSide(true);
-        }
-        else {
-            fmxProperty.setIsClassSide(false);
         }
 
         this.makeFamixIndexFileAnchor(property, fmxProperty);

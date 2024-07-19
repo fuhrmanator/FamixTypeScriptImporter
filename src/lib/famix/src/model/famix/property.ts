@@ -7,7 +7,7 @@ export type VisibilityTypes = "public" | "private" | "protected" | "";
 
 export class Property extends StructuralEntity {
 
-  private isClassSide: boolean;
+  private isClassSide: boolean = false;
 
   /**
    * Getter $readOnly
