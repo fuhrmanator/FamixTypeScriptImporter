@@ -513,6 +513,13 @@ function processParameterAsProperty(param: ParameterDeclaration, c: ClassDeclara
 
     const p = c.getProperty(propertyRepresentation.name);
     const fmxProperty = entityDictionary.createFamixProperty(p);
+    if (c instanceof ClassDeclaration) {
+        const fmxClass = entityDictionary.createOrGetFamixClass(c);
+        fmxClass.addProperty(fmxProperty);
+    } else { 
+        throw new Error("Unexpected type ClassExpression.");
+    }
+
     processComments(p, fmxProperty);
 
     // remove the property from the class
