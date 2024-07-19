@@ -537,13 +537,13 @@ function convertParameterToPropertyRepresentation(param: ParameterDeclaration) {
     const paramType = param.getType().getText(param);
 
     // Determine visibility
-    let visibility: 'private' | 'protected' | 'public' | undefined;
+    let scope: Scope;
     if (param.hasModifier(SyntaxKind.PrivateKeyword)) {
-        visibility = 'private';
+        scope = Scope.Private;
     } else if (param.hasModifier(SyntaxKind.ProtectedKeyword)) {
-        visibility = 'protected';
+        scope = Scope.Protected;
     } else if (param.hasModifier(SyntaxKind.PublicKeyword)) {
-        visibility = 'public';
+        scope = Scope.Public;
     }
 
     // Determine if readonly
@@ -553,7 +553,7 @@ function convertParameterToPropertyRepresentation(param: ParameterDeclaration) {
     const propertyRepresentation = {
         name: paramName,
         type: paramType,
-        visibility: visibility,
+        scope: scope,
         isReadonly: isReadonly,
     };
 

@@ -12,7 +12,7 @@ const project = new Project(
 );
 project.createSourceFile("./src/propertyDefinedInConstructorSignature.ts",
 `class Point {
-  constructor(public x: number, public readonly y: number) {}
+  constructor(private x: number, public readonly y: number, protected z: number) {}
 }`);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -27,18 +27,28 @@ describe('Tests for properties in a Class', () => {
     const allProperties =  fmxRep._getAllEntitiesWithType("Property");
 
     it("should contain two properties", () => {
-        expect(allProperties.size).toBe(2);
+        expect(allProperties.size).toBe(3);
     });
 
-    it("should contain a property 'x'", () => {
+    it("should contain a private property 'x'", () => {
         const theProperty = pointProperties.find((f) => f.getName() === "x");
         expect(theProperty).toBeTruthy();
+        expect(theProperty?.readOnly).toBe(false);
+        expect(theProperty?.visibility).toBe("private");
     });
 
-    it("should contain a readonly property 'y'", () => {
+    it("should contain a public readonly property 'y'", () => {
         const theProperty = pointProperties.find((f) => f.getName() === "y");
         expect(theProperty).toBeTruthy();
         expect(theProperty?.readOnly).toBe(true);
+        expect(theProperty?.visibility).toBe("public");
+    });
+
+    it("should contain a protected property 'z'", () => {
+        const theProperty = pointProperties.find((f) => f.getName() === "z");
+        expect(theProperty).toBeTruthy();
+        expect(theProperty?.readOnly).toBe(false);
+        expect(theProperty?.visibility).toBe("protected");
     });
 
 });

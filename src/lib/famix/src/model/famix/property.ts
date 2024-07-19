@@ -3,25 +3,27 @@ import { Class } from "./class";
 import { Interface } from "./interface";
 import { StructuralEntity } from "./structural_entity";
 
+export type VisibilityTypes = "public" | "private" | "protected" | "";
+
 export class Property extends StructuralEntity {
 
-  private isClassSide: boolean;
+  private isClassSide: boolean = false;
 
-    /**
-     * Getter $readOnly
-     * @return {boolean}
-     */
-	public get readOnly(): boolean {
-		return this._readOnly;
-	}
+  /**
+   * Getter $readOnly
+   * @return {boolean}
+   */
+  public get readOnly(): boolean {
+    return this._readOnly;
+  }
 
-    /**
-     * Setter $readOnly
-     * @param {boolean} value
-     */
-	public set readOnly(value: boolean) {
-		this._readOnly = value;
-	}
+  /**
+   * Setter $readOnly
+   * @param {boolean} value
+   */
+  public set readOnly(value: boolean) {
+    this._readOnly = value;
+  }
   private _readOnly: boolean;
 
   public getIsClassSide(): boolean {
@@ -55,7 +57,25 @@ export class Property extends StructuralEntity {
     }
   }
 
-  
+
+  /**
+   * Getter visibility
+   * @return {VisibilityTypes }
+   */
+  public get visibility(): VisibilityTypes {
+    return this._visibility;
+  }
+
+  /**
+   * Setter visibility
+   * @param {VisibilityTypes } value
+   */
+  public set visibility(value: VisibilityTypes) {
+    this._visibility = value;
+  }
+
+  private _visibility: VisibilityTypes = "";
+
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("Property", this);
     this.addPropertiesToExporter(json);
@@ -64,6 +84,7 @@ export class Property extends StructuralEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
+    exporter.addProperty("readOnly", this.readOnly);
     exporter.addProperty("isClassSide", this.getIsClassSide());
     exporter.addProperty("parentEntity", this.getParentEntity());
     exporter.addProperty("modifiers", this.getModifiers());

@@ -119,7 +119,7 @@ describe('Entities', () => {
         if (theEntityClass) {
             const nameAttribute = Array.from(theEntityClass.getProperties())[0];
             expect(nameAttribute.getName()).toBe("name");
-            expect(nameAttribute.getModifiers()).toContain("public");
+            expect(nameAttribute.visibility).toBe("public");
         }
     });
 
@@ -133,7 +133,7 @@ describe('Entities', () => {
         if (theEntityClass) {
             const p1Attribute = Array.from(theEntityClass.getProperties())[1];
             expect(p1Attribute.getName()).toBe("p1");
-            expect(p1Attribute.getModifiers()).toContain("private");
+            expect(p1Attribute.visibility).toBe("private");
             expect(p1Attribute.getDeclaredType().getName()).toBe("boolean");
         }
     });
@@ -150,7 +150,7 @@ describe('Entities', () => {
         if (theEntityClass) {
             const prot1Attribute = Array.from(theEntityClass.getProperties())[3];
             expect(prot1Attribute.getName()).toBe("prot1");
-            expect(prot1Attribute.getModifiers()).toContain("protected");
+            expect(prot1Attribute.visibility).toBe("protected");
             expect(prot1Attribute.getDeclaredType().getName()).toBe("Map<any, any>");
         }
     });
@@ -168,7 +168,7 @@ describe('Entities', () => {
         if (theEntityClass) {
             const roAttribute = Array.from(theEntityClass.getProperties())[5];
             expect(roAttribute.getName()).toBe("ro");
-            expect(roAttribute.getModifiers()).toContain("readonly");
+            expect(roAttribute.readOnly).toBe(true);
             expect(roAttribute.getDeclaredType().getName()).toBe('"yes"');
         }
     });
@@ -177,7 +177,7 @@ describe('Entities', () => {
         if (theEntityClass) {
             const userCountAttribute = Array.from(theEntityClass.getProperties())[6];
             expect(userCountAttribute.getName()).toBe("#userCount");
-            expect(userCountAttribute.getModifiers()).toContain("static");
+            expect(userCountAttribute.getIsClassSide()).toBe(true); // static
             expect(userCountAttribute.getDeclaredType().getName()).toBe('number');
         }
     });
