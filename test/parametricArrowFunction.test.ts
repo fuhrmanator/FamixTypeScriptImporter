@@ -1,5 +1,6 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
+import exp from 'constants';
 
 const importer = new Importer();
 const project = new Project(
@@ -26,7 +27,13 @@ describe('ArrowFunctions', () => {
         expect(methodList?.size).toBe(1);
     });
 
-    const theFunction = fmxRep._getFamixFunction('{parametricArrowFunctions.ts}.arrayLength');
+    const method1 = methodList.values().next().value;
+    it("should contain arrow function arrayLength", () => {
+        expect(method1).toBeTruthy();
+        expect(method1?.getDeclaredType().getName()).toBe("number");
+        expect(method1?.getFullyQualifiedName()).toBe("{parametricArrowFunctions.ts}.arrayLength.ArrowFunction(2:25)");
+    });
+    const theFunction = fmxRep._getFamixFunction('{parametricArrowFunctions.ts}.arrayLength.ArrowFunction(2:25)');
 
     it("should contain a parametric arrow function arrayLength", () => {
         expect(theFunction).toBeTruthy();

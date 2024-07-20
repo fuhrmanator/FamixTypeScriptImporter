@@ -26,8 +26,8 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Tests for functions in function', () => {
     
     const theFunction1 = fmxRep._getFamixFunction("{functionsInFunction.ts}.fct");
-    const theFunction2 = fmxRep._getFamixFunction("{functionsInFunction.ts}.fct.fct2");
-    const theFunction3 = fmxRep._getFamixFunction("{functionsInFunction.ts}.fct.fct2.fct3");
+    const theFunction2 = fmxRep._getFamixFunction("{functionsInFunction.ts}.fct.Block(2:5).fct2");
+    const theFunction3 = fmxRep._getFamixFunction("{functionsInFunction.ts}.fct.Block(3:9).fct2.Block(3:9).fct3");
 
     it("should have one function 'fct' with a function 'fct2'", () => {
         expect(theFunction1).toBeTruthy();

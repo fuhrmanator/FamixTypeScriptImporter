@@ -28,8 +28,8 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Tests for functions in method', () => {
     
     const theMethod = fmxRep._getFamixMethod("{functionsInMethod.ts}.F.m");
-    const theFunction2 = fmxRep._getFamixFunction("{functionsInMethod.ts}.F.m.fct2");
-    const theFunction3 = fmxRep._getFamixFunction("{functionsInMethod.ts}.F.m.fct2.fct3");
+    const theFunction2 = fmxRep._getFamixFunction("{functionsInMethod.ts}.F.m.Block(3:9).fct2");
+    const theFunction3 = fmxRep._getFamixFunction("{functionsInMethod.ts}.F.m.Block(4:13).fct2.Block(4:13).fct3");
 
     it("should have one method 'm' with a function 'fct2'", () => {
         expect(theMethod).toBeTruthy();

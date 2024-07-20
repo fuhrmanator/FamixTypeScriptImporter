@@ -91,7 +91,7 @@ describe('Tests for namespaces', () => {
     // fmxRep._getFamixModules().forEach(m => { console.log(m.getFullyQualifiedName()) });
 
     // the main file is a module because it exports/imports
-    const theNamespace9 = fmxRep._getFamixModule("namespaces.ts");
+    const theNamespace9 = fmxRep._getFamixModule("{namespaces.ts}");
     it("should contain a module for the main file", () => {
         expect(theNamespace9).toBeTruthy();
     });

@@ -63,7 +63,9 @@ describe('Tests for accessors with decorators', () => {
     });
 
     const theMethod1 = fmxRep._getFamixMethod("{accessorsWithDecorators.ts}.Point.x");
+    expect(theMethod1).toBeTruthy();
     const theMethod2 = fmxRep._getFamixMethod("{accessorsWithDecorators.ts}.Point.y");
+    expect(theMethod2).toBeTruthy();
     const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).filter((d) => d.getName() === "@x");
     const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).filter((d) => d.getName() === "@b");
     const d3 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).filter((d) => d.getName() === "@configurable");

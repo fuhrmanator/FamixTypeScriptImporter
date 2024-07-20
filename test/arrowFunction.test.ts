@@ -39,28 +39,28 @@ describe('ArrowFunctions', () => {
     });
 
     it("should contain arrow function add and should return number should have two parameters", () => {
-        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.add');
+        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.add.ArrowFunction(3:17)');
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getDeclaredType().getName()).toBe("number");
         expect(theFunction?.getParameters().size).toBe(2);
     });
 
     it("should contain arrow function multiply", () => {
-        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.multiply');
+        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.multiply.ArrowFunction(6:22)');
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getDeclaredType().getName()).toBe("number");
         expect(theFunction?.getParameters().size).toBe(2);
     });
 
     it("should contain arrow function greet", () => {
-        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.greet');
+        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.greet.ArrowFunction(11:19)');
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getDeclaredType().getName()).toBe("void");
         expect(theFunction?.getParameters().size).toBe(0);
     });
 
     it("should contain arrow function square", () => {
-        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.square');
+        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.square.ArrowFunction(16:20)');
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getDeclaredType().getName()).toBe("number");
         expect(theFunction?.getParameters().size).toBe(1);
