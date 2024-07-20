@@ -946,10 +946,13 @@ export function processConcretisations(classes: ClassDeclaration[], interfaces: 
     logger.info(`processConcretisations: Creating concretisations:`);
     classes.forEach(cls => {
         logger.debug(`processConcretisations: Checking class concretisation for ${cls.getName()}`);
-        entityDictionary.createFamixConcretisation(cls);
+        entityDictionary.createFamixConcretisationClassOrInterfaceSpecialisation(cls);
+        entityDictionary.createFamixConcretisationGenericInstantiation(cls);
+        entityDictionary.createFamixConcretisationInterfaceClass(cls);
     });
     interfaces.forEach(inter => {
         logger.debug(`processConcretisations: Checking class concretisation for ${inter.getName()}`);
-        entityDictionary.createFamixConcretisation(inter);
+        entityDictionary.createFamixConcretisationClassOrInterfaceSpecialisation(inter)
     });
+
 }
