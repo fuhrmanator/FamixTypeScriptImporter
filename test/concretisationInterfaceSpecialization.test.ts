@@ -54,6 +54,13 @@ describe('Tests for concretisation', () => {
         expect(numberOfInterfaceA).toBe(3); 
     });
 
+    it("should contain generic interfaces named InterfaceE", () => {
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).getName());
+        expect(listOfNames).toContain("InterfaceE");
+        const numberOfInterfaceE = listOfNames.filter(name => name === "InterfaceE").length;
+        expect(numberOfInterfaceE).toBe(3); 
+    });
+
     const theInterface = fmxRep._getFamixInterface("{concretisationInterfaceSpecialization.ts}.InterfaceA<T>");
 
     it("should contain 3 concretisations", () => {

@@ -943,14 +943,31 @@ function processNodeForInvocations(n: Identifier, m: MethodDeclaration | Constru
  * @param classes An array of classes
  * @param interfaces An array of interfaces
  */
-export function processConcretisations(classes: ClassDeclaration[], interfaces: InterfaceDeclaration[]): void {
+export function processConcretisations(classes: ClassDeclaration[], interfaces: InterfaceDeclaration[], accesses : Map<number, ParameterDeclaration | VariableDeclaration | PropertyDeclaration | EnumMember>, functions: Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction>): void {
     logger.info(`processConcretisations: Creating concretisations:`);
     classes.forEach(cls => {
         logger.debug(`processConcretisations: Checking class concretisation for ${cls.getName()}`);
-        entityDictionary.createFamixConcretisation(cls);
+        entityDictionary.createFamixConcretisationClassOrInterfaceSpecialisation(cls);
+        entityDictionary.createFamixConcretisationGenericInstantiation(cls);
+        entityDictionary.createFamixConcretisationInterfaceClass(cls);
     });
     interfaces.forEach(inter => {
-        logger.debug(`processConcretisations: Checking class concretisation for ${inter.getName()}`);
-        entityDictionary.createFamixConcretisation(inter);
+        logger.debug(`processConcretisations: Checking interface concretisation for ${inter.getName()}`);
+        entityDictionary.createFamixConcretisationClassOrInterfaceSpecialisation(inter)
     });
+    accesses.forEach(access => {
+        if (access instanceof VariableDeclaration) {
+            logger.debug(`processConcretisations: Checking Type concretisation`);
+            interfaces.forEach(inter => {
+                entityDictionary.createFamixConcretisationTypeInstanciation(access,inter);
+            });
+        }
+    });
+    functions.forEach(func => {
+        if(func instanceof FunctionDeclaration){
+            logger.debug(`processConcretisations: Checking Type concretisation`);
+            interfaces.forEach(inter => {
+                entityDictionary.createFamixConcretisationTypeInstanciation(func,inter);
+            });        }
+    })
 }
