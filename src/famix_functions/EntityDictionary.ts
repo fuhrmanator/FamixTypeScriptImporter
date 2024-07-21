@@ -1,4 +1,4 @@
-import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration, SyntaxKind, Expression, TypeNode, Node, ts, Scope } from "ts-morph";
+import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration, SyntaxKind, Expression, TypeNode, Node, ts, Scope, Type } from "ts-morph";
 import { isAmbient, isNamespace } from "../analyze_functions/process_functions";
 import * as Famix from "../lib/famix/src/model/famix";
 import { logger, config } from "../analyze";
@@ -294,43 +294,7 @@ export class EntityDictionary {
             fmxClass = this.fmxClassMap.get(classeFullyQualifiedName) as (Famix.ParametricClass);
         }
         
-        // const conClassDeclaration = cls.getHeritageClauses()[0].getTypeNodes()[0].getType().getSymbol().getDeclarations()[0] as ClassDeclaration;
-        
-        // const typeParameterDeclarations = cls.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments();
-        
-        // let params = "";
-        // typeParameterDeclarations.map((param) => {
-        //     params = params+param.getText()+','
-        // })
-        // params = params.substring(0, params.length - 1)
-        
-        // const isAbstract = conClassDeclaration.isAbstract();
-        
-        // let classFullyQualifiedName = FQNFunctions.getFQN(conClassDeclaration);
-        
-        // classFullyQualifiedName = Helpers.remplacerTypeGenerique(classFullyQualifiedName,params);
-                
-        // const clsName = conClassDeclaration.getName();
-
-        // if (!this.fmxClassMap.has(classFullyQualifiedName)) {
-        //     fmxClass = new Famix.ParametricClass();
-        //     fmxClass.setName(clsName);
-        //     fmxClass.setFullyQualifiedName(classFullyQualifiedName);
-        //     fmxClass.setIsAbstract(isAbstract);
-        //     this.fmxClassMap.set(classFullyQualifiedName, fmxClass);
-        //     this.famixRep.addElement(fmxClass);
-        //     this.fmxElementObjectMap.set(fmxClass,conClassDeclaration);
-
-        //     typeParameterDeclarations.map((param) => {
-        //         const parameter = this.createOrGetFamixConcreteType(param);
-        //         fmxClass.addConcreteParameter(parameter);
-        //     })
-        // }
-        // else {
-        //     fmxClass = this.fmxClassMap.get(classFullyQualifiedName) as (Famix.ParametricClass);
-        // }
         return fmxClass;
-
     }
 
     /**
@@ -375,8 +339,12 @@ export class EntityDictionary {
     public createOrGetFamixConcreteInterface(inter): Famix.ParametricInterface {
         
         let fmxInterface : Famix.ParametricInterface;
-
-        const conInterfaceDeclaration = inter.getExpression().getSymbol().getDeclarations()[0] as InterfaceDeclaration;
+        let conInterfaceDeclaration ;
+        if (inter instanceof Type) {
+            conInterfaceDeclaration = inter.getSymbol().getDeclarations()[0] as InterfaceDeclaration;
+        } else {
+            conInterfaceDeclaration = inter.getExpression().getSymbol().getDeclarations()[0] as InterfaceDeclaration;
+        }
         
         const typeParameterDeclarations = inter.getTypeArguments();
         
@@ -387,13 +355,14 @@ export class EntityDictionary {
         params = params.substring(0, params.length - 1)
                 
         let interfaceFullyQualifiedName = FQNFunctions.getFQN(conInterfaceDeclaration);
-        
+
         interfaceFullyQualifiedName = Helpers.remplacerTypeGenerique(interfaceFullyQualifiedName,params);
-        const clsName = conInterfaceDeclaration.getName();
+
+        const interName = conInterfaceDeclaration.getName();
 
         if (!this.fmxInterfaceMap.has(interfaceFullyQualifiedName)) {
             fmxInterface = new Famix.ParametricInterface();
-            fmxInterface.setName(clsName);
+            fmxInterface.setName(interName);
             fmxInterface.setFullyQualifiedName(interfaceFullyQualifiedName);
             this.fmxInterfaceMap.set(interfaceFullyQualifiedName, fmxInterface);
             this.famixRep.addElement(fmxInterface);
@@ -405,7 +374,6 @@ export class EntityDictionary {
             })
         }
         else {
-            console.log("existe")
             fmxInterface = this.fmxInterfaceMap.get(interfaceFullyQualifiedName) as (Famix.ParametricInterface);
         }
         return fmxInterface;
@@ -1181,7 +1149,6 @@ export class EntityDictionary {
     public createFamixParameterConcrestisation(concretisation: Famix.Concretisation): Famix.ParameterConcretisation {
         const conClass = concretisation.getConcreteEntity();
         const genClass = concretisation.getGenericEntity();
-        console.log(genClass)
         const parameterConcretisations = this.famixRep._getAllEntitiesWithType("ParameterConcretisation");
         const concreteParameters = conClass.getConcreteParameters();
         const genericParameters = genClass.getGenericParameters();
@@ -1344,6 +1311,54 @@ export class EntityDictionary {
                 }
             }
         });
+    }
+
+    /**
+     * Creates a Famix concretisation between an interface and a Type
+     * @param element A variable or a function
+     * @param inter An interface
+     */
+    public createFamixConcretisationTypeInstanciation(element : VariableDeclaration | FunctionDeclaration , inter: InterfaceDeclaration){
+
+        const interfaceName = inter.getName();
+        let typeName;
+        
+        if (element instanceof FunctionDeclaration){
+            typeName = element.getReturnType().getText().split('<')[0];
+            } else {
+            typeName = element.getType().getText().split('<')[0];
+        }
+
+        if (interfaceName == typeName) {
+            const genParams = inter.getTypeParameters().map((param) => param.getText());
+            let conParams;
+            if (element instanceof FunctionDeclaration){
+                conParams = element.getReturnType().getTypeArguments().map((param) => param.getText());
+            } else {
+                conParams = element.getType().getTypeArguments().map((param) => param.getText());
+            }
+
+            if (!Helpers.arraysAreEqual(conParams,genParams)) {
+                const genInterface = this.createOrGetFamixInterface(inter) as Famix.ParametricInterface;
+                let conInterface;
+                if (element instanceof FunctionDeclaration){
+                    conInterface = this.createOrGetFamixConcreteInterface(element.getReturnType());
+                } else {
+                    conInterface = this.createOrGetFamixConcreteInterface(element.getType());
+                }
+                const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
+                let createConcretisation : boolean = true;
+                concretisations.forEach((conc : Famix.Concretisation) => {
+                    if (genInterface.getFullyQualifiedName() == conc.getGenericEntity().getFullyQualifiedName() && conc.getConcreteEntity().getFullyQualifiedName() == conInterface.getFullyQualifiedName()){
+                        createConcretisation = false;
+                    }
+                });
+    
+                if (createConcretisation) {
+                    const fmxConcretisation : Famix.Concretisation = this.createFamixConcretisation(conInterface,genInterface);
+                }
+            }
+        }
     }
 
     public convertToRelativePath(absolutePath: string, absolutePathProject: string) {
