@@ -438,7 +438,7 @@ function processFunction(f: FunctionDeclaration | FunctionExpression | ArrowFunc
     if( f instanceof ArrowFunction) {
         fmxFunction = entityDictionary.createFamixArrowFunction(f, currentCC);
     } else {
-        fmxFunction = entityDictionary.createFamixFunction(f, currentCC);
+        fmxFunction = entityDictionary.createOrGetFamixFunction(f, currentCC);
     }
 
     processComments(f, fmxFunction);
@@ -961,6 +961,12 @@ export function processConcretisations(classes: ClassDeclaration[], interfaces: 
             interfaces.forEach(inter => {
                 entityDictionary.createFamixConcretisationTypeInstanciation(access,inter);
             });
+            functions.forEach(func => {
+                if(func instanceof FunctionDeclaration){
+                    logger.debug(`processConcretisations: Checking Method concretisation`);
+                    entityDictionary.createFamixConcretisationFunctionInstantiation(access,func);
+                }
+            })
         }
     });
     functions.forEach(func => {
@@ -968,6 +974,7 @@ export function processConcretisations(classes: ClassDeclaration[], interfaces: 
             logger.debug(`processConcretisations: Checking Type concretisation`);
             interfaces.forEach(inter => {
                 entityDictionary.createFamixConcretisationTypeInstanciation(func,inter);
-            });        }
+            });
+        }
     })
 }

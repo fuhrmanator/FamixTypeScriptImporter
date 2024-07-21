@@ -21,6 +21,7 @@ export class EntityDictionary {
     private fmxModuleMap = new Map<string, Famix.Module>(); // Maps the namespace names to their Famix model
     private fmxFileMap = new Map<string, Famix.ScriptEntity | Famix.Module>(); // Maps the source file names to their Famix model
     private fmxTypeMap = new Map<string, Famix.Type | Famix.PrimitiveType | Famix.ParameterType>(); // Maps the type names to their Famix model
+    private fmxFunctionMap = new Map<string, Famix.Function | Famix.ParametricFunction> // Maps the function names to their Famix model
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
     public fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
             
@@ -550,48 +551,55 @@ export class EntityDictionary {
      * @param currentCC The cyclomatic complexity metrics of the current source file
      * @returns The Famix model of the function
      */
-    public createFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: unknown): Famix.Function | Famix.ParametricFunction {
+    public createOrGetFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: unknown): Famix.Function | Famix.ParametricFunction {
         let fmxFunction: Famix.Function | Famix.ParametricFunction;
-
-        const isGeneric = func.getTypeParameters().length > 0;
-       
+        const isGeneric = func.getTypeParameters().length > 0;        
+        const functionFullyQualifiedName = FQNFunctions.getFQN(func);
+        if (!this.fmxFunctionMap.has(functionFullyQualifiedName)) {
             if (isGeneric) {
                 fmxFunction = new Famix.ParametricFunction();
             }
             else {
                 fmxFunction = new Famix.Function();
             }
-        
+    
+            if (func.getName()) {
+                fmxFunction.setName(func.getName());
+            }
+            else {
+                fmxFunction.setName("anonymous");
+            }
 
-        if (func.getName()) {
-            fmxFunction.setName(func.getName());
+            fmxFunction.setSignature(Helpers.computeSignature(func.getText()));
+            fmxFunction.setCyclomaticComplexity(currentCC[fmxFunction.getName()]);
+            fmxFunction.setIsGeneric(isGeneric);
+            fmxFunction.setFullyQualifiedName(functionFullyQualifiedName);
+    
+            let functionTypeName = this.UNKNOWN_VALUE;
+            try {
+                functionTypeName = func.getReturnType().getText().trim();
+            } catch (error) {
+                logger.error(`> WARNING: got exception ${error}. Failed to get usable name for return type of function: ${func.getName()}. Continuing...`);
+            }
+    
+            const fmxType = this.createOrGetFamixType(functionTypeName, func);
+            fmxFunction.setDeclaredType(fmxType);
+            fmxFunction.setNumberOfLinesOfCode(func.getEndLineNumber() - func.getStartLineNumber());
+            const parameters = func.getParameters();
+            fmxFunction.setNumberOfParameters(parameters.length);
+            fmxFunction.setNumberOfStatements(func.getStatements().length);
+    
+            this.makeFamixIndexFileAnchor(func, fmxFunction);
+    
+            this.famixRep.addElement(fmxFunction);
+    
+            this.fmxElementObjectMap.set(fmxFunction,func);
+
+            this.fmxFunctionMap.set(functionFullyQualifiedName, fmxFunction);
         }
         else {
-            fmxFunction.setName("anonymous");
+            fmxFunction = this.fmxFunctionMap.get(functionFullyQualifiedName) as (Famix.Function | Famix.ParametricFunction);
         }
-        fmxFunction.setSignature(Helpers.computeSignature(func.getText()));
-        fmxFunction.setCyclomaticComplexity(currentCC[fmxFunction.getName()]);
-        fmxFunction.setIsGeneric(isGeneric);
-
-        let functionTypeName = this.UNKNOWN_VALUE;
-        try {
-            functionTypeName = func.getReturnType().getText().trim();
-        } catch (error) {
-            logger.error(`> WARNING: got exception ${error}. Failed to get usable name for return type of function: ${func.getName()}. Continuing...`);
-        }
-
-        const fmxType = this.createOrGetFamixType(functionTypeName, func);
-        fmxFunction.setDeclaredType(fmxType);
-        fmxFunction.setNumberOfLinesOfCode(func.getEndLineNumber() - func.getStartLineNumber());
-        const parameters = func.getParameters();
-        fmxFunction.setNumberOfParameters(parameters.length);
-        fmxFunction.setNumberOfStatements(func.getStatements().length);
-
-        this.makeFamixIndexFileAnchor(func, fmxFunction);
-
-        this.famixRep.addElement(fmxFunction);
-
-        this.fmxElementObjectMap.set(fmxFunction,func);
 
         return fmxFunction;
     }
@@ -1283,6 +1291,41 @@ export class EntityDictionary {
                 }
             }
         })
+    }
+
+    /**
+     * Creates a Famix concretisation between a class and its instanciations
+     * @param func A function
+     */
+    public createFamixConcretisationFunctionInstantiation(element : VariableDeclaration ,func: FunctionDeclaration){
+        
+        const initializer = element.getInitializer();
+
+        if (initializer.getKind() === SyntaxKind.CallExpression) {
+            const callExpression = initializer.asKind(SyntaxKind.CallExpression);
+            if(callExpression.getExpression().getText() == func.getName()){
+                const conParams = callExpression.getTypeArguments().map(arg => arg.getText());
+                const genParams = func.getTypeParameters().map(arg => arg.getText());
+                if (!Helpers.arraysAreEqual(conParams,genParams)) {
+                    const genFunction = this.createOrGetFamixFunction(func,0) as Famix.ParametricFunction;
+                    console.log(genFunction);
+                    // const conFunction = this.createOrGetFamixConcreteInterface(interfaceType);
+                    // const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
+                    // let createConcretisation : boolean = true;
+                    // concretisations.forEach((conc : Famix.Concretisation) => {
+                    //     if (genInterface.getFullyQualifiedName() == conc.getGenericEntity().getFullyQualifiedName() && conc.getConcreteEntity().getFullyQualifiedName() == conInterface.getFullyQualifiedName()){
+                    //         createConcretisation = false;
+                    //     }
+                    // });
+        
+                    // if (createConcretisation) {
+                    //     const fmxConcretisation : Famix.Concretisation = this.createFamixConcretisation(conInterface,genInterface);
+                    // }
+                }
+                console.log(conParams)
+                console.log(genParams)
+            }
+        }
     }
 
     /**
