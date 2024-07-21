@@ -844,10 +844,14 @@ export class EntityDictionary {
         let ancestor: Famix.ContainerEntity;
         if (element !== undefined) {
             const typeAncestor = Helpers.findTypeAncestor(element);
+            if (!typeAncestor) {
+                throw new Error(`Ancestor not found for element ${element.getText()}.`);
+            }
             const ancestorFullyQualifiedName = FQNFunctions.getFQN(typeAncestor);
             ancestor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
             if (!ancestor) {
-                throw new Error(`Ancestor ${ancestorFullyQualifiedName} not found.`);
+                logger.debug(`Ancestor ${FQNFunctions.getFQN(typeAncestor)} not found. Adding the new type.`);
+                ancestor = this.createOrGetFamixType(typeAncestor.getText(), typeAncestor as TypeDeclaration);
             }
         }
 
