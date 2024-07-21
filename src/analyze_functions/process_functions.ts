@@ -3,6 +3,7 @@ import * as Famix from "../lib/famix/src/model/famix";
 import { calculate } from "../lib/ts-complex/cyclomatic-service";
 import * as fs from 'fs';
 import { logger , entityDictionary } from "../analyze";
+import { getFQN } from "../fqn";
 
 export const methodsAndFunctionsWithId = new Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction>(); // Maps the Famix method, constructor, getter, setter and function ids to their ts-morph method, constructor, getter, setter or function object
 export const accessMap = new Map<number, ParameterDeclaration | VariableDeclaration | PropertyDeclaration | EnumMember>(); // Maps the Famix parameter, variable, property and enum value ids to their ts-morph parameter, variable, property or enum member object
@@ -430,15 +431,15 @@ function processMethod(m: MethodDeclaration | ConstructorDeclaration | MethodSig
  * @returns A Famix.Function representing the function
  */
 function processFunction(f: FunctionDeclaration | FunctionExpression | ArrowFunction): Famix.Function {
-    
+
+    logger.debug(`Function: ${(f instanceof ArrowFunction ? "anonymous" : f.getName() ? f.getName() : "anonymous")}, (${f.getType().getText()}), fqn = ${getFQN(f)}`);
+
     let fmxFunction;
     if( f instanceof ArrowFunction) {
         fmxFunction = entityDictionary.createFamixArrowFunction(f, currentCC);
     } else {
         fmxFunction = entityDictionary.createFamixFunction(f, currentCC);
     }
-
-    //logger.debug(`Function: ${(f.getName()) ? f.getName() : "anonymous"}, (${f.getType().getText()}), fqn = ${fmxFunction.getFullyQualifiedName()}`);
 
     processComments(f, fmxFunction);
 
