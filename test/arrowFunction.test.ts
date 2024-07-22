@@ -1,22 +1,20 @@
 import { Project } from 'ts-morph';
-import { Importer } from '../src/analyze';
+import { Importer, logger } from '../src/analyze';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: "./src"
-        }
-    }
-);
-project.createSourceFile("./src/arrowFunctions.ts",
+logger.settings.minLevel = 0; // all your messages are belong to us
+const project = new Project({
+    useInMemoryFileSystem: true,
+});
+
+project.createSourceFile("arrowFunctions.ts",
 `
     // Basic arrow function
     const add = (a: number, b: number): number => a + b;
 
     // Arrow function with a code block
-    const multiply = (a: number, b: number): number => {
-        return a * b;
+    const multiply = (c: number, d: number): number => {
+        return c * d;
     };
 
     // Arrow function with no parameters
@@ -26,6 +24,25 @@ project.createSourceFile("./src/arrowFunctions.ts",
 
     // Arrow function with a single parameter
     const square = (x: number): number => x * x;
+
+    // Arrow function declaring a class inside its body
+    test('blah', t => {
+      class User {
+        @JsonProperty() @JsonClassType({type: () => [Number]})
+        @JsonClassType({type: () => [Number]})
+        age: number;
+      }
+    });
+
+    // Arrow function declaring a class inside its body (with same name as before)
+    test('blah', t => {
+      class User {
+        @JsonProperty() @JsonClassType({type: () => [Number]})
+        @JsonView({value: () => [Views.public]})
+        id: number;
+      }
+    });
+
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -34,25 +51,53 @@ describe('ArrowFunctions', () => {
 
     const methodList = fmxRep._getAllEntitiesWithType('ArrowFunction');
     
-    it("should have 4 Arrow Functions", () => {
-        expect(methodList?.size).toBe(4);
+    it("should have several Arrow Functions", () => {
+        expect(methodList?.size).toBe(14);
     });
 
     it("should contain arrow function add and should return number should have two parameters", () => {
         const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.add.ArrowFunction(3:17)');
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getDeclaredType().getName()).toBe("number");
-        expect(theFunction?.getParameters().size).toBe(2);
+        expect(theFunction?.getSignature()).toBe("(a: number, b: number) => number");
+        const params = theFunction?.getParameters();
+        expect(params).toBeTruthy();
+        expect(params?.size).toBe(2);
+
+        const pIter = params?.values();
+        expect(pIter).toBeTruthy();
+        const firstParam = pIter?.next().value;
+        expect(firstParam).toBeTruthy();
+        expect(firstParam.getName()).toBe("a");
+        expect(firstParam.getDeclaredType().getName()).toBe("number");
+        const secondParam = pIter?.next().value;
+        expect(secondParam).toBeTruthy();
+        expect(secondParam.getName()).toBe("b");
+        expect(secondParam.getDeclaredType().getName()).toBe("number");
     });
 
-    it("should contain arrow function multiply", () => {
+    it("should contain arrow function multiply with two parameters", () => {
         const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.multiply.ArrowFunction(6:22)');
         expect(theFunction).toBeTruthy();
+        expect(theFunction?.getSignature()).toBe("(c: number, d: number) => number");
         expect(theFunction?.getDeclaredType().getName()).toBe("number");
-        expect(theFunction?.getParameters().size).toBe(2);
+        const params = theFunction?.getParameters();
+        expect(params).toBeTruthy();
+        expect(params?.size).toBe(2);
+
+        const pIter = params?.values();
+        expect(pIter).toBeTruthy();
+        const firstParam = pIter?.next().value;
+        expect(firstParam).toBeTruthy();
+        expect(firstParam.getName()).toBe("c");
+        expect(firstParam.getDeclaredType().getName()).toBe("number");
+        const secondParam = pIter?.next().value;
+        expect(secondParam).toBeTruthy();
+        expect(secondParam.getName()).toBe("d");
+        expect(secondParam.getDeclaredType().getName()).toBe("number");
     });
 
-    it("should contain arrow function greet", () => {
+    it("should contain arrow function greet with no parameters", () => {
         const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.greet.ArrowFunction(11:19)');
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getDeclaredType().getName()).toBe("void");
@@ -64,6 +109,25 @@ describe('ArrowFunctions', () => {
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getDeclaredType().getName()).toBe("number");
         expect(theFunction?.getParameters().size).toBe(1);
+        expect(theFunction?.getParameters().values().next().value.getName()).toBe("x");
+        expect(theFunction?.getParameters().values().next().value.getDeclaredType().getName()).toBe("number");
+    });
+
+    it("should contain an arrow function with a single parameter t", () => {
+        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.ArrowFunction(19:18)');
+        expect(theFunction).toBeTruthy();
+        expect(theFunction?.getDeclaredType().getName()).toBe("void");
+        expect(theFunction?.getSignature()).toBe("(t) => void");
+        const params = theFunction?.getParameters();
+        expect(params).toBeTruthy();
+        expect(params?.size).toBe(1);
+
+        const pIter = params?.values();
+        expect(pIter).toBeTruthy();
+        const firstParam = pIter?.next().value;
+        expect(firstParam).toBeTruthy();
+        expect(firstParam.getName()).toBe("t");
+        expect(firstParam.getDeclaredType().getName()).toBe("any");
     });
 
 });

@@ -762,7 +762,7 @@ export function processAccesses(accessMap: Map<number, ParameterDeclaration | Va
             const temp_nodes = v.findReferencesAsNodes() as Array<Identifier>;
             temp_nodes.forEach(node => processNodeForAccesses(node, id));
         } catch (error) {
-            logger.error(`> WARNING: got exception ${error}. Continuing...`);
+            logger.error(`> WARNING: got exception "${error}".\nContinuing...`);
         }
     });
 }
@@ -785,7 +785,7 @@ function processNodeForAccesses(n: Identifier, id: number): void {
         entityDictionary.createFamixAccess(n, id);
         logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})`);
     } catch (error) {
-        logger.error(`> WARNING: got exception ${error}. ScopeDeclaration invalid for ${n.getSymbol().getFullyQualifiedName()}. Continuing...`);
+        logger.error(`> Got exception "${error}".\nScopeDeclaration invalid for "${n.getSymbol().getFullyQualifiedName()}".\nContinuing...`);
     }
 }
 
