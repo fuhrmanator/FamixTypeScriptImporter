@@ -1,6 +1,6 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import { ParametricClass, Concretisation, ParametricInterface } from '../src/lib/famix/src/model/famix';
+import { ParametricInterface } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project(
@@ -19,7 +19,7 @@ interface InterfaceA<T> {
 interface InterfaceB extends InterfaceA<string> {
 }
 
-interface InterfaceC extends InterfaceA<string> {
+interface InterfaceF extends InterfaceA<string> {
 }
 
 interface InterfaceD<U> extends InterfaceA<U> {
@@ -28,10 +28,10 @@ interface InterfaceD<U> extends InterfaceA<U> {
 interface InterfaceE<T> {
 }
 
-interface InterfaceF extends InterfaceE<string> {
+interface InterfaceH extends InterfaceE<string> {
 }
 
-interface InterfaceH extends InterfaceA<string>, InterfaceE<number> {
+interface InterfaceH extends InterfaceE<number> , InterfaceA<number> {
 }
 `);
 
@@ -43,15 +43,15 @@ describe('Tests for concretisation', () => {
         expect(fmxRep).toBeTruthy();
     });
 
-    it("should contain 6 generic interfaces", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParametricInterface").size).toBe(7);
+    it("should contain 8 generic interfaces", () => {
+        expect(fmxRep._getAllEntitiesWithType("ParametricInterface").size).toBe(8);
     });
 
     it("should contain generic interfaces named InterfaceA", () => {
         const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).getName());
         expect(listOfNames).toContain("InterfaceA");
         const numberOfInterfaceA = listOfNames.filter(name => name === "InterfaceA").length;
-        expect(numberOfInterfaceA).toBe(3); 
+        expect(numberOfInterfaceA).toBe(4); 
     });
 
     it("should contain generic interfaces named InterfaceE", () => {
@@ -64,7 +64,7 @@ describe('Tests for concretisation', () => {
     const theInterface = fmxRep._getFamixInterface("{concretisationInterfaceSpecialization.ts}.InterfaceA<T>");
 
     it("should contain 3 concretisations", () => {
-        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(4);
+        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(5);
     });
 
     it("The generic Class should be InterfaceA<T> with genericParameter T", () => {

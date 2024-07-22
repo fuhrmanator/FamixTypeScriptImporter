@@ -950,31 +950,25 @@ export function processConcretisations(classes: ClassDeclaration[], interfaces: 
         entityDictionary.createFamixConcretisationClassOrInterfaceSpecialisation(cls);
         entityDictionary.createFamixConcretisationGenericInstantiation(cls);
         entityDictionary.createFamixConcretisationInterfaceClass(cls);
+        entityDictionary.createFamixConcretisationTypeInstanciation(cls); 
+
     });
     interfaces.forEach(inter => {
         logger.debug(`processConcretisations: Checking interface concretisation for ${inter.getName()}`);
+        entityDictionary.createFamixConcretisationTypeInstanciation(inter); 
         entityDictionary.createFamixConcretisationClassOrInterfaceSpecialisation(inter)
     });
     accesses.forEach(access => {
         if (access instanceof VariableDeclaration) {
             logger.debug(`processConcretisations: Checking Type concretisation`);
             interfaces.forEach(inter => {
-                entityDictionary.createFamixConcretisationTypeInstanciation(access,inter);
             });
-            functions.forEach(func => {
-                if(func instanceof FunctionDeclaration){
-                    logger.debug(`processConcretisations: Checking Method concretisation`);
-                    entityDictionary.createFamixConcretisationFunctionInstantiation(access,func);
-                }
-            })
         }
     });
     functions.forEach(func => {
-        if(func instanceof FunctionDeclaration){
-            logger.debug(`processConcretisations: Checking Type concretisation`);
-            interfaces.forEach(inter => {
-                entityDictionary.createFamixConcretisationTypeInstanciation(func,inter);
-            });
+        if(func instanceof FunctionDeclaration || func instanceof MethodDeclaration ){
+            logger.debug(`processConcretisations: Checking Method concretisation`);
+            entityDictionary.createFamixConcretisationFunctionInstantiation(func);
         }
     })
 }

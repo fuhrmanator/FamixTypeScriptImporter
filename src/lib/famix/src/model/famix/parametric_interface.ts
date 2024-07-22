@@ -18,6 +18,10 @@ export class ParametricInterface extends Interface {
     }
   }
 
+  clearGenericParameters(): void {
+    this.genericParameters.clear();
+  }
+
   private concreteParameters: Set<PrimitiveType> = new Set();
 
   public getConcreteParameters(): Set<PrimitiveType> {

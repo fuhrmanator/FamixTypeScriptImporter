@@ -1,6 +1,6 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import { ParametricClass, Concretisation } from '../src/lib/famix/src/model/famix';
+import { ParametricClass } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project(

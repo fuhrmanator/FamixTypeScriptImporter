@@ -1,27 +1,29 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { Entity } from "./entity";
 import { ParametricClass } from "./parametric_class";
+import { ParametricFunction } from "./parametric_function";
 import { ParametricInterface } from "./parametric_interface";
+import { ParametricMethod } from "./parametric_method";
 
 export class Concretisation extends Entity {
 
-    private genericEntity: ParametricClass | ParametricInterface;
+    private genericEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod;
 
-    public getGenericEntity(): ParametricClass | ParametricInterface {
+    public getGenericEntity(): ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod {
       return this.genericEntity;
     }
   
-    public setGenericEntity(genericEntity: ParametricClass | ParametricInterface): void {
+    public setGenericEntity(genericEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod): void {
       this.genericEntity = genericEntity;
     }
   
-    private concreteEntity: ParametricClass | ParametricInterface;
+    private concreteEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod;
   
-    public getConcreteEntity(): ParametricClass | ParametricInterface {
+    public getConcreteEntity(): ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod {
       return this.concreteEntity;
     }
   
-    public setConcreteEntity(concreteEntity: ParametricClass | ParametricInterface): void {
+    public setConcreteEntity(concreteEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod): void {
       this.concreteEntity = concreteEntity;
     }
   

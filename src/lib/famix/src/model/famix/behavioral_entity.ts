@@ -87,6 +87,10 @@ export class BehavioralEntity extends ContainerEntity {
     }
   }
 
+  clearGenericParameters(): void {
+    this.genericParameters.clear();
+  }
+
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("BehavioralEntity", this);
     this.addPropertiesToExporter(json);
