@@ -6,11 +6,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/simpleFunction.ts",
+project.createSourceFile("/simpleFunction.ts",
 `function fct(): number {
     return 0;
 }

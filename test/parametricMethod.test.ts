@@ -7,12 +7,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/parametricMethod.ts",
+project.createSourceFile("/parametricMethod.ts",
 `
 class ClassParametric<T> {
 

@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/genericClass.ts",
+project.createSourceFile("/genericClass.ts",
 `class MyClass<T> {}
 `);
 

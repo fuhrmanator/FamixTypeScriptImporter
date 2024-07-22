@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/classExtendsUndefinedClass.ts",
+project.createSourceFile("/classExtendsUndefinedClass.ts",
 `import {ClassDeclaration} from "ts-morph";
 
 class MyClass extends ClassDeclaration {}

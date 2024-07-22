@@ -7,11 +7,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/propertyWithDecorators.ts",
+project.createSourceFile("/propertyWithDecorators.ts",
 `import "reflect-metadata";
 
 const formatMetadataKey = Symbol("format");

@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/methodWithDecorator.ts",
+project.createSourceFile("/methodWithDecorator.ts",
 `function first() {
     console.log("first(): factory evaluated");
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {

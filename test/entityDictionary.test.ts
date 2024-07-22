@@ -5,12 +5,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/famixMorphObject.ts",
+project.createSourceFile("/famixMorphObject.ts",
 `
 class Class1 {
     public returnHi(): string {

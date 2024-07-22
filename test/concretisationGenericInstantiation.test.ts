@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/concretisationGenericInstantiation.ts",
+project.createSourceFile("/concretisationGenericInstantiation.ts",
 `
 class ClassA<T> {
     property: T;

@@ -4,11 +4,11 @@ import { Importer } from '../src/analyze';
 const importer = new Importer();
 const project = new Project({
     compilerOptions: {
-        baseUrl: "./src"
+        baseUrl: ""
     }
 });
 
-project.createSourceFile("./src/namespaces.ts", 
+project.createSourceFile("/namespaces.ts", 
 `namespace MyNamespace {}
 
 module MyModule {}

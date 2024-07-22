@@ -6,11 +6,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/abstracts.ts",
+project.createSourceFile("/abstracts.ts",
 `abstract class MyAbstractClass {
     public abstract abstractMethod1();
     public abstract abstractMethod2();

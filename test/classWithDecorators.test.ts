@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/classWithDecorators.ts",
+project.createSourceFile("/classWithDecorators.ts",
 `function sealed(constructor: Function) { // function can't take other parameters with constructor
     Object.seal(constructor);
     Object.seal(constructor.prototype);

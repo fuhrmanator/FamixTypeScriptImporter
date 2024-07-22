@@ -8,11 +8,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile('./src/accesses.ts',
+project.createSourceFile('/accesses.ts',
 `var b = 2;
 
 var x = b;
@@ -24,7 +25,7 @@ class P {
     }
 }
 `);
-project.createSourceFile('./src/accesses2.ts',
+project.createSourceFile('/accesses2.ts',
 `class AAA {
     public method(): void {}
 }

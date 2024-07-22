@@ -7,12 +7,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/classImplementsUndefinedInterface.ts",
+project.createSourceFile("/classImplementsUndefinedInterface.ts",
 `import {FileSystemHost} from "ts-morph";
 
 class myClass implements FileSystemHost {}

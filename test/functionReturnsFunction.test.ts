@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/functionReturnsFunction.ts",
+project.createSourceFile("/functionReturnsFunction.ts",
 `export function deco() {
     function fct() {
         return function logMethod(target: any, propertyKey: string, descriptor: PropertyDescriptor) {

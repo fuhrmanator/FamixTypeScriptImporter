@@ -6,11 +6,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/propertyDefinedInConstructorSignature.ts",
+project.createSourceFile("/propertyDefinedInConstructorSignature.ts",
 `class Point {
   constructor(private x: number, public readonly y: number, protected z: number) {}
 }`);
