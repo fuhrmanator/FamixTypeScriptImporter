@@ -20,19 +20,12 @@ interface InterfaceE<T> {
 
 const interfaceInstance: InterfaceE<number> = { value: "example" };
 
-function func(param: string): InterfaceE<string> {
-    return function(param: string): void {
-        console.log(param);
-    };
-}
-
 class MyClass<T> {
 }
 
 function processInstance(instance: MyClass<boolean>): MyClass<boolean> {
     return instance;
 }
-
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -65,4 +58,26 @@ describe('Tests for concretisation', () => {
     it("should contain two parameter concretisation", () => {
         expect(fmxRep._getAllEntitiesWithType("ParameterConcretisation").size).toBe(3);
     });
+
+    const theInterface = fmxRep._getFamixInterface("{concretisationTypeInstantiation.ts}.InterfaceE<T>");
+
+    it("The concrete Class should be MyClass with concreteParameter boolean", () => {
+        const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
+        const iterator = theConcretisation.values();
+        const firstElement = iterator.next().value;
+        expect(firstElement.getConcreteEntity().getName()).toBe("MyClass");
+        const concParameter = firstElement.getConcreteEntity().getConcreteParameters().values().next().value;
+        expect(concParameter.getName()).toBe("boolean");
+    });
+
+    it("The concrete Interface should be InterfaceE with concreteParameter number", () => {
+        const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
+        const iterator = theConcretisation.values();
+        const firstElement = iterator.next().value;
+        const secondElement = iterator.next().value;
+        expect(secondElement.getConcreteEntity().getName()).toBe("InterfaceE");
+        const concParameter = secondElement.getConcreteEntity().getConcreteParameters().values().next().value;
+        expect(concParameter.getName()).toBe("number");
+    });
+
 });

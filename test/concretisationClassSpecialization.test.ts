@@ -72,15 +72,6 @@ describe('Tests for concretisation', () => {
         expect(T.getName()).toBe("T");
     });
 
-    it("The concrete Class should be ClassA<string> with concreteParameter string", () => {
-        const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
-        const iterator = theConcretisation.values();
-        const firstElement = iterator.next().value;
-        expect(firstElement.getConcreteEntity().getName()).toBe("ClassA");
-        const concParameter = firstElement.getConcreteEntity().getConcreteParameters().values().next().value;
-        expect(concParameter.getName()).toBe("string");
-    });
-
     it("should contain two parameter concretisation", () => {
         expect(fmxRep._getAllEntitiesWithType("ParameterConcretisation").size).toBe(2);
     });
