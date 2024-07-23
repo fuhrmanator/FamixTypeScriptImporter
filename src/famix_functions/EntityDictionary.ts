@@ -1187,6 +1187,11 @@ export class EntityDictionary {
         let genClassTypeParametersIterator = genericParameters.values();
         let fmxParameterConcretisation : Famix.ParameterConcretisation;
 
+        logger.debug(`Creating ParameterConcretisation for ${conClass.getFullyQualifiedName()} and ${genClass.getFullyQualifiedName()}.`);
+
+        logger.debug(`genericParameters: ${genericParameters.size}`);
+        logger.debug(`concreteParameters: ${concreteParameters.size}`);
+
         for (let i = 0; i < genericParameters.size; i++) {
             const conClassTypeParameter = conClassTypeParametersIterator.next().value;
             if (!conClassTypeParameter) {

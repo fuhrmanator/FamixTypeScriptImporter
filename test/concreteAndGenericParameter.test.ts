@@ -1,8 +1,9 @@
 import { Project } from 'ts-morph';
-import { Importer } from '../src/analyze';
+import { Importer, logger } from '../src/analyze';
 import { ParametricClass } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
+logger.settings.minLevel = 0; // show all messages
 const project = new Project(
     {
         compilerOptions: {
@@ -19,12 +20,44 @@ class ClassB extends ClassA<string>{}
 
 class ClassC<U> extends ClassA<U> {}
 
+
+/// try to reproduce bug from jackson-js 
+
 /**
  * Helper interface used to declare a List of ClassType recursively.
  */
 export interface ClassList<T> extends Array<any> {
   [index: number]: T | ClassList<T>;
   0: T;
+}
+
+/**
+ * Helper type that represents a general JavaScript type.
+ */
+export type ClassType<T> = (new () => T) | (new (...args: any[]) => T) |
+((...args: any[]) => T) | ((...args: any[]) => ((cls: any) => T)) | { name: string; prototype: T };
+
+interface JsonDecoratorOptions {
+  enabled?: boolean;
+  contextGroups?: string[];
+  _descriptor?: TypedPropertyDescriptor<any>;
+  _propertyKey?: string;
+}
+
+export class JsonParser<T> {
+  private cachedGetMetadata<T extends JsonDecoratorOptions>(metadataKey: string,
+                                                            target: ClassType<any>,
+                                                            propertyKey: string = null,
+                                                            context: JsonParserTransformerContext): T { /* empty */}
+
+  private parseJsonInject(replacement: any, obj: any, key: string, context: JsonParserTransformerContext) {
+    const currentMainCreator = context.mainCreator[0];
+
+    let propertySetter;
+    let jsonInject: JsonInjectOptions =
+      this.cachedGetMetadata('JsonInject', currentMainCreator, key, context);
+  }
+
 }
 `);
 
