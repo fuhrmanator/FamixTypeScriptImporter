@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/concretisationFunctionInstantiation.ts",
+project.createSourceFile("/src/concretisationFunctionInstantiation.ts",
 `
 interface CustomType {
     message: string;
@@ -70,7 +71,7 @@ describe('Tests for concretisation', () => {
         expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(2);
     });
 
-    const theInterface = fmxRep._getFamixInterface("{concretisationFunctionInstantiation.ts}.CustomType");
+    const theInterface = fmxRep._getFamixInterface("{src/concretisationFunctionInstantiation.ts}.CustomType");
 
     it("The concrete Function should be createInstance with concreteParameter CustomType", () => {
         const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");

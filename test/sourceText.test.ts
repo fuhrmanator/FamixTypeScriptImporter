@@ -7,12 +7,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "."
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./test_src/simple.ts",
+project.createSourceFile("/test_src/simple.ts",
     `let a: number = 1;
 export class A {
     /**
@@ -26,7 +27,7 @@ export class A {
 }`, { overwrite: true }).saveSync();
 
 // multi-code point emoji is handled differently in JavaScript () and Pharo (one character)
-project.createSourceFile("./test_src/a-b.ts", `let c = "💷", d = 5;`);
+project.createSourceFile("/test_src/a-b.ts", `let c = "💷", d = 5;`);
 
 config.expectGraphemes = true;
 const fmxRep = importer.famixRepFromProject(project);

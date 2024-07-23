@@ -6,7 +6,8 @@ const project = new Project(
   {
     compilerOptions: {
         baseUrl: ""
-    }
+    },
+    useInMemoryFileSystem: true,
   }
 );
 

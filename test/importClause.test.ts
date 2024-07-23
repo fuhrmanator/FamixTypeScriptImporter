@@ -1,25 +1,25 @@
 import { Project } from "ts-morph";
 import { Importer, logger } from "../src/analyze";
 import { Class, ImportClause, IndexedFileAnchor, Module, NamedEntity, StructuralEntity } from "../src/lib/famix/src/model/famix";
-import { getTextFromAnchor } from "./testUtils";
 
 const importer = new Importer();
-logger.settings.minLevel = 0; // all your messages are belong to us
+//logger.settings.minLevel = 0; // all your messages are belong to us
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "."
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./test_src/oneClassExporter.ts",
+project.createSourceFile("/test_src/oneClassExporter.ts",
     `export class ExportedClass {}`);
 
-project.createSourceFile("./test_src/oneClassImporter.ts",
+project.createSourceFile("/test_src/oneClassImporter.ts",
     `import {ExportedClass} from "./oneClassExport";`);
 
-project.createSourceFile("./test_src/complexExportModule.ts",
+project.createSourceFile("/test_src/complexExportModule.ts",
     `class ClassZ {}
 class ClassY {}
 export class ClassX {}
@@ -32,19 +32,19 @@ export default class ClassW {}
 export namespace Nsp {}
 `);
 
-project.createSourceFile("./test_src/defaultImporterModule.ts",
+project.createSourceFile("/test_src/defaultImporterModule.ts",
     `import * as test from "./complexExportModule.ts";`);
 
-project.createSourceFile("./test_src/multipleClassImporterModule.ts",
+project.createSourceFile("/test_src/multipleClassImporterModule.ts",
     `import { ClassZ } from "./complexExportModule.ts";`);
 
-project.createSourceFile("./test_src/reExporterModule.ts",
+project.createSourceFile("/test_src/reExporterModule.ts",
     `export * from "./complexExportModule.ts";`);
 
-project.createSourceFile("./test_src/reImporterModule.ts",
+project.createSourceFile("/test_src/reImporterModule.ts",
     `import { ClassX } from "./reExporterModule.ts";`);
 
-project.createSourceFile("./test_src/renameDefaultExportImporter.ts",
+project.createSourceFile("/test_src/renameDefaultExportImporter.ts",
     `import myRenamedDefaultClassW from "./complexExportModule.ts";`);
 
 project.createSourceFile("lazyRequireModuleCommonJS.ts",

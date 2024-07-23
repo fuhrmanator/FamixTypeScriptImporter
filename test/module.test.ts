@@ -6,11 +6,12 @@ import { Module } from '../src/lib/famix/src/model/famix/module';
 const importer = new Importer();
 const project = new Project({
     compilerOptions: {
-        baseUrl: "./test_src"
-    }
+        baseUrl: ""
+    },
+    useInMemoryFileSystem: true,
 });
 
-project.createSourceFile("./test_src/moduleBecauseExports.ts", `
+project.createSourceFile("/test_src/moduleBecauseExports.ts", `
 class ClassZ {}
 class ClassY {}
 export class ClassX {}
@@ -23,7 +24,7 @@ export default class ClassW {}
 export namespace Nsp {}
 `);
 
-project.createSourceFile("./test_src/moduleBecauseImports.ts", `
+project.createSourceFile("/test_src/moduleBecauseImports.ts", `
 import * as Famix from "../src/lib/famix/src/model/famix";
 import { ClassDeclaration, ConstructorDeclaration } from "ts-morph";
 import { Importer } from "../test_src/sampleForModule";
@@ -33,12 +34,12 @@ import { Nsp } from "../test_src/moduleBecauseExports";
 import * as express from "express";
 `);
     
-project.createSourceFile("./test_src/moduleImportFromFileWithExtension.ts", `
+project.createSourceFile("/test_src/moduleImportFromFileWithExtension.ts", `
 import { ClassX } from "express.ts";
 import * as test from "./sampleForModule.ts";
 `);
 
-project.createSourceFile("./test_src/ambientModule.d.ts", `
+project.createSourceFile("/test_src/ambientModule.d.ts", `
 declare module "module-a" {
     export class ClassA {}
 }
