@@ -8,12 +8,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/genericMethod.ts",
+project.createSourceFile("/genericMethod.ts",
 `class AA {
     public i<T> (j: T): void {}
 }

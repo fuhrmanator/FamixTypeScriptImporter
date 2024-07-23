@@ -8,11 +8,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile('./src/accessorsWithDecorators.ts',
+project.createSourceFile('/accessorsWithDecorators.ts',
 `function configurable(value: boolean) {
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         descriptor.configurable = value;

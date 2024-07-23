@@ -8,12 +8,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/invocationWithFunction.ts", 
+project.createSourceFile("/invocationWithFunction.ts", 
 `function func(): void {}
 const x1 = func();`);
 

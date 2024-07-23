@@ -5,11 +5,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/functions.ts",
+project.createSourceFile("/functions.ts",
 `function a() {}
 function b() {}
 `);

@@ -7,11 +7,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/abstractClassWithComments.ts", `// before
+project.createSourceFile("/abstractClassWithComments.ts", `// before
 abstract class MyAbstractClass {} // a comment
 // after
 /* test */

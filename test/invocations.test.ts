@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/invocations.ts",
+project.createSourceFile("/invocations.ts",
 `class Class1 {
     public returnHi(): string {
         return "Hi";

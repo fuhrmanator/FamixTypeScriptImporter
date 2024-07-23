@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/interfaceInheritsUndefinedInterface.ts",
+project.createSourceFile("/interfaceInheritsUndefinedInterface.ts",
 `import {FileSystemHost} from "ts-morph";
 
 interface MyInterface extends FileSystemHost {}

@@ -6,11 +6,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/listParameter.ts",
+project.createSourceFile("/listParameter.ts",
 `function testMethod(list: Array<any>): Array<any> {
 }
 `);

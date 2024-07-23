@@ -9,12 +9,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/functionWithVariables.ts",
+project.createSourceFile("/functionWithVariables.ts",
 `function fct(): number {
     // comment 1
     let i: number /*comment 2*/, j: number; // comment 3

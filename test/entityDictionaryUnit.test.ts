@@ -5,12 +5,12 @@ import * as Famix from "../src/lib/famix/src/model/famix";
 const project = new Project(
   {
     compilerOptions: {
-        baseUrl: "./src"
+        baseUrl: ""
     }
   }
 );
 
-const sourceFile = project.createSourceFile("./src/entityDictionaryUnit.ts",
+const sourceFile = project.createSourceFile("/entityDictionaryUnit.ts",
 `
 namespace MyNamespace {
     

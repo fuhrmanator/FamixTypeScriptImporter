@@ -7,12 +7,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/namespacesAndClasses.ts",
+project.createSourceFile("/namespacesAndClasses.ts",
 `namespace MyNamespace {
 	class EntityClass {}
 	class class2 {}

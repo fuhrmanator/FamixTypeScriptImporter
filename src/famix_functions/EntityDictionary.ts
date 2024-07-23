@@ -891,9 +891,16 @@ export class EntityDictionary {
      */
     public createFamixAccess(node: Identifier, id: number): void {
         const fmxVar = this.famixRep.getFamixEntityById(id) as Famix.StructuralEntity;
+
+        logger.debug(`Creating FamixAccess. Node: [${node.getKindName()}] '${node.getText()}', id: ${id} refers to fmxVar '${fmxVar.getName()}'.`);
+
         const nodeReferenceAncestor = Helpers.findAncestor(node);
         const ancestorFullyQualifiedName = FQNFunctions.getFQN(nodeReferenceAncestor);
-        const accessor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
+        let accessor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
+        if (!accessor) {
+            logger.error(`Ancestor ${ancestorFullyQualifiedName} not found.`);
+            // accessor = this.createOrGetFamixType(ancestorFullyQualifiedName, nodeReferenceAncestor as TypeDeclaration);
+        }
 
         const fmxAccess = new Famix.Access();
         fmxAccess.setAccessor(accessor);
@@ -1118,7 +1125,10 @@ export class EntityDictionary {
             fmxArrowFunction.setName("anonymous");
         }
 
-        fmxArrowFunction.setSignature(Helpers.computeSignature(arrowFunction.getBodyText()));
+        // Signature of an arrow function is (parameters) => return_type
+        const parametersSignature = arrowFunction.getParameters().map(p => p.getText()).join(", ");
+        const returnTypeSignature = arrowFunction.getReturnType().getText();
+        fmxArrowFunction.setSignature(`(${parametersSignature}) => ${returnTypeSignature}`);
         fmxArrowFunction.setCyclomaticComplexity(currentCC[fmxArrowFunction.getName()]);
         fmxArrowFunction.setIsGeneric(isGeneric);
 

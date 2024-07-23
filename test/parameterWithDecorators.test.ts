@@ -8,12 +8,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/parameterWithDecorators.ts",
+project.createSourceFile("/parameterWithDecorators.ts",
 `function deco2(bo: boolean) {
     return function(target: Object, propertyKey: string, parameterIndex: number) {
         console.log(bo);

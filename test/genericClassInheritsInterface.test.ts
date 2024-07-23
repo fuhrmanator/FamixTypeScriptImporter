@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/genericClassInheritsInterface.ts",
+project.createSourceFile("/genericClassInheritsInterface.ts",
 `interface MyDaoInterface<T> {}
 
 class MyDao<T> implements MyDaoInterface<T> {}

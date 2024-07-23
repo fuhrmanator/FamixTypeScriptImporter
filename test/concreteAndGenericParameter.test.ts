@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/parametrizableClass.ts",
+project.createSourceFile("/parametrizableClass.ts",
 `class ClassA<V> {}
 
 class ClassB extends ClassA<string>{}

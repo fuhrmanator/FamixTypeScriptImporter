@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/concretisationTypeInstantiation.ts",
+project.createSourceFile("/concretisationTypeInstantiation.ts",
 `
 interface InterfaceE<T> {
     (param: T): void;

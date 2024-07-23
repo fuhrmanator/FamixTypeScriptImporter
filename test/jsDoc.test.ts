@@ -9,12 +9,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/jsDoc.ts",
+project.createSourceFile("/jsDoc.ts",
 `/**
  * Gets the name.
  * @param person - Person to get the name from.

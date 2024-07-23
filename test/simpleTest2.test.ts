@@ -8,11 +8,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/simpleTest2.ts",
+project.createSourceFile("/simpleTest2.ts",
 `var a: number = 10;
     
 console.log(a);
