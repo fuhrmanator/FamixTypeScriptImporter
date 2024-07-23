@@ -84,6 +84,6 @@ export function arraysAreEqual(array1: string[], array2: string[]): boolean {
 }
 
 export function remplacerTypeGenerique(chaine: string, nouveauType: string): string {
-    // Utiliser une expression régulière pour capturer le contenu entre '<' et '>'
-    return chaine.replace(/<[^>]*>/, `<${nouveauType}>`);
+    // Utiliser une expression régulière pour capturer le dernier contenu entre '<' et '>'
+    return chaine.replace(/<[^>]>(?=[^<]$)/, `<${nouveauType}>`);
 }

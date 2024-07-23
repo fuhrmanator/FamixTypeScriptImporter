@@ -18,6 +18,14 @@ project.createSourceFile("/parametrizableClass.ts",
 class ClassB extends ClassA<string>{}
 
 class ClassC<U> extends ClassA<U> {}
+
+/**
+ * Helper interface used to declare a List of ClassType recursively.
+ */
+export interface ClassList<T> extends Array<any> {
+  [index: number]: T | ClassList<T>;
+  0: T;
+}
 `);
 
 const fmxRep = importer.famixRepFromProject(project);

@@ -1189,9 +1189,13 @@ export class EntityDictionary {
 
         for (let i = 0; i < genericParameters.size; i++) {
             const conClassTypeParameter = conClassTypeParametersIterator.next().value;
+            if (!conClassTypeParameter) {
+                logger.error(`The concrete class ${conClass.getFullyQualifiedName()} has less type parameters than the generic class ${genClass.getFullyQualifiedName()}.`);
+                throw new Error("The concrete class has less type parameters than the generic class.");
+            }
             const genClassTypeParameter = genClassTypeParametersIterator.next().value;
             let createParameterConcretisation : boolean = true;
-            if(conClassTypeParameter.getName() != genClassTypeParameter.getName()){
+            if(conClassTypeParameter && genClassTypeParameter && conClassTypeParameter.getName() != genClassTypeParameter.getName()){
                 parameterConcretisations.forEach((param : Famix.ParameterConcretisation) => {
                     if (conClassTypeParameter.getName() == param.getConcreteParameter().getName() && genClassTypeParameter.getName() == param.getGenericParameter().getName()) {
                         createParameterConcretisation = false;
