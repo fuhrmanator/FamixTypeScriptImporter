@@ -1,5 +1,6 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
+import { ParametricFunction, ParametricMethod } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project(
@@ -12,15 +13,25 @@ const project = new Project(
 
 project.createSourceFile("./src/concretisationFunctionInstantiation.ts",
 `
-function createInstance<T>(c: new () => T): T {
-    return new c();
+interface CustomType {
+    message: string;
 }
 
-class ClassE {
-    property: string = "example";
+function createInstance<T>(c: string): T {
+    return c as unknown as T;
 }
 
-const instance = createInstance<ClassE>(ClassE);
+const instance = createInstance<CustomType>("hello");
+
+class Processor {
+    process<V>(value: V): V {
+        return value;
+    }
+}
+
+const processor = new Processor();
+
+const resultString = processor.process<string>("Hello, world!");
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -31,43 +42,56 @@ describe('Tests for concretisation', () => {
         expect(fmxRep).toBeTruthy();
     });
 
-    it("should contain one generic function", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParametricFunction").size).toBe(1);
+    it("should contain two generic functions", () => {
+        expect(fmxRep._getAllEntitiesWithType("ParametricFunction").size).toBe(2);
     });
 
-    // it("should contain generic interfaces named InterfaceE", () => {
-    //     const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).getName());
-    //     expect(listOfNames).toContain("InterfaceE");
+    it("should contain generic functions named createInstance", () => {
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricFunction")).map(e => (e as ParametricFunction).getName());
+        expect(listOfNames).toContain("createInstance");
 
-    //     const numberOfInterfaceE = listOfNames.filter(name => name === "InterfaceE").length;
-    //     expect(numberOfInterfaceE).toBe(3); 
-    // });
+        const numberOfCreateInstance = listOfNames.filter(name => name === "createInstance").length;
+        expect(numberOfCreateInstance).toBe(2); 
+    });
 
-    // const theInterface = fmxRep._getFamixInterface("{concretisationTypeInstantiation.ts}.InterfaceE<T>");
+    it("should contain two generic methods", () => {
+        expect(fmxRep._getAllEntitiesWithType("ParametricMethod").size).toBe(2);
+    });
 
-    // it("should contain one concretisation", () => {
-    //     expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(2);
-    // });
+    it("should contain generic methods named process", () => {
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod")).map(e => (e as ParametricMethod).getName());
+        expect(listOfNames).toContain("process");
 
-    // it("The generic interface should be InterfaceE<T> with genericParameter T", () => {
-    //     const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
-    //     const iterator = theConcretisation.values();
-    //     const firstElement = iterator.next().value;
-    //     expect(firstElement.getGenericEntity()).toBe(theInterface);
-    //     const T = firstElement.getGenericEntity().getGenericParameters().values().next().value;
-    //     expect(T.getName()).toBe("T");
-    // });
+        const numberOfCreateInstance = listOfNames.filter(name => name === "process").length;
+        expect(numberOfCreateInstance).toBe(2); 
+    });
 
-    // it("The concrete Class should be InterfaceE with concreteParameter string", () => {
-    //     const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
-    //     const iterator = theConcretisation.values();
-    //     const firstElement = iterator.next().value;
-    //     expect(firstElement.getConcreteEntity().getName()).toBe("InterfaceE");
-    //     const concParameter = firstElement.getConcreteEntity().getConcreteParameters().values().next().value;
-    //     expect(concParameter.getName()).toBe("number");
-    // });
+    it("should contain two concretisations", () => {
+        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(2);
+    });
 
-    // it("should contain one parameter concretisation", () => {
-    //     expect(fmxRep._getAllEntitiesWithType("ParameterConcretisation").size).toBe(2);
-    // });
+    const theInterface = fmxRep._getFamixInterface("{concretisationFunctionInstantiation.ts}.CustomType");
+
+    it("The concrete Function should be createInstance with concreteParameter CustomType", () => {
+        const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
+        const iterator = theConcretisation.values();
+        const firstElement = iterator.next().value;
+        const secondElement = iterator.next().value;
+        expect(secondElement.getConcreteEntity().getName()).toBe("createInstance");
+        const concParameter = secondElement.getConcreteEntity().getConcreteParameters().values().next().value;
+        expect(concParameter.getName()).toBe(theInterface?.getName());
+    });
+
+    it("The concrete Method should be process with concreteParameter string", () => {
+        const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
+        const iterator = theConcretisation.values();
+        const firstElement = iterator.next().value;
+        expect(firstElement.getConcreteEntity().getName()).toBe("process");
+        const concParameter = firstElement.getConcreteEntity().getConcreteParameters().values().next().value;
+        expect(concParameter.getName()).toBe("string");
+    });
+
+    it("should contain two parameter concretisations", () => {
+        expect(fmxRep._getAllEntitiesWithType("ParameterConcretisation").size).toBe(2);
+    });
 });

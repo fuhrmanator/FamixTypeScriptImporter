@@ -295,7 +295,7 @@ export class EntityDictionary {
      * @param concreteArguments concrete arguments
      * @returns A parametric Element  
      */
-    public createOrGetFamixConcreteElement(el : Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod, elDeclaration : ClassDeclaration | InterfaceDeclaration, concreteArguments : any): Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod {
+    public createOrGetFamixConcreteElement(el : Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod, elDeclaration : ClassDeclaration | InterfaceDeclaration | FunctionDeclaration | MethodDeclaration, concreteArguments : any): Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod {
         
         let fullyQualifiedFilename = el.getFullyQualifiedName();
         let params = "";
@@ -415,95 +415,103 @@ export class EntityDictionary {
      * @param currentCC The cyclomatic complexity metrics of the current source file
      * @returns The Famix model of the method or the accessor
      */
-    public createFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: unknown): Famix.Method | Famix.Accessor | Famix.ParametricMethod {
+    public createOrGetFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: unknown): Famix.Method | Famix.Accessor | Famix.ParametricMethod {
         let fmxMethod: Famix.Method | Famix.Accessor | Famix.ParametricMethod;
         const isGeneric = method.getTypeParameters().length > 0;
+        const functionFullyQualifiedName = FQNFunctions.getFQN(method);
+        if (!this.fmxFunctionAndMethodMap.has(functionFullyQualifiedName)) {
 
-        if (method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) {
-            fmxMethod = new Famix.Accessor();
-            const isGetter = method instanceof GetAccessorDeclaration;
-            const isSetter = method instanceof SetAccessorDeclaration;
-            if (isGetter) {(fmxMethod as Famix.Accessor).setKind("getter");}
-            if (isSetter) {(fmxMethod as Famix.Accessor).setKind("setter");}
-            this.famixRep.addElement(fmxMethod);
-        }
-        else {
-            if (isGeneric) {
-                fmxMethod = new Famix.ParametricMethod();
+            if (method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) {
+                fmxMethod = new Famix.Accessor();
+                const isGetter = method instanceof GetAccessorDeclaration;
+                const isSetter = method instanceof SetAccessorDeclaration;
+                if (isGetter) {(fmxMethod as Famix.Accessor).setKind("getter");}
+                if (isSetter) {(fmxMethod as Famix.Accessor).setKind("setter");}
+                this.famixRep.addElement(fmxMethod);
             }
             else {
-                fmxMethod = new Famix.Method();
+                if (isGeneric) {
+                    fmxMethod = new Famix.ParametricMethod();
+                }
+                else {
+                    fmxMethod = new Famix.Method();
+                }
+                this.famixRep.addElement(fmxMethod);
             }
-            this.famixRep.addElement(fmxMethod);
-        }
-        const isConstructor = method instanceof ConstructorDeclaration;
-        const isSignature = method instanceof MethodSignature;
-        fmxMethod.setIsGeneric(isGeneric);
+            const isConstructor = method instanceof ConstructorDeclaration;
+            const isSignature = method instanceof MethodSignature;
+            fmxMethod.setIsGeneric(isGeneric);
 
-        let isAbstract = false;
-        let isStatic = false;
-        if (method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) {
-            isAbstract = method.isAbstract();
-            isStatic = method.isStatic();
-        }
-
-        if (isConstructor) {(fmxMethod as Famix.Accessor).setKind("constructor");}
-        fmxMethod.setIsAbstract(isAbstract);
-        fmxMethod.setIsClassSide(isStatic);
-        fmxMethod.setIsPrivate((method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) ? (method.getModifiers().find(x => x.getText() === 'private')) !== undefined : false);
-        fmxMethod.setIsProtected((method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) ? (method.getModifiers().find(x => x.getText() === 'protected')) !== undefined : false);
-        fmxMethod.setSignature(Helpers.computeSignature(method.getText()));
-
-        let methodName: string;
-        if (isConstructor) {
-            methodName = "constructor";
-        }
-        else {
-            methodName = (method as MethodDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration).getName();
-        }
-        fmxMethod.setName(methodName);
-
-        if (!isConstructor) {
-            if (method.getName().substring(0, 1) === "#") {
-                fmxMethod.setIsPrivate(true);
+            let isAbstract = false;
+            let isStatic = false;
+            if (method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) {
+                isAbstract = method.isAbstract();
+                isStatic = method.isStatic();
             }
-        }
 
-        if (!fmxMethod.getIsPrivate() && !fmxMethod.getIsProtected()) {
-            fmxMethod.setIsPublic(true);    
+            if (isConstructor) {(fmxMethod as Famix.Accessor).setKind("constructor");}
+            fmxMethod.setIsAbstract(isAbstract);
+            fmxMethod.setIsClassSide(isStatic);
+            fmxMethod.setIsPrivate((method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) ? (method.getModifiers().find(x => x.getText() === 'private')) !== undefined : false);
+            fmxMethod.setIsProtected((method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) ? (method.getModifiers().find(x => x.getText() === 'protected')) !== undefined : false);
+            fmxMethod.setSignature(Helpers.computeSignature(method.getText()));
+
+            let methodName: string;
+            if (isConstructor) {
+                methodName = "constructor";
+            }
+            else {
+                methodName = (method as MethodDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration).getName();
+            }
+            fmxMethod.setName(methodName);
+
+            if (!isConstructor) {
+                if (method.getName().substring(0, 1) === "#") {
+                    fmxMethod.setIsPrivate(true);
+                }
+            }
+
+            if (!fmxMethod.getIsPrivate() && !fmxMethod.getIsProtected()) {
+                fmxMethod.setIsPublic(true);    
+            }
+            else {
+                fmxMethod.setIsPublic(false);
+            }
+
+            if (!isSignature) {
+                fmxMethod.setCyclomaticComplexity(currentCC[fmxMethod.getName()]);
+            }
+            else {
+                fmxMethod.setCyclomaticComplexity(0);
+            }
+
+            let methodTypeName = this.UNKNOWN_VALUE; 
+            try {
+                methodTypeName = method.getReturnType().getText().trim();            
+            } catch (error) {
+                logger.error(`> WARNING: got exception ${error}. Failed to get usable name for return type of method: ${fmxMethod.getName()}. Continuing...`);
+            }
+
+            const fmxType = this.createOrGetFamixType(methodTypeName, method);
+            fmxMethod.setDeclaredType(fmxType);
+            fmxMethod.setNumberOfLinesOfCode(method.getEndLineNumber() - method.getStartLineNumber());
+            const parameters = method.getParameters();
+            fmxMethod.setNumberOfParameters(parameters.length);
+
+            if (!isSignature) {
+                fmxMethod.setNumberOfStatements(method.getStatements().length);
+            }
+            else {
+                fmxMethod.setNumberOfStatements(0);
+            }
+            
+            this.makeFamixIndexFileAnchor(method, fmxMethod);
+
+            this.fmxFunctionAndMethodMap.set(functionFullyQualifiedName, fmxMethod);
         }
         else {
-            fmxMethod.setIsPublic(false);
+            fmxMethod = this.fmxFunctionAndMethodMap.get(functionFullyQualifiedName) as (Famix.Method | Famix.Accessor | Famix.ParametricMethod);
         }
-
-        if (!isSignature) {
-            fmxMethod.setCyclomaticComplexity(currentCC[fmxMethod.getName()]);
-        }
-        else {
-            fmxMethod.setCyclomaticComplexity(0);
-        }
-
-        let methodTypeName = this.UNKNOWN_VALUE; 
-        try {
-            methodTypeName = method.getReturnType().getText().trim();            
-        } catch (error) {
-            logger.error(`> WARNING: got exception ${error}. Failed to get usable name for return type of method: ${fmxMethod.getName()}. Continuing...`);
-        }
-
-        const fmxType = this.createOrGetFamixType(methodTypeName, method);
-        fmxMethod.setDeclaredType(fmxType);
-        fmxMethod.setNumberOfLinesOfCode(method.getEndLineNumber() - method.getStartLineNumber());
-        const parameters = method.getParameters();
-        fmxMethod.setNumberOfParameters(parameters.length);
-
-        if (!isSignature) {
-            fmxMethod.setNumberOfStatements(method.getStatements().length);
-        }
-        else {
-            fmxMethod.setNumberOfStatements(0);
-        }
-        
-        this.makeFamixIndexFileAnchor(method, fmxMethod);
 
         this.fmxElementObjectMap.set(fmxMethod,method);
         
@@ -622,26 +630,61 @@ export class EntityDictionary {
      * @param tp A type parameter
      * @returns The Famix model of the type parameter
      */
-    public createOrGetFamixConcreteType(param: TypeNode): Famix.ParameterType | Famix.PrimitiveType {
+    public createOrGetFamixConcreteType(param: TypeNode): Famix.ParameterType | Famix.PrimitiveType | Famix.Class | Famix.Interface {
         const typeParameterDeclaration = param.getSymbol()?.getDeclarations()[0] as TypeParameterDeclaration;
-        const parameterTypeName = param.getText();
+        const parameterTypeName : string = param.getText();
+        let fmxParameterType: Famix.Type | Famix.Class | Famix.Interface;
 
-        let fmxParameterType: Famix.Type;
-        if (!this.fmxTypeMap.has(parameterTypeName)) {           
-            if (parameterTypeName === "number" || parameterTypeName === "string" || parameterTypeName === "boolean" || parameterTypeName === "bigint" || parameterTypeName === "symbol" || parameterTypeName === "undefined" || parameterTypeName === "null" || parameterTypeName === "any" || parameterTypeName === "unknown" || parameterTypeName === "never" || parameterTypeName === "void") {
-                fmxParameterType = new Famix.PrimitiveType();
-                fmxParameterType.setIsStub(true);
-            } else {
-                fmxParameterType = new Famix.ParameterType();
-            } 
-
-            fmxParameterType.setName(parameterTypeName);
-            this.famixRep.addElement(fmxParameterType);
-            this.fmxTypeMap.set(parameterTypeName, fmxParameterType);
-            this.fmxElementObjectMap.set(fmxParameterType,typeParameterDeclaration);
+        let isClassOrInterface = false;
+        if (this.fmxClassMap.has(parameterTypeName)){
+            this.fmxClassMap.forEach((obj, name) => {
+                if(obj instanceof Famix.ParametricClass){
+                    if (name === param.getText() && obj.getGenericParameters().size>0) {
+                        fmxParameterType = obj;
+                        isClassOrInterface = true;
+                    } 
+                } else {
+                    if (name === param.getText()) {
+                        fmxParameterType = obj;
+                        isClassOrInterface = true;
+                    } 
+                }   
+            })
         }
-        else {
-            fmxParameterType = this.fmxTypeMap.get(parameterTypeName);
+
+        if (this.fmxInterfaceMap.has(parameterTypeName)){
+            this.fmxInterfaceMap.forEach((obj, name) => {
+                if(obj instanceof Famix.ParametricInterface){
+                    if (name === param.getText() && obj.getGenericParameters().size>0) {
+                        fmxParameterType = obj;
+                        isClassOrInterface = true;
+                    } 
+                } else {
+                    if (name === param.getText()) {
+                        fmxParameterType = obj;
+                        isClassOrInterface = true;
+                    } 
+                }   
+            })
+        }
+
+        if(!isClassOrInterface){
+            if (!this.fmxTypeMap.has(parameterTypeName)) {           
+                if (parameterTypeName === "number" || parameterTypeName === "string" || parameterTypeName === "boolean" || parameterTypeName === "bigint" || parameterTypeName === "symbol" || parameterTypeName === "undefined" || parameterTypeName === "null" || parameterTypeName === "any" || parameterTypeName === "unknown" || parameterTypeName === "never" || parameterTypeName === "void") {
+                    fmxParameterType = new Famix.PrimitiveType();
+                    fmxParameterType.setIsStub(true);
+                } else {
+                    fmxParameterType = new Famix.ParameterType();
+                } 
+    
+                fmxParameterType.setName(parameterTypeName);
+                this.famixRep.addElement(fmxParameterType);
+                this.fmxTypeMap.set(parameterTypeName, fmxParameterType);
+                this.fmxElementObjectMap.set(fmxParameterType,typeParameterDeclaration);
+            }
+            else {
+                fmxParameterType = this.fmxTypeMap.get(parameterTypeName);
+            }
         }
 
         return fmxParameterType;
@@ -1266,46 +1309,47 @@ export class EntityDictionary {
      * Creates a Famix concretisation between a class and its instanciations
      * @param func A function
      */
-    public createFamixConcretisationFunctionInstantiation(func: FunctionDeclaration | MethodDeclaration){
-        
-        const usages = func.findReferencesAsNodes();
+    public createFamixConcretisationFunctionInstantiation(element: FunctionDeclaration | MethodDeclaration){
+        const isGeneric = element.getTypeParameters().length > 0;
+        if (isGeneric) {
+            const genParams = element.getTypeParameters().map(param => param.getText());
+            const uses = element.findReferencesAsNodes();    
+            uses.forEach(usage => {
+                let currentNode = usage;
 
-        usages.forEach(usage => {
-            console.log(usage)
-            const callExpression = usage.getParentIfKind(SyntaxKind.CallExpression);
-            if (callExpression) {
-                console.log("Appel de 'createInstance' trouvé à la ligne", callExpression.getStartLineNumber());
-                console.log("Texte de l'appel:", callExpression.getText());
-            }
-        });
-        // const callExpressions = func.getDescendantsOfKind(SyntaxKind.CallExpression);
-        // console.log(callExpressions)
-        // const genParams = func.getTypeParameters().map(arg => arg.getText());
-        // console.log(genParams)
-        // callExpressions.forEach(callExpression => {
-        //         const argumentsList = callExpression.getArguments();
-        //         console.log(argumentsList)
-        //         const conParams = callExpression.getTypeArguments();
-        //         console.log(conParams);
-                
-        //         // if (!Helpers.arraysAreEqual(conParams,genParams)) {
-        //         //     // const genFunction = this.createOrGetFamixFunction(func,0) as Famix.ParametricFunction;
-                    
-        //         //     // const conFunction = this.createOrGetFamixConcreteInterface(interfaceType);
-        //         //     // const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
-        //         //     // let createConcretisation : boolean = true;
-        //         //     // concretisations.forEach((conc : Famix.Concretisation) => {
-        //         //     //     if (genInterface.getFullyQualifiedName() == conc.getGenericEntity().getFullyQualifiedName() && conc.getConcreteEntity().getFullyQualifiedName() == conInterface.getFullyQualifiedName()){
-        //         //     //         createConcretisation = false;
-        //         //     //     }
-        //         //     // });
-        
-        //         //     // if (createConcretisation) {
-        //         //     //     const fmxConcretisation : Famix.Concretisation = this.createFamixConcretisation(conInterface,genInterface);
-        //         //     // }
-        //         // }
-            
-        // });
+                while (currentNode) {
+                    if (currentNode.getKind() === SyntaxKind.CallExpression) {
+                        const callExpression = currentNode.asKind(SyntaxKind.CallExpression);
+                        const args = callExpression.getTypeArguments();
+                        const conParams = callExpression.getTypeArguments().map(param => param.getText());
+                        if (!Helpers.arraysAreEqual(conParams,genParams)) {
+                            let genElement;
+                            if(element instanceof FunctionDeclaration){
+                                genElement = this.createOrGetFamixFunction(element,0) as Famix.ParametricFunction;
+                            } else {
+                                genElement = this.createOrGetFamixMethod(element,0) as Famix.ParametricMethod;
+                            }
+                            let concElement;
+                            concElement = this.createOrGetFamixConcreteElement(genElement,element,args);
+                            const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
+                            let createConcretisation : boolean = true;
+                            concretisations.forEach((conc : Famix.Concretisation) => {
+                                if (genElement.getFullyQualifiedName() == conc.getGenericEntity().getFullyQualifiedName() && conc.getConcreteEntity().getFullyQualifiedName() == concElement.getFullyQualifiedName()){
+                                    createConcretisation = false;
+                                }
+                            });
+    
+                            if (createConcretisation) {
+                                const fmxConcretisation : Famix.Concretisation = this.createFamixConcretisation(concElement,genElement);
+                            }
+                        }
+                        break;
+                    }
+                    // Remonter à l'élément parent (utile si le nœud de référence est un enfant)
+                    currentNode = currentNode.getParent();
+                }
+            });
+        }
     }
 
     /**
