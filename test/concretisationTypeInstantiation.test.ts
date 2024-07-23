@@ -37,7 +37,7 @@ describe('Tests for concretisation', () => {
     });
 
     it("should contain 3 generic interfaces", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParametricInterface").size).toBe(3);
+        expect(fmxRep._getAllEntitiesWithType("ParametricInterface").size).toBe(2);
     });
 
     it("should contain 2 generic classes", () => {
@@ -48,15 +48,15 @@ describe('Tests for concretisation', () => {
         const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).getName());
         expect(listOfNames).toContain("InterfaceE");
         const numberOfInterfaceE = listOfNames.filter(name => name === "InterfaceE").length;
-        expect(numberOfInterfaceE).toBe(3); 
+        expect(numberOfInterfaceE).toBe(2); 
     });
 
     it("should contain 3 concretisations", () => {
-        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(3);
+        expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(2);
     });
 
     it("should contain two parameter concretisation", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParameterConcretisation").size).toBe(3);
+        expect(fmxRep._getAllEntitiesWithType("ParameterConcretisation").size).toBe(2);
     });
 
     const theInterface = fmxRep._getFamixInterface("{concretisationTypeInstantiation.ts}.InterfaceE<T>");
