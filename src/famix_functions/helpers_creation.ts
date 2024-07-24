@@ -83,7 +83,21 @@ export function arraysAreEqual(array1: string[], array2: string[]): boolean {
     }
 }
 
-export function remplacerTypeGenerique(chaine: string, nouveauType: string): string {
-    // Utiliser une expression régulière pour capturer le contenu entre '<' et '>'
-    return chaine.replace(/<[^>]*>/, `<${nouveauType}>`);
+export function replaceLastBetweenTags(input: string, replacement: string): string {
+    const lastTagIndex = input.lastIndexOf('<');
+    
+    if (lastTagIndex === -1) {
+        return input; // Return the original string if no tags are found
+    }
+
+    const closingTagIndex = input.indexOf('>', lastTagIndex);
+    
+    if (closingTagIndex === -1) {
+        return input; // Return the original string if no closing tag is found
+    }
+
+    const beforeTag = input.substring(0, lastTagIndex + 1); // Include '<'
+    const afterTag = input.substring(closingTagIndex); // Include '>'
+
+    return beforeTag + replacement + afterTag;
 }

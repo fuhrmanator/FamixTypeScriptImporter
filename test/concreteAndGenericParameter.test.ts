@@ -43,22 +43,6 @@ interface JsonDecoratorOptions {
   _descriptor?: TypedPropertyDescriptor<any>;
   _propertyKey?: string;
 }
-
-export class JsonParser<T> {
-  private cachedGetMetadata<T extends JsonDecoratorOptions>(metadataKey: string,
-                                                            target: ClassType<any>,
-                                                            propertyKey: string = null,
-                                                            context: JsonParserTransformerContext): T { /* empty */}
-
-  private parseJsonInject(replacement: any, obj: any, key: string, context: JsonParserTransformerContext) {
-    const currentMainCreator = context.mainCreator[0];
-
-    let propertySetter;
-    let jsonInject: JsonInjectOptions =
-      this.cachedGetMetadata('JsonInject', currentMainCreator, key, context);
-  }
-
-}
 `);
 
 const fmxRep = importer.famixRepFromProject(project);

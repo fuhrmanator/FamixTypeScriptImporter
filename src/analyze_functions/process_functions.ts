@@ -782,7 +782,7 @@ function processNodeForAccesses(n: Identifier, id: number): void {
             logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})'s first ancestor is a PropertyDeclaration. Skipping...`);
             return;
         }
-        entityDictionary.createFamixAccess(n, id);
+        // entityDictionary.createFamixAccess(n, id);
         logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})`);
     } catch (error) {
         logger.error(`> Got exception "${error}".\nScopeDeclaration invalid for "${n.getSymbol().getFullyQualifiedName()}".\nContinuing...`);
