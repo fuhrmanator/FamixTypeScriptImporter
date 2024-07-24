@@ -1026,7 +1026,6 @@ export class EntityDictionary {
         const absolutePath = path.normalize(moduleSpecifierFilePath);
         // convert the path and remove any windows backslashes introduced by path.normalize
         const pathInProject: string = this.convertToRelativePath(absolutePath, absolutePathProject).replace(/\\/g, "/");
-
         let pathName = "{" + pathInProject + "}.";
 
         // Named imports, e.g. import { ClassW } from "./complexExportModule";

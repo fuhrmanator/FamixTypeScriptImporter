@@ -55,7 +55,7 @@ export function getFQN(node: FQNNode | Node): string {
         path.normalize(sourceFile.getFilePath()), 
                        absolutePathProject).replace(/\\/sg, "/");
     parts.unshift(`{${relativePath}}`);
-
+    console.log(parts.join('.'))
     return parts.join('.');
 }
 
