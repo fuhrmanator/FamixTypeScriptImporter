@@ -15,7 +15,7 @@
     "uml": "./src/generate_uml.sh"
   },
   "bin": {
-    "ts2famix": "dist/ts2famix-cli.js"
+    "ts2famix": "dist/ts2famix-cli-wrapper.js"
   },
   "keywords": [],
   "author": "",
@@ -27,23 +27,23 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.11.18",
+    "@types/node": "^20.14.12",
     "@types/yargs": "^17.0.32",
-    "eslint": "^9.6.0",
+    "eslint": "^9.7.0",
     "jest": "^29.7.0",
     "tplant": "3.1.0",
-    "ts-jest": "^29.1.2",
+    "ts-jest": "^29.2.3",
     "ts-node": "^10.9.2",
-    "typedoc": "^0.26.3"
+    "typedoc": "^0.26.5"
   },
   "dependencies": {
-    "@types/lodash": "^4.17.6",
+    "@types/lodash": "^4.17.7",
     "grapheme-splitter": "^1.0.4",
     "lodash": "^4.17.21",
     "ts-morph": "^22.0.0",
     "tslog": "^4.9.2",
     "tsutils": "^3.21.0",
-    "typescript": "^5.4.5",
+    "typescript": "^5.5.4",
     "yargs": "^17.7.2"
   }
 }
