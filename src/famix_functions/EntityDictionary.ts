@@ -891,7 +891,7 @@ export class EntityDictionary {
     public createFamixAccess(node: Identifier, id: number): void {
         const fmxVar = this.famixRep.getFamixEntityById(id) as Famix.StructuralEntity;
 
-        logger.info(`Creating FamixAccess. Node: [${node.getKindName()}] '${node.getText()}' at line ${node.getStartLineNumber()} in ${node.getSourceFile().getBaseName()}, id: ${id} refers to fmxVar '${fmxVar.getFullyQualifiedName()}'.`);
+        logger.debug(`Creating FamixAccess. Node: [${node.getKindName()}] '${node.getText()}' at line ${node.getStartLineNumber()} in ${node.getSourceFile().getBaseName()}, id: ${id} refers to fmxVar '${fmxVar.getFullyQualifiedName()}'.`);
 
         const nodeReferenceAncestor = Helpers.findAncestor(node);
         const ancestorFullyQualifiedName = FQNFunctions.getFQN(nodeReferenceAncestor);
