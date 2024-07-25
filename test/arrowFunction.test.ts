@@ -38,19 +38,19 @@ project.createSourceFile("arrowFunctions.ts",
     // Arrow function declaring a class inside its body (with same name as before)
     test('blah', t => {
       class User {
-        @JsonProperty() @JsonClassType({type: () => [Number]})
-        @JsonView({value: () => [Views.public]})
-        id: number;
+        id: string;
 
-        @JsonValue()
         toUserInfo(): string {
           return this.id;
         }
         p : number;
-        enum Color {
-          RED = "Red",
-          GREEN = "Green"
-        }
+      }
+      function a() {}
+      const pi = 3.14;
+      enum Color {
+        Red,
+        Green,
+        Blue
       }
     });
 
@@ -63,7 +63,7 @@ describe('ArrowFunctions', () => {
     const methodList = fmxRep._getAllEntitiesWithType('ArrowFunction');
     
     it("should have several Arrow Functions", () => {
-        expect(methodList?.size).toBe(14);
+        expect(methodList?.size).toBe(10);
     });
 
     it("should contain arrow function add and should return number should have two parameters", () => {
@@ -160,5 +160,12 @@ describe('ArrowFunctions', () => {
         const theEnum = theEnums.values().next().value;
         expect(theEnum.getName()).toBe("Color");
     });
+
+    it("should contain a class User with function a", () => {
+        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.ArrowFunction(28:18).Block(28:23).a');
+        expect(theFunction).toBeTruthy();
+        expect(theFunction?.getDeclaredType().getName()).toBe("void");
+        expect(theFunction?.getParameters().size).toBe(0);
+    }); 
 
 });
