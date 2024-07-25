@@ -1,5 +1,5 @@
 import { ArrowFunction, CallExpression, ClassDeclaration, ClassExpression, ConstructorDeclaration, Decorator, EnumDeclaration, FunctionDeclaration, FunctionExpression, GetAccessorDeclaration, Identifier, ImportDeclaration, ImportEqualsDeclaration, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, Node, PropertyDeclaration, SetAccessorDeclaration, SourceFile, ts, TypeParameterDeclaration, VariableDeclaration } from "ts-morph";
-import { entityDictionary } from "./analyze";
+import { entityDictionary, logger } from "./analyze";
 import path from "path";
 import { TypeDeclaration } from "./famix_functions/EntityDictionary";
 
@@ -17,10 +17,10 @@ export function getFQN(node: FQNNode | Node): string {
     const sourceFile = node.getSourceFile();
     let parts: string[] = [];
     let currentNode: Node | undefined = node;
-    const { line, column } = sourceFile.getLineAndColumnAtPos(currentNode.getStart());
-    const lc = `${line}:${column}`;
 
     while (currentNode && !Node.isSourceFile(currentNode)) {
+        const { line, column } = sourceFile.getLineAndColumnAtPos(currentNode.getStart());
+        const lc = `${line}:${column}`;
         if (Node.isClassDeclaration(currentNode) || 
             Node.isClassExpression(currentNode) || 
             Node.isInterfaceDeclaration(currentNode) ||
@@ -55,7 +55,7 @@ export function getFQN(node: FQNNode | Node): string {
         path.normalize(sourceFile.getFilePath()), 
                        absolutePathProject).replace(/\\/sg, "/");
     parts.unshift(`{${relativePath}}`);
-    console.log(parts.join('.'))
+    logger.debug(parts.join('.'));
     return parts.join('.');
 }
 

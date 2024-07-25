@@ -5,8 +5,12 @@ import * as fs from 'fs';
 import { logger , entityDictionary } from "../analyze";
 import { getFQN } from "../fqn";
 
+export type AccessibleTSMorphElement = ParameterDeclaration | VariableDeclaration | PropertyDeclaration | EnumMember;
+export type FamixID = number;
+
 export const methodsAndFunctionsWithId = new Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction>(); // Maps the Famix method, constructor, getter, setter and function ids to their ts-morph method, constructor, getter, setter or function object
-export const accessMap = new Map<number, ParameterDeclaration | VariableDeclaration | PropertyDeclaration | EnumMember>(); // Maps the Famix parameter, variable, property and enum value ids to their ts-morph parameter, variable, property or enum member object
+
+export const accessMap = new Map<FamixID, AccessibleTSMorphElement>(); // Maps the Famix parameter, variable, property and enum value ids to their ts-morph parameter, variable, property or enum member object
 export const classes = new Array<ClassDeclaration>(); // Array of all the classes of the source files
 export const interfaces = new Array<InterfaceDeclaration>(); // Array of all the interfaces of the source files
 export const modules = new Array<SourceFile>(); // Array of all the source files which are modules
@@ -188,10 +192,37 @@ function processAliases(m: ContainerTypes, fmxScope: ScopedTypes): void {
  */
 function processClasses(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module ): void {
     logger.debug(`processClasses: ---------- Finding Classes:`);
-    m.getClasses().forEach(c => {
+    const classesInArrowFunctions = getClassesDeclaredInArrowFunctions(m);
+    const classes = m.getClasses().concat(classesInArrowFunctions);
+    classes.forEach(c => {
         const fmxClass = processClass(c);
         fmxScope.addType(fmxClass);
     });
+}
+
+function getArrowFunctionClasses(f: ArrowFunction): ClassDeclaration[] {
+    const classes: ClassDeclaration[] = [];
+
+    function findClasses(node: any) {
+        if (node.getKind() === SyntaxKind.ClassDeclaration) {
+            classes.push(node as ClassDeclaration);
+        }
+        node.getChildren().forEach(findClasses);
+    }
+
+    findClasses(f);
+    return classes;
+}
+
+/**
+ * ts-morph doesn't find classes in arrow functions, so we need to find them manually
+ * @param s A source file 
+ * @returns the ClassDeclaration objects found in arrow functions of the source file
+ */
+function getClassesDeclaredInArrowFunctions(s: SourceFile | ModuleDeclaration): ClassDeclaration[] {
+    const arrowFunctions = s.getDescendantsOfKind(SyntaxKind.ArrowFunction);
+    const classesInArrowFunctions = arrowFunctions.map(f => getArrowFunctionClasses(f)).flat();
+    return classesInArrowFunctions;
 }
 
 /**
@@ -374,11 +405,12 @@ function processProperty(p: PropertyDeclaration | PropertySignature): Famix.Prop
     const ancestor = p.getFirstAncestorOrThrow();
     logger.debug(` ---> Its first ancestor is a ${ancestor.getKindName()}`);
 
+    // decorators
     if (!(p instanceof PropertySignature)) {
         processDecorators(p, fmxProperty);
         // only add access if the p's first ancestor is not a PropertyDeclaration
         if (ancestor.getKindName() !== "PropertyDeclaration") {
-            logger.debug(`adding access: ${p.getName()}, (${p.getType().getText()}) Famix ${fmxProperty.getName()}`);
+            logger.debug(`adding access to map: ${p.getName()}, (${p.getType().getText()}) Famix ${fmxProperty.getName()} id: ${fmxProperty.id}`);
             accessMap.set(fmxProperty.id, p);
         }
     }
@@ -754,10 +786,10 @@ function processComment(c: CommentRange, fmxScope: Famix.NamedEntity): Famix.Com
  * Builds a Famix model for the accesses on the parameters, variables, properties and enum members of the source files
  * @param accessMap A map of parameters, variables, properties and enum members with their id
  */
-export function processAccesses(accessMap: Map<number, ParameterDeclaration | VariableDeclaration | PropertyDeclaration | EnumMember>): void {
-    logger.debug(`processAccesses: Creating accesses:`);
+export function processAccesses(accessMap: Map<FamixID, AccessibleTSMorphElement>): void {
+    logger.debug(`Creating accesses:`);
     accessMap.forEach((v, id) => {
-        logger.debug(`processAccesses: Accesses to ${v.getName()}`);
+        logger.debug(`Accesses to ${v.getName()}`);
         try {
             const temp_nodes = v.findReferencesAsNodes() as Array<Identifier>;
             temp_nodes.forEach(node => processNodeForAccesses(node, id));

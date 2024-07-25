@@ -1,5 +1,6 @@
 import { Project } from 'ts-morph';
 import { Importer, logger } from '../src/analyze';
+import { Class, Enum, Function, Method } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 logger.settings.minLevel = 0; // all your messages are belong to us
@@ -27,7 +28,7 @@ project.createSourceFile("arrowFunctions.ts",
 
     // Arrow function declaring a class inside its body
     test('blah', t => {
-      class User {
+      class Person {
         @JsonProperty() @JsonClassType({type: () => [Number]})
         @JsonClassType({type: () => [Number]})
         age: number;
@@ -40,6 +41,16 @@ project.createSourceFile("arrowFunctions.ts",
         @JsonProperty() @JsonClassType({type: () => [Number]})
         @JsonView({value: () => [Views.public]})
         id: number;
+
+        @JsonValue()
+        toUserInfo(): string {
+          return this.id;
+        }
+        p : number;
+        enum Color {
+          RED = "Red",
+          GREEN = "Green"
+        }
       }
     });
 
@@ -128,6 +139,26 @@ describe('ArrowFunctions', () => {
         expect(firstParam).toBeTruthy();
         expect(firstParam.getName()).toBe("t");
         expect(firstParam.getDeclaredType().getName()).toBe("any");
+    });
+
+    it("should contain a class User inside an arrow function", () => {
+        const theClass = fmxRep._getFamixClass('{arrowFunctions.ts}.ArrowFunction(19:18).Block(19:23).Person');
+        expect(theClass).toBeTruthy();
+        expect(theClass?.getName()).toBe("Person");
+    });
+
+    it("should contain an method toUserInfo inside a class User inside an arrow function", () => {
+        const methods = fmxRep._getAllEntitiesWithType('Method') as Set<Method>;
+        const theMethod = fmxRep._getFamixMethod('{arrowFunctions.ts}.ArrowFunction(28:18).Block(28:23).User.toUserInfo');
+        expect(theMethod).toBeTruthy();
+        expect(theMethod?.getDeclaredType().getName()).toBe("string");
+        expect(theMethod?.getParameters().size).toBe(0);
+    });
+
+    it("should contain a class User with an enum Color inside an arrow function", () => {
+        const theEnums = fmxRep._getAllEntitiesWithType('Enum') as Set<Enum>;
+        const theEnum = theEnums.values().next().value;
+        expect(theEnum.getName()).toBe("Color");
     });
 
 });

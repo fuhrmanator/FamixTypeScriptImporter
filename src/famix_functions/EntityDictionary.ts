@@ -891,13 +891,13 @@ export class EntityDictionary {
     public createFamixAccess(node: Identifier, id: number): void {
         const fmxVar = this.famixRep.getFamixEntityById(id) as Famix.StructuralEntity;
 
-        logger.debug(`Creating FamixAccess. Node: [${node.getKindName()}] '${node.getText()}', id: ${id} refers to fmxVar '${fmxVar}'.`);
+        logger.info(`Creating FamixAccess. Node: [${node.getKindName()}] '${node.getText()}' at line ${node.getStartLineNumber()} in ${node.getSourceFile().getBaseName()}, id: ${id} refers to fmxVar '${fmxVar.getFullyQualifiedName()}'.`);
 
         const nodeReferenceAncestor = Helpers.findAncestor(node);
         const ancestorFullyQualifiedName = FQNFunctions.getFQN(nodeReferenceAncestor);
         let accessor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
         if (!accessor) {
-            logger.error(`Ancestor ${ancestorFullyQualifiedName} not found.`);
+            logger.error(`Ancestor ${ancestorFullyQualifiedName} of kind ${nodeReferenceAncestor.getKindName()} not found.`);
             // accessor = this.createOrGetFamixType(ancestorFullyQualifiedName, nodeReferenceAncestor as TypeDeclaration);
         }
 
