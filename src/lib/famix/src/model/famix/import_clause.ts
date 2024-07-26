@@ -48,6 +48,7 @@ export class ImportClause extends Entity {
     super.addPropertiesToExporter(exporter);
     exporter.addProperty("importingEntity", this.getImportingEntity());
     exporter.addProperty("importedEntity", this.getImportedEntity());
-    exporter.addProperty("moduleSpecifier", this.getModuleSpecifier());
+    // unknown property below
+//    exporter.addProperty("moduleSpecifier", this.getModuleSpecifier());
   }
 }

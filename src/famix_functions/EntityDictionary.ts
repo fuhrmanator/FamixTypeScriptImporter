@@ -39,7 +39,7 @@ export class EntityDictionary {
         logger.debug("making index file anchor for '" + sourceElement?.getText() + "' with famixElement " + famixElement.getJSON());
         const fmxIndexFileAnchor = new Famix.IndexedFileAnchor();
         fmxIndexFileAnchor.setElement(famixElement);
-        this.fmxElementObjectMap.set(famixElement,sourceElement);
+        this.fmxElementObjectMap.set(famixElement, sourceElement);
 
         if (sourceElement !== null) {
             const absolutePathProject = this.famixRep.getAbsolutePath();
@@ -107,7 +107,9 @@ export class EntityDictionary {
             }
 
             if (!(famixElement instanceof Famix.ImportClause || famixElement instanceof Famix.Access || famixElement instanceof Famix.Reference || famixElement instanceof Famix.Invocation || famixElement instanceof Famix.Inheritance) && !(famixElement instanceof Famix.Comment) && !(sourceElement instanceof CommentRange) && !(sourceElement instanceof Identifier) && !(sourceElement instanceof ImportSpecifier) && !(sourceElement instanceof ExpressionWithTypeArguments)) {
-                (famixElement as Famix.NamedEntity).setFullyQualifiedName(FQNFunctions.getFQN(sourceElement));
+                const fqn = FQNFunctions.getFQN(sourceElement);
+                logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+                (famixElement as Famix.NamedEntity).setFullyQualifiedName(fqn);
             }
         } else {
             // sourceElement is null
@@ -890,6 +892,9 @@ export class EntityDictionary {
      */
     public createFamixAccess(node: Identifier, id: number): void {
         const fmxVar = this.famixRep.getFamixEntityById(id) as Famix.StructuralEntity;
+        if (!fmxVar) {
+            throw new Error(`Famix entity with id ${id} not found, for node ${node.getText()} in ${node.getSourceFile().getBaseName()} at line ${node.getStartLineNumber()}.`);
+        }
 
         logger.debug(`Creating FamixAccess. Node: [${node.getKindName()}] '${node.getText()}' at line ${node.getStartLineNumber()} in ${node.getSourceFile().getBaseName()}, id: ${id} refers to fmxVar '${fmxVar.getFullyQualifiedName()}'.`);
 
@@ -1065,8 +1070,8 @@ export class EntityDictionary {
             this.makeFamixIndexFileAnchor(importElement, importedEntity);
             importedEntity.setFullyQualifiedName(pathName);
         }
-
-        this.famixRep.addElement(importedEntity);
+        // I don't think it should be added to the repository if it exists already
+        if (!isInExports) this.famixRep.addElement(importedEntity);
         const importerFullyQualifiedName = FQNFunctions.getFQN(importer);
         const fmxImporter = this.famixRep.getFamixEntityByFullyQualifiedName(importerFullyQualifiedName) as Famix.Module;
         fmxImportClause.setImportingEntity(fmxImporter);
