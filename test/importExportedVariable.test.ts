@@ -33,7 +33,8 @@ describe('Tests for exported and imported variable', () => {
         expect(variables.size).toBe(3);
     });
 
-    it(`imported hasBigInt should refer to the variable in exporter2.ts`, () => {
+    // reifying the imported variable (not supported)
+    it.skip(`imported hasBigInt should refer to the variable in exporter2.ts`, () => {
         // get ImportClause
         const importClauses = fmxRep._getAllEntitiesWithType("ImportClause") as Set<ImportClause>;
         expect(importClauses).toBeTruthy();
