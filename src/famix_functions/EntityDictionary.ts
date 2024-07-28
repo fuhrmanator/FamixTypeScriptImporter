@@ -1008,6 +1008,14 @@ export class EntityDictionary {
 
     }
 
+    public createFamixImportClause(importedEntity: Famix.NamedEntity, importingEntity: Famix.Module) {
+        const fmxImportClause = new Famix.ImportClause();
+        fmxImportClause.setImportedEntity(importedEntity);
+        fmxImportClause.setImportingEntity(importingEntity);
+        importingEntity.addOutgoingImport(fmxImportClause);
+        this.famixRep.addElement(fmxImportClause);
+    }
+
     /**
      * Creates a Famix import clause
      * @param importClauseInfo The information needed to create a Famix import clause
@@ -1018,8 +1026,8 @@ export class EntityDictionary {
      * @param isInExports A boolean indicating if the imported entity is in the exports
      * @param isDefaultExport A boolean indicating if the imported entity is a default export
      */
-    public createFamixImportClause(importClauseInfo: {importDeclaration?: ImportDeclaration | ImportEqualsDeclaration, importer: SourceFile, moduleSpecifierFilePath: string, importElement: ImportSpecifier | Identifier, isInExports: boolean, isDefaultExport: boolean}): void {
-        const {importDeclaration, importer, moduleSpecifierFilePath, importElement, isInExports, isDefaultExport} = importClauseInfo;
+    public oldCreateFamixImportClause(importClauseInfo: {importDeclaration?: ImportDeclaration | ImportEqualsDeclaration, importerSourceFile: SourceFile, moduleSpecifierFilePath: string, importElement: ImportSpecifier | Identifier, isInExports: boolean, isDefaultExport: boolean}): void {
+        const {importDeclaration, importerSourceFile: importer, moduleSpecifierFilePath, importElement, isInExports, isDefaultExport} = importClauseInfo;
         logger.debug(`createFamixImportClause: Creating import clause:`);
         const fmxImportClause = new Famix.ImportClause();
 
@@ -1034,6 +1042,9 @@ export class EntityDictionary {
         let pathName = "{" + pathInProject + "}.";
 
         // Named imports, e.g. import { ClassW } from "./complexExportModule";
+
+        // Start with simple import clause (without referring to the actual variable)
+
         if (importDeclaration instanceof ImportDeclaration 
             && importElement instanceof ImportSpecifier) { 
                 importedEntityName = importElement.getName();
@@ -1049,6 +1060,8 @@ export class EntityDictionary {
                 }
                 this.makeFamixIndexFileAnchor(importElement, importedEntity);
                 importedEntity.setFullyQualifiedName(pathName);
+                // must add entity to repository
+                this.famixRep.addElement(importedEntity);
             }
         }
         // handle import equals declarations, e.g. import myModule = require("./complexExportModule");
