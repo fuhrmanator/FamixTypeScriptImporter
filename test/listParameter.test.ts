@@ -21,7 +21,7 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Tests for parameters in function', () => {
 
     it("should contain function 'testMethod'", () => {
-        const theFunction = fmxRep._getFamixFunction('{listParameter.ts}.testMethod');
+        const theFunction = fmxRep._getFamixFunction('{listParameter.ts}.testMethod[FunctionDeclaration]');
         expect(theFunction).toBeTruthy();
     });
 

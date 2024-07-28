@@ -20,12 +20,12 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Functions', () => {
 
     it("should contain function 'a'", () => {
-        const theFunction = fmxRep._getFamixFunction('{functions.ts}.a');
+        const theFunction = fmxRep._getFamixFunction('{functions.ts}.a[FunctionDeclaration]');
         expect(theFunction).toBeTruthy();
     });
 
     it("should contain function 'b'", () => {
-        const theFunction = fmxRep._getFamixFunction('{functions.ts}.b');
+        const theFunction = fmxRep._getFamixFunction('{functions.ts}.b[FunctionDeclaration]');
         expect(theFunction).toBeTruthy();
     });
 });

@@ -67,7 +67,7 @@ describe('ArrowFunctions', () => {
     });
 
     it("should contain arrow function add and should return number should have two parameters", () => {
-        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.add.ArrowFunction(3:17)');
+        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.add.ArrowFunction(3:17)[ArrowFunction]');
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getDeclaredType().getName()).toBe("number");
         expect(theFunction?.getSignature()).toBe("(a: number, b: number) => number");
@@ -88,7 +88,7 @@ describe('ArrowFunctions', () => {
     });
 
     it("should contain arrow function multiply with two parameters", () => {
-        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.multiply.ArrowFunction(6:22)');
+        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.multiply.ArrowFunction(6:22)[ArrowFunction]');
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getSignature()).toBe("(c: number, d: number) => number");
         expect(theFunction?.getDeclaredType().getName()).toBe("number");
@@ -109,14 +109,14 @@ describe('ArrowFunctions', () => {
     });
 
     it("should contain arrow function greet with no parameters", () => {
-        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.greet.ArrowFunction(11:19)');
+        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.greet.ArrowFunction(11:19)[ArrowFunction]');
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getDeclaredType().getName()).toBe("void");
         expect(theFunction?.getParameters().size).toBe(0);
     });
 
     it("should contain arrow function square", () => {
-        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.square.ArrowFunction(16:20)');
+        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.square.ArrowFunction(16:20)[ArrowFunction]');
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getDeclaredType().getName()).toBe("number");
         expect(theFunction?.getParameters().size).toBe(1);
@@ -125,7 +125,7 @@ describe('ArrowFunctions', () => {
     });
 
     it("should contain an arrow function with a single parameter t", () => {
-        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.ArrowFunction(19:18)');
+        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.ArrowFunction(19:18)[ArrowFunction]');
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getDeclaredType().getName()).toBe("void");
         expect(theFunction?.getSignature()).toBe("(t) => void");
@@ -142,14 +142,14 @@ describe('ArrowFunctions', () => {
     });
 
     it("should contain a class User inside an arrow function", () => {
-        const theClass = fmxRep._getFamixClass('{arrowFunctions.ts}.ArrowFunction(19:18).Block(19:23).Person');
+        const theClass = fmxRep._getFamixClass('{arrowFunctions.ts}.ArrowFunction(19:18).Block(19:23).Person[ClassDeclaration]');
         expect(theClass).toBeTruthy();
         expect(theClass?.getName()).toBe("Person");
     });
 
     it("should contain an method toUserInfo inside a class User inside an arrow function", () => {
         const methods = fmxRep._getAllEntitiesWithType('Method') as Set<Method>;
-        const theMethod = fmxRep._getFamixMethod('{arrowFunctions.ts}.ArrowFunction(28:18).Block(28:23).User.toUserInfo');
+        const theMethod = fmxRep._getFamixMethod('{arrowFunctions.ts}.ArrowFunction(28:18).Block(28:23).User.toUserInfo[MethodDeclaration]');
         expect(theMethod).toBeTruthy();
         expect(theMethod?.getDeclaredType().getName()).toBe("string");
         expect(theMethod?.getParameters().size).toBe(0);
@@ -162,7 +162,7 @@ describe('ArrowFunctions', () => {
     });
 
     it("should contain a class User with function a", () => {
-        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.ArrowFunction(28:18).Block(28:23).a');
+        const theFunction = fmxRep._getFamixFunction('{arrowFunctions.ts}.ArrowFunction(28:18).Block(28:23).a[FunctionDeclaration]');
         expect(theFunction).toBeTruthy();
         expect(theFunction?.getDeclaredType().getName()).toBe("void");
         expect(theFunction?.getParameters().size).toBe(0);

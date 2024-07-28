@@ -71,7 +71,7 @@ describe('Tests for concretisation', () => {
         expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(2);
     });
 
-    const theInterface = fmxRep._getFamixInterface("{src/concretisationFunctionInstantiation.ts}.CustomType");
+    const theInterface = fmxRep._getFamixInterface("{src/concretisationFunctionInstantiation.ts}.CustomType[InterfaceDeclaration]");
 
     it("The concrete Function should be createInstance with concreteParameter CustomType", () => {
         const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");

@@ -24,7 +24,7 @@ describe('Tests for properties in a Class', () => {
         expect(fmxRep._getAllEntitiesWithType("Class").size).toBe(1);
     });
 
-    const pointProperties = Array.from(fmxRep._getFamixClass("{propertyDefinedInConstructorSignature.ts}.Point")?.getProperties() as Set<Property>) as Array<Property>;
+    const pointProperties = Array.from(fmxRep._getFamixClass("{propertyDefinedInConstructorSignature.ts}.Point[ClassDeclaration]")?.getProperties() as Set<Property>) as Array<Property>;
     const allProperties =  fmxRep._getAllEntitiesWithType("Property");
 
     it("should contain two properties", () => {

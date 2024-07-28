@@ -45,7 +45,7 @@ describe('Tests for concretisation', () => {
         expect(numberOfClassA).toBe(2); 
     });
 
-    const theClass = fmxRep._getFamixClass("{concretisationGenericInstantiation.ts}.ClassA<T>");
+    const theClass = fmxRep._getFamixClass("{concretisationGenericInstantiation.ts}.ClassA<T>[ClassDeclaration]");
 
     it ("should not be an abstract class", () => {
         expect(theClass).toBeTruthy();

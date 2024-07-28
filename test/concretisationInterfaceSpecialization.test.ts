@@ -62,7 +62,7 @@ describe('Tests for concretisation', () => {
         expect(numberOfInterfaceE).toBe(3); 
     });
 
-    const theInterface = fmxRep._getFamixInterface("{concretisationInterfaceSpecialization.ts}.InterfaceA<T>");
+    const theInterface = fmxRep._getFamixInterface("{concretisationInterfaceSpecialization.ts}.InterfaceA<T>[InterfaceDeclaration]");
 
     it("should contain 3 concretisations", () => {
         expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(5);

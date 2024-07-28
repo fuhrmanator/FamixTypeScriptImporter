@@ -60,7 +60,7 @@ describe('Tests for class with decorators', () => {
         expect(fmxRep._getAllEntitiesWithType("Decorator").size).toBe(4);
     });
 
-    const theClass = fmxRep._getFamixClass("{classWithDecorators.ts}.BugReport");
+    const theClass = fmxRep._getFamixClass("{classWithDecorators.ts}.BugReport[ClassDeclaration]");
     const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@c");
     const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@d");
     const d3 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@sealed");

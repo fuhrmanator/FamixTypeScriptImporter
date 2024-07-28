@@ -28,16 +28,15 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for generics', () => {
 
-    const theMethod = fmxRep._getFamixMethod("{genericWithInvocation.ts}.AA.i<T>") as Method;
-    const entities = fmxRep._getAllEntities();
-    entities.forEach(entity => {
-
-        console.log(entity);
-      });
-    const classe = fmxRep._getFamixClass("{genericWithInvocation.ts}.AA") as Class;
+    const theMethod = fmxRep._getFamixMethod("{genericWithInvocation.ts}.AA.i<T>[MethodDeclaration]") as Method;
 
     it("should parse generics", () => {
         expect(fmxRep).toBeTruthy();
+    });
+
+    it("should contain one class", () => {
+        const klass = fmxRep._getFamixClass("{genericWithInvocation.ts}.AA[ClassDeclaration]") as Class;
+        expect(klass).toBeTruthy();
     });
 
     it("should contain a variable x instance of AA", () => {
@@ -75,7 +74,7 @@ describe('Tests for generics', () => {
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
         expect((invocations[0] as Invocation).getReceiver()).toBeTruthy();
-        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{genericWithInvocation.ts}.AA"));
+        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{genericWithInvocation.ts}.AA[ClassDeclaration]"));
     });
 
     it("should contain an invocation for i with a signature 'public i<T> (j: T): void'", () => {

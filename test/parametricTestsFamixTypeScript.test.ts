@@ -62,14 +62,14 @@ class ClassB<V> extends ClassA<string, V> {
 
 const fmxRep = importer.famixRepFromProject(project);
 
-describe.skip('Tests for generics (from FamixTypeScript)', () => {
+describe('Tests for generics (from FamixTypeScript)', () => {
 
     it("should parse", () => {
         expect(fmxRep).toBeTruthy();
     });
     
     it("Class A should contain a method testMethod", () => {
-        const listOfMethodsOfClassA = fmxRep._getFamixClass("{parametricTests.ts}.A")?.getMethods();
+        const listOfMethodsOfClassA = fmxRep._getFamixClass("{parametricTests.ts}.A[ClassDeclaration]")?.getMethods();
         expect(listOfMethodsOfClassA?.size).toBe(1);
         expect(Array.from(listOfMethodsOfClassA as Set<Method>)[0].getName()).toBe("testMethod");
     });
@@ -82,13 +82,13 @@ describe.skip('Tests for generics (from FamixTypeScript)', () => {
 
     it("should contain an arrow function testArrowFunction", () => {
         const listOfFunctions = fmxRep._getAllEntitiesWithType("ArrowFunction") as Set<ArrowFunction>;
-        expect(listOfFunctions.size).toBe(1);
+        expect(listOfFunctions.size).toBe(3);
         expect(Array.from(listOfFunctions)[0].getName()).toBe("testArrowFunction");
     });
 
     it("should contain a class GenA", () => {
         const listOfClasses = fmxRep._getAllEntitiesWithType("ParametricClass") as Set<ParametricClass>;
-        expect(listOfClasses.size).toBe(1);
+        expect(listOfClasses.size).toBe(4);
         expect(Array.from(listOfClasses)[0].getName()).toBe("GenA");
     });
 

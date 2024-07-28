@@ -45,7 +45,7 @@ describe('Tests for generic class', () => {
         }
     });
 
-    const theClass = fmxRep._getFamixClass("{genericClass.ts}.MyClass<T>");
+    const theClass = fmxRep._getFamixClass("{genericClass.ts}.MyClass<T>[ClassDeclaration]");
     it ("should not be an abstract class", () => {
         expect(theClass).toBeTruthy();
         if (theClass) expect(theClass.getIsAbstract()).toBe(false);

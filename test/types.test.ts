@@ -75,7 +75,7 @@ describe('Tests for types', () => {
     });
 
     it("should contain a variable 'a' of type 'A'", () => {
-        const aVariable = fmxRep._getFamixVariable("{types.ts}.a");
+        const aVariable = fmxRep._getFamixVariable("{types.ts}.a[VariableDeclaration]");
         expect(aVariable).toBeTruthy();
         expect(aVariable?.getDeclaredType()).toBeTruthy();
         expect(aVariable?.getDeclaredType()?.getName()).toBe("A");

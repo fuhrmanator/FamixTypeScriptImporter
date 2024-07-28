@@ -54,7 +54,7 @@ describe('Tests for parameter with decorators', () => {
         expect(fmxRep._getAllEntitiesWithType("Decorator").size).toBe(2);
     });
 
-    const theParam = (Array.from(fmxRep._getFamixMethod("{parameterWithDecorators.ts}.BugReport2.print")?.getParameters() as Set<Parameter>) as Array<Parameter>).find((f) => f.getName() === "verbose");
+    const theParam = (Array.from(fmxRep._getFamixMethod("{parameterWithDecorators.ts}.BugReport2.print[MethodDeclaration]")?.getParameters() as Set<Parameter>) as Array<Parameter>).find((f) => f.getName() === "verbose");
     const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@tes");
     const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@deco2");
 

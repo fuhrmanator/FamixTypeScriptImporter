@@ -43,7 +43,7 @@ describe('Tests for accesses', () => {
 
     const accessFile1 = fmxRep._getFamixFile("accesses.ts");
     const accessFile2 = fmxRep._getFamixFile("accesses2.ts");
-    const theMethod = fmxRep._getFamixMethod("{accesses.ts}.P.m");
+    const theMethod = fmxRep._getFamixMethod("{accesses.ts}.P.m[MethodDeclaration]");
 
     it("should contain one access to 'b'", () => {
         const theVariable = Array.from(fmxRep._getAllEntitiesWithType("Variable") as Set<Variable>).find(v => v.getName() === "b");

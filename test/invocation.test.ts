@@ -31,7 +31,7 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for invocation', () => {
 
-    const theMethod = fmxRep._getFamixMethod("{invocation.ts}.A.x") as Method;
+    const theMethod = fmxRep._getFamixMethod("{invocation.ts}.A.x[MethodDeclaration]") as Method;
 
     it("should contain two class", () => {
         expect(fmxRep._getAllEntitiesWithType("Class").size).toBe(2);
@@ -83,7 +83,7 @@ describe('Tests for invocation', () => {
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
         expect((invocations[0] as Invocation).getSender()).toBeTruthy();
-        expect((invocations[0] as Invocation).getSender()).toBe(fmxRep._getFamixMethod("{invocation.ts}.B.y"));
+        expect((invocations[0] as Invocation).getSender()).toBe(fmxRep._getFamixMethod("{invocation.ts}.B.y[MethodDeclaration]"));
     });
 
     it("should contain an invocation for x with a receiver 'A'", () => {
@@ -92,7 +92,7 @@ describe('Tests for invocation', () => {
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
         expect((invocations[0] as Invocation).getReceiver()).toBeTruthy();
-        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{invocation.ts}.A"));
+        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{invocation.ts}.A[ClassDeclaration]"));
     });
 
     it("should contain an invocation for x with a signature 'public x(): void'", () => {

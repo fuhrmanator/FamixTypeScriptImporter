@@ -31,7 +31,7 @@ export function getFQN(node: FQNNode | Node): string {
             Node.isGetAccessorDeclaration(currentNode) ||
             Node.isSetAccessorDeclaration(currentNode) ||
             Node.isIdentifier(currentNode)) {
-            const name = Node.isIdentifier(currentNode) ? currentNode.getText() 
+            let name = Node.isIdentifier(currentNode) ? currentNode.getText() 
                 : getNameOfNode(currentNode) /* currentNode.getName() */ || 'Unnamed_' + currentNode.getKindName() + `(${lc})`;
             parts.unshift(name);
         } else if (Node.isArrowFunction(currentNode) || 
@@ -50,13 +50,17 @@ export function getFQN(node: FQNNode | Node): string {
         currentNode = currentNode.getParent();
     }
 
+
+
     // Prepend the relative path of the source file
     const relativePath = entityDictionary.convertToRelativePath(
         path.normalize(sourceFile.getFilePath()), 
                        absolutePathProject).replace(/\\/sg, "/");
     parts.unshift(`{${relativePath}}`);
-    logger.debug(parts.join('.'));
-    return parts.join('.');
+    const fqn = parts.join(".") + `[${node.getKindName()}]`;  // disambiguate
+
+    logger.debug(fqn);
+    return fqn;
 }
 
 

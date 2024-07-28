@@ -24,7 +24,7 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for generics', () => {
 
-    const theClass = fmxRep._getFamixClass("{genericMethod.ts}.AA");
+    const theClass = fmxRep._getFamixClass("{genericMethod.ts}.AA[ClassDeclaration]");
 
     it("should parse generics", () => {
         expect(fmxRep).toBeTruthy();

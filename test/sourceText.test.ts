@@ -35,7 +35,7 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Tests for source text', () => {
 
     it("should have a class '{test_src/simple.ts}.A' with the proper source text", () => {
-        const theClass = fmxRep._getFamixClass("{test_src/simple.ts}.A");
+        const theClass = fmxRep._getFamixClass("{test_src/simple.ts}.A[ClassDeclaration]");
         expect(theClass).toBeDefined();
         const sourceAnchor = theClass?.getSourceAnchor() as IndexedFileAnchor;
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based

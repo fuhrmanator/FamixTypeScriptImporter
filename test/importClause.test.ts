@@ -17,7 +17,7 @@ project.createSourceFile("/test_src/oneClassExporter.ts",
     `export class ExportedClass {}`);
 
 project.createSourceFile("/test_src/oneClassImporter.ts",
-    `import {ExportedClass} from "./oneClassExport";`);
+    `import { ExportedClass } from "./oneClassExporter";`);
 
 project.createSourceFile("/test_src/complexExportModule.ts",
     `class ClassZ {}
