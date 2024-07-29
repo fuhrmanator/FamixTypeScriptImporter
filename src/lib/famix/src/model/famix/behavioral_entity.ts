@@ -7,16 +7,6 @@ import { ParameterType } from "./parameter_type";
 
 export class BehavioralEntity extends ContainerEntity {
 
-  private isGeneric: boolean;
-
-  public getIsGeneric(): boolean {
-    return this.isGeneric;
-  }
-
-  public setIsGeneric(isGeneric: boolean): void {
-    this.isGeneric = isGeneric;
-  }
-
   private signature: string;
 
   public getSignature(): string {
@@ -99,7 +89,6 @@ export class BehavioralEntity extends ContainerEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("isGeneric", this.getIsGeneric());
     exporter.addProperty("signature", this.getSignature());
     exporter.addProperty("parameters", this.getParameters());
     exporter.addProperty("numberOfParameters", this.getNumberOfParameters());

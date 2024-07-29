@@ -441,7 +441,6 @@ export class EntityDictionary {
             }
             const isConstructor = method instanceof ConstructorDeclaration;
             const isSignature = method instanceof MethodSignature;
-            fmxMethod.setIsGeneric(isGeneric);
 
             let isAbstract = false;
             let isStatic = false;
@@ -546,7 +545,6 @@ export class EntityDictionary {
 
             fmxFunction.setSignature(Helpers.computeSignature(func.getText()));
             fmxFunction.setCyclomaticComplexity(currentCC[fmxFunction.getName()]);
-            fmxFunction.setIsGeneric(isGeneric);
             fmxFunction.setFullyQualifiedName(functionFullyQualifiedName);
     
             let functionTypeName = this.UNKNOWN_VALUE;
@@ -1146,7 +1144,6 @@ export class EntityDictionary {
         const returnTypeSignature = arrowFunction.getReturnType().getText();
         fmxArrowFunction.setSignature(`(${parametersSignature}) => ${returnTypeSignature}`);
         fmxArrowFunction.setCyclomaticComplexity(currentCC[fmxArrowFunction.getName()]);
-        fmxArrowFunction.setIsGeneric(isGeneric);
 
         let functionTypeName = this.UNKNOWN_VALUE;
         try {

@@ -88,7 +88,7 @@ export class NamedEntity extends SourcedEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("fullyQualifiedName", this.getFullyQualifiedName());
+    // exporter.addProperty("fullyQualifiedName", this.getFullyQualifiedName());
     exporter.addProperty("incomingInvocations", this.getReceivedInvocations());
     exporter.addProperty("incomingImports", this.getIncomingImports());
     exporter.addProperty("name", this.getName());
