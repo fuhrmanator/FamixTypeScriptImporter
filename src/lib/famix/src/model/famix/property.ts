@@ -45,18 +45,75 @@ export class Property extends StructuralEntity {
     parentEntity.addProperty(this);
   }
 
-  private modifiers: Set<string> = new Set();
 
-  public getModifiers(): Set<string> {
-    return this.modifiers;
-  }
+    /**
+     * Getter $isClassSide
+     * @return {boolean }
+     */
+	public get $isClassSide(): boolean  {
+		return this.isClassSide;
+	}
 
-  public addModifier(modifier: string): void {
-    if (!this.modifiers.has(modifier)) {
-      this.modifiers.add(modifier);
-    }
-  }
+    /**
+     * Setter $isClassSide
+     * @param {boolean } value
+     */
+	public set $isClassSide(value: boolean ) {
+		this.isClassSide = value;
+	}
 
+    /**
+     * Getter isDefinitelyAssigned
+     * @return {boolean}
+     */
+	public get isDefinitelyAssigned(): boolean {
+		return this._isDefinitelyAssigned;
+	}
+
+    /**
+     * Setter isDefinitelyAssigned
+     * @param {boolean} value
+     */
+	public set isDefinitelyAssigned(value: boolean) {
+		this._isDefinitelyAssigned = value;
+	}
+
+    /**
+     * Getter isOptional
+     * @return {boolean}
+     */
+	public get isOptional(): boolean {
+		return this._isOptional;
+	}
+
+    /**
+     * Setter isOptional
+     * @param {boolean} value
+     */
+	public set isOptional(value: boolean) {
+		this._isOptional = value;
+	}
+
+    /**
+     * Getter isJavaScriptPrivate
+     * @return {boolean}
+     */
+	public get isJavaScriptPrivate(): boolean {
+		return this._isJavaScriptPrivate;
+	}
+
+    /**
+     * Setter isJavaScriptPrivate
+     * @param {boolean} value
+     */
+	public set isJavaScriptPrivate(value: boolean) {
+		this._isJavaScriptPrivate = value;
+	}
+  private _isDefinitelyAssigned: boolean;
+
+  private _isOptional: boolean;
+
+  private _isJavaScriptPrivate: boolean;
 
   /**
    * Getter visibility
@@ -87,6 +144,9 @@ export class Property extends StructuralEntity {
     exporter.addProperty("readOnly", this.readOnly);
     exporter.addProperty("isClassSide", this.getIsClassSide());
     exporter.addProperty("parentBehaviouralEntity", this.getParentEntity());
-    exporter.addProperty("modifiers", this.getModifiers());
+    exporter.addProperty("visibility", this.visibility);
+    exporter.addProperty("isDefinitelyAssigned", this.isDefinitelyAssigned);
+    exporter.addProperty("isOptional", this.isOptional);
+    exporter.addProperty("isJavaScriptPrivate", this.isJavaScriptPrivate);
   }
 }

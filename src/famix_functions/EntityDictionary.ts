@@ -392,13 +392,13 @@ export class EntityDictionary {
         });
 
         if (!isSignature && property.getExclamationTokenNode()) {
-            fmxProperty.addModifier("!");
+            fmxProperty.isDefinitelyAssigned = true;
         }
         if (property.getQuestionTokenNode()) {
-            fmxProperty.addModifier("?");
+            fmxProperty.isOptional = true;
         }
         if (property.getName().substring(0, 1) === "#") {
-            fmxProperty.addModifier("#");
+            fmxProperty.isJavaScriptPrivate = true;
         }
 
         this.makeFamixIndexFileAnchor(property, fmxProperty);

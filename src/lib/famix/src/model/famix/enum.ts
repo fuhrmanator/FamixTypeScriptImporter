@@ -26,6 +26,6 @@ export class Enum extends Type {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("values", this.getValues());
+    exporter.addProperty("enumValues", this.getValues());
   }
 }

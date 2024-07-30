@@ -24,6 +24,6 @@ export class EnumValue extends StructuralEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("parentBehaviouralEntity", this.getParentEntity());
+    exporter.addProperty("parentEnum", this.getParentEntity());
   }
 }

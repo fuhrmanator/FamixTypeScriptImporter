@@ -160,7 +160,7 @@ describe('Entities', () => {
         if (theEntityClass) {
             const trustMeAttribute = Array.from(theEntityClass.getProperties())[4];
             expect(trustMeAttribute.getName()).toBe("trustMe");
-            expect(trustMeAttribute.getModifiers()).toContain("!");
+            expect(trustMeAttribute.isDefinitelyAssigned).toBe(true);
             expect(trustMeAttribute.getDeclaredType().getName()).toBe("string");
         }
     });
@@ -187,7 +187,7 @@ describe('Entities', () => {
         if (theEntityClass) {
             const userCountAttribute = Array.from(theEntityClass.getProperties())[7];
             expect(userCountAttribute.getName()).toBe("optional");
-            expect(userCountAttribute.getModifiers()).toContain("?");
+            expect(userCountAttribute.isOptional).toBe(true);
             expect(userCountAttribute.getDeclaredType().getName()).toBe('string');
         }
     });
