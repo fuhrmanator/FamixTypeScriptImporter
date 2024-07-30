@@ -80,9 +80,10 @@ export class Type extends ContainerEntity {
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
     exporter.addProperty("container", this.getContainer());
-    exporter.addProperty("typeAliases", this.getTypeAliases());
-    exporter.addProperty("structuresWithDeclaredType", this.getStructuresWithDeclaredType());
-    exporter.addProperty("behavioralEntitiesWithDeclaredType", this.getBehavioralEntitiesWithDeclaredType());
+    /* unsupported properties in MM so far */
+    // exporter.addProperty("typeAliases", this.getTypeAliases());
+    // exporter.addProperty("structuresWithDeclaredType", this.getStructuresWithDeclaredType());
+    // exporter.addProperty("behavioralEntitiesWithDeclaredType", this.getBehavioralEntitiesWithDeclaredType());
     exporter.addProperty("incomingReferences", this.getIncomingReferences());
   }
 }
