@@ -160,6 +160,6 @@ export class ContainerEntity extends NamedEntity {
     exporter.addProperty("accesses", this.getAccesses());
     exporter.addProperty("types", this.getTypes());
     exporter.addProperty("functions", this.getFunctions());
-    exporter.addProperty("variables", this.getVariables());
+    exporter.addProperty("localVariables", this.getVariables());
   }
 }
