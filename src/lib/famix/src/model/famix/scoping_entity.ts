@@ -31,6 +31,6 @@ export class ScopingEntity extends ContainerEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("namespaces", this.getModules());
+//    exporter.addProperty("namespaces", this.getModules());
   }
 }

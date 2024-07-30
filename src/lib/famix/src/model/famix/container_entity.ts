@@ -151,7 +151,7 @@ export class ContainerEntity extends NamedEntity {
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
 //    exporter.addProperty("parentBehaviouralEntity", this.getParentContainerEntity());
-    exporter.addProperty("childrenContainerEntities", this.getChildrenContainerEntities());
+//    exporter.addProperty("childrenContainerEntities", this.getChildrenContainerEntities());
     exporter.addProperty("cyclomaticComplexity", this.getCyclomaticComplexity());
     exporter.addProperty("numberOfStatements", this.getNumberOfStatements());
 //    exporter.addProperty("outgoingReferences", this.getOutgoingReferences());  /* derived ?*/
