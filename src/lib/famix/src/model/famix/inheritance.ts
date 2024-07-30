@@ -1,9 +1,9 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
-import { Association } from "./association";
 import { Class } from "./class";
+import { Entity } from "./entity";
 import { Interface } from "./interface";
 
-export class Inheritance extends Association {
+export class Inheritance extends Entity {
 
   private superclass: Class | Interface;
 
@@ -26,7 +26,6 @@ export class Inheritance extends Association {
     this.subclass = subclass;
     subclass.addSuperInheritance(this);
   }
-
 
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("Inheritance", this);

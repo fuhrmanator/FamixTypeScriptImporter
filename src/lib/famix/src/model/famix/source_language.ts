@@ -31,7 +31,6 @@ export class SourceLanguage extends Entity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("name", this.name);
     exporter.addProperty("sourcedEntities", this.getSourcedEntities());
   }
 }

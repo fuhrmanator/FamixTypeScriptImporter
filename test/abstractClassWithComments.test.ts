@@ -7,11 +7,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/abstractClassWithComments.ts", `// before
+project.createSourceFile("/abstractClassWithComments.ts", `// before
 abstract class MyAbstractClass {} // a comment
 // after
 /* test */
@@ -28,7 +29,7 @@ describe('Tests for abstract class with comments', () => {
         expect(fmxRep._getAllEntitiesWithType("Class").size).toBe(1);
     });
 
-    const theAbstractClass = fmxRep._getFamixClass("{abstractClassWithComments.ts}.MyAbstractClass");
+    const theAbstractClass = fmxRep._getFamixClass("{abstractClassWithComments.ts}.MyAbstractClass[ClassDeclaration]");
 
     it("should contain an abstract class MyAbstractClass", () => {
         expect(theAbstractClass).toBeTruthy();
@@ -50,7 +51,7 @@ describe('Tests for abstract class with comments', () => {
         expect(fmxRep._getAllEntitiesWithType("Function").size).toBe(1);
     });
 
-    const theFunction = fmxRep._getFamixFunction("{abstractClassWithComments.ts}.tst");
+    const theFunction = fmxRep._getFamixFunction("{abstractClassWithComments.ts}.tst[FunctionDeclaration]");
 
     it("should have three comments for the function", () => {
         expect(theFunction?.getComments().size).toBe(3);

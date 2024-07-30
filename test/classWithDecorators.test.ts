@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/classWithDecorators.ts",
+project.createSourceFile("/classWithDecorators.ts",
 `function sealed(constructor: Function) { // function can't take other parameters with constructor
     Object.seal(constructor);
     Object.seal(constructor.prototype);
@@ -59,7 +60,7 @@ describe('Tests for class with decorators', () => {
         expect(fmxRep._getAllEntitiesWithType("Decorator").size).toBe(4);
     });
 
-    const theClass = fmxRep._getFamixClass("{classWithDecorators.ts}.BugReport");
+    const theClass = fmxRep._getFamixClass("{classWithDecorators.ts}.BugReport[ClassDeclaration]");
     const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@c");
     const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@d");
     const d3 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@sealed");

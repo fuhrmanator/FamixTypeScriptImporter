@@ -6,11 +6,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/entities_json.ts",
+project.createSourceFile("/entities_json.ts",
 `class EntityClass {
     constructor() {}
     public move() {}

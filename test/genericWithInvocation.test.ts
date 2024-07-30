@@ -3,17 +3,19 @@ import { Method } from "../src/lib/famix/src/model/famix/method";
 import { Variable } from "../src/lib/famix/src/model/famix/variable";
 import { Invocation } from "../src/lib/famix/src/model/famix/invocation";
 import { Project } from 'ts-morph';
+import { Class } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/genericWithInvocation.ts",
+project.createSourceFile("/genericWithInvocation.ts",
 `class AA {
     public i<T> (j: T): void {}
 }
@@ -26,10 +28,15 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for generics', () => {
 
-    const theMethod = fmxRep._getFamixMethod("{genericWithInvocation.ts}.AA.i") as Method;
+    const theMethod = fmxRep._getFamixMethod("{genericWithInvocation.ts}.AA.i<T>[MethodDeclaration]") as Method;
 
     it("should parse generics", () => {
         expect(fmxRep).toBeTruthy();
+    });
+
+    it("should contain one class", () => {
+        const klass = fmxRep._getFamixClass("{genericWithInvocation.ts}.AA[ClassDeclaration]") as Class;
+        expect(klass).toBeTruthy();
     });
 
     it("should contain a variable x instance of AA", () => {
@@ -67,7 +74,7 @@ describe('Tests for generics', () => {
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
         expect((invocations[0] as Invocation).getReceiver()).toBeTruthy();
-        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{genericWithInvocation.ts}.AA"));
+        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{genericWithInvocation.ts}.AA[ClassDeclaration]"));
     });
 
     it("should contain an invocation for i with a signature 'public i<T> (j: T): void'", () => {

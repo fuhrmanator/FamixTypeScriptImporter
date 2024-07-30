@@ -1,17 +1,18 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import { ParameterizableInterface, ParameterType } from '../src/lib/famix/src/model/famix';
+import { ParametricInterface, ParameterType } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/genericInterface.ts",
+project.createSourceFile("/genericInterface.ts",
 `interface MyInterface<T> {
     myProperty;
     myMethod();
@@ -27,22 +28,22 @@ describe('Tests for generic interface', () => {
     });
 
     it("should contain one generic interface", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParameterizableInterface").size).toBe(1);
+        expect(fmxRep._getAllEntitiesWithType("ParametricInterface").size).toBe(1);
     });
 
     it("should contain a generic interface MyInterface", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParameterizableInterface")).map(e => (e as ParameterizableInterface).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).getName());
         expect(listOfNames).toContain("MyInterface");
     });
 
     it("should contain a generic interface MyInterface with a type parameter T", () => {
-        const pList = Array.from(fmxRep._getAllEntitiesWithType("ParameterizableInterface") as Set<ParameterizableInterface>);
+        const pList = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface") as Set<ParametricInterface>);
         expect(pList).toBeTruthy();
         const MyInterface = pList.find(p => p.getName() === "MyInterface");
         expect(MyInterface).toBeTruthy();
-        expect(MyInterface?.getParameterTypes().size).toBe(1);
+        expect(MyInterface?.getGenericParameters().size).toBe(1);
         if (MyInterface) {
-            expect((Array.from(MyInterface.getParameterTypes())[0] as ParameterType).getName()).toBe("T");
+            expect((Array.from(MyInterface.getGenericParameters())[0] as ParameterType).getName()).toBe("T");
         }
     });
 });

@@ -5,11 +5,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/functions.ts",
+project.createSourceFile("/functions.ts",
 `function a() {}
 function b() {}
 `);
@@ -19,12 +20,12 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Functions', () => {
 
     it("should contain function 'a'", () => {
-        const theFunction = fmxRep._getFamixFunction('{functions.ts}.a');
+        const theFunction = fmxRep._getFamixFunction('{functions.ts}.a[FunctionDeclaration]');
         expect(theFunction).toBeTruthy();
     });
 
     it("should contain function 'b'", () => {
-        const theFunction = fmxRep._getFamixFunction('{functions.ts}.b');
+        const theFunction = fmxRep._getFamixFunction('{functions.ts}.b[FunctionDeclaration]');
         expect(theFunction).toBeTruthy();
     });
 });

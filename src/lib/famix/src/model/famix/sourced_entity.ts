@@ -41,7 +41,7 @@ export class SourcedEntity extends Entity {
       this.comments.add(comment);
       comment.setContainer(this);
     } else {
-      logger.warn("WARNING: adding comment that is already in comments: " + comment.getJSON() + " to " + this.getJSON());
+      logger.debug("Adding comment that is already in comments: " + comment.getJSON() + " to " + this.getJSON());
     }
   }
 

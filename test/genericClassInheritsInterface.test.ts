@@ -1,17 +1,18 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import { ParameterizableClass, ParameterizableInterface } from '../src/lib/famix/src/model/famix';
+import { ParametricClass, ParametricInterface } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/genericClassInheritsInterface.ts",
+project.createSourceFile("/genericClassInheritsInterface.ts",
 `interface MyDaoInterface<T> {}
 
 class MyDao<T> implements MyDaoInterface<T> {}
@@ -26,16 +27,16 @@ describe('Tests for generic class inherits interface', () => {
     });
 
     it("should contain one generic class and one generic interface", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParameterizableClass").size).toBe(1);
-        expect(fmxRep._getAllEntitiesWithType("ParameterizableInterface").size).toBe(1);
+        expect(fmxRep._getAllEntitiesWithType("ParametricClass").size).toBe(1);
+        expect(fmxRep._getAllEntitiesWithType("ParametricInterface").size).toBe(1);
     });
 
     it("should contain a generic class MyDao that implements a generic interface MyDaoInterface", () => {
-        const cList = Array.from(fmxRep._getAllEntitiesWithType("ParameterizableClass") as Set<ParameterizableClass>);
+        const cList = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass") as Set<ParametricClass>);
         expect(cList).toBeTruthy();
         const myDao = cList.find(p => p.getName() === "MyDao");
         expect(myDao).toBeTruthy();
-        const iList = Array.from(fmxRep._getAllEntitiesWithType("ParameterizableInterface") as Set<ParameterizableInterface>);
+        const iList = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface") as Set<ParametricInterface>);
         expect(iList).toBeTruthy();
         const myDaoInterface = iList.find(p => p.getName() === "MyDaoInterface");
         expect(myDaoInterface).toBeTruthy();

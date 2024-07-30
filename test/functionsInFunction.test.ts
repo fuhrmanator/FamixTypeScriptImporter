@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/functionsInFunction.ts",
+project.createSourceFile("/functionsInFunction.ts",
 `function fct() {
     function fct2() {
         function fct3() {
@@ -25,9 +26,9 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for functions in function', () => {
     
-    const theFunction1 = fmxRep._getFamixFunction("{functionsInFunction.ts}.fct");
-    const theFunction2 = fmxRep._getFamixFunction("{functionsInFunction.ts}.fct.fct2");
-    const theFunction3 = fmxRep._getFamixFunction("{functionsInFunction.ts}.fct.fct2.fct3");
+    const theFunction1 = fmxRep._getFamixFunction("{functionsInFunction.ts}.fct[FunctionDeclaration]");
+    const theFunction2 = fmxRep._getFamixFunction("{functionsInFunction.ts}.fct.Block(1:16).fct2[FunctionDeclaration]");
+    const theFunction3 = fmxRep._getFamixFunction("{functionsInFunction.ts}.fct.Block(1:16).fct2.Block(2:21).fct3[FunctionDeclaration]");
 
     it("should have one function 'fct' with a function 'fct2'", () => {
         expect(theFunction1).toBeTruthy();

@@ -5,12 +5,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/inheritance.ts",
+project.createSourceFile("/inheritance.ts",
 `class Animal {}
 class Fish extends Animal {}
 interface Flyable {}

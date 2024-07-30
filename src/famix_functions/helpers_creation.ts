@@ -1,6 +1,7 @@
 import * as Famix from "../lib/famix/src/model/famix";
 import { logger } from "../analyze";
 import { ConstructorDeclaration, Identifier, FunctionDeclaration, MethodDeclaration, MethodSignature, PropertyDeclaration, PropertySignature, VariableDeclaration, ParameterDeclaration, GetAccessorDeclaration, SetAccessorDeclaration, EnumMember, TypeAliasDeclaration, Node, SyntaxKind, FunctionExpression } from "ts-morph";
+import { TypeDeclaration } from "./EntityDictionary";
 
 interface SearchParameters {
     searchArray: string[];
@@ -72,6 +73,31 @@ export function findAncestor(node: Identifier): Node {
  * @param element A ts-morph element
  * @returns The ancestor of the ts-morph element
  */
-export function findTypeAncestor(element: TypeAliasDeclaration | PropertyDeclaration | PropertySignature | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | EnumMember): Node {
+export function findTypeAncestor(element: TypeDeclaration): Node {
     return element.getAncestors().find(a => a.getKind() === SyntaxKind.MethodDeclaration || a.getKind() === SyntaxKind.Constructor || a.getKind() === SyntaxKind.MethodSignature || a.getKind() === SyntaxKind.FunctionDeclaration || a.getKind() === SyntaxKind.FunctionExpression || a.getKind() === SyntaxKind.ModuleDeclaration || a.getKind() === SyntaxKind.SourceFile || a.getKindName() === "GetAccessor" || a.getKindName() === "SetAccessor" || a.getKind() === SyntaxKind.ClassDeclaration || a.getKind() === SyntaxKind.InterfaceDeclaration);
+}
+
+export function arraysAreEqual(array1: string[], array2: string[]): boolean {
+    if (array1 && array2 ) {
+        return array1.length === array2.length && array1.every((value, index) => value === array2[index]);
+    }
+}
+
+export function replaceLastBetweenTags(input: string, replacement: string): string {
+    const lastTagIndex = input.lastIndexOf('<');
+    
+    if (lastTagIndex === -1) {
+        return input; // Return the original string if no tags are found
+    }
+
+    const closingTagIndex = input.indexOf('>', lastTagIndex);
+    
+    if (closingTagIndex === -1) {
+        return input; // Return the original string if no closing tag is found
+    }
+
+    const beforeTag = input.substring(0, lastTagIndex + 1); // Include '<'
+    const afterTag = input.substring(closingTagIndex); // Include '>'
+
+    return beforeTag + replacement + afterTag;
 }

@@ -44,7 +44,7 @@ export class Comment extends SourcedEntity {
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
     exporter.addProperty("isJSDoc", this.getIsJSDoc());
-    exporter.addProperty("container", this.getContainer());
+    exporter.addProperty("commentedEntity", this.getContainer());
     exporter.addProperty("content", this.getContent());
   }
 }

@@ -11,12 +11,13 @@ logger.settings.minLevel = 0;   // see all messages in testing
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/enum.ts",
+project.createSourceFile("/enum.ts",
 `// comment before
 enum Weekday {
     // just another manic Monday

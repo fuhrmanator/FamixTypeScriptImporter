@@ -1,6 +1,6 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import { ParameterizedType } from '../src/lib/famix/src/model/famix/parameterized_type';
+import { ParameterType } from '../src/lib/famix/src/model/famix/parameter_type';
 import { PrimitiveType } from '../src/lib/famix/src/model/famix/primitive_type';
 import { Type } from '../src/lib/famix/src/model/famix/type';
 import { IndexedFileAnchor } from '../src/lib/famix/src/model/famix';
@@ -9,11 +9,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/types.ts",
+project.createSourceFile("/types.ts",
 `const aString: string = "one";
 const aBoolean: boolean = false;
 const aNumber: number = 3;
@@ -38,8 +39,8 @@ describe('Tests for types', () => {
 
     const types = Array.from(fmxRep._getAllEntitiesWithType("Type") as Set<Type>);
     const primitiveTypes = Array.from(fmxRep._getAllEntitiesWithType("PrimitiveType") as Set<PrimitiveType>);
-    const parameterizedTypes = Array.from(fmxRep._getAllEntitiesWithType("ParameterizedType") as Set<ParameterizedType>);
-    const theParameterizedType = parameterizedTypes.find(t => t.getName() === "Map<any, boolean>");
+    const ParameterTypes = Array.from(fmxRep._getAllEntitiesWithType("ParameterType") as Set<ParameterType>);
+    const theParameterType = ParameterTypes.find(t => t.getName() === "Map<any, boolean>");
     const theBaseType = types.find(t => t.getName() === "Map");
     const theFile = fmxRep._getFamixFile("types.ts");
     const theAnyType = primitiveTypes.find(t => t.getName() === "any");
@@ -74,25 +75,25 @@ describe('Tests for types', () => {
     });
 
     it("should contain a variable 'a' of type 'A'", () => {
-        const aVariable = fmxRep._getFamixVariable("{types.ts}.a");
+        const aVariable = fmxRep._getFamixVariable("{types.ts}.a[VariableDeclaration]");
         expect(aVariable).toBeTruthy();
         expect(aVariable?.getDeclaredType()).toBeTruthy();
         expect(aVariable?.getDeclaredType()?.getName()).toBe("A");
     });
 
     it("should contain a parameterized type", () => {
-        expect(parameterizedTypes.length).toBe(1);
-        expect(parameterizedTypes.find(t => t.getName() === "Map<any, boolean>")).toBeTruthy();
+        expect(ParameterTypes.length).toBe(1);
+        expect(ParameterTypes.find(t => t.getName() === "Map<any, boolean>")).toBeTruthy();
     });
 
     it("should have Map for base type of Map<any, boolean>", () => {
-        expect(theParameterizedType?.getBaseType()).toBe(theBaseType);
+        expect(theParameterType?.getBaseType()).toBe(theBaseType);
     });
 
     it("should have any and boolean for arguments of Map<any, boolean>", () => {
-        expect(theParameterizedType?.getArguments().size).toBe(2);
-        expect(Array.from(theParameterizedType?.getArguments() as Set<Type>)[0]).toBe(theAnyType);
-        expect(Array.from(theParameterizedType?.getArguments() as Set<Type>)[1]).toBe(theBooleanType);
+        expect(theParameterType?.getArguments().size).toBe(2);
+        expect(Array.from(theParameterType?.getArguments() as Set<Type>)[0]).toBe(theAnyType);
+        expect(Array.from(theParameterType?.getArguments() as Set<Type>)[1]).toBe(theBooleanType);
     });
 
     it("should have types.ts for container", () => {
@@ -100,7 +101,7 @@ describe('Tests for types', () => {
     });
 
     it("should have an IndexedFileAnchor with a filename of 'types.ts' for Map<any, boolean>", () => {
-        const indexedFileAnchor = theParameterizedType?.getSourceAnchor();
+        const indexedFileAnchor = theParameterType?.getSourceAnchor();
         expect(indexedFileAnchor).toBeTruthy();
         expect((indexedFileAnchor as IndexedFileAnchor).getFileName().endsWith("types.ts")).toBe(true);
     });

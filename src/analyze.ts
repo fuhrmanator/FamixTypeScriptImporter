@@ -6,7 +6,7 @@ import * as processFunctions from "./analyze_functions/process_functions";
 import { EntityDictionary } from "./famix_functions/EntityDictionary";
 import path from "path";
 
-export const logger = new Logger({ name: "ts2famix", minLevel: 3});
+export const logger = new Logger({ name: "ts2famix", minLevel: 3 });
 export const config = { "expectGraphemes": false };
 export const entityDictionary = new EntityDictionary();
 
@@ -22,7 +22,7 @@ export class Importer {
             }
         }
     ); // The project containing the source files to analyze
-    
+
     /**
      * Main method
      * @param paths An array of paths to the source files to analyze
@@ -30,7 +30,7 @@ export class Importer {
      */
     public famixRepFromPaths(paths: Array<string>): FamixRepository {
 
-//        try {
+        //        try {
         logger.debug(`famixRepFromPaths: paths: ${paths}`);
 
         this.project.addSourceFilesAtPaths(paths);
@@ -40,13 +40,13 @@ export class Importer {
         this.processEntities(this.project);
 
         const famixRep = entityDictionary.famixRep;
-//        }
-//        catch (error) {
-            // logger.error(`> ERROR: got exception ${error}. Exiting...`);
-            // logger.error(error.message);
-            // logger.error(error.stack);
-            // process.exit(1);
-//        }
+        //        }
+        //        catch (error) {
+        // logger.error(`> ERROR: got exception ${error}. Exiting...`);
+        // logger.error(error.message);
+        // logger.error(error.stack);
+        // process.exit(1);
+        //        }
 
         return famixRep;
     }
@@ -59,13 +59,15 @@ export class Importer {
         const classes = processFunctions.classes;
         const interfaces = processFunctions.interfaces;
         const modules = processFunctions.modules;
-        const exports = processFunctions.exportedMap;
+        const exports = processFunctions.listOfExportMaps;
 
         processFunctions.processImportClausesForImportEqualsDeclarations(project.getSourceFiles(), exports);
         processFunctions.processImportClausesForModules(modules, exports);
         processFunctions.processAccesses(accesses);
         processFunctions.processInvocations(methodsAndFunctionsWithId);
         processFunctions.processInheritances(classes, interfaces);
+        processFunctions.processConcretisations(classes, interfaces, methodsAndFunctionsWithId);
+
     }
 
     /**
@@ -97,7 +99,7 @@ export class Importer {
         //const famixRep = this.famixRepFromPaths(sourceFileNames);
 
         initFamixRep(project);
-        
+
         this.processEntities(project);
 
         return entityDictionary.famixRep;
@@ -105,15 +107,14 @@ export class Importer {
 
 }
 
-function initFamixRep(project :Project ): void {
-    
-        // get compiler options
-        const compilerOptions = project.getCompilerOptions();
+function initFamixRep(project: Project): void {
+    // get compiler options
+    const compilerOptions = project.getCompilerOptions();
 
-        // get baseUrl
-        const baseUrl = compilerOptions.baseUrl;
+    // get baseUrl
+    const baseUrl = compilerOptions.baseUrl || ".";
 
-        const absoluteBaseUrl = path.resolve(baseUrl);
+    const absoluteBaseUrl = path.resolve(baseUrl);
 
-        entityDictionary.famixRep.setAbsolutePath(path.normalize(absoluteBaseUrl));
+    entityDictionary.famixRep.setAbsolutePath(path.normalize(absoluteBaseUrl));
 }

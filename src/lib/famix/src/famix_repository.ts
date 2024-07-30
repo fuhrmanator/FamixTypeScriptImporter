@@ -1,5 +1,5 @@
 import { FamixBaseElement } from "./famix_base_element";
-import { Class, Interface, Namespace, Variable, Method, Function as FamixFunctionEntity, Type, NamedEntity, ScriptEntity, Module, SourceLanguage } from "./model/famix";
+import { Class, Interface, Variable, Method, ArrowFunction, Function as FamixFunctionEntity, Type, NamedEntity, ScriptEntity, Module, SourceLanguage } from "./model/famix";
 // import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration } from "ts-morph";
 import * as Famix from "./model/famix";
 import { TSMorphObjectType } from "../../../famix_functions/EntityDictionary";
@@ -10,7 +10,7 @@ export class FamixRepository {
   private elements = new Set<FamixBaseElement>(); // All Famix elements
   private famixClasses = new Set<Class>(); // All Famix classes
   private famixInterfaces = new Set<Interface>(); // All Famix interfaces
-  private famixNamespaces = new Set<Namespace>(); // All Famix namespaces
+  private famixModules = new Set<Module>(); // All Famix namespaces
   private famixMethods = new Set<Method>(); // All Famix methods
   private famixVariables = new Set<Variable>(); // All Famix variables
   private famixFunctions = new Set<FamixFunctionEntity>(); // All Famix functions
@@ -139,16 +139,16 @@ export class FamixRepository {
    * @param name A namespace name
    * @returns The Famix namespace corresponding to the name or undefined if it doesn't exist
    */
-  public _getFamixNamespace(fullyQualifiedName: string): Namespace | undefined {
-    return Array.from(this.famixNamespaces.values()).find(ns => ns.getFullyQualifiedName() === fullyQualifiedName);
+  public _getFamixModule(fullyQualifiedName: string): Module | undefined {
+    return Array.from(this.famixModules.values()).find(ns => ns.getFullyQualifiedName() === fullyQualifiedName);
   }
 
   /**
    * Gets all Famix namespaces
    * @returns All Famix namespaces
    */
-  public _getFamixNamespaces(): Set<Namespace> {
-    return new Set(Array.from(this.famixNamespaces.values()));
+  public _getFamixModules(): Set<Module> {
+    return new Set(Array.from(this.famixModules.values()));
   }
 
   /**
@@ -212,13 +212,13 @@ export class FamixRepository {
       this.famixClasses.add(element);
     } else if (element instanceof Interface) {
       this.famixInterfaces.add(element);
-    } else if (element instanceof Namespace) {
-      this.famixNamespaces.add(element);
+    } else if (element instanceof Module) {
+      this.famixModules.add(element);
     } else if (element instanceof Variable) {
       this.famixVariables.add(element);
     } else if (element instanceof Method) {
       this.famixMethods.add(element);
-    } else if (element instanceof FamixFunctionEntity) {
+    } else if (element instanceof FamixFunctionEntity || element instanceof ArrowFunction) {
       this.famixFunctions.add(element);
     } else if (element instanceof ScriptEntity || element instanceof Module) {
       this.famixFiles.add(element);

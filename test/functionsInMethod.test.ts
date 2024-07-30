@@ -6,12 +6,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/functionsInMethod.ts",
+project.createSourceFile("/functionsInMethod.ts",
 `class F {
     m() {
         function fct2() {
@@ -27,9 +28,9 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for functions in method', () => {
     
-    const theMethod = fmxRep._getFamixMethod("{functionsInMethod.ts}.F.m");
-    const theFunction2 = fmxRep._getFamixFunction("{functionsInMethod.ts}.F.m.fct2");
-    const theFunction3 = fmxRep._getFamixFunction("{functionsInMethod.ts}.F.m.fct2.fct3");
+    const theMethod = fmxRep._getFamixMethod("{functionsInMethod.ts}.F.m[MethodDeclaration]");
+    const theFunction2 = fmxRep._getFamixFunction("{functionsInMethod.ts}.F.m.Block(2:9).fct2[FunctionDeclaration]");
+    const theFunction3 = fmxRep._getFamixFunction("{functionsInMethod.ts}.F.m.Block(2:9).fct2.Block(3:25).fct3[FunctionDeclaration]");
 
     it("should have one method 'm' with a function 'fct2'", () => {
         expect(theMethod).toBeTruthy();

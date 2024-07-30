@@ -33,8 +33,14 @@ let famixRep: FamixRepository;
 
 if ((argv.input as string).endsWith('tsconfig.json')) {
     const tsConfigFilePath = argv.input as string;
+    // get the baseUrl from the tsconfig file
+    const baseUrl = tsConfigFilePath.substring(0, tsConfigFilePath.lastIndexOf('/'));
+    logger.info(`baseUrl: ${baseUrl}`);
     const project = new Project({
-        tsConfigFilePath
+        tsConfigFilePath,
+        compilerOptions: {
+            baseUrl: baseUrl,
+        }
       }); 
     famixRep = importer.famixRepFromProject(project);
 

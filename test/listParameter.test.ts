@@ -6,11 +6,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/listParameter.ts",
+project.createSourceFile("/listParameter.ts",
 `function testMethod(list: Array<any>): Array<any> {
 }
 `);
@@ -20,7 +21,7 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Tests for parameters in function', () => {
 
     it("should contain function 'testMethod'", () => {
-        const theFunction = fmxRep._getFamixFunction('{listParameter.ts}.testMethod');
+        const theFunction = fmxRep._getFamixFunction('{listParameter.ts}.testMethod[FunctionDeclaration]');
         expect(theFunction).toBeTruthy();
     });
 

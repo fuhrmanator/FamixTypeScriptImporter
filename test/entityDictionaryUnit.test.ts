@@ -5,12 +5,13 @@ import * as Famix from "../src/lib/famix/src/model/famix";
 const project = new Project(
   {
     compilerOptions: {
-        baseUrl: "./src"
-    }
+        baseUrl: ""
+    },
+    useInMemoryFileSystem: true,
   }
 );
 
-const sourceFile = project.createSourceFile("./src/entityDictionaryUnit.ts",
+const sourceFile = project.createSourceFile("/entityDictionaryUnit.ts",
 `
 namespace MyNamespace {
     
@@ -34,22 +35,22 @@ namespace MyNamespace {
 
 describe('EntityDictionary', () => {
 
-  const namespaces = sourceFile.getModules();
+  const modules = sourceFile.getModules();
 
-  test('should get a namespace and add it to the map', () => {
+  test('should get a module/namespace and add it to the map', () => {
     
     //Create a type namespace declaration
-    const namespace : Famix.Namespace = entityDictionary.createOrGetFamixNamespace(namespaces[0]);
-    expect(namespaces[0]).toBe(entityDictionary.fmxElementObjectMap.get(namespace));  
+    const namespace : Famix.Module = entityDictionary.createOrGetFamixModule(modules[0]);
+    expect(modules[0]).toBe(entityDictionary.fmxElementObjectMap.get(namespace));  
   
   });
 
-  const classes = namespaces[0].getClasses();
+  const classes = modules[0].getClasses();
 
   test('should get a class and add it to the map', () => {
     
     //Create a type class declaration   
-    const classe : Famix.Class | Famix.ParameterizableClass = entityDictionary.createOrGetFamixClass(classes[0]);
+    const classe : Famix.Class | Famix.ParametricClass = entityDictionary.createOrGetFamixClass(classes[0]);
     expect(classes[0]).toBe(entityDictionary.fmxElementObjectMap.get(classe));  
   
   });
@@ -69,7 +70,7 @@ describe('EntityDictionary', () => {
   test('should get a constructor and add it to the map', () => {
     
     //Create a type constructor declaration   
-    const constructor : Famix.Method | Famix.Accessor = entityDictionary.createFamixMethod(constructors[0],0);
+    const constructor : Famix.Method | Famix.Accessor = entityDictionary.createOrGetFamixMethod(constructors[0],0);
     expect(constructors[0]).toBe(entityDictionary.fmxElementObjectMap.get(constructor));  
   
   });
@@ -84,12 +85,12 @@ describe('EntityDictionary', () => {
   
   });
 
-  const functions = namespaces[0].getFunctions();
+  const functions = modules[0].getFunctions();
 
   test('should get a function and add it to the map', () => {
     
     //Create a type function declaration   
-    const famixFunction : Famix.Function = entityDictionary.createFamixFunction(functions[0],0);
+    const famixFunction : Famix.Function = entityDictionary.createOrGetFamixFunction(functions[0],0);
 
     expect(functions[0]).toBe(entityDictionary.fmxElementObjectMap.get(famixFunction));  
   

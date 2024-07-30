@@ -7,16 +7,6 @@ import { ParameterType } from "./parameter_type";
 
 export class BehavioralEntity extends ContainerEntity {
 
-  private isGeneric: boolean;
-
-  public getIsGeneric(): boolean {
-    return this.isGeneric;
-  }
-
-  public setIsGeneric(isGeneric: boolean): void {
-    this.isGeneric = isGeneric;
-  }
-
   private signature: string;
 
   public getSignature(): string {
@@ -74,19 +64,22 @@ export class BehavioralEntity extends ContainerEntity {
     declaredType.addBehavioralEntityWithDeclaredType(this);
   }
 
-  private typeParameters: Set<ParameterType> = new Set();
+  private genericParameters: Set<ParameterType> = new Set();
 
-  public getParameterTypes(): Set<ParameterType> {
-    return this.typeParameters;
+  public getGenericParameters(): Set<ParameterType> {
+    return this.genericParameters;
   }
 
-  public addParameterType(typeParameter: ParameterType): void {
-    if (!this.typeParameters.has(typeParameter)) {
-      this.typeParameters.add(typeParameter);
-      typeParameter.setParentGeneric(this);
+  public addGenericParameter(genericParameter: ParameterType): void {
+    if (!this.genericParameters.has(genericParameter)) {
+      this.genericParameters.add(genericParameter);
+      genericParameter.setParentGeneric(this);
     }
   }
 
+  clearGenericParameters(): void {
+    this.genericParameters.clear();
+  }
 
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("BehavioralEntity", this);
@@ -96,12 +89,12 @@ export class BehavioralEntity extends ContainerEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("isGeneric", this.getIsGeneric());
     exporter.addProperty("signature", this.getSignature());
     exporter.addProperty("parameters", this.getParameters());
     exporter.addProperty("numberOfParameters", this.getNumberOfParameters());
     exporter.addProperty("incomingInvocations", this.getIncomingInvocations());
     exporter.addProperty("declaredType", this.getDeclaredType());
-    exporter.addProperty("typeParameters", this.getParameterTypes());
+    /* don't add the property here, since it doesn't apply to all subclasses */
+//    exporter.addProperty("genericParameters", this.getGenericParameters());
   }
 }

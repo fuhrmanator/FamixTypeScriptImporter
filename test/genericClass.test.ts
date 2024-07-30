@@ -1,17 +1,18 @@
 import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import { ParameterizableClass, ParameterType } from '../src/lib/famix/src/model/famix';
+import { ParametricClass, ParameterType } from '../src/lib/famix/src/model/famix';
 
 const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/genericClass.ts",
+project.createSourceFile("/genericClass.ts",
 `class MyClass<T> {}
 `);
 
@@ -24,27 +25,27 @@ describe('Tests for generic class', () => {
     });
 
     it("should contain one generic class", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParameterizableClass").size).toBe(1);
+        expect(fmxRep._getAllEntitiesWithType("ParametricClass").size).toBe(1);
     });
 
     it("should contain a generic class MyClass", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParameterizableClass")).map(e => (e as ParameterizableClass).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass")).map(e => (e as ParametricClass).getName());
         expect(listOfNames).toContain("MyClass");
     });
 
     it("should contain a generic class MyClass with a type parameter T", () => {
-        const pList = Array.from(fmxRep._getAllEntitiesWithType("ParameterizableClass") as Set<ParameterizableClass>);
+        const pList = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass") as Set<ParametricClass>);
         expect(pList).toBeTruthy();
         const MyClass = pList.find(p => p.getName() === "MyClass");
         expect(MyClass).toBeTruthy();
-        expect(MyClass?.getParameterTypes().size).toBe(1);
+        expect(MyClass?.getGenericParameters().size).toBe(1);
         if (MyClass) {
-            expect((Array.from(MyClass.getParameterTypes())[0] as ParameterType).getName()).toBe("T");
-            expect((Array.from(MyClass.getParameterTypes())[0] as ParameterType).getParentGeneric()).toBe(MyClass);
+            expect((Array.from(MyClass.getGenericParameters())[0] as ParameterType).getName()).toBe("T");
+            expect((Array.from(MyClass.getGenericParameters())[0] as ParameterType).getParentGeneric()).toBe(MyClass);
         }
     });
 
-    const theClass = fmxRep._getFamixClass("{genericClass.ts}.MyClass");
+    const theClass = fmxRep._getFamixClass("{genericClass.ts}.MyClass<T>[ClassDeclaration]");
     it ("should not be an abstract class", () => {
         expect(theClass).toBeTruthy();
         if (theClass) expect(theClass.getIsAbstract()).toBe(false);

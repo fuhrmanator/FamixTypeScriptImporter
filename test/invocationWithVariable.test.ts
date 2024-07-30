@@ -8,12 +8,13 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
 
-project.createSourceFile("./src/invocationWithVariable.ts",
+project.createSourceFile("/invocationWithVariable.ts",
 `class AAA {
     public method(): void {}
 }
@@ -34,7 +35,7 @@ describe('Tests for invocation with variable', () => {
         expect(x1?.getDeclaredType().getName()).toBe("AAA");
     });
     
-    const theMethod = fmxRep._getFamixMethod("{invocationWithVariable.ts}.AAA.method") as Method;
+    const theMethod = fmxRep._getFamixMethod("{invocationWithVariable.ts}.AAA.method[MethodDeclaration]") as Method;
     const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
     
     it("should contain one invocation", () => {
@@ -51,6 +52,6 @@ describe('Tests for invocation with variable', () => {
     });
 
     it("should contain an invocation with a receiver 'AAA'", () => {
-        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{invocationWithVariable.ts}.AAA"));
+        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{invocationWithVariable.ts}.AAA[ClassDeclaration]"));
     });
 });

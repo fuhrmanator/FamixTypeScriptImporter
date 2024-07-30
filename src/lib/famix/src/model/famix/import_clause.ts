@@ -1,9 +1,9 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
-import { Association } from "./association";
+import { Entity } from "./entity";
 import { Module } from "./module";
 import { NamedEntity } from "./named_entity";
 
-export class ImportClause extends Association {
+export class ImportClause extends Entity {
 
   private importingEntity: Module;
 
@@ -48,6 +48,7 @@ export class ImportClause extends Association {
     super.addPropertiesToExporter(exporter);
     exporter.addProperty("importingEntity", this.getImportingEntity());
     exporter.addProperty("importedEntity", this.getImportedEntity());
-    exporter.addProperty("moduleSpecifier", this.getModuleSpecifier());
+    // unknown property below
+//    exporter.addProperty("moduleSpecifier", this.getModuleSpecifier());
   }
 }

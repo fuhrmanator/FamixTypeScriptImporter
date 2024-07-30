@@ -7,11 +7,12 @@ const importer = new Importer();
 const project = new Project(
     {
         compilerOptions: {
-            baseUrl: "./src"
-        }
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
     }
 );
-project.createSourceFile("./src/interfaceInheritsInterface.ts",
+project.createSourceFile("/interfaceInheritsInterface.ts",
 `interface MyInterface1 {}
 interface MyInterface2 extends MyInterface1 {}`);
 

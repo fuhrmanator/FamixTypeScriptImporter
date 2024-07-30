@@ -64,8 +64,8 @@ export class IndexedFileAnchor extends SourceAnchor {
     super.addPropertiesToExporter(exporter);
     exporter.addProperty("startPos", this.getStartPos());
     exporter.addProperty("endPos", this.getEndPos());
-    exporter.addProperty("startLine", this.getStartLine());
-    exporter.addProperty("endLine", this.getEndLine());
+    // exporter.addProperty("startLine", this.getStartLine());
+    // exporter.addProperty("endLine", this.getEndLine());
     exporter.addProperty("fileName", this.getFileName());
   }
 }

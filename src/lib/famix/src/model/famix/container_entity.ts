@@ -150,16 +150,16 @@ export class ContainerEntity extends NamedEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("parentBehaviouralEntity", this.getParentContainerEntity());
-    exporter.addProperty("childrenContainerEntities", this.getChildrenContainerEntities());
+//    exporter.addProperty("parentBehaviouralEntity", this.getParentContainerEntity());
+//    exporter.addProperty("childrenContainerEntities", this.getChildrenContainerEntities());
     exporter.addProperty("cyclomaticComplexity", this.getCyclomaticComplexity());
     exporter.addProperty("numberOfStatements", this.getNumberOfStatements());
-    exporter.addProperty("outgoingReferences", this.getOutgoingReferences());
+//    exporter.addProperty("outgoingReferences", this.getOutgoingReferences());  /* derived ?*/
     exporter.addProperty("numberOfLinesOfCode", this.getNumberOfLinesOfCode());
-    exporter.addProperty("outgoingInvocations", this.getOutgoingInvocations());
-    exporter.addProperty("accesses", this.getAccesses());
+//    exporter.addProperty("outgoingInvocations", this.getOutgoingInvocations());  /* derived ?*/
+//    exporter.addProperty("accesses", this.getAccesses());  /* derived ?*/
     exporter.addProperty("types", this.getTypes());
     exporter.addProperty("functions", this.getFunctions());
-    exporter.addProperty("variables", this.getVariables());
+    exporter.addProperty("localVariables", this.getVariables());
   }
 }

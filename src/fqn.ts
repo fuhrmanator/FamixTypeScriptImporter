@@ -1,16 +1,104 @@
-import * as ts from "ts-morph";
-import { entityDictionary } from "./analyze";
+import { ArrowFunction, CallExpression, ClassDeclaration, ClassExpression, ConstructorDeclaration, Decorator, EnumDeclaration, FunctionDeclaration, FunctionExpression, GetAccessorDeclaration, Identifier, ImportDeclaration, ImportEqualsDeclaration, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, Node, PropertyDeclaration, SetAccessorDeclaration, SourceFile, ts, TypeParameterDeclaration, VariableDeclaration } from "ts-morph";
+import { entityDictionary, logger } from "./analyze";
 import path from "path";
+import { TypeDeclaration } from "./famix_functions/EntityDictionary";
+
+
+type FQNNode = SourceFile | VariableDeclaration | ArrowFunction | Identifier | MethodDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | PropertyDeclaration | TypeDeclaration | EnumDeclaration | ImportDeclaration | ImportEqualsDeclaration | CallExpression | GetAccessorDeclaration | SetAccessorDeclaration | ConstructorDeclaration | TypeParameterDeclaration | ClassDeclaration | InterfaceDeclaration | Decorator | ModuleDeclaration;
+
+function isFQNNode(node: Node): node is FQNNode {
+    return Node.isVariableDeclaration(node) || Node.isArrowFunction(node) || Node.isIdentifier(node) || Node.isMethodDeclaration(node) || Node.isClassDeclaration(node) || Node.isClassExpression(node) || Node.isDecorator(node) || Node.isModuleDeclaration(node) || Node.isCallExpression(node);
+
+}
+
+export function getFQN(node: FQNNode | Node): string {
+    const absolutePathProject = entityDictionary.famixRep.getAbsolutePath();
+
+    const sourceFile = node.getSourceFile();
+    let parts: string[] = [];
+    let currentNode: Node | undefined = node;
+
+    while (currentNode && !Node.isSourceFile(currentNode)) {
+        const { line, column } = sourceFile.getLineAndColumnAtPos(currentNode.getStart());
+        const lc = `${line}:${column}`;
+        if (Node.isClassDeclaration(currentNode) || 
+            Node.isClassExpression(currentNode) || 
+            Node.isInterfaceDeclaration(currentNode) ||
+            Node.isFunctionDeclaration(currentNode) || 
+            Node.isMethodDeclaration(currentNode) || 
+            Node.isModuleDeclaration(currentNode) || 
+            Node.isVariableDeclaration(currentNode) || 
+            Node.isGetAccessorDeclaration(currentNode) ||
+            Node.isSetAccessorDeclaration(currentNode) ||
+            Node.isIdentifier(currentNode)) {
+            let name = Node.isIdentifier(currentNode) ? currentNode.getText() 
+                : getNameOfNode(currentNode) /* currentNode.getName() */ || 'Unnamed_' + currentNode.getKindName() + `(${lc})`;
+            parts.unshift(name);
+        } else if (Node.isArrowFunction(currentNode) || 
+                   Node.isBlock(currentNode) || 
+                   Node.isForInStatement(currentNode) || 
+                   Node.isForOfStatement(currentNode) || 
+                   Node.isForStatement(currentNode) || 
+                   Node.isCatchClause(currentNode)) {
+            parts.unshift(`${currentNode.getKindName()}(${lc})`);
+        } else if (Node.isConstructorDeclaration(currentNode)) {
+            parts.unshift(`constructor`);
+        } else {
+            // For other kinds, you might want to handle them specifically or ignore
+            //console.log(`Ignoring node kind: ${currentNode.getKindName()}`);
+        }
+        currentNode = currentNode.getParent();
+    }
+
+
+
+    // Prepend the relative path of the source file
+    const relativePath = entityDictionary.convertToRelativePath(
+        path.normalize(sourceFile.getFilePath()), 
+                       absolutePathProject).replace(/\\/sg, "/");
+    parts.unshift(`{${relativePath}}`);
+    const fqn = parts.join(".") + `[${node.getKindName()}]`;  // disambiguate
+
+    logger.debug(fqn);
+    return fqn;
+}
+
+
+export function getUniqueFQN(node: Node): string | undefined {
+    const absolutePathProject = entityDictionary.famixRep.getAbsolutePath();
+    let parts: string[] = [];
+
+    if (node instanceof SourceFile) {
+        return entityDictionary.convertToRelativePath(path.normalize(node.getFilePath()), absolutePathProject).replace(/\\/g, "/");
+    }
+
+    while (node) {
+        if (Node.isSourceFile(node)) {
+            const relativePath = entityDictionary.convertToRelativePath(path.normalize(node.getFilePath()), absolutePathProject).replace(/\\/g, "/");
+            parts.unshift(relativePath); // Add file path at the start
+            break;
+        } else if (node.getSymbol()) {
+            const name = node.getSymbol()!.getName();
+            // For anonymous nodes, use kind and position as unique identifiers
+            const identifier = name !== "__computed" ? name : `${node.getKindName()}_${node.getStartLinePos()}`;
+            parts.unshift(identifier);
+        }
+        node = node.getParent();
+    }
+
+    return parts.join("::");
+}
+
 
 /**
  * Gets the fully qualified name of a node, if it has one
  * @param node A node
  * @returns The fully qualified name of the node, or undefined if it doesn't have one
  */
-export function getFQN(node: ts.Node): string {
+export function oldGetFQN(node: Node): string {
     const absolutePathProject = entityDictionary.famixRep.getAbsolutePath();
     
-    if (node instanceof ts.SourceFile) {
+    if (node instanceof SourceFile) {
         return entityDictionary.convertToRelativePath(path.normalize(node.getFilePath()), 
             absolutePathProject).replace(/\\/sg, "/");
     }
@@ -67,7 +155,7 @@ export function getFQN(node: ts.Node): string {
  * @param a A node
  * @returns The name of the node, or an empty string if it doesn't have one
  */
-export function getNameOfNode(a: ts.Node<ts.ts.Node>): string {
+export function getNameOfNode(a: Node): string {
     switch (a.getKind()) {
         case ts.SyntaxKind.SourceFile:
             return a.asKind(ts.SyntaxKind.SourceFile)?.getBaseName();
@@ -76,10 +164,18 @@ export function getNameOfNode(a: ts.Node<ts.ts.Node>): string {
             return a.asKind(ts.SyntaxKind.ModuleDeclaration)?.getName(); 
 
         case ts.SyntaxKind.ClassDeclaration:
-            return a.asKind(ts.SyntaxKind.ClassDeclaration)?.getName();
+            if (a.asKind(ts.SyntaxKind.ClassDeclaration).getTypeParameters().length>0){
+                return a.asKind(ts.SyntaxKind.ClassDeclaration)?.getName()+getParameters(a);
+            } else {
+                return a.asKind(ts.SyntaxKind.ClassDeclaration)?.getName();
+            }
 
         case ts.SyntaxKind.InterfaceDeclaration:
-            return a.asKind(ts.SyntaxKind.InterfaceDeclaration)?.getName();
+            if (a.asKind(ts.SyntaxKind.InterfaceDeclaration).getTypeParameters().length>0){
+                return a.asKind(ts.SyntaxKind.InterfaceDeclaration)?.getName()+getParameters(a);
+            } else {
+                return a.asKind(ts.SyntaxKind.InterfaceDeclaration)?.getName();
+            }
                 
         case ts.SyntaxKind.PropertyDeclaration:
             return a.asKind(ts.SyntaxKind.PropertyDeclaration)?.getName();    
@@ -88,7 +184,11 @@ export function getNameOfNode(a: ts.Node<ts.ts.Node>): string {
             return a.asKind(ts.SyntaxKind.PropertySignature)?.getName();    
     
         case ts.SyntaxKind.MethodDeclaration:
-            return a.asKind(ts.SyntaxKind.MethodDeclaration)?.getName();
+            if (a.asKind(ts.SyntaxKind.MethodDeclaration).getTypeParameters().length>0){
+                return a.asKind(ts.SyntaxKind.MethodDeclaration)?.getName()+getParameters(a);
+            } else {
+                return a.asKind(ts.SyntaxKind.MethodDeclaration)?.getName();
+            }
 
         case ts.SyntaxKind.MethodSignature:
             return a.asKind(ts.SyntaxKind.MethodSignature)?.getName();   
@@ -100,7 +200,11 @@ export function getNameOfNode(a: ts.Node<ts.ts.Node>): string {
             return a.asKind(ts.SyntaxKind.SetAccessor)?.getName();
     
         case ts.SyntaxKind.FunctionDeclaration:
-            return a.asKind(ts.SyntaxKind.FunctionDeclaration)?.getName();
+            if (a.asKind(ts.SyntaxKind.FunctionDeclaration).getTypeParameters().length>0){
+                return a.asKind(ts.SyntaxKind.FunctionDeclaration)?.getName()+getParameters(a);
+            } else {
+                return a.asKind(ts.SyntaxKind.FunctionDeclaration)?.getName();
+            }
 
         case ts.SyntaxKind.FunctionExpression:
             return (a.asKind(ts.SyntaxKind.FunctionExpression)?.getName()) ? a.asKind(ts.SyntaxKind.FunctionExpression)?.getName() : "anonymous";
@@ -133,4 +237,22 @@ export function getNameOfNode(a: ts.Node<ts.ts.Node>): string {
             // ancestor hasn't got a useful name
             return "";
         }
+}
+
+/**
+ * Gets the name of a node, if it has one
+ * @param a A node
+ * @returns The name of the node, or an empty string if it doesn't have one
+ */
+export function getParameters(a: Node): string {
+    switch (a.getKind()) {
+        case ts.SyntaxKind.ClassDeclaration:    
+            return "<" + a.asKind(ts.SyntaxKind.ClassDeclaration)?.getTypeParameters().map(tp => tp.getName()).join(", ") + ">";
+        case ts.SyntaxKind.InterfaceDeclaration:
+            return "<" + a.asKind(ts.SyntaxKind.InterfaceDeclaration)?.getTypeParameters().map(tp => tp.getName()).join(", ") + ">";
+        case ts.SyntaxKind.MethodDeclaration:
+            return "<" + a.asKind(ts.SyntaxKind.MethodDeclaration)?.getTypeParameters().map(tp => tp.getName()).join(", ") + ">";
+        case ts.SyntaxKind.FunctionDeclaration:
+            return "<" + a.asKind(ts.SyntaxKind.FunctionDeclaration)?.getTypeParameters().map(tp => tp.getName()).join(", ") + ">";
+    }
 }

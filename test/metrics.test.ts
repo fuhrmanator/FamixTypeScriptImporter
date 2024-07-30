@@ -7,7 +7,8 @@ const project = new Project(
     {
         compilerOptions: {
             baseUrl: "./test_src"
-        }
+        },
+        useInMemoryFileSystem: false, // cyclomatic complexity is calculated on disk
     }
 );
 
