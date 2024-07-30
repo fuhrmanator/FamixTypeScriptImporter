@@ -47,27 +47,10 @@ class SourcedEntity extends Entity {
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
-class Association extends SourcedEntity {
-    -next: Association
-    +getNext(): Association
-    +setNext(next: Association): void
-    -previous: Association
-    +getPrevious(): Association
-    +setPrevious(previous: Association): void
-    +getJSON(): string
-    +addPropertiesToExporter(exporter: FamixJSONExporter): void
-}
-class Namespace extends ScopingEntity {
-    -parentScope: ScopingEntity
-    +getParentScope(): ScopingEntity
-    +setParentScope(parentScope: ScopingEntity): void
-    +getJSON(): string
-    +addPropertiesToExporter(exporter: FamixJSONExporter): void
-}
 class ScopingEntity extends ContainerEntity {
-    -childrenNamespaces: Set<Namespace>
-    +getNamespaces(): Set<Namespace>
-    +addNamespace(childNamespace: Namespace): void
+    -childModules: Set<Module>
+    +getModules(): Set<Module>
+    +addModule(childModule: Module): void
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
@@ -82,13 +65,25 @@ class ScriptEntity extends ScopingEntity {
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
 class Module extends ScriptEntity {
+    +$isAmbient: boolean
+    +$isAmbient: boolean
+    -isAmbient: boolean
+    +$isNamespace: boolean
+    +$isNamespace: boolean
+    -isNamespace: boolean
+    +$isModule: boolean
+    +$isModule: boolean
+    -isModule: boolean
+    -parentScope: ScopingEntity
+    +getParentScope(): ScopingEntity
+    +setParentScope(parentScope: ScopingEntity): void
     -outgoingImports: Set<ImportClause>
     +getOutgoingImports(): Set<ImportClause>
     +addOutgoingImport(importClause: ImportClause): void
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
-class ImportClause extends Association {
+class ImportClause extends Entity {
     -importingEntity: Module
     +getImportingEntity(): Module
     +setImportingEntity(importer: Module): void
@@ -152,18 +147,32 @@ class Parameter extends StructuralEntity {
 }
 class Property extends StructuralEntity {
     -isClassSide: boolean
+    +readOnly: boolean
+    +readOnly: boolean
+    -_readOnly: boolean
     +getIsClassSide(): boolean
     +setIsClassSide(isClassSide: boolean): void
     -parentEntity: Class | Interface
     +getParentEntity(): Class | Interface
     +setParentEntity(parentEntity: Class | Interface): void
-    -modifiers: Set<string>
-    +getModifiers(): Set<string>
-    +addModifier(modifier: string): void
+    +$isClassSide: boolean
+    +$isClassSide: boolean
+    +isDefinitelyAssigned: boolean
+    +isDefinitelyAssigned: boolean
+    +isOptional: boolean
+    +isOptional: boolean
+    +isJavaScriptPrivate: boolean
+    +isJavaScriptPrivate: boolean
+    -_isDefinitelyAssigned: boolean
+    -_isOptional: boolean
+    -_isJavaScriptPrivate: boolean
+    +visibility: VisibilityTypes
+    +visibility: VisibilityTypes
+    -_visibility: VisibilityTypes
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
-class Inheritance extends Association {
+class Inheritance extends Entity {
     -superclass: Class | Interface
     +getSuperclass(): Class | Interface
     +setSuperclass(superclass: Class | Interface): void
@@ -173,7 +182,10 @@ class Inheritance extends Association {
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
-class Interface extends Type {
+class Class extends Type {
+    -isAbstract: boolean
+    +getIsAbstract(): boolean
+    +setIsAbstract(isAbstract: boolean): void
     -properties: Set<Property>
     +getProperties(): Set<Property>
     +addProperty(property: Property): void
@@ -214,10 +226,7 @@ class Method extends BehavioralEntity {
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
-class Class extends Type {
-    -isAbstract: boolean
-    +getIsAbstract(): boolean
-    +setIsAbstract(isAbstract: boolean): void
+class Interface extends Type {
     -properties: Set<Property>
     +getProperties(): Set<Property>
     +addProperty(property: Property): void
@@ -233,17 +242,29 @@ class Class extends Type {
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
-class ParameterizableClass extends Class {
-    -parameterTypes: Set<ParameterType>
-    +getParameterTypes(): Set<ParameterType>
-    +addParameterType(parameterType: ParameterType): void
+class PrimitiveType extends Type {
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
-class ParameterizableInterface extends Interface {
-    -parameterTypes: Set<ParameterType>
-    +getParameterTypes(): Set<ParameterType>
-    +addParameterType(parameterType: ParameterType): void
+class ParametricClass extends Class {
+    -genericParameters: Set<ParameterType>
+    +getGenericParameters(): Set<ParameterType>
+    +addGenericParameter(genericParameter: ParameterType): void
+    +clearGenericParameters(): void
+    -concreteParameters: Set<Class | Interface | PrimitiveType>
+    +getConcreteParameters(): Set<Class | Interface | PrimitiveType>
+    +addConcreteParameter(concreteParameter: Class | Interface | PrimitiveType): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ParametricInterface extends Interface {
+    -genericParameters: Set<ParameterType>
+    +getGenericParameters(): Set<ParameterType>
+    +addGenericParameter(genericParameter: ParameterType): void
+    +clearGenericParameters(): void
+    -concreteParameters: Set<Class | Interface | PrimitiveType>
+    +getConcreteParameters(): Set<Class | Interface | PrimitiveType>
+    +addConcreteParameter(concreteParameter: Class | Interface | PrimitiveType): void
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
@@ -255,17 +276,45 @@ class Accessor extends Method {
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
+class ParametricMethod extends Method {
+    -concreteParameters: Set<Class | Interface | PrimitiveType>
+    +getConcreteParameters(): Set<Class | Interface | PrimitiveType>
+    +addConcreteParameter(concreteParameter: Class | Interface | PrimitiveType): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ParametricFunction extends Function {
+    -concreteParameters: Set<Class | Interface | PrimitiveType>
+    +getConcreteParameters(): Set<Class | Interface | PrimitiveType>
+    +addConcreteParameter(concreteParameter: Class | Interface | PrimitiveType): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ArrowFunction extends BehavioralEntity {
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class ParametricArrowFunction extends ArrowFunction {
+    -concreteParameters: Set<Class | Interface | PrimitiveType>
+    +getConcreteParameters(): Set<Class | Interface | PrimitiveType>
+    +addConcreteParameter(concreteParameter: Class | Interface | PrimitiveType): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
 class ParameterType extends Type {
-    -parentGeneric: Method | ParameterizableClass | ParameterizableInterface | Accessor | FamixFunction
-    +getParentGeneric(): Method | ParameterizableClass | ParameterizableInterface | Accessor | FamixFunction
-    +setParentGeneric(parentGeneric: Method | ParameterizableClass | ParameterizableInterface | Accessor | FamixFunction): void
+    -parentGeneric: Method | ParametricClass | ParametricInterface | ParametricMethod | Accessor | FamixFunction | ParametricFunction | ArrowFunction | ParametricArrowFunction
+    +getParentGeneric(): Method | ParametricClass | ParametricInterface | ParametricMethod | Accessor | FamixFunction | ParametricFunction | ArrowFunction | ParametricArrowFunction
+    +setParentGeneric(parentGeneric: Method | ParametricClass | ParametricInterface | ParametricMethod | Accessor | FamixFunction | ParametricFunction | ArrowFunction | ParametricArrowFunction): void
+    -baseType: Type
+    +getBaseType(): Type
+    +setBaseType(baseType: Type): void
+    -arguments: Set<Type>
+    +getArguments(): Set<Type>
+    +addArgument(argument: Type): void
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
 class BehavioralEntity extends ContainerEntity {
-    -isGeneric: boolean
-    +getIsGeneric(): boolean
-    +setIsGeneric(isGeneric: boolean): void
     -signature: string
     +getSignature(): string
     +setSignature(signature: string): void
@@ -281,13 +330,14 @@ class BehavioralEntity extends ContainerEntity {
     -declaredType: Type
     +getDeclaredType(): Type
     +setDeclaredType(declaredType: Type): void
-    -typeParameters: Set<ParameterType>
-    +getParameterTypes(): Set<ParameterType>
-    +addParameterType(typeParameter: ParameterType): void
+    -genericParameters: Set<ParameterType>
+    +getGenericParameters(): Set<ParameterType>
+    +addGenericParameter(genericParameter: ParameterType): void
+    +clearGenericParameters(): void
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
-class Invocation extends Association {
+class Invocation extends Entity {
     -candidates: Set<BehavioralEntity>
     +getCandidates(): Set<BehavioralEntity>
     +addCandidate(candidate: BehavioralEntity): void
@@ -303,7 +353,7 @@ class Invocation extends Association {
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
-class Reference extends Association {
+class Reference extends Entity {
     -source: ContainerEntity
     +getSource(): ContainerEntity
     +setSource(source: ContainerEntity): void
@@ -386,7 +436,7 @@ class StructuralEntity extends NamedEntity {
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
-class Access extends Association {
+class Access extends Entity {
     -accessor: ContainerEntity
     +getAccessor(): ContainerEntity
     +setAccessor(accessor: ContainerEntity): void
@@ -396,6 +446,16 @@ class Access extends Association {
     -isWrite: boolean
     +getIsWrite(): boolean
     +setIsWrite(isWrite: boolean): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
+class Concretisation extends Entity {
+    -genericEntity: ParametricClass | ParametricInterface | ParametricMethod | ParametricFunction
+    +getGenericEntity(): ParametricClass | ParametricInterface | ParametricMethod | ParametricFunction
+    +setGenericEntity(genericEntity: ParametricClass | ParametricInterface | ParametricMethod | ParametricFunction): void
+    -concreteEntity: ParametricClass | ParametricInterface | ParametricMethod | ParametricFunction
+    +getConcreteEntity(): ParametricClass | ParametricInterface | ParametricMethod | ParametricFunction
+    +setConcreteEntity(concreteEntity: ParametricClass | ParametricInterface | ParametricMethod | ParametricFunction): void
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
@@ -436,20 +496,6 @@ class IndexedFileAnchor extends SourceAnchor {
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
-class ParameterizedType extends Type {
-    -baseType: Type
-    +getBaseType(): Type
-    +setBaseType(baseType: Type): void
-    -arguments: Set<Type>
-    +getArguments(): Set<Type>
-    +addArgument(argument: Type): void
-    +getJSON(): string
-    +addPropertiesToExporter(exporter: FamixJSONExporter): void
-}
-class PrimitiveType extends Type {
-    +getJSON(): string
-    +addPropertiesToExporter(exporter: FamixJSONExporter): void
-}
 class TextAnchor extends SourceAnchor {
     -startPos: number
     +getStartPos(): number
@@ -463,6 +509,19 @@ class TextAnchor extends SourceAnchor {
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
+class ParameterConcretisation extends Entity {
+    -genericParameter: ParameterType
+    +getGenericParameter(): ParameterType
+    +setGenericParameter(genericEntity: ParameterType): void
+    -concreteParameter: PrimitiveType
+    +getConcreteParameter(): PrimitiveType
+    +setConcreteParameter(concreteParameter: PrimitiveType): void
+    -concretisations: Set<Concretisation>
+    +getConcretisations(): Set<Concretisation>
+    +addConcretisation(concretisation: Concretisation): void
+    +getJSON(): string
+    +addPropertiesToExporter(exporter: FamixJSONExporter): void
+}
 interface SearchParameters {
     +searchArray: string[]
     +targetArray: string[]
@@ -471,41 +530,53 @@ interface SearchParameters {
 class EntityDictionary {
     +famixRep: FamixRepository
     -fmxAliasMap: Map<string, Famix.Alias>
-    -fmxClassMap: Map<string, Famix.Class | Famix.ParameterizableClass>
-    -fmxInterfaceMap: Map<string, Famix.Interface | Famix.ParameterizableInterface>
-    -fmxNamespaceMap: Map<string, Famix.Namespace>
+    -fmxClassMap: Map<string, Famix.Class | Famix.ParametricClass>
+    -fmxInterfaceMap: Map<string, Famix.Interface | Famix.ParametricInterface>
+    -fmxModuleMap: Map<string, Famix.Module>
     -fmxFileMap: Map<string, Famix.Module | Famix.ScriptEntity>
-    -fmxTypeMap: Map<string, Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType>
+    -fmxTypeMap: Map<string, Famix.Type | Famix.ParameterType | Famix.PrimitiveType>
+    -fmxFunctionAndMethodMap: Map<string, Famix.Method | Famix.ParametricMethod | Famix.Function | Famix.ParametricFunction>
     -UNKNOWN_VALUE: string
     +fmxElementObjectMap: Map<Famix.Entity, TSMorphObjectType>
     +makeFamixIndexFileAnchor(sourceElement: TSMorphObjectType, famixElement: Famix.SourcedEntity): void
     +createOrGetFamixFile(f: SourceFile, isModule: boolean): Famix.Module | Famix.ScriptEntity
-    +createOrGetFamixNamespace(m: ModuleDeclaration): Famix.Namespace
+    +createOrGetFamixModule(m: ModuleDeclaration): Famix.Module
     +createFamixAlias(a: TypeAliasDeclaration): Famix.Alias
-    +createOrGetFamixClass(cls: ClassDeclaration): Famix.Class | Famix.ParameterizableClass
-    +createOrGetFamixInterface(inter: InterfaceDeclaration): Famix.Interface | Famix.ParameterizableInterface
+    +createOrGetFamixClass(cls: ClassDeclaration): Famix.Class | Famix.ParametricClass
+    +createOrGetFamixInterface(inter: InterfaceDeclaration): Famix.Interface | Famix.ParametricInterface
+    +createOrGetFamixConcreteElement(el: Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricMethod | Famix.ParametricFunction, elDeclaration: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | FunctionDeclaration, concreteArguments: any): Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricMethod | Famix.ParametricFunction
     +createFamixProperty(property: PropertyDeclaration | PropertySignature): Famix.Property
-    +createFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: unknown): Famix.Method | Famix.Accessor
-    +createFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: unknown): Famix.Function
+    +createOrGetFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: unknown): Famix.Method | Famix.ParametricMethod | Famix.Accessor
+    +createOrGetFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: unknown): Famix.Function | Famix.ParametricFunction
     +createFamixParameter(param: ParameterDeclaration): Famix.Parameter
     +createFamixParameterType(tp: TypeParameterDeclaration): Famix.ParameterType
+    +createOrGetFamixConcreteType(param: TypeNode<ts.TypeNode>): Famix.Class | Famix.Interface | Famix.ParameterType | Famix.PrimitiveType
     +createFamixVariable(variable: VariableDeclaration): Famix.Variable
     +createFamixEnum(enumEntity: EnumDeclaration): Famix.Enum
     +createFamixEnumValue(enumMember: EnumMember): Famix.EnumValue
     +createOrGetFamixDecorator(decorator: Decorator, decoratedEntity: ClassDeclaration | MethodDeclaration | ParameterDeclaration | PropertyDeclaration | GetAccessorDeclaration | SetAccessorDeclaration): Famix.Decorator
     +createFamixComment(comment: CommentRange, fmxScope: Famix.NamedEntity, isJSDoc: boolean): Famix.Comment
-    +createOrGetFamixType(typeName: string, element: MethodDeclaration | ConstructorDeclaration | MethodSignature | FunctionDeclaration | ... 8 more ... | TypeAliasDeclaration): Famix.Type | Famix.PrimitiveType | Famix.ParameterizedType
+    +createOrGetFamixType(typeName: string, element: TypeDeclaration): Famix.Type | Famix.ParameterType | Famix.PrimitiveType
     +createFamixAccess(node: Identifier, id: number): void
     +createFamixInvocation(node: Identifier, m: MethodDeclaration | ConstructorDeclaration | FunctionDeclaration | FunctionExpression | GetAccessorDeclaration | SetAccessorDeclaration, id: number): void
     +createFamixInheritance(cls: ClassDeclaration | InterfaceDeclaration, inhClass: ClassDeclaration | InterfaceDeclaration | ExpressionWithTypeArguments): void
-    +createFamixImportClause(importClauseInfo: { importDeclaration?: ImportDeclaration | ImportEqualsDeclaration; importer: SourceFile; moduleSpecifierFilePath: string; importElement: ImportSpecifier | Identifier; isInExports: boolean; isDefaultExport: boolean; }): void
+    +createFamixImportClause(importedEntity: Famix.NamedEntity, importingEntity: Famix.Module): void
+    +oldCreateFamixImportClause(importClauseInfo: { importDeclaration?: ImportDeclaration | ImportEqualsDeclaration; importerSourceFile: SourceFile; moduleSpecifierFilePath: string; importElement: ImportSpecifier | Identifier; isInExports: boolean; isDefaultExport: boolean; }): void
+    +createFamixArrowFunction(arrowExpression: Expression<ts.Expression>, currentCC: unknown): Famix.ArrowFunction | Famix.ParametricArrowFunction
+    +createFamixConcretisation(conEntity: Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricMethod | Famix.ParametricFunction, genEntity: Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricMethod | Famix.ParametricFunction): Famix.Concretisation
+    +createFamixParameterConcrestisation(concretisation: Famix.Concretisation): Famix.ParameterConcretisation
+    +createFamixConcretisationClassOrInterfaceSpecialisation(element: ClassDeclaration | InterfaceDeclaration): void
+    +createFamixConcretisationGenericInstantiation(cls: ClassDeclaration): void
+    +createFamixConcretisationFunctionInstantiation(element: MethodDeclaration | FunctionDeclaration): void
+    +createFamixConcretisationInterfaceClass(cls: ClassDeclaration): void
+    +createFamixConcretisationTypeInstanciation(element: ClassDeclaration | InterfaceDeclaration): void
     +convertToRelativePath(absolutePath: string, absolutePathProject: string): string
 }
 class FamixRepository {
     -elements: Set<FamixBaseElement>
     -famixClasses: Set<Class>
     -famixInterfaces: Set<Interface>
-    -famixNamespaces: Set<Namespace>
+    -famixModules: Set<Module>
     -famixMethods: Set<Method>
     -famixVariables: Set<Variable>
     -famixFunctions: Set<FamixFunctionEntity>
@@ -527,8 +598,8 @@ class FamixRepository {
     +_getFamixMethod(fullyQualifiedName: string): Method
     +_getFamixFunction(fullyQualifiedName: string): FamixFunctionEntity
     +_getFamixVariable(fullyQualifiedName: string): Variable
-    +_getFamixNamespace(fullyQualifiedName: string): Namespace
-    +_getFamixNamespaces(): Set<Namespace>
+    +_getFamixModule(fullyQualifiedName: string): Module
+    +_getFamixModules(): Set<Module>
     +_getFamixFile(fullyQualifiedName: string): Module | ScriptEntity
     +_getFamixFiles(): Set<Module | ScriptEntity>
     +_methodNamesAsSetFromClass(className: string): Set<string>
