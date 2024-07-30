@@ -143,7 +143,7 @@ export class Property extends StructuralEntity {
     super.addPropertiesToExporter(exporter);
     exporter.addProperty("readOnly", this.readOnly);
     exporter.addProperty("isClassSide", this.getIsClassSide());
-    exporter.addProperty("parentBehaviouralEntity", this.getParentEntity());
+    exporter.addProperty("parentType", this.getParentEntity());
     exporter.addProperty("visibility", this.visibility);
     exporter.addProperty("isDefinitelyAssigned", this.isDefinitelyAssigned);
     exporter.addProperty("isOptional", this.isOptional);
