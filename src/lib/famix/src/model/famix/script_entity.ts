@@ -32,7 +32,5 @@ export class ScriptEntity extends ScopingEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("numberOfLinesOfText", this.getNumberOfLinesOfText());
-    exporter.addProperty("numberOfCharacters", this.getNumberOfCharacters());
   }
 }
