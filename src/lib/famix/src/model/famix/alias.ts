@@ -35,7 +35,7 @@ export class Alias extends NamedEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("parentEntity", this.getParentEntity());
+    exporter.addProperty("parentBehaviouralEntity", this.getParentEntity());
     exporter.addProperty("aliasedEntity", this.getAliasedEntity());
   }
 }

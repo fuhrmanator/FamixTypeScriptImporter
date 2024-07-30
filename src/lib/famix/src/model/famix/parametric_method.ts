@@ -26,5 +26,7 @@ export class ParametricMethod extends Method {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
+    exporter.addProperty("genericParameters", this.getGenericParameters());
+    exporter.addProperty("concreteParameters", this.getConcreteParameters());
   }
 }

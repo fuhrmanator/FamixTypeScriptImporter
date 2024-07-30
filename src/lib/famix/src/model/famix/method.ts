@@ -85,7 +85,7 @@ export class Method extends BehavioralEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("parentEntity", this.getParentEntity());
+    exporter.addProperty("parentBehaviouralEntity", this.getParentEntity());
     exporter.addProperty("kind", this.getKind());
     exporter.addProperty("isAbstract", this.getIsAbstract());
     exporter.addProperty("isClassSide", this.getIsClassSide());

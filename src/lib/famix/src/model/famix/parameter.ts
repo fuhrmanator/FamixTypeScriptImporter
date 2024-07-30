@@ -24,6 +24,6 @@ export class Parameter extends StructuralEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("parentEntity", this.getParentEntity());
+    exporter.addProperty("parentBehaviouralEntity", this.getParentEntity());
   }
 }

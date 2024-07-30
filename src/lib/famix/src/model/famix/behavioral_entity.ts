@@ -94,6 +94,7 @@ export class BehavioralEntity extends ContainerEntity {
     exporter.addProperty("numberOfParameters", this.getNumberOfParameters());
     exporter.addProperty("incomingInvocations", this.getIncomingInvocations());
     exporter.addProperty("declaredType", this.getDeclaredType());
-    exporter.addProperty("genericParameters", this.getGenericParameters());
+    /* don't add the property here, since it doesn't apply to all subclasses */
+//    exporter.addProperty("genericParameters", this.getGenericParameters());
   }
 }

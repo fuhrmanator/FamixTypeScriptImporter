@@ -8,7 +8,7 @@ import { Accessor } from "./accessor";
 import { ParametricMethod } from "./parametric_method";
 import { ParametricFunction } from "./parametric_function";
 import { ArrowFunction } from "./arrowFunction";
-import { ParametricArrowFunction } from "./parametricArrowFunction";
+import { ParametricArrowFunction } from "./parametric_arrow_function";
 
 export class ParameterType extends Type {
 

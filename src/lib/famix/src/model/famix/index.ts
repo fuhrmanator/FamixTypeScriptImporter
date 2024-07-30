@@ -39,5 +39,5 @@ export { Variable } from "./variable";
 export { ParametricFunction } from "./parametric_function";
 export { ParametricMethod } from "./parametric_method";
 export { ArrowFunction } from "./arrowFunction";
-export { ParametricArrowFunction } from "./parametricArrowFunction";
+export { ParametricArrowFunction } from "./parametric_arrow_function";
 export { ParameterConcretisation } from "./parameterConcretisation";
