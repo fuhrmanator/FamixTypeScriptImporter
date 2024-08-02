@@ -484,12 +484,6 @@ class IndexedFileAnchor extends SourceAnchor {
     -endPos: number
     +getEndPos(): number
     +setEndPos(endPos: number): void
-    -endLine: number
-    +getEndLine(): number
-    +setEndLine(sourceEndLine: number): void
-    -startLine: number
-    +getStartLine(): number
-    +setStartLine(sourceStartLine: number): void
     -fileName: string
     +getFileName(): string
     +setFileName(fileName: string): void
@@ -538,6 +532,7 @@ class EntityDictionary {
     -fmxFunctionAndMethodMap: Map<string, Famix.Method | Famix.ParametricMethod | Famix.Function | Famix.ParametricFunction>
     -UNKNOWN_VALUE: string
     +fmxElementObjectMap: Map<Famix.Entity, TSMorphObjectType>
+    +addSourceAnchor(fmx: Famix.SourcedEntity, node: TSMorphObjectType): Famix.IndexedFileAnchor
     +makeFamixIndexFileAnchor(sourceElement: TSMorphObjectType, famixElement: Famix.SourcedEntity): void
     +createOrGetFamixFile(f: SourceFile, isModule: boolean): Famix.Module | Famix.ScriptEntity
     +createOrGetFamixModule(m: ModuleDeclaration): Famix.Module
