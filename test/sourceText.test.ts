@@ -26,7 +26,7 @@ export class A {
     }
 }`, { overwrite: true }).saveSync();
 
-// multi-code point emoji is handled differently in JavaScript () and Pharo (one character)
+// multi-code point emoji is handled differently in JavaScript (two chars) and Pharo (one character)
 project.createSourceFile("/test_src/a-b.ts", `let c = "💷", d = 5;`);
 
 config.expectGraphemes = true;
@@ -41,8 +41,6 @@ describe('Tests for source text', () => {
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.getStartPos()).toBe(19 + 1);
         expect(sourceAnchor.getEndPos()).toBe(402 + 1);
-        expect(sourceAnchor.getStartLine()).toBe(2);
-        expect(sourceAnchor.getEndLine()).toBe(11);
         expect(sourceAnchor.getFileName()).toBe("test_src/simple.ts");
         expect(project.getSourceFileOrThrow(
             sourceAnchor.getFileName()).getFullText().substring(
@@ -66,8 +64,6 @@ describe('Tests for source text', () => {
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.getStartPos()).toBe(266 + 1);
         expect(sourceAnchor.getEndPos()).toBe(400 + 1);
-        expect(sourceAnchor.getStartLine()).toBe(8);
-        expect(sourceAnchor.getEndLine()).toBe(10);
         expect(sourceAnchor.getFileName()).toBe("test_src/simple.ts");
         expect(project.getSourceFileOrThrow(
             sourceAnchor.getFileName()).getFullText().substring(
@@ -86,8 +82,6 @@ describe('Tests for source text', () => {
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.getStartPos()).toBe(4 + 1);
         expect(sourceAnchor.getEndPos()).toBe(17 + 1);
-        expect(sourceAnchor.getStartLine()).toBe(1);
-        expect(sourceAnchor.getEndLine()).toBe(1);
         expect(sourceAnchor.getFileName()).toBe("test_src/simple.ts");
         expect(project.getSourceFileOrThrow(
             sourceAnchor.getFileName()).getFullText().substring(
@@ -102,8 +96,6 @@ describe('Tests for source text', () => {
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.getStartPos()).toBe(320 + 1);
         expect(sourceAnchor.getEndPos()).toBe(393 + 1);
-        expect(sourceAnchor.getStartLine()).toBe(9);
-        expect(sourceAnchor.getEndLine()).toBe(9);
         expect(sourceAnchor.getFileName()).toBe("test_src/simple.ts");
         expect(project.getSourceFileOrThrow(
             sourceAnchor.getFileName()).getFullText().substring(
@@ -123,8 +115,6 @@ describe('Tests for source text', () => {
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.getStartPos()).toBe(4 + 1);
         expect(sourceAnchor.getEndPos()).toBe(4 + testSourceWithGraphemes.length + 1);
-        expect(sourceAnchor.getStartLine()).toBe(1);
-        expect(sourceAnchor.getEndLine()).toBe(1);
         expect(sourceAnchor.getFileName()).toBe("test_src/a-b.ts");
         const sourceFileTextWithGraphemes = splitter.splitGraphemes(project.getSourceFileOrThrow(sourceAnchor.getFileName()).getFullText());
         expect(sourceFileTextWithGraphemes.slice(sourceAnchor.getStartPos() - 1, sourceAnchor.getEndPos() - 1)).toEqual(testSourceWithGraphemes);
@@ -136,8 +126,6 @@ describe('Tests for source text', () => {
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.getStartPos()).toBe(13 + 1);
         expect(sourceAnchor.getEndPos()).toBe(18 + 1);
-        expect(sourceAnchor.getStartLine()).toBe(1);
-        expect(sourceAnchor.getEndLine()).toBe(1);
         expect(sourceAnchor.getFileName()).toBe("test_src/a-b.ts");
         const sourceFileTextWithGraphemes = splitter.splitGraphemes(project.getSourceFileOrThrow(sourceAnchor.getFileName()).getFullText());
         const testSourceWithGraphemes = splitter.splitGraphemes('d = 5');

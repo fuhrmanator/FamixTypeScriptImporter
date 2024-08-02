@@ -37,6 +37,7 @@ describe('Abstract classes and methods', () => {
             if (theMethods) {
                 expect(theMethods.size).toBe(3);
                 const foundMethodName = fmxRep._getFamixMethod("{abstracts.ts}.MyAbstractClass.abstractMethod1[MethodDeclaration]") as Method;
+                expect(foundMethodName).toBeTruthy();
                 expect(foundMethodName.getIsAbstract()).toBe(true);
             }
         }

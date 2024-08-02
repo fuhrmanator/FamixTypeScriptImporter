@@ -23,25 +23,27 @@ export class IndexedFileAnchor extends SourceAnchor {
     this.endPos = endPos;
   }
 
-  private endLine: number;
+  // Yo, these are supposed to be derived in Moose, not stored in the model
 
-  public getEndLine(): number {
-    return this.endLine;
-  }
+  // private endLine: number;
 
-  public setEndLine(sourceEndLine: number) {
-    this.endLine = sourceEndLine;
-  }
+  // public getEndLine(): number {
+  //   return this.endLine;
+  // }
 
-  private startLine: number;
+  // public setEndLine(sourceEndLine: number) {
+  //   this.endLine = sourceEndLine;
+  // }
 
-  public getStartLine(): number {
-    return this.startLine;
-  }
+  // private startLine: number;
 
-  public setStartLine(sourceStartLine: number) {
-    this.startLine = sourceStartLine;
-  }
+  // public getStartLine(): number {
+  //   return this.startLine;
+  // }
+
+  // public setStartLine(sourceStartLine: number) {
+  //   this.startLine = sourceStartLine;
+  // }
 
   private fileName: string;
 
