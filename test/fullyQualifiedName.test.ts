@@ -1,4 +1,4 @@
-import { ArrowFunction, Block, MethodDeclaration, Project, ReturnStatement, SyntaxKind } from 'ts-morph';
+import { Block, Project, ReturnStatement, SyntaxKind } from 'ts-morph';
 import { getFQN } from '../src/fqn';
 
 const project = new Project(
@@ -9,7 +9,6 @@ const project = new Project(
         useInMemoryFileSystem: true,
     }
 );
-
 
 describe.skip('fullyQualifiedName functionality', () => {
     let sourceFile: ReturnType<Project['createSourceFile']>;

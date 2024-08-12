@@ -1,18 +1,10 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 import { Alias, IndexedFileAnchor } from '../src/lib/famix/src/model/famix';
 import { Type } from '../src/lib/famix/src/model/famix';
 import { getTextFromAnchor } from './testUtils';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/alias.ts", 
 `type Point = {

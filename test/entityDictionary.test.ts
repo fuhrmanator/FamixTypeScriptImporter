@@ -1,17 +1,8 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import exp from 'constants';
 import { ScriptEntity, Class, PrimitiveType, Method, Parameter, Comment, Access, Variable, Function } from '../src/lib/famix/src/model/famix';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/famixMorphObject.ts",
 `

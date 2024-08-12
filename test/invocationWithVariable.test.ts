@@ -2,17 +2,9 @@ import { Importer } from '../src/analyze';
 import { Method } from "../src/lib/famix/src/model/famix/method";
 import { Variable } from "../src/lib/famix/src/model/famix/variable";
 import { Invocation } from "../src/lib/famix/src/model/famix/invocation";
-import { Project } from 'ts-morph';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/invocationWithVariable.ts",
 `class AAA {

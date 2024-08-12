@@ -1,21 +1,13 @@
-import { Project } from 'ts-morph';
 import { Importer, logger } from '../src/analyze';
 import { Access } from '../src/lib/famix/src/model/famix/access';
 import { Enum } from '../src/lib/famix/src/model/famix/enum';
 import { ScriptEntity } from '../src/lib/famix/src/model/famix/script_entity';
 import { IndexedFileAnchor } from '../src/lib/famix/src/model/famix/indexed_file_anchor';
 import { getCommentTextFromCommentViaAnchor } from './testUtils';
+import { project } from './testUtils';
 
 const importer = new Importer();
-logger.settings.minLevel = 0;   // see all messages in testing
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
+// logger.settings.minLevel = 0;   // see all messages in testing
 
 project.createSourceFile("/enum.ts",
 `// comment before

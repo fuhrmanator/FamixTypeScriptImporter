@@ -1,17 +1,9 @@
 import { Importer } from '../src/analyze';
 import { Type } from '../src/lib/famix/src/model/famix/type';
 import { Class } from '../src/lib/famix/src/model/famix/class';
-import { Project } from 'ts-morph';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/namespacesAndClasses.ts",
 `namespace MyNamespace {

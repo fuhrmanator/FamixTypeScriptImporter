@@ -1,16 +1,8 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 import { ScriptEntity } from '../src/lib/famix/src/model/famix/script_entity';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 project.createSourceFile("/simpleTest.ts",
 `console.log("Hello");
 `);

@@ -1,17 +1,9 @@
-import { Project } from 'ts-morph';
 import { Importer, logger } from '../src/analyze';
 import { ParametricClass } from '../src/lib/famix/src/model/famix';
+import { project } from './testUtils';
 
 const importer = new Importer();
 logger.settings.minLevel = 0; // show all messages
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/parametrizableClass.ts",
 `class ClassA<V> {}

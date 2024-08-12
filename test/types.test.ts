@@ -1,19 +1,11 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 import { ParameterType } from '../src/lib/famix/src/model/famix/parameter_type';
 import { PrimitiveType } from '../src/lib/famix/src/model/famix/primitive_type';
 import { Type } from '../src/lib/famix/src/model/famix/type';
 import { IndexedFileAnchor } from '../src/lib/famix/src/model/famix';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 project.createSourceFile("/types.ts",
 `const aString: string = "one";
 const aBoolean: boolean = false;

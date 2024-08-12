@@ -1,16 +1,8 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 import { Decorator } from '../src/lib/famix/src/model/famix/decorator';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/classWithDecorators.ts",
 `function sealed(constructor: Function) { // function can't take other parameters with constructor

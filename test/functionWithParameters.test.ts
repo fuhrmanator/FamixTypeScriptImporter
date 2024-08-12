@@ -1,16 +1,8 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 import { Function as FamixFunctionEntity } from "../src/lib/famix/src/model/famix/function";
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/functionWithParameters.ts",
 `function fct(i: number, x: string): number {

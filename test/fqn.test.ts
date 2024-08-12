@@ -1,5 +1,5 @@
-import { Project, SyntaxKind, ts } from 'ts-morph';
-import { getFQN, getUniqueFQN } from '../src/fqn';
+import { Project, SyntaxKind } from 'ts-morph';
+import { getFQN } from '../src/fqn';
 
 describe('getFQN functionality', () => {
     let project: Project;

@@ -1,12 +1,9 @@
-import { Project } from 'ts-morph';
 import { Importer, logger } from '../src/analyze';
 import { Class, Enum, Function, Method } from '../src/lib/famix/src/model/famix';
+import { project } from './testUtils';
 
 const importer = new Importer();
-logger.settings.minLevel = 0; // all your messages are belong to us
-const project = new Project({
-    useInMemoryFileSystem: true,
-});
+// logger.settings.minLevel = 0; // all your messages are belong to us
 
 project.createSourceFile("arrowFunctions.ts",
 `

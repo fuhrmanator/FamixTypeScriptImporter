@@ -1,16 +1,7 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import exp from 'constants';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 project.createSourceFile("/parametricArrowFunctions.ts",
 `
     const arrayLength = <T>(arr: T[]): number => {

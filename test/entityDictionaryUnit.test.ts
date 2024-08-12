@@ -1,15 +1,6 @@
-import { Project, ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration } from "ts-morph";
 import { entityDictionary } from "../src/analyze";
 import * as Famix from "../src/lib/famix/src/model/famix";
-
-const project = new Project(
-  {
-    compilerOptions: {
-        baseUrl: ""
-    },
-    useInMemoryFileSystem: true,
-  }
-);
+import { project } from './testUtils';
 
 const sourceFile = project.createSourceFile("/entityDictionaryUnit.ts",
 `

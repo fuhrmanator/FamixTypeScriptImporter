@@ -1,15 +1,8 @@
-import { Project } from 'ts-morph';
 import { Importer, logger } from '../src/analyze';
-import { ImportClause } from '../src/lib/famix/src/model/famix/import_clause';
 import { Module } from '../src/lib/famix/src/model/famix/module';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project({
-    compilerOptions: {
-        baseUrl: ""
-    },
-    useInMemoryFileSystem: true,
-});
 
 project.createSourceFile("/test_src/moduleBecauseExports.ts", `
 class ClassZ {}

@@ -1,16 +1,8 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import { ParametricClass, Concretisation } from '../src/lib/famix/src/model/famix';
+import { ParametricClass } from '../src/lib/famix/src/model/famix';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/concretisationGenericInstantiation.ts",
 `

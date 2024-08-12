@@ -1,17 +1,9 @@
-import { Project } from "ts-morph";
 import { Importer, config } from "../src/analyze";
 import { IndexedFileAnchor, Method, Module, ScriptEntity } from "../src/lib/famix/src/model/famix";
 import GraphemeSplitter from "grapheme-splitter";
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/test_src/simple.ts",
     `let a: number = 1;

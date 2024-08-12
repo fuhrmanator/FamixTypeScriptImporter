@@ -1,17 +1,9 @@
 import { Importer } from '../src/analyze';
 import { Interface } from '../src/lib/famix/src/model/famix';
-import { Project } from 'ts-morph';
+import { project } from './testUtils';
 
 const importer = new Importer();
 
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 project.createSourceFile("/interfaceInheritsInterface.ts",
 `interface MyInterface1 {}
 interface MyInterface2 extends MyInterface1 {}`);

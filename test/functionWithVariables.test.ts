@@ -1,19 +1,11 @@
 import { Importer } from '../src/analyze';
 import { Function as FamixFunctionEntity } from "../src/lib/famix/src/model/famix/function";
 import { Comment } from '../src/lib/famix/src/model/famix/comment';
-import { Project } from 'ts-morph';
 import { IndexedFileAnchor } from '../src/lib/famix/src/model/famix/indexed_file_anchor';
 import { getCommentTextFromCommentViaAnchor } from './testUtils';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/functionWithVariables.ts",
 `function fct(): number {

@@ -1,18 +1,9 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
-import { Class } from "../src/lib/famix/src/model/famix/class";
 import { Parameter } from "../src/lib/famix/src/model/famix/parameter";
 import { ParametricFunction, ParametricMethod } from '../src/lib/famix/src/model/famix';
+import { project } from "./testUtils";
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/genericMethod.ts",
 `function func<T>(arg: T): T {

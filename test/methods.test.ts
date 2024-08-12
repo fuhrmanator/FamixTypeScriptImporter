@@ -1,16 +1,8 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 import { Method } from "../src/lib/famix/src/model/famix/method";
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/methods.ts",
 `class AAA {

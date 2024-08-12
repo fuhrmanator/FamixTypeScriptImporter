@@ -1,18 +1,11 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 import { Access } from '../src/lib/famix/src/model/famix/access';
 import { Parameter } from '../src/lib/famix/src/model/famix/parameter';
 import { Variable } from '../src/lib/famix/src/model/famix/variable';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
+
 project.createSourceFile('/accesses.ts',
 `var b = 2;
 

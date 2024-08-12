@@ -1,17 +1,9 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 import { Class } from '../src/lib/famix/src/model/famix/class';
 import { Interface } from '../src/lib/famix/src/model/famix/interface';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/classImplementsUndefinedInterface.ts",
 `import {FileSystemHost} from "ts-morph";

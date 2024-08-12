@@ -1,17 +1,9 @@
-import { Project } from "ts-morph";
-import { Importer, logger } from "../src/analyze";
-import { Class, Variable, StructuralEntity, ImportClause } from "../src/lib/famix/src/model/famix";
+import { Importer } from "../src/analyze";
+import { Variable, StructuralEntity, ImportClause } from "../src/lib/famix/src/model/famix";
+import { project } from './testUtils';
 
 const importer = new Importer();
 //logger.settings.minLevel = 0; // all your messages are belong to us
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/test_src/exporter1.ts",
     `export const hasBigInt = typeof BigInt !== 'undefined';

@@ -1,16 +1,8 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 import { Property } from '../src/lib/famix/src/model/famix/property';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 project.createSourceFile("/propertyDefinedInConstructorSignature.ts",
 `class Point {
   constructor(private x: number, public readonly y: number, protected z: number) {}

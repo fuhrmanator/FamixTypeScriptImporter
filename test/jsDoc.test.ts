@@ -1,19 +1,9 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 import { Comment } from '../src/lib/famix/src/model/famix/comment';
-import { IndexedFileAnchor } from '../src/lib/famix/src/model/famix/indexed_file_anchor';
-import { get } from 'http';
 import { getCommentTextFromCommentViaAnchor } from './testUtils';
+import { project } from './testUtils';
 
 const importer = new Importer();
-const project = new Project(
-    {
-        compilerOptions: {
-            baseUrl: ""
-        },
-        useInMemoryFileSystem: true,
-    }
-);
 
 project.createSourceFile("/jsDoc.ts",
 `/**

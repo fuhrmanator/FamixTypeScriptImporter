@@ -2,6 +2,15 @@ import { IndexedFileAnchor } from "../src/lib/famix/src/model/famix/indexed_file
 import { Comment } from "../src/lib/famix/src/model/famix/comment";
 import { Project } from "ts-morph";
 
+export const project = new Project(
+    {
+        compilerOptions: {
+            baseUrl: ""
+        },
+        useInMemoryFileSystem: true,
+    }
+);
+
 function getIndexedFileAnchorFromComment(comment: Comment) {
     return comment?.getSourceAnchor() as IndexedFileAnchor;
 }

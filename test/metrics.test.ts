@@ -1,6 +1,6 @@
-import { Project } from 'ts-morph';
 import { Importer } from '../src/analyze';
 import * as fs from 'fs';
+import { Project } from 'ts-morph';
 
 const importer = new Importer();
 const project = new Project(
