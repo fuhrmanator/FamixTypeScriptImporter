@@ -39,9 +39,9 @@ jobs:
       id: check_changes
       run: |
         if git status --porcelain | grep 'doc-uml/famix-typescript-model.puml\|doc-uml/famix-typescript-model.svg'; then
-          echo "::set-output name=changed::true"
+          echo "changed=true" >> $GITHUB_OUTPUT
         else
-          echo "::set-output name=changed::false"
+          echo "changed=false" >> $GITHUB_OUTPUT
         fi
 
     - name: Push docs to current branch
