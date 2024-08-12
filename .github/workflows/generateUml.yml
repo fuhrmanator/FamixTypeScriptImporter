@@ -35,12 +35,15 @@ jobs:
       with:
         args: -v -config "doc-metamodel/skins.include.cfg" -tsvg doc-uml/famix-typescript-model.puml
 
-    - name: Check if UML files have changed
+    - name: Check for changes in UML diagrams
       id: check_changes
       run: |
-        git fetch origin
-        git diff --exit-code origin/${{ github.ref }} -- doc-uml/famix-typescript-model.puml doc-uml/famix-typescript-model.svg || echo "Files have changed"
-  
+        if git status --porcelain | grep 'doc-uml/famix-typescript-model.puml\|doc-uml/famix-typescript-model.svg'; then
+          echo "::set-output name=changed::true"
+        else
+          echo "::set-output name=changed::false"
+        fi
+
     - name: Push docs to current branch
       if: steps.check_changes.outputs.changed == 'true'
       env:
