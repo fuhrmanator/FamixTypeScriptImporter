@@ -473,24 +473,7 @@ class EnumValue extends StructuralEntity {
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
 }
-class ImplicitVariable extends Variable {
-    +getJSON(): string
-    +addPropertiesToExporter(exporter: FamixJSONExporter): void
-}
 class IndexedFileAnchor extends SourceAnchor {
-    -startPos: number
-    +getStartPos(): number
-    +setStartPos(startPos: number): void
-    -endPos: number
-    +getEndPos(): number
-    +setEndPos(endPos: number): void
-    -fileName: string
-    +getFileName(): string
-    +setFileName(fileName: string): void
-    +getJSON(): string
-    +addPropertiesToExporter(exporter: FamixJSONExporter): void
-}
-class TextAnchor extends SourceAnchor {
     -startPos: number
     +getStartPos(): number
     +setStartPos(startPos: number): void
