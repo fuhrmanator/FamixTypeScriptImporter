@@ -39,7 +39,7 @@ describe('Tests for enum', () => {
         expect(theEnum.getComments().size).toBe(1);
         const comment = Array.from(theEnum.getComments())[0];
         expect(getCommentTextFromCommentViaAnchor(comment, project)).toBe("// comment before");
-        expect((comment.getSourceAnchor() as IndexedFileAnchor).getFileName().endsWith("enum.ts")).toBe(true);
+        expect((comment.getSourceAnchor() as IndexedFileAnchor).fileName.endsWith("enum.ts")).toBe(true);
         });
 
     it("should contain one enum with seven enum values", () => {

@@ -72,13 +72,13 @@ export class EntityDictionary {
             }
 
             // The +1 is because the source anchor (Pharo) is 1-based, but ts-morph is 0-based
-            sourceAnchor.setStartPos(sourceStart + 1);
-            sourceAnchor.setEndPos(sourceEnd + 1);
+            sourceAnchor.startPos = sourceStart + 1;
+            sourceAnchor.endPos = sourceEnd + 1;
 
             const fileName = node.getSourceFile().getFilePath();
 
             sourceAnchor.setElement(fmx);
-            sourceAnchor.setFileName(fileName);
+            sourceAnchor.fileName = fileName;
             fmx.setSourceAnchor(sourceAnchor);
             this.famixRep.addElement(sourceAnchor);
 
@@ -125,7 +125,7 @@ export class EntityDictionary {
             // revert any backslashes to forward slashes (path.normalize on windows introduces them)
             pathInProject = pathInProject.replace(/\\/g, "/");
 
-            fmxIndexFileAnchor.setFileName(pathInProject);
+            fmxIndexFileAnchor.fileName = pathInProject;
             let sourceStart, sourceEnd, sourceLineStart, sourceLineEnd: number;
             if (!(sourceElement instanceof CommentRange)) {
                 sourceStart = sourceElement.getStart();
@@ -164,8 +164,8 @@ export class EntityDictionary {
                 } 
             }
             // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
-            fmxIndexFileAnchor.setStartPos(sourceStart + 1);
-            fmxIndexFileAnchor.setEndPos(sourceEnd + 1);
+            fmxIndexFileAnchor.startPos = sourceStart + 1;
+            fmxIndexFileAnchor.endPos = sourceEnd + 1;
 
             // if (!(famixElement instanceof Famix.ImportClause || famixElement instanceof Famix.Access || famixElement instanceof Famix.Reference || famixElement instanceof Famix.Invocation || famixElement instanceof Famix.Inheritance) && !(famixElement instanceof Famix.Comment) && !(sourceElement instanceof CommentRange) && !(sourceElement instanceof Identifier) && !(sourceElement instanceof ImportSpecifier) && !(sourceElement instanceof ExpressionWithTypeArguments)) {
             //    initFQN(sourceElement, famixElement);
@@ -173,9 +173,9 @@ export class EntityDictionary {
         } else {
             // sourceElement is null
             logger.warn("sourceElement is null for famixElement " + famixElement.getJSON());
-            fmxIndexFileAnchor.setFileName("unknown");
-            fmxIndexFileAnchor.setStartPos(0);
-            fmxIndexFileAnchor.setEndPos(0);
+            fmxIndexFileAnchor.fileName = "unknown";
+            fmxIndexFileAnchor.startPos = 0;
+            fmxIndexFileAnchor.endPos = 0;
         }
 
         this.famixRep.addElement(fmxIndexFileAnchor);

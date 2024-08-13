@@ -51,7 +51,7 @@ describe('Tests for alias', () => {
         const sourceAnchor = theFirstAlias.getSourceAnchor();
         expect(sourceAnchor.constructor.name).toBe("IndexedFileAnchor");
         const indexedFileAnchor = sourceAnchor as IndexedFileAnchor;
-        expect(indexedFileAnchor.getFileName().endsWith("alias.ts")).toBe(true);
+        expect(indexedFileAnchor.fileName.endsWith("alias.ts")).toBe(true);
         const fileAnchorText = getTextFromAnchor(indexedFileAnchor, project);
         expect(fileAnchorText).toBe(`type Point = {
     x: number;
@@ -82,7 +82,7 @@ describe('Tests for alias', () => {
         const sourceAnchor = arrayOfAliases[1].getSourceAnchor();
         expect(sourceAnchor.constructor.name).toBe("IndexedFileAnchor");
         const indexedFileAnchor = sourceAnchor as IndexedFileAnchor;
-        expect(indexedFileAnchor.getFileName().endsWith("alias.ts")).toBe(true);
+        expect(indexedFileAnchor.fileName.endsWith("alias.ts")).toBe(true);
         const fileAnchorText = getTextFromAnchor(indexedFileAnchor, project);
         expect(fileAnchorText).toBe(`type Text = string | { text: string };`);
     });
@@ -109,7 +109,7 @@ describe('Tests for alias', () => {
         const sourceAnchor = arrayOfAliases[2].getSourceAnchor();
         expect(sourceAnchor.constructor.name).toBe("IndexedFileAnchor");
         const indexedFileAnchor = sourceAnchor as IndexedFileAnchor;
-        expect(indexedFileAnchor.getFileName().endsWith("alias.ts")).toBe(true);
+        expect(indexedFileAnchor.fileName.endsWith("alias.ts")).toBe(true);
         const fileAnchorText = getTextFromAnchor(indexedFileAnchor, project);
         expect(fileAnchorText).toBe(`type Callback = (data: string) => void;`);
     });

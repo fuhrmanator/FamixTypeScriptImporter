@@ -157,7 +157,7 @@ describe('Tests for import clauses', () => {
         expect(importClause).toBeTruthy();
         // const fileAnchor = importClause?.getSourceAnchor() as IndexedFileAnchor;
         // expect(fileAnchor).toBeTruthy();
-        // const fileName = fileAnchor?.getFileName().split("/").pop();
+        // const fileName = fileAnchor?.fileName.split("/").pop();
         // expect(fileName).toBe("renameDefaultExportImporter.ts");
         // expect the text from the file anchor to be ""
         // expect(getTextFromAnchor(fileAnchor, project)).toBe(`import myRenamedDefaultClassW from "./complexExportModule.ts";`);

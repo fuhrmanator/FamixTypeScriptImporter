@@ -89,13 +89,13 @@ describe('Tests for types', () => {
     });
 
     it("should have types.ts for container", () => {
-        expect(types[0].container).toBe(theFile);
+        expect(types[0].getContainer()).toBe(theFile);
     });
 
     it("should have an IndexedFileAnchor with a filename of 'types.ts' for Map<any, boolean>", () => {
         const indexedFileAnchor = theParameterType?.getSourceAnchor();
         expect(indexedFileAnchor).toBeTruthy();
-        expect((indexedFileAnchor as IndexedFileAnchor).getFileName().endsWith("types.ts")).toBe(true);
+        expect((indexedFileAnchor as IndexedFileAnchor).fileName.endsWith("types.ts")).toBe(true);
     });
 
 });
