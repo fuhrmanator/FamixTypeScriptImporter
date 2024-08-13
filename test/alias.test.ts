@@ -30,17 +30,17 @@ describe('Tests for alias', () => {
     });
 
     it("should contain an alias Point", () => {
-        expect(theFirstAlias.getName()).toBe("Point");
+        expect(theFirstAlias.name).toBe("Point");
     });
 
     it("should contain a type Point", () => {
-        expect(theFirstType.getName()).toBe("Point");
+        expect(theFirstType.name).toBe("Point");
     });
     
     const theFile = fmxRep._getFamixFile("alias.ts");
     it("should contain an alias on type Point", () => {
-        expect(theFile?.getAliases().size).toBe(NUMBER_OF_ALIASES);
-        expect(Array.from(theFile?.getAliases() as Set<Alias>)[0]).toBe(theFirstAlias);
+        expect(theFile?.aliases.size).toBe(NUMBER_OF_ALIASES);
+        expect(Array.from(theFile?.aliases as Set<Alias>)[0]).toBe(theFirstAlias);
         expect(theFirstAlias.aliasedEntity).toBe(theFirstType);
         expect(theFirstAlias.parentEntity).toBe(theFile);
         expect(theFirstType.getTypeAliases().size).toBe(1);
@@ -62,16 +62,16 @@ describe('Tests for alias', () => {
 
     // test for the second alias
     it("should contain an alias Text", () => {
-        expect(arrayOfAliases[1].getName()).toBe("Text");
+        expect(arrayOfAliases[1].name).toBe("Text");
     });
 
     it("should contain a type Text", () => {
-        expect(arrayOfTypes[1].getName()).toBe("Text");
+        expect(arrayOfTypes[1].name).toBe("Text");
     });
 
     it("should contain an alias on type Text", () => {
-        expect(theFile?.getAliases().size).toBe(NUMBER_OF_ALIASES);
-        expect(Array.from(theFile?.getAliases() as Set<Alias>)[1]).toBe(arrayOfAliases[1]);
+        expect(theFile?.aliases.size).toBe(NUMBER_OF_ALIASES);
+        expect(Array.from(theFile?.aliases as Set<Alias>)[1]).toBe(arrayOfAliases[1]);
         expect(arrayOfAliases[1].aliasedEntity).toBe(arrayOfTypes[1]);
         expect(arrayOfAliases[1].parentEntity).toBe(theFile);
         expect(arrayOfTypes[1].getTypeAliases().size).toBe(1);
@@ -89,16 +89,16 @@ describe('Tests for alias', () => {
 
     // write tests for the third alias
     it("should contain an alias Callback", () => {
-        expect(arrayOfAliases[2].getName()).toBe("Callback");
+        expect(arrayOfAliases[2].name).toBe("Callback");
     });
 
     it("should contain a type Callback", () => {
-        expect(arrayOfTypes[2].getName()).toBe("Callback");
+        expect(arrayOfTypes[2].name).toBe("Callback");
     });
 
     it("should contain an alias on type Callback", () => {
-        expect(theFile?.getAliases().size).toBe(NUMBER_OF_ALIASES);
-        expect(Array.from(theFile?.getAliases() as Set<Alias>)[2]).toBe(arrayOfAliases[2]);
+        expect(theFile?.aliases.size).toBe(NUMBER_OF_ALIASES);
+        expect(Array.from(theFile?.aliases as Set<Alias>)[2]).toBe(arrayOfAliases[2]);
         expect(arrayOfAliases[2].aliasedEntity).toBe(arrayOfTypes[2]);
         expect(arrayOfAliases[2].parentEntity).toBe(theFile);
         expect(arrayOfTypes[2].getTypeAliases().size).toBe(1);

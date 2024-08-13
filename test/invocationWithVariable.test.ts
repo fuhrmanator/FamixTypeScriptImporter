@@ -22,9 +22,9 @@ describe('Tests for invocation with variable', () => {
     it("should contain a variable 'x1' instance of 'AAA'", () => {
         const pList = Array.from(fmxRep._getAllEntitiesWithType("Variable") as Set<Variable>);
         expect(pList).toBeTruthy();
-        const x1 = pList.find(p => p.getName() === "x1");
+        const x1 = pList.find(p => p.name === "x1");
         expect(x1).toBeTruthy();
-        expect(x1?.getDeclaredType().getName()).toBe("AAA");
+        expect(x1?.getDeclaredType().name).toBe("AAA");
     });
     
     const theMethod = fmxRep._getFamixMethod("{invocationWithVariable.ts}.AAA.method[MethodDeclaration]") as Method;

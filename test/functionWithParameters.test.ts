@@ -19,23 +19,23 @@ describe('Tests for function with parameters', () => {
         expect(theFunction?.parameters.size).toBe(2);
     });
 
-    const firstParam = Array.from(theFunction?.parameters).find((p) => p.getName() === "i");
+    const firstParam = Array.from(theFunction?.parameters).find((p) => p.name === "i");
     it("should have a parameter 'i'", () => {
         expect(firstParam).toBeTruthy();
     });
 
     it("should be of type number", () => {
-        expect(firstParam?.getDeclaredType().getName()).toBe("number");
+        expect(firstParam?.getDeclaredType().name).toBe("number");
         expect(firstParam?.getParentEntity()).toBe(theFunction);
     });
 
-    const secondParam = Array.from(theFunction?.parameters).find((p) => p.getName() === "x");
+    const secondParam = Array.from(theFunction?.parameters).find((p) => p.name === "x");
     it("should have a parameter 'x'", () => {
         expect(secondParam).toBeTruthy();
     });
 
     it("should be of type string", () => {
-        expect(secondParam?.getDeclaredType().getName()).toBe("string");
+        expect(secondParam?.getDeclaredType().name).toBe("string");
         expect(secondParam?.getParentEntity()).toBe(theFunction);
     });
 });

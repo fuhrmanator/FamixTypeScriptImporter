@@ -25,7 +25,7 @@ describe('Tests for function with variables', () => {
         expect(theFunction?.variables.size).toBe(3);
     });
 
-    const firstVariable = Array.from(theFunction?.variables).find((p) => p.getName() === "i");
+    const firstVariable = Array.from(theFunction?.variables).find((p) => p.name === "i");
     const firstVariableComments = Array.from(firstVariable?.getComments() as Set<Comment>);
 
     it("should have a variable 'i' with three comments", () => {
@@ -43,10 +43,10 @@ describe('Tests for function with variables', () => {
     });
 
     it("should be of type number", () => {
-        expect(firstVariable?.getDeclaredType().getName()).toBe("number");
+        expect(firstVariable?.getDeclaredType().name).toBe("number");
     });
 
-    const secondVariable = Array.from(theFunction?.variables).find((p) => p.getName() === "j");
+    const secondVariable = Array.from(theFunction?.variables).find((p) => p.name === "j");
     const secondVariableComments = Array.from(secondVariable?.getComments() as Set<Comment>);
 
     it("should have a variable 'j' with two comments", () => {
@@ -69,16 +69,16 @@ describe('Tests for function with variables', () => {
     });
     
     it("should be of type number", () => {
-        expect(secondVariable?.getDeclaredType().getName()).toBe("number");
+        expect(secondVariable?.getDeclaredType().name).toBe("number");
     });
 
-    const thirdVariable = Array.from(theFunction?.variables).find((p) => p.getName() === "x");
+    const thirdVariable = Array.from(theFunction?.variables).find((p) => p.name === "x");
     it("should have a variable 'x'", () => {
         expect(thirdVariable).toBeTruthy();
         expect(thirdVariable?.getParentContainerEntity()).toBe(theFunction);
     });
 
     it("should be of type string", () => {
-        expect(thirdVariable?.getDeclaredType().getName()).toBe("string");
+        expect(thirdVariable?.getDeclaredType().name).toBe("string");
     });
 });

@@ -14,11 +14,11 @@ export class ScopingEntity extends ContainerEntity {
 
   public addModule(childModule: Module): void {
     if (!this.childModules.has(childModule)) {
-      logger.debug("Adding module " + childModule.getName() + " to " + this.getName());
+      logger.debug("Adding module " + childModule.name + " to " + this.name);
       this.childModules.add(childModule);
       childModule.parentScope = this;
     } else {
-      logger.debug("Module " + childModule.getName() + " already added to " + this.getName());
+      logger.debug("Module " + childModule.name + " already added to " + this.name);
     }
   }
 

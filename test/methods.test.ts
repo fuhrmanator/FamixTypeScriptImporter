@@ -22,12 +22,12 @@ describe('Tests for methods', () => {
     const theMethod = Array.from(methodList)[0] as Method;
     it("should contain a method 'method'", () => {
         expect(theMethod).toBeTruthy();
-        expect(theMethod?.getName()).toBe('method');
+        expect(theMethod?.name).toBe('method');
     });
 
 
     it("should return void", () => {
-        expect(theMethod?.declaredType.getName()).toBe("void");
+        expect(theMethod?.declaredType.name).toBe("void");
     });
 
     it("should have no parameter", () => {

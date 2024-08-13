@@ -56,7 +56,7 @@ export class FamixRepository {
    */
   public getFamixEntityByFullyQualifiedName(fullyQualifiedName: string): FamixBaseElement | undefined {
     const allEntities = Array.from(this.elements.values()).filter(e => e instanceof NamedEntity) as Array<NamedEntity>;
-    const entity = allEntities.find(e => e.getFullyQualifiedName() === fullyQualifiedName);
+    const entity = allEntities.find(e => e.fullyQualifiedName === fullyQualifiedName);
     return entity;
   }
 
@@ -94,7 +94,7 @@ export class FamixRepository {
    * @returns The Famix class corresponding to the name or undefined if it doesn't exist
    */
   public _getFamixClass(fullyQualifiedName: string): Class | undefined {
-    return Array.from(this.famixClasses.values()).find(ns => ns.getFullyQualifiedName() === fullyQualifiedName);
+    return Array.from(this.famixClasses.values()).find(ns => ns.fullyQualifiedName === fullyQualifiedName);
   }
 
   /**
@@ -103,7 +103,7 @@ export class FamixRepository {
    * @returns The Famix interface corresponding to the name or undefined if it doesn't exist
    */
   public _getFamixInterface(fullyQualifiedName: string): Interface | undefined {
-    return Array.from(this.famixInterfaces.values()).find(ns => ns.getFullyQualifiedName() === fullyQualifiedName);
+    return Array.from(this.famixInterfaces.values()).find(ns => ns.fullyQualifiedName === fullyQualifiedName);
   }
 
   /**
@@ -112,7 +112,7 @@ export class FamixRepository {
    * @returns The Famix method corresponding to the name or undefined if it doesn't exist
    */
   public _getFamixMethod(fullyQualifiedName: string): Method | undefined {
-    return Array.from(this.famixMethods.values()).find(ns => ns.getFullyQualifiedName() === fullyQualifiedName);
+    return Array.from(this.famixMethods.values()).find(ns => ns.fullyQualifiedName === fullyQualifiedName);
   }
 
   /**
@@ -121,7 +121,7 @@ export class FamixRepository {
    * @returns The Famix function corresponding to the name or undefined if it doesn't exist
    */
   public _getFamixFunction(fullyQualifiedName: string): FamixFunctionEntity | undefined {
-    return Array.from(this.famixFunctions.values()).find(ns => ns.getFullyQualifiedName() === fullyQualifiedName);
+    return Array.from(this.famixFunctions.values()).find(ns => ns.fullyQualifiedName === fullyQualifiedName);
   }
 
 
@@ -131,7 +131,7 @@ export class FamixRepository {
    * @returns The Famix variable corresponding to the name or undefined if it doesn't exist
    */
   public _getFamixVariable(fullyQualifiedName: string): Variable | undefined {
-    return Array.from(this.famixVariables.values()).find(v => v.getFullyQualifiedName() === fullyQualifiedName);
+    return Array.from(this.famixVariables.values()).find(v => v.fullyQualifiedName === fullyQualifiedName);
   }
 
   /**
@@ -140,7 +140,7 @@ export class FamixRepository {
    * @returns The Famix namespace corresponding to the name or undefined if it doesn't exist
    */
   public _getFamixModule(fullyQualifiedName: string): Module | undefined {
-    return Array.from(this.famixModules.values()).find(ns => ns.getFullyQualifiedName() === fullyQualifiedName);
+    return Array.from(this.famixModules.values()).find(ns => ns.fullyQualifiedName === fullyQualifiedName);
   }
 
   /**
@@ -157,7 +157,7 @@ export class FamixRepository {
    * @returns The Famix file corresponding to the name or undefined if it doesn't exist
    */
   public _getFamixFile(fullyQualifiedName: string): ScriptEntity | Module | undefined {
-    return Array.from(this.famixFiles.values()).find(ns => ns.getName() === fullyQualifiedName);
+    return Array.from(this.famixFiles.values()).find(ns => ns.name === fullyQualifiedName);
   }
 
   /**
@@ -175,7 +175,7 @@ export class FamixRepository {
    */
   public _methodNamesAsSetFromClass(className: string): Set<string> {
     const theClass = this._getFamixClass(className) as Class;
-    return new Set(Array.from(theClass.methods).map(m => m.getName()));
+    return new Set(Array.from(theClass.methods).map(m => m.name));
   }
 
   /**

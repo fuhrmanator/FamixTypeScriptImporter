@@ -21,18 +21,18 @@ describe('Tests for generic class', () => {
     });
 
     it("should contain a generic class MyClass", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass")).map(e => (e as ParametricClass).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass")).map(e => (e as ParametricClass).name);
         expect(listOfNames).toContain("MyClass");
     });
 
     it("should contain a generic class MyClass with a type parameter T", () => {
         const pList = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass") as Set<ParametricClass>);
         expect(pList).toBeTruthy();
-        const MyClass = pList.find(p => p.getName() === "MyClass");
+        const MyClass = pList.find(p => p.name === "MyClass");
         expect(MyClass).toBeTruthy();
         expect(MyClass?.genericParameters.size).toBe(1);
         if (MyClass) {
-            expect((Array.from(MyClass.genericParameters)[0] as ParameterType).getName()).toBe("T");
+            expect((Array.from(MyClass.genericParameters)[0] as ParameterType).name).toBe("T");
             expect((Array.from(MyClass.genericParameters)[0] as ParameterType).getParentGeneric()).toBe(MyClass);
         }
     });

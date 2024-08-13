@@ -21,10 +21,10 @@ describe('Tests for interface inherits undefined interface', () => {
     it("should contain an interface MyInterface that extends an interface FileSystemHost", () => {
         const cList = Array.from(fmxRep._getAllEntitiesWithType("Interface") as Set<Interface>);
         expect(cList).toBeTruthy();
-        const myInterface1 = cList.find(p => p.getName() === "FileSystemHost");
+        const myInterface1 = cList.find(p => p.name === "FileSystemHost");
         expect(myInterface1).toBeTruthy();
         expect(myInterface1?.getIsStub()).toBe(true);
-        const myInterface2 = cList.find(p => p.getName() === "MyInterface");
+        const myInterface2 = cList.find(p => p.name === "MyInterface");
         expect(myInterface2).toBeTruthy();
         if (myInterface2) {
             expect(myInterface2.subInheritances.size).toBe(0);

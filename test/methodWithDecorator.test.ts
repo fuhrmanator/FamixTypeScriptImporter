@@ -37,10 +37,10 @@ describe('Tests for method with decorator', () => {
     });
 
     const theMethod = fmxRep._getFamixMethod("{methodWithDecorator.ts}.ExampleClass.method[MethodDeclaration]");
-    const d = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@first");
+    const d = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.name === "@first");
 
     it("should contain a method with one decorator", () => {
-        expect(theMethod?.getDecorators().size).toBe(1);
+        expect(theMethod?.decorators.size).toBe(1);
         expect(d?.decoratedEntity).toBe(theMethod);
         expect(d?.decoratorExpression).toBe("first()");
     });

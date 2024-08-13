@@ -53,13 +53,13 @@ describe('Tests for class with decorators', () => {
     });
 
     const theClass = fmxRep._getFamixClass("{classWithDecorators.ts}.BugReport[ClassDeclaration]");
-    const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@c");
-    const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@d");
-    const d3 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@sealed");
-    const d4 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@reportableClassDecorator");
+    const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.name === "@c");
+    const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.name === "@d");
+    const d3 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.name === "@sealed");
+    const d4 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.name === "@reportableClassDecorator");
 
     it("should contain a class with four decorators", () => {
-        expect(theClass?.getDecorators().size).toBe(4);
+        expect(theClass?.decorators.size).toBe(4);
         expect(d1?.decoratedEntity).toBe(theClass);
         expect(d2?.decoratedEntity).toBe(theClass);
         expect(d3?.decoratedEntity).toBe(theClass);

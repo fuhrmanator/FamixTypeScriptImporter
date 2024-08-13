@@ -58,8 +58,8 @@ describe('Tests for accessors with decorators', () => {
     });
 
     const accessors = fmxRep._getAllEntitiesWithType("Accessor") as Set<Accessor>;
-    const theMethod1 = Array.from(accessors).find((a) => a.getName() === "x");
-    const theMethod2 = Array.from(accessors).find((a) => a.getName() === "y");
+    const theMethod1 = Array.from(accessors).find((a) => a.name === "x");
+    const theMethod2 = Array.from(accessors).find((a) => a.name === "y");
 
     it("should contain two accessors", () => {
         expect(accessors.size).toBe(2);
@@ -67,27 +67,27 @@ describe('Tests for accessors with decorators', () => {
         expect(theMethod2).toBeTruthy();
     });
 
-    const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).filter((d) => d.getName() === "@x");
-    const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).filter((d) => d.getName() === "@b");
-    const d3 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).filter((d) => d.getName() === "@configurable");
+    const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).filter((d) => d.name === "@x");
+    const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).filter((d) => d.name === "@b");
+    const d3 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).filter((d) => d.name === "@configurable");
 
     it("should contain two accessors with three decorators for each one", () => {
         expect(fmxRep._getAllEntitiesWithType("Accessor").size).toBe(2);
         expect(fmxRep._getAllEntitiesWithType("Decorator").size).toBe(6);
 
-        expect(theMethod1?.getDecorators().size).toBe(3);
+        expect(theMethod1?.decorators.size).toBe(3);
         expect(d1[0]?.decoratedEntity).toBe(theMethod1);
         expect(d2[0]?.decoratedEntity).toBe(theMethod1);
         expect(d3[0]?.decoratedEntity).toBe(theMethod1);
 
-        expect(theMethod2?.getDecorators().size).toBe(3);
+        expect(theMethod2?.decorators.size).toBe(3);
         expect(d1[1]?.decoratedEntity).toBe(theMethod2);
         expect(d2[1]?.decoratedEntity).toBe(theMethod2);
         expect(d3[1]?.decoratedEntity).toBe(theMethod2);
     });
 
     it("should contain two accesses to '_x'", () => {
-        const theProperty = Array.from(fmxRep._getAllEntitiesWithType("Property") as Set<Property>).find(v => v.getName() === "_x");
+        const theProperty = Array.from(fmxRep._getAllEntitiesWithType("Property") as Set<Property>).find(v => v.name === "_x");
         const theMethod1 = fmxRep._getFamixMethod("{accessorsWithDecorators.ts}.Point.constructor[Constructor]");
         expect(theMethod1?.kind).toBe("constructor");
         const theMethod2 = fmxRep._getFamixMethod("{accessorsWithDecorators.ts}.Point.x[GetAccessor]");
@@ -99,7 +99,7 @@ describe('Tests for accessors with decorators', () => {
     });
 
     it("should contain two accesses to '_y'", () => {
-        const theProperty = Array.from(fmxRep._getAllEntitiesWithType("Property") as Set<Property>).find(v => v.getName() === "_y");
+        const theProperty = Array.from(fmxRep._getAllEntitiesWithType("Property") as Set<Property>).find(v => v.name === "_y");
         const theMethod1 = fmxRep._getFamixMethod("{accessorsWithDecorators.ts}.Point.constructor[Constructor]");
         const theMethod2 = fmxRep._getFamixMethod("{accessorsWithDecorators.ts}.Point.y[SetAccessor]");
         expect(theMethod2?.kind).toBe("setter");

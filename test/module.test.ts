@@ -51,11 +51,11 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Tests for module', () => {
     
     const moduleList = Array.from(fmxRep._getAllEntitiesWithType('Module')) as Array<Module>;
-    const moduleBecauseExports = moduleList.find(e => e.getName() === 'moduleBecauseExports.ts');
-    const moduleBecauseImports = moduleList.find(e => e.getName() === 'moduleBecauseImports.ts');
-    const moduleImportFromFileWithExtension = moduleList.find(e => e.getName() === 'moduleImportFromFileWithExtension.ts');
-    const ambientModule = moduleList.find(e => e.getName() === '"module-a"');
-    const exportedNsp = moduleList.find(e => e.getName() === 'Nsp');
+    const moduleBecauseExports = moduleList.find(e => e.name === 'moduleBecauseExports.ts');
+    const moduleBecauseImports = moduleList.find(e => e.name === 'moduleBecauseImports.ts');
+    const moduleImportFromFileWithExtension = moduleList.find(e => e.name === 'moduleImportFromFileWithExtension.ts');
+    const ambientModule = moduleList.find(e => e.name === '"module-a"');
+    const exportedNsp = moduleList.find(e => e.name === 'Nsp');
     it("should have five modules", () => {
         expect(moduleList?.length).toBe(5);
         expect(moduleBecauseExports).toBeTruthy();

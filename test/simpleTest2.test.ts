@@ -16,14 +16,14 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Tests for simple test 2', () => {
     
     const scriptEntityList = Array.from(fmxRep._getAllEntitiesWithType('ScriptEntity')) as Array<ScriptEntity>;
-    const theFile = scriptEntityList.find(e => e.getName() === 'simpleTest2.ts');
+    const theFile = scriptEntityList.find(e => e.name === 'simpleTest2.ts');
     it("should have one file", () => {
         expect(scriptEntityList?.length).toBe(1);
         expect(theFile).toBeTruthy();
     });
 
     const variableList = Array.from(fmxRep._getAllEntitiesWithType('Variable')) as Array<Variable>;
-    const theVariable = variableList.find(e => e.getName() === 'a');
+    const theVariable = variableList.find(e => e.name === 'a');
     it("should have one variable", () => {
         expect(scriptEntityList?.length).toBe(1);
         expect(theVariable).toBeTruthy();

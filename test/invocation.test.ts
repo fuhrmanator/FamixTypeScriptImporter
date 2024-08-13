@@ -29,7 +29,7 @@ describe('Tests for invocation', () => {
     });
 
     it("should contain a class A and a class B", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("Class")).map(e => (e as Class).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("Class")).map(e => (e as Class).name);
         expect(listOfNames).toContain("A");
         expect(listOfNames).toContain("B");
     });
@@ -37,22 +37,22 @@ describe('Tests for invocation', () => {
     it("should contain a method x for class A", () => {
         const cList = Array.from(fmxRep._getAllEntitiesWithType("Class") as Set<Class>);
         expect(cList).toBeTruthy();
-        const A = cList.find(c => c.getName() === "A");
+        const A = cList.find(c => c.name === "A");
         const mList = Array.from(A?.methods as Set<Method>);
-        const x = mList?.find(m => m.getName() === "x");
+        const x = mList?.find(m => m.name === "x");
         expect(x).toBeTruthy();
-        expect(x?.declaredType.getName()).toBe("void");
+        expect(x?.declaredType.name).toBe("void");
         expect(x?.parameters.size).toBe(0);
     });
 
     it("should contain a method y for class B", () => {
         const cList = Array.from(fmxRep._getAllEntitiesWithType("Class") as Set<Class>);
         expect(cList).toBeTruthy();
-        const B = cList.find(c => c.getName() === "B");
+        const B = cList.find(c => c.name === "B");
         const mList = Array.from(B?.methods as Set<Method>);
-        const y = mList?.find(m => m.getName() === "y");
+        const y = mList?.find(m => m.name === "y");
         expect(y).toBeTruthy();
-        expect(y?.declaredType.getName()).toBe("void");
+        expect(y?.declaredType.name).toBe("void");
         expect(y?.parameters.size).toBe(0);
     });
 

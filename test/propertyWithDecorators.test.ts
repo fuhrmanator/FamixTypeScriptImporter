@@ -56,7 +56,7 @@ describe('Tests for property with decorators', () => {
 
     it("should contain a property 'greeting'", () => {
         expect(fmxRep._getAllEntitiesWithType("Property").size).toBe(1);
-        const theProperty = (Array.from(fmxRep._getFamixClass("{propertyWithDecorators.ts}.Greeter[ClassDeclaration]")?.properties as Set<Property>) as Array<Property>).find((f) => f.getName() === "greeting");
+        const theProperty = (Array.from(fmxRep._getFamixClass("{propertyWithDecorators.ts}.Greeter[ClassDeclaration]")?.properties as Set<Property>) as Array<Property>).find((f) => f.name === "greeting");
         expect(theProperty).toBeTruthy();
     });
 
@@ -64,15 +64,15 @@ describe('Tests for property with decorators', () => {
         expect(fmxRep._getAllEntitiesWithType("Decorator").size).toBe(5);
     });
 
-    const theProperty = (Array.from(fmxRep._getFamixClass("{propertyWithDecorators.ts}.Greeter[ClassDeclaration]")?.properties as Set<Property>) as Array<Property>).find((f) => f.getName() === "greeting");
-    const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@deco");
-    const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@h");
-    const d3 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@o");
-    const d4 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@t");
-    const d5 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@format");
+    const theProperty = (Array.from(fmxRep._getFamixClass("{propertyWithDecorators.ts}.Greeter[ClassDeclaration]")?.properties as Set<Property>) as Array<Property>).find((f) => f.name === "greeting");
+    const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.name === "@deco");
+    const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.name === "@h");
+    const d3 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.name === "@o");
+    const d4 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.name === "@t");
+    const d5 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.name === "@format");
 
     it("should contain a property with five decorators", () => {
-        expect(theProperty?.getDecorators().size).toBe(5);
+        expect(theProperty?.decorators.size).toBe(5);
         expect(d1?.decoratedEntity).toBe(theProperty);
         expect(d2?.decoratedEntity).toBe(theProperty);
         expect(d3?.decoratedEntity).toBe(theProperty);

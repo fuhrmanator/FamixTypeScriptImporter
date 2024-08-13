@@ -19,9 +19,9 @@ describe('Tests for interface inherits interface', () => {
     it("should contain an interface MyInterface2 that extends an interface MyInterface1", () => {
         const cList = Array.from(fmxRep._getAllEntitiesWithType("Interface") as Set<Interface>);
         expect(cList).toBeTruthy();
-        const myInterface1 = cList.find(p => p.getName() === "MyInterface1");
+        const myInterface1 = cList.find(p => p.name === "MyInterface1");
         expect(myInterface1).toBeTruthy();
-        const myInterface2 = cList.find(p => p.getName() === "MyInterface2");
+        const myInterface2 = cList.find(p => p.name === "MyInterface2");
         expect(myInterface2).toBeTruthy();
         if (myInterface2) {
             expect(myInterface2.subInheritances.size).toBe(0);

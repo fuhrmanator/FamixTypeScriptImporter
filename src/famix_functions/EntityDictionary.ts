@@ -95,7 +95,7 @@ export class EntityDictionary {
         // check if famixElement doesn't have a valid fullyQualifiedName
         if (typeof (famixElement as any).getFullyQualifiedName === 'function') {
             // The method exists
-            const fullyQualifiedName = (famixElement as any).getFullyQualifiedName();
+            const fullyQualifiedName = (famixElement as any).fullyQualifiedName;
             if (!fullyQualifiedName || fullyQualifiedName === this.UNKNOWN_VALUE) {
                 throw new Error(`Famix element ${famixElement.constructor.name} has no valid fullyQualifiedName.`);
             }
@@ -199,7 +199,7 @@ export class EntityDictionary {
             else {
                 fmxFile = new Famix.ScriptEntity();
             }
-            fmxFile.setName(fileName);
+            fmxFile.name = fileName;
             fmxFile.setNumberOfLinesOfText(f.getEndLineNumber() - f.getStartLineNumber());
             fmxFile.setNumberOfCharacters(f.getFullText().length);
 
@@ -228,7 +228,7 @@ export class EntityDictionary {
         const moduleName = m.getName();
         if (!this.fmxModuleMap.has(moduleName)) {
             fmxModule = new Famix.Module();
-            fmxModule.setName(moduleName);
+            fmxModule.name = moduleName;
             fmxModule.isAmbient = isAmbient(m);
             fmxModule.isNamespace = isNamespace(m);
             fmxModule.isModule = !fmxModule.isNamespace && !fmxModule.isAmbient;
@@ -259,7 +259,7 @@ export class EntityDictionary {
         const aliasFullyQualifiedName = a.getType().getText(); // FQNFunctions.getFQN(a);
         if (!this.fmxAliasMap.has(aliasFullyQualifiedName)) {
             fmxAlias = new Famix.Alias();
-            fmxAlias.setName(a.getName());
+            fmxAlias.name = a.getName();
             const aliasNameWithGenerics = aliasName + (a.getTypeParameters().length ? ("<" + a.getTypeParameters().map(tp => tp.getName()).join(", ") + ">") : "");
             logger.debug(`> NOTE: alias ${aliasName} has fully qualified name ${aliasFullyQualifiedName} and name with generics ${aliasNameWithGenerics}.`);
 
@@ -299,8 +299,8 @@ export class EntityDictionary {
                 fmxClass = new Famix.Class();
             }
 
-            fmxClass.setName(clsName);
-            fmxClass.setFullyQualifiedName(classFullyQualifiedName);
+            fmxClass.name = clsName;
+            fmxClass.fullyQualifiedName = classFullyQualifiedName;
             fmxClass.isAbstract = isAbstract;
 
             this.makeFamixIndexFileAnchor(cls, fmxClass);
@@ -336,7 +336,7 @@ export class EntityDictionary {
                 fmxInterface = new Famix.Interface();
             }
 
-            fmxInterface.setName(interName);
+            fmxInterface.name = interName;
             initFQN(inter, fmxInterface);
             this.makeFamixIndexFileAnchor(inter, fmxInterface);
 
@@ -361,7 +361,7 @@ export class EntityDictionary {
      */
     public createOrGetFamixConcreteElement(el : Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod, elDeclaration : ClassDeclaration | InterfaceDeclaration | FunctionDeclaration | MethodDeclaration, concreteArguments : any): Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod {
         
-        let fullyQualifiedFilename = el.getFullyQualifiedName();
+        let fullyQualifiedFilename = el.fullyQualifiedName;
         let params = "";
         
         concreteArguments.map((param) => {
@@ -376,7 +376,7 @@ export class EntityDictionary {
 
         if (!this.fmxInterfaceMap.has(fullyQualifiedFilename) && !this.fmxClassMap.has(fullyQualifiedFilename) && !this.fmxFunctionAndMethodMap.has(fullyQualifiedFilename)){
             concElement = _.cloneDeep(el); 
-            concElement.setFullyQualifiedName(fullyQualifiedFilename);
+            concElement.fullyQualifiedName = fullyQualifiedFilename;
             concElement.clearGenericParameters();
             concreteArguments.map((param) => {
                 const parameter = this.createOrGetFamixConcreteType(param);
@@ -416,7 +416,7 @@ export class EntityDictionary {
     public createFamixProperty(property: PropertyDeclaration | PropertySignature): Famix.Property {
         const fmxProperty = new Famix.Property();
         const isSignature = property instanceof PropertySignature;
-        fmxProperty.setName(property.getName());
+        fmxProperty.name = property.getName();
 
         let propTypeName = this.UNKNOWN_VALUE;
         try {
@@ -526,7 +526,7 @@ export class EntityDictionary {
             else {
                 methodName = (method as MethodDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration).getName();
             }
-            fmxMethod.setName(methodName);
+            fmxMethod.name = methodName;
 
             if (!isConstructor) {
                 if (method.getName().substring(0, 1) === "#") {
@@ -542,7 +542,7 @@ export class EntityDictionary {
             }
 
             if (!isSignature) {
-                fmxMethod.cyclomaticComplexity = currentCC[fmxMethod.getName()];
+                fmxMethod.cyclomaticComplexity = currentCC[fmxMethod.name];
             }
             else {
                 fmxMethod.cyclomaticComplexity = 0;
@@ -552,7 +552,7 @@ export class EntityDictionary {
             try {
                 methodTypeName = method.getReturnType().getText().trim();            
             } catch (error) {
-                logger.error(`> WARNING: got exception ${error}. Failed to get usable name for return type of method: ${fmxMethod.getName()}. Continuing...`);
+                logger.error(`> WARNING: got exception ${error}. Failed to get usable name for return type of method: ${fmxMethod.name}. Continuing...`);
             }
 
             const fmxType = this.createOrGetFamixType(methodTypeName, method);
@@ -601,15 +601,15 @@ export class EntityDictionary {
             }
     
             if (func.getName()) {
-                fmxFunction.setName(func.getName());
+                fmxFunction.name = func.getName();
             }
             else {
-                fmxFunction.setName("anonymous");
+                fmxFunction.name = "anonymous";
             }
 
             fmxFunction.signature = Helpers.computeSignature(func.getText());
-            fmxFunction.cyclomaticComplexity = currentCC[fmxFunction.getName()];
-            fmxFunction.setFullyQualifiedName(functionFullyQualifiedName);
+            fmxFunction.cyclomaticComplexity = currentCC[fmxFunction.name];
+            fmxFunction.fullyQualifiedName = functionFullyQualifiedName;
     
             let functionTypeName = this.UNKNOWN_VALUE;
             try {
@@ -656,7 +656,7 @@ export class EntityDictionary {
 
         const fmxType = this.createOrGetFamixType(paramTypeName, param);
         fmxParam.setDeclaredType(fmxType);
-        fmxParam.setName(param.getName());
+        fmxParam.name = param.getName();
 
         initFQN(param, fmxParam);
         this.makeFamixIndexFileAnchor(param, fmxParam);
@@ -677,7 +677,7 @@ export class EntityDictionary {
         
         const fmxParameterType = new Famix.ParameterType();
    
-        fmxParameterType.setName(tp.getName());      
+        fmxParameterType.name = tp.getName();      
         initFQN(tp, fmxParameterType);
         this.makeFamixIndexFileAnchor(tp, fmxParameterType);
 
@@ -740,7 +740,7 @@ export class EntityDictionary {
                     fmxParameterType = new Famix.ParameterType();
                 } 
     
-                fmxParameterType.setName(parameterTypeName);
+                fmxParameterType.name = parameterTypeName;
                 this.famixRep.addElement(fmxParameterType);
                 this.fmxTypeMap.set(parameterTypeName, fmxParameterType);
                 this.fmxElementObjectMap.set(fmxParameterType,typeParameterDeclaration);
@@ -770,7 +770,7 @@ export class EntityDictionary {
     
         const fmxType = this.createOrGetFamixType(variableTypeName, variable);
         fmxVariable.setDeclaredType(fmxType);
-        fmxVariable.setName(variable.getName());
+        fmxVariable.name = variable.getName();
         initFQN(variable, fmxVariable);
         this.makeFamixIndexFileAnchor(variable, fmxVariable);
     
@@ -788,7 +788,7 @@ export class EntityDictionary {
      */
     public createFamixEnum(enumEntity: EnumDeclaration): Famix.Enum {
         const fmxEnum = new Famix.Enum();
-        fmxEnum.setName(enumEntity.getName());
+        fmxEnum.name = enumEntity.getName();
         initFQN(enumEntity, fmxEnum);
         this.makeFamixIndexFileAnchor(enumEntity, fmxEnum);
 
@@ -816,7 +816,7 @@ export class EntityDictionary {
 
         const fmxType = this.createOrGetFamixType(enumValueTypeName, enumMember);
         fmxEnumValue.setDeclaredType(fmxType);
-        fmxEnumValue.setName(enumMember.getName());
+        fmxEnumValue.name = enumMember.getName();
         initFQN(enumMember, fmxEnumValue);
         this.makeFamixIndexFileAnchor(enumMember, fmxEnumValue);
 
@@ -838,7 +838,7 @@ export class EntityDictionary {
         const decoratorName = "@" + decorator.getName();
         const decoratorExpression = decorator.getText().substring(1);
 
-        fmxDecorator.setName(decoratorName);
+        fmxDecorator.name = decoratorName;
         fmxDecorator.decoratorExpression = decoratorExpression;
         const decoratedEntityFullyQualifiedName = FQNFunctions.getFQN(decoratedEntity);
         const fmxDecoratedEntity = this.famixRep.getFamixEntityByFullyQualifiedName(decoratedEntityFullyQualifiedName) as Famix.NamedEntity;
@@ -861,7 +861,7 @@ export class EntityDictionary {
      * @returns The Famix model of the comment
      */
     public createFamixComment(comment: CommentRange, fmxScope: Famix.NamedEntity, isJSDoc: boolean): Famix.Comment {
-        logger.debug(`> NOTE: creating comment ${comment.getText()} in scope ${fmxScope.getName()}.`);
+        logger.debug(`> NOTE: creating comment ${comment.getText()} in scope ${fmxScope.name}.`);
         const fmxComment = new Famix.Comment();
         fmxComment.container = fmxScope;  // adds comment to the container's comments collection
         fmxComment.isJSDoc = isJSDoc;
@@ -929,7 +929,7 @@ export class EntityDictionary {
                 fmxType = new Famix.Type();
             }
 
-            fmxType.setName(typeName);
+            fmxType.name = typeName;
             fmxType.setContainer(ancestor);
             initFQN(element, fmxType);
             this.makeFamixIndexFileAnchor(element, fmxType);
@@ -958,7 +958,7 @@ export class EntityDictionary {
             throw new Error(`Famix entity with id ${id} not found, for node ${node.getText()} in ${node.getSourceFile().getBaseName()} at line ${node.getStartLineNumber()}.`);
         }
 
-        logger.debug(`Creating FamixAccess. Node: [${node.getKindName()}] '${node.getText()}' at line ${node.getStartLineNumber()} in ${node.getSourceFile().getBaseName()}, id: ${id} refers to fmxVar '${fmxVar.getFullyQualifiedName()}'.`);
+        logger.debug(`Creating FamixAccess. Node: [${node.getKindName()}] '${node.getText()}' at line ${node.getStartLineNumber()} in ${node.getSourceFile().getBaseName()}, id: ${id} refers to fmxVar '${fmxVar.fullyQualifiedName}'.`);
 
         const nodeReferenceAncestor = Helpers.findAncestor(node);
         const ancestorFullyQualifiedName = FQNFunctions.getFQN(nodeReferenceAncestor);
@@ -1052,8 +1052,8 @@ export class EntityDictionary {
 
             this.fmxElementObjectMap.set(superClass,inhClass);
 
-            superClass.setName(inhClassName);
-            superClass.setFullyQualifiedName(inhClassFullyQualifiedName);
+            superClass.name = inhClassName;
+            superClass.fullyQualifiedName = inhClassFullyQualifiedName;
             superClass.setIsStub(true);
 
             this.makeFamixIndexFileAnchor(inhClass, superClass);
@@ -1116,11 +1116,11 @@ export class EntityDictionary {
             }
             if (importedEntity === undefined) {
                 importedEntity = new Famix.NamedEntity();
-                importedEntity.setName(importedEntityName);
+                importedEntity.name = importedEntityName;
                 if (!isInExports) {
                     importedEntity.setIsStub(true);
                 }
-                importedEntity.setFullyQualifiedName(pathName);
+                importedEntity.fullyQualifiedName = pathName;
                 this.makeFamixIndexFileAnchor(importElement, importedEntity);
                 // must add entity to repository
                 this.famixRep.addElement(importedEntity);
@@ -1132,18 +1132,18 @@ export class EntityDictionary {
             importedEntityName = importDeclaration?.getName();
             pathName = pathName + importedEntityName;
             importedEntity = new Famix.StructuralEntity();
-            importedEntity.setName(importedEntityName);
+            importedEntity.name = importedEntityName;
             initFQN(importDeclaration, importedEntity);
             this.makeFamixIndexFileAnchor(importElement, importedEntity);
-            importedEntity.setFullyQualifiedName(pathName);
+            importedEntity.fullyQualifiedName = pathName;
             const anyType = this.createOrGetFamixType('any', undefined);
             (importedEntity as Famix.StructuralEntity).setDeclaredType(anyType);
         } else {  // default imports, e.g. import ClassW from "./complexExportModule";  
             importedEntityName = importElement.getText();
             pathName = pathName + (isDefaultExport ? "defaultExport" : "namespaceExport");
             importedEntity = new Famix.NamedEntity();
-            importedEntity.setName(importedEntityName);
-            importedEntity.setFullyQualifiedName(pathName);
+            importedEntity.name = importedEntityName;
+            importedEntity.fullyQualifiedName = pathName;
             this.makeFamixIndexFileAnchor(importElement, importedEntity);
         }
         // I don't think it should be added to the repository if it exists already
@@ -1158,8 +1158,8 @@ export class EntityDictionary {
             fmxImportClause.moduleSpecifier = importDeclaration?.getModuleSpecifierValue() as string;
         }
     
-        logger.debug(`createFamixImportClause: ${fmxImportClause.importedEntity?.getName()} (of type ${
-            Helpers.getSubTypeName(fmxImportClause.importedEntity)}) is imported by ${fmxImportClause.importingEntity?.getName()}`);
+        logger.debug(`createFamixImportClause: ${fmxImportClause.importedEntity?.name} (of type ${
+            Helpers.getSubTypeName(fmxImportClause.importedEntity)}) is imported by ${fmxImportClause.importingEntity?.name}`);
 
         fmxImporter.addOutgoingImport(fmxImportClause);
 
@@ -1198,17 +1198,17 @@ export class EntityDictionary {
         }
 
         if (functionName) {
-            fmxArrowFunction.setName(functionName);
+            fmxArrowFunction.name = functionName;
         }
         else {
-            fmxArrowFunction.setName("anonymous");
+            fmxArrowFunction.name = "anonymous";
         }
 
         // Signature of an arrow function is (parameters) => return_type
         const parametersSignature = arrowFunction.getParameters().map(p => p.getText()).join(", ");
         const returnTypeSignature = arrowFunction.getReturnType().getText();
         fmxArrowFunction.signature = `(${parametersSignature}) => ${returnTypeSignature}`;
-        fmxArrowFunction.cyclomaticComplexity = currentCC[fmxArrowFunction.getName()];
+        fmxArrowFunction.cyclomaticComplexity = currentCC[fmxArrowFunction.name];
 
         let functionTypeName = this.UNKNOWN_VALUE;
         try {
@@ -1266,12 +1266,12 @@ export class EntityDictionary {
         let fmxParameterConcretisation : Famix.ParameterConcretisation;
 
         for (let i = 0; i < genericParameters.size; i++) {
-            const conClassTypeParameter = conClassTypeParametersIterator.next().value;
-            const genClassTypeParameter = genClassTypeParametersIterator.next().value;
+            const conClassTypeParameter = conClassTypeParametersIterator.next().value as Famix.ParameterType;
+            const genClassTypeParameter = genClassTypeParametersIterator.next().value as Famix.ParameterType;
             let createParameterConcretisation : boolean = true;
-            if(conClassTypeParameter && genClassTypeParameter && conClassTypeParameter.getName() != genClassTypeParameter.getName()){
+            if(conClassTypeParameter && genClassTypeParameter && conClassTypeParameter.name != genClassTypeParameter.name){
                 parameterConcretisations.forEach((param : Famix.ParameterConcretisation) => {
-                    if (conClassTypeParameter.getName() == param.getConcreteParameter().getName() && genClassTypeParameter.getName() == param.getGenericParameter().getName()) {
+                    if (conClassTypeParameter.name == param.getConcreteParameter().name && genClassTypeParameter.name == param.getGenericParameter().name) {
                         createParameterConcretisation = false;
                         fmxParameterConcretisation = param;
                     }
@@ -1336,7 +1336,7 @@ export class EntityDictionary {
                         const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
                         let createConcretisation : boolean = true;
                         concretisations.forEach((conc : Famix.Concretisation) => {
-                            if (genEntity.getFullyQualifiedName() == conc.genericEntity.getFullyQualifiedName() && conc.concreteEntity.getFullyQualifiedName() == conEntity.getFullyQualifiedName()){
+                            if (genEntity.fullyQualifiedName == conc.genericEntity.fullyQualifiedName && conc.concreteEntity.fullyQualifiedName == conEntity.fullyQualifiedName){
                                 createConcretisation = false;
                             }
                         });
@@ -1377,7 +1377,7 @@ export class EntityDictionary {
                         const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
                         let createConcretisation : boolean = true;
                         concretisations.forEach((conc : Famix.Concretisation) => {
-                            if (genEntity.getFullyQualifiedName() == conc.genericEntity.getFullyQualifiedName() && conc.concreteEntity.getFullyQualifiedName() == conEntity.getFullyQualifiedName()){
+                            if (genEntity.fullyQualifiedName == conc.genericEntity.fullyQualifiedName && conc.concreteEntity.fullyQualifiedName == conEntity.fullyQualifiedName){
                                 createConcretisation = false;
                             }
                         });
@@ -1422,7 +1422,7 @@ export class EntityDictionary {
                                 const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
                                 let createConcretisation : boolean = true;
                                 concretisations.forEach((conc : Famix.Concretisation) => {
-                                    if (genElement.getFullyQualifiedName() == conc.genericEntity.getFullyQualifiedName() && conc.concreteEntity.getFullyQualifiedName() == concElement.getFullyQualifiedName()){
+                                    if (genElement.fullyQualifiedName == conc.genericEntity.fullyQualifiedName && conc.concreteEntity.fullyQualifiedName == concElement.fullyQualifiedName){
                                         createConcretisation = false;
                                     }
                                 });
@@ -1461,7 +1461,7 @@ export class EntityDictionary {
                     const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
                     let createConcretisation : boolean = true;
                     concretisations.forEach((conc : Famix.Concretisation) => {
-                        if (genInterface.getFullyQualifiedName() == conc.genericEntity.getFullyQualifiedName() && conc.concreteEntity.getFullyQualifiedName() == conInterface.getFullyQualifiedName()){
+                        if (genInterface.fullyQualifiedName == conc.genericEntity.fullyQualifiedName && conc.concreteEntity.fullyQualifiedName == conInterface.fullyQualifiedName){
                             createConcretisation = false;
                         }
                     });
@@ -1506,7 +1506,7 @@ export class EntityDictionary {
                                 const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
                                 let createConcretisation : boolean = true;
                                 concretisations.forEach((conc : Famix.Concretisation) => {
-                                    if (genElement.getFullyQualifiedName() == conc.genericEntity.getFullyQualifiedName() && conc.concreteEntity.getFullyQualifiedName() == concElement.getFullyQualifiedName()){
+                                    if (genElement.fullyQualifiedName == conc.genericEntity.fullyQualifiedName && conc.concreteEntity.fullyQualifiedName == concElement.fullyQualifiedName){
                                         createConcretisation = false;
                                     }
                                 });
@@ -1531,7 +1531,7 @@ function initFQN(sourceElement: TSMorphObjectType, famixElement: Famix.SourcedEn
     if (!(sourceElement instanceof CommentRange)) {
         const fqn = FQNFunctions.getFQN(sourceElement);
         logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-        (famixElement as Famix.NamedEntity).setFullyQualifiedName(fqn);
+        (famixElement as Famix.NamedEntity).fullyQualifiedName = fqn;
     }
 }
 

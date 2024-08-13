@@ -24,18 +24,18 @@ describe('Tests for generic interface', () => {
     });
 
     it("should contain a generic interface MyInterface", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).name);
         expect(listOfNames).toContain("MyInterface");
     });
 
     it("should contain a generic interface MyInterface with a type parameter T", () => {
         const pList = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface") as Set<ParametricInterface>);
         expect(pList).toBeTruthy();
-        const MyInterface = pList.find(p => p.getName() === "MyInterface");
+        const MyInterface = pList.find(p => p.name === "MyInterface");
         expect(MyInterface).toBeTruthy();
         expect(MyInterface?.genericParameters.size).toBe(1);
         if (MyInterface) {
-            expect((Array.from(MyInterface.genericParameters)[0] as ParameterType).getName()).toBe("T");
+            expect((Array.from(MyInterface.genericParameters)[0] as ParameterType).name).toBe("T");
         }
     });
 });

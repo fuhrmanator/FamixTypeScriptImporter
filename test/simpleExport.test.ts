@@ -21,8 +21,8 @@ describe('Tests for simple exported variable', () => {
     it(`should have the variable in exporter1.ts`, () => {
         const hasBigIntVariable = variables.values().next().value as Variable;
         expect(hasBigIntVariable).toBeTruthy();
-        expect(hasBigIntVariable.getName()).toBe("hasBigInt");
-        expect(hasBigIntVariable.getFullyQualifiedName()).toBe("{test_src/exporter1.ts}.hasBigInt[VariableDeclaration]");
+        expect(hasBigIntVariable.name).toBe("hasBigInt");
+        expect(hasBigIntVariable.fullyQualifiedName).toBe("{test_src/exporter1.ts}.hasBigInt[VariableDeclaration]");
     });
 
 });

@@ -32,24 +32,24 @@ describe('Tests for function returns function', () => {
     const theFunction = Array.from(functionList)[0] as FamixFunctionEntity;
     it("should contain a function 'deco'", () => {
         expect(theFunction).toBeTruthy();
-        expect(theFunction?.getName()).toBe('deco');
+        expect(theFunction?.name).toBe('deco');
     });
 
     const theFunction2 = Array.from(functionList)[1] as FamixFunctionEntity;
     it("should contain a function 'fct'", () => {
         expect(theFunction2).toBeTruthy();
-        expect(theFunction2?.getName()).toBe('fct');
+        expect(theFunction2?.name).toBe('fct');
     });
 
     const theFunction3 = Array.from(functionList)[2] as FamixFunctionEntity;
     it("should contain a function 'logMethod'", () => {
         expect(theFunction3).toBeTruthy();
-        expect(theFunction3?.getName()).toBe('logMethod');
+        expect(theFunction3?.name).toBe('logMethod');
     });
 
     const theFunction4 = Array.from(functionList)[3] as FamixFunctionEntity;
     it("should contain a function 'anonymous'", () => {
         expect(theFunction4).toBeTruthy();
-        expect(theFunction4?.getName()).toBe('anonymous');
+        expect(theFunction4?.name).toBe('anonymous');
     });
 });

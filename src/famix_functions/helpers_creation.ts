@@ -45,7 +45,7 @@ export function getSubTypeName(fmxNamedEntity: Famix.NamedEntity) {
                                                 fmxNamedEntity instanceof Famix.Parameter ? 'Parameter' :
                                                     fmxNamedEntity instanceof Famix.Property ? 'Property' :
                                                         'NamedEntity';
-    logger.debug(`${fmxNamedEntity.getName()} is of type ${name}`);
+    logger.debug(`${fmxNamedEntity.name} is of type ${name}`);
     return name;
 }
 

@@ -28,7 +28,7 @@ describe('Tests for invocation with function', () => {
     it("should contain a variable 'x1'", () => {
         const pList = Array.from(fmxRep._getAllEntitiesWithType("Variable") as Set<Variable>);
         expect(pList).toBeTruthy();
-        const x1 = pList.find(p => p.getName() === "x1");
+        const x1 = pList.find(p => p.name === "x1");
         expect(x1).toBeTruthy();
     });
     

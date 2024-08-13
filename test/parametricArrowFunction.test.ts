@@ -1,4 +1,5 @@
 import { Importer } from '../src/analyze';
+import { Parameter, ParametricArrowFunction } from '../src/lib/famix/src/model/famix';
 import { project } from './testUtils';
 
 const importer = new Importer();
@@ -13,17 +14,17 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('ArrowFunctions', () => {
 
-    const functionList = fmxRep._getAllEntitiesWithType('ParametricArrowFunction');
+    const functionList = fmxRep._getAllEntitiesWithType('ParametricArrowFunction') as Set<ParametricArrowFunction>;
     
     it("should have 1 parametric Arrow Function", () => {
         expect(functionList?.size).toBe(1);
     });
 
-    const theFunction = functionList.values().next().value;
+    const theFunction = functionList.values().next().value as ParametricArrowFunction;
     it("should contain arrow function arrayLength", () => {
         expect(theFunction).toBeTruthy();
-        expect(theFunction?.declaredType.getName()).toBe("number");
-        expect(theFunction?.getFullyQualifiedName()).toBe("{parametricArrowFunctions.ts}.arrayLength.ArrowFunction(2:25)[ArrowFunction]");
+        expect(theFunction?.declaredType.name).toBe("number");
+        expect(theFunction?.fullyQualifiedName).toBe("{parametricArrowFunctions.ts}.arrayLength.ArrowFunction(2:25)[ArrowFunction]");
     });
 
     it("should contain a parametric arrow function arrayLength", () => {
@@ -31,7 +32,7 @@ describe('ArrowFunctions', () => {
     });
 
     it("should return number", () => {
-        expect(theFunction?.declaredType.getName()).toBe("number");
+        expect(theFunction?.declaredType.name).toBe("number");
     });
 
     it("should have one parameter", () => {
@@ -39,7 +40,8 @@ describe('ArrowFunctions', () => {
     });
 
     it("should contain a type parameter T", () => {
-        expect(theFunction?.genericParameters?.values().next().value.getName()).toBe('T')
+        const parameter = theFunction?.genericParameters.values().next().value as Parameter;
+        expect(parameter.name).toBe('T')
     });
 
 });

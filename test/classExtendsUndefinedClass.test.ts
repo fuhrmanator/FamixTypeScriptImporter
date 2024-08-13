@@ -21,10 +21,10 @@ describe.skip('Tests for class extends undefined class', () => {
     it("should contain a class MyClass that extends a class ClassDeclaration", () => {
         const cList = Array.from(fmxRep._getAllEntitiesWithType("Class") as Set<Interface>);
         expect(cList).toBeTruthy();
-        const myClass1 = cList.find(p => p.getName() === "ClassDeclaration");
+        const myClass1 = cList.find(p => p.name === "ClassDeclaration");
         expect(myClass1).toBeTruthy();
         expect(myClass1?.getIsStub()).toBe(true);
-        const myClass2 = cList.find(p => p.getName() === "MyClass");
+        const myClass2 = cList.find(p => p.name === "MyClass");
         expect(myClass2).toBeTruthy();
         if (myClass2) {
             expect(myClass2.subInheritances.size).toBe(0);

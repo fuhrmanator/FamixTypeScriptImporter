@@ -26,11 +26,11 @@ describe('Tests for generic class inherits interface', () => {
     it("should contain a generic class MyDao that implements a generic interface MyDaoInterface", () => {
         const cList = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass") as Set<ParametricClass>);
         expect(cList).toBeTruthy();
-        const myDao = cList.find(p => p.getName() === "MyDao");
+        const myDao = cList.find(p => p.name === "MyDao");
         expect(myDao).toBeTruthy();
         const iList = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface") as Set<ParametricInterface>);
         expect(iList).toBeTruthy();
-        const myDaoInterface = iList.find(p => p.getName() === "MyDaoInterface");
+        const myDaoInterface = iList.find(p => p.name === "MyDaoInterface");
         expect(myDaoInterface).toBeTruthy();
         if (myDao) {
             expect(myDao.subInheritances.size).toBe(0);

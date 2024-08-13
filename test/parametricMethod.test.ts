@@ -30,7 +30,7 @@ describe('Tests for generics', () => {
     });
  
     it("should contain a ParametricClass ClassParametric", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass")).map(e => (e as ParametricClass).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass")).map(e => (e as ParametricClass).name);
         expect(listOfNames).toContain("ClassParametric");
     });
 
@@ -46,7 +46,7 @@ describe('Tests for generics', () => {
     });
 
     it("should contain a ParametricMethod methodParametric", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod")).map(e => (e as ParametricClass).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod")).map(e => (e as ParametricClass).name);
         expect(listOfNames).toContain("methodParametric");
     });
 
@@ -55,16 +55,16 @@ describe('Tests for generics', () => {
     });
 
     it("should contain a Famix Method methodNotParametric", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("Method")).map(e => (e as ParametricClass).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("Method")).map(e => (e as ParametricClass).name);
         expect(listOfNames).toContain("methodNotParametric");
     });
 
     it("should contain a ParametricMethod methodParametric with type parameter V", () => {
         const pmList = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod") as Set<ParametricMethod>)
         expect(pmList).toBeTruthy();
-        const parametricMethod = pmList.find(m => m.getName() === "methodParametric");
+        const parametricMethod = pmList.find(m => m.name === "methodParametric");
         const parameterTypes = parametricMethod?.genericParameters;
-        expect(parameterTypes?.values().next().value.getName()).toBe('V')
+        expect(parameterTypes?.values().next().value.name).toBe('V')
     });
 
 });

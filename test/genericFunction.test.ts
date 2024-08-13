@@ -26,14 +26,14 @@ describe('Tests for generics', () => {
     it("should contain a generic function fun with type parameter T", () => {
         const fList = Array.from(fmxRep._getAllEntitiesWithType("ParametricFunction") as Set<ParametricFunction>);
         expect(fList).toBeTruthy();
-        const func =fList.find(f => f.getName() === "func");
+        const func =fList.find(f => f.name === "func");
         expect(func).toBeTruthy();
-        expect(func?.declaredType.getName()).toBe("T");
+        expect(func?.declaredType.name).toBe("T");
         expect(func?.parameters.size).toBe(1);
         const pList = Array.from(func?.parameters as Set<Parameter>);
-        const arg = pList?.find(p => p.getName() === "arg");
+        const arg = pList?.find(p => p.name === "arg");
         expect(arg).toBeTruthy();
-        expect(arg?.getDeclaredType().getName()).toBe("T");
+        expect(arg?.getDeclaredType().name).toBe("T");
     });
 
 });
