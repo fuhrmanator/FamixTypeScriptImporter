@@ -200,8 +200,8 @@ export class EntityDictionary {
                 fmxFile = new Famix.ScriptEntity();
             }
             fmxFile.name = fileName;
-            fmxFile.setNumberOfLinesOfText(f.getEndLineNumber() - f.getStartLineNumber());
-            fmxFile.setNumberOfCharacters(f.getFullText().length);
+            fmxFile.numberOfLinesOfText = f.getEndLineNumber() - f.getStartLineNumber();
+            fmxFile.numberOfCharacters = f.getFullText().length;
 
             initFQN(f, fmxFile);
 
