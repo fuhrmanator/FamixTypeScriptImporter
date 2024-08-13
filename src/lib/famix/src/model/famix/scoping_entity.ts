@@ -16,7 +16,7 @@ export class ScopingEntity extends ContainerEntity {
     if (!this.childModules.has(childModule)) {
       logger.debug("Adding module " + childModule.getName() + " to " + this.getName());
       this.childModules.add(childModule);
-      childModule.setParentScope(this);
+      childModule.parentScope = this;
     } else {
       logger.debug("Module " + childModule.getName() + " already added to " + this.getName());
     }

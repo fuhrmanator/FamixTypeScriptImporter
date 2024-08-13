@@ -5,93 +5,91 @@ import { ScriptEntity } from "./script_entity";
 
 export class Module extends ScriptEntity {
 
-
     /**
      * Getter $isAmbient
      * @return {boolean }
      */
-	public get $isAmbient(): boolean  {
-		return this.isAmbient;
-	}
+    public get isAmbient() {
+        return this._isAmbient;
+    }
 
     /**
      * Setter $isAmbient
      * @param {boolean } value
      */
-	public set $isAmbient(value: boolean ) {
-		this.isAmbient = value;
-	}
+    public set isAmbient(value: boolean) {
+        this._isAmbient = value;
+    }
 
-  private isAmbient: boolean = false;
+    private _isAmbient: boolean = false;
 
     /**
      * Getter $isNamespace
      * @return {boolean }
      */
-	public get $isNamespace(): boolean  {
-		return this.isNamespace;
-	}
+    public get isNamespace() {
+        return this._isNamespace;
+    }
 
     /**
      * Setter $isNamespace
      * @param {boolean } value
      */
-	public set $isNamespace(value: boolean ) {
-		this.isNamespace = value;
-	}
-  private isNamespace: boolean = false;
+    public set isNamespace(value: boolean) {
+        this._isNamespace = value;
+    }
+    private _isNamespace: boolean = false;
 
     /**
      * Getter $isModule
      * @return {boolean }
      */
-	public get $isModule(): boolean  {
-		return this.isModule;
-	}
+    public get isModule() {
+        return this._isModule;
+    }
 
     /**
      * Setter $isModule
      * @param {boolean } value
      */
-	public set $isModule(value: boolean ) {
-		this.isModule = value;
-	}
-  
-  private isModule: boolean = true;
-
-  private parentScope: ScopingEntity;
-
-  public getParentScope(): ScopingEntity {
-    return this.parentScope;
-  }
-
-  public setParentScope(parentScope: ScopingEntity): void {
-    this.parentScope = parentScope;
-    parentScope.addModule(this);
-  }
-
-  // incomingImports are in NamedEntity
-  private outgoingImports: Set<ImportClause> = new Set();
-  
-  getOutgoingImports() {
-    return this.outgoingImports;
-  }
-
-  addOutgoingImport(importClause: ImportClause) {
-    if (!this.outgoingImports.has(importClause)) {
-      this.outgoingImports.add(importClause);
-      importClause.importingEntity = this;  // opposite
+    public set isModule(value: boolean) {
+        this._isModule = value;
     }
-  }
 
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("Module", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
+    private _isModule: boolean = true;
 
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("outgoingImports", this.getOutgoingImports());
-  }
+    private _parentScope: ScopingEntity;
+    // incomingImports are in NamedEntity
+    private _outgoingImports: Set<ImportClause> = new Set();
+
+    addOutgoingImport(importClause: ImportClause) {
+        if (!this._outgoingImports.has(importClause)) {
+            this._outgoingImports.add(importClause);
+            importClause.importingEntity = this;  // opposite
+        }
+    }
+
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("Module", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
+
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("outgoingImports", this.outgoingImports);
+    }
+
+    get parentScope() {
+        return this._parentScope;
+    }
+
+    set parentScope(parentScope: ScopingEntity) {
+        this._parentScope = parentScope;
+        parentScope.addModule(this);
+    }
+
+    get outgoingImports() {
+        return this._outgoingImports;
+    }
 }

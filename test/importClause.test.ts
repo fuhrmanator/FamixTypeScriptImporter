@@ -138,9 +138,9 @@ describe('Tests for import clauses', () => {
     it("should contain one outgoingImports element for module oneClassImporter.ts", () => {
         const importerModule = moduleList.find(e => e.getName() === 'oneClassImporter.ts');
         expect(importerModule).toBeTruthy();
-        expect(importerModule?.getOutgoingImports()).toBeTruthy();
-        expect(importerModule?.getOutgoingImports()?.size).toBe(1);
-        expect(importerModule?.getOutgoingImports()?.values().next().value.importedEntity?.getName()).toBe("ExportedClass");
+        expect(importerModule?.outgoingImports).toBeTruthy();
+        expect(importerModule?.outgoingImports?.size).toBe(1);
+        expect(importerModule?.outgoingImports?.values().next().value.importedEntity?.getName()).toBe("ExportedClass");
     });
 
     it("should contain one imports element for module oneClassExporter.ts", () => {

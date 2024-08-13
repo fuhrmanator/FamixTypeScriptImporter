@@ -229,9 +229,9 @@ export class EntityDictionary {
         if (!this.fmxModuleMap.has(moduleName)) {
             fmxModule = new Famix.Module();
             fmxModule.setName(moduleName);
-            fmxModule.$isAmbient = isAmbient(m);
-            fmxModule.$isNamespace = isNamespace(m);
-            fmxModule.$isModule = !fmxModule.$isNamespace && !fmxModule.$isAmbient;
+            fmxModule.isAmbient = isAmbient(m);
+            fmxModule.isNamespace = isNamespace(m);
+            fmxModule.isModule = !fmxModule.isNamespace && !fmxModule.isAmbient;
 
             initFQN(m, fmxModule);
             this.makeFamixIndexFileAnchor(m, fmxModule);

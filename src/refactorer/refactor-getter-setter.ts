@@ -1,8 +1,8 @@
-import { Project, PropertyDeclaration, SyntaxKind } from "ts-morph";
+import { Project, SyntaxKind } from "ts-morph";
 import * as path from "path";
 
 const project = new Project();
-project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/method.ts");
+project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/module.ts");
 project.getSourceFiles().forEach(sourceFile => { console.log(sourceFile.getFilePath()); });
 
 project.getSourceFiles().forEach(sourceFile => {
