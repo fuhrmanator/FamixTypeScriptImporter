@@ -63,7 +63,7 @@ describe('Tests for invocation', () => {
         expect(invocations.length).toBe(1);
         const candidates = invocations.filter(i => {
             const invocation = i as Invocation;
-            return invocation.getCandidates().has(theMethod);
+            return invocation.candidates.has(theMethod);
         });
         expect(candidates).toHaveLength(1);
     });
@@ -73,8 +73,8 @@ describe('Tests for invocation', () => {
         const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
-        expect((invocations[0] as Invocation).getSender()).toBeTruthy();
-        expect((invocations[0] as Invocation).getSender()).toBe(fmxRep._getFamixMethod("{invocation.ts}.B.y[MethodDeclaration]"));
+        expect((invocations[0] as Invocation).sender).toBeTruthy();
+        expect((invocations[0] as Invocation).sender).toBe(fmxRep._getFamixMethod("{invocation.ts}.B.y[MethodDeclaration]"));
     });
 
     it("should contain an invocation for x with a receiver 'A'", () => {
@@ -82,8 +82,8 @@ describe('Tests for invocation', () => {
         const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
-        expect((invocations[0] as Invocation).getReceiver()).toBeTruthy();
-        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{invocation.ts}.A[ClassDeclaration]"));
+        expect((invocations[0] as Invocation).receiver).toBeTruthy();
+        expect((invocations[0] as Invocation).receiver).toBe(fmxRep._getFamixClass("{invocation.ts}.A[ClassDeclaration]"));
     });
 
     it("should contain an invocation for x with a signature 'public x(): void'", () => {
@@ -91,7 +91,7 @@ describe('Tests for invocation', () => {
         const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
-        expect((invocations[0] as Invocation).getSignature()).toBeTruthy();
-        expect((invocations[0] as Invocation).getSignature()).toBe('public x(): void');
+        expect((invocations[0] as Invocation).signature).toBeTruthy();
+        expect((invocations[0] as Invocation).signature).toBe('public x(): void');
     });
 });

@@ -36,14 +36,14 @@ describe('Tests for invocation with variable', () => {
     });
 
     it("should contain an invocation for 'method'", () => {
-        expect((invocations[0] as Invocation).getCandidates().has(theMethod));
+        expect((invocations[0] as Invocation).candidates.has(theMethod));
     });
 
     it("should contain an invocation with a sender 'invocationWithVariable.ts'", () => {
-        expect((invocations[0] as Invocation).getSender()).toBe(fmxRep._getFamixFile("invocationWithVariable.ts"));
+        expect((invocations[0] as Invocation).sender).toBe(fmxRep._getFamixFile("invocationWithVariable.ts"));
     });
 
     it("should contain an invocation with a receiver 'AAA'", () => {
-        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{invocationWithVariable.ts}.AAA[ClassDeclaration]"));
+        expect((invocations[0] as Invocation).receiver).toBe(fmxRep._getFamixClass("{invocationWithVariable.ts}.AAA[ClassDeclaration]"));
     });
 });

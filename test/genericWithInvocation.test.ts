@@ -46,7 +46,7 @@ describe('Tests for generics', () => {
         expect(invocations.length).toBe(1);
         const candidates = invocations.filter(i => {
             const invocation = i as Invocation;
-            return invocation.getCandidates().has(theMethod);
+            return invocation.candidates.has(theMethod);
         });
         expect(candidates).toHaveLength(1);
     });
@@ -56,8 +56,8 @@ describe('Tests for generics', () => {
         const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
-        expect((invocations[0] as Invocation).getSender()).toBeTruthy();
-        expect((invocations[0] as Invocation).getSender()).toBe(fmxRep._getFamixFile("genericWithInvocation.ts"));
+        expect((invocations[0] as Invocation).sender).toBeTruthy();
+        expect((invocations[0] as Invocation).sender).toBe(fmxRep._getFamixFile("genericWithInvocation.ts"));
     });
 
     it("should contain an invocation for i with a receiver 'AA'", () => {
@@ -65,8 +65,8 @@ describe('Tests for generics', () => {
         const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
-        expect((invocations[0] as Invocation).getReceiver()).toBeTruthy();
-        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{genericWithInvocation.ts}.AA[ClassDeclaration]"));
+        expect((invocations[0] as Invocation).receiver).toBeTruthy();
+        expect((invocations[0] as Invocation).receiver).toBe(fmxRep._getFamixClass("{genericWithInvocation.ts}.AA[ClassDeclaration]"));
     });
 
     it("should contain an invocation for i with a signature 'public i<T> (j: T): void'", () => {
@@ -74,7 +74,7 @@ describe('Tests for generics', () => {
         const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBe(1);
-        expect((invocations[0] as Invocation).getSignature()).toBeTruthy();
-        expect((invocations[0] as Invocation).getSignature()).toBe('public i<T> (j: T): void');
+        expect((invocations[0] as Invocation).signature).toBeTruthy();
+        expect((invocations[0] as Invocation).signature).toBe('public i<T> (j: T): void');
     });
 });

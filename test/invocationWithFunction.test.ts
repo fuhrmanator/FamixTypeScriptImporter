@@ -41,14 +41,14 @@ describe('Tests for invocation with function', () => {
     });
 
     it("should contain an invocation for 'func'", () => {
-        expect((invocations[0] as Invocation).getCandidates().has(theFunction));
+        expect((invocations[0] as Invocation).candidates.has(theFunction));
     });
 
     it("should contain an invocation with a sender 'invocationWithFunction.ts'", () => {
-        expect((invocations[0] as Invocation).getSender()).toBe(fmxRep._getFamixFile("invocationWithFunction.ts"));
+        expect((invocations[0] as Invocation).sender).toBe(fmxRep._getFamixFile("invocationWithFunction.ts"));
     });
 
     it("should contain an invocation with a receiver 'invocationWithFunction.ts'", () => {
-        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixFile("invocationWithFunction.ts"));
+        expect((invocations[0] as Invocation).receiver).toBe(fmxRep._getFamixFile("invocationWithFunction.ts"));
     });
 });

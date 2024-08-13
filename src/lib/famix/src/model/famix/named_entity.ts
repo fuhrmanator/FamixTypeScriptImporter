@@ -26,7 +26,7 @@ export class NamedEntity extends SourcedEntity {
   public addReceivedInvocation(receivedInvocation: Invocation): void {
     if (!this.receivedInvocations.has(receivedInvocation)) {
       this.receivedInvocations.add(receivedInvocation);
-      receivedInvocation.setReceiver(this);
+      receivedInvocation.receiver = this;
     }
   }
 

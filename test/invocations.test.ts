@@ -81,7 +81,7 @@ describe('Invocations', () => {
             expect(invocations.length).toBeTruthy();
             const candidates = invocations.filter(i => {
                 const invocation = i as Invocation;
-                return invocation.getCandidates().has(theMethod);
+                return invocation.candidates.has(theMethod);
             });
             expect(candidates).toHaveLength(1);
         }
@@ -98,8 +98,8 @@ describe('Invocations', () => {
             const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
             expect(invocations).toBeTruthy();
             expect(invocations.length).toBeTruthy();
-            expect((invocations[0] as Invocation).getReceiver()).toBeTruthy();
-            expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{invocations.ts}.Class1[ClassDeclaration]"));
+            expect((invocations[0] as Invocation).receiver).toBeTruthy();
+            expect((invocations[0] as Invocation).receiver).toBe(fmxRep._getFamixClass("{invocations.ts}.Class1[ClassDeclaration]"));
         }
     });
 
@@ -114,8 +114,8 @@ describe('Invocations', () => {
             const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
             expect(invocations).toBeTruthy();
             expect(invocations.length).toBeTruthy();
-            expect((invocations[0] as Invocation).getSignature()).toBeTruthy();
-            expect((invocations[0] as Invocation).getSignature()).toBe('public returnHi(): string');
+            expect((invocations[0] as Invocation).signature).toBeTruthy();
+            expect((invocations[0] as Invocation).signature).toBe('public returnHi(): string');
         }
     });
 
@@ -125,7 +125,7 @@ describe('Invocations', () => {
         const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBeTruthy();
-        expect((invocations[0] as Invocation).getSignature()).toBeTruthy();
-        expect((invocations[0] as Invocation).getSignature()).toBe('public returnHi(): string');
+        expect((invocations[0] as Invocation).signature).toBeTruthy();
+        expect((invocations[0] as Invocation).signature).toBe('public returnHi(): string');
     });
 });

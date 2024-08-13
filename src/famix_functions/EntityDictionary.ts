@@ -992,10 +992,10 @@ export class EntityDictionary {
         const receiver = this.famixRep.getFamixEntityByFullyQualifiedName(receiverFullyQualifiedName) as Famix.NamedEntity;
 
         const fmxInvocation = new Famix.Invocation();
-        fmxInvocation.setSender(sender);
-        fmxInvocation.setReceiver(receiver);
+        fmxInvocation.sender = sender;
+        fmxInvocation.receiver = receiver;
         fmxInvocation.addCandidate(fmxMethodOrFunction);
-        fmxInvocation.setSignature(fmxMethodOrFunction.signature);
+        fmxInvocation.signature = fmxMethodOrFunction.signature;
 
         this.famixRep.addElement(fmxInvocation);
 

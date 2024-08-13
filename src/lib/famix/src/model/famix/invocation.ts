@@ -6,51 +6,18 @@ import { Entity } from "./entity";
 
 export class Invocation extends Entity {
 
-  private candidates: Set<BehavioralEntity> = new Set();
-
-  public getCandidates(): Set<BehavioralEntity> {
-    return this.candidates;
-  }
+  private _candidates: Set<BehavioralEntity> = new Set();
 
   public addCandidate(candidate: BehavioralEntity): void {  
-    if (!this.candidates.has(candidate)) {
-      this.candidates.add(candidate);
+    if (!this._candidates.has(candidate)) {
+      this._candidates.add(candidate);
       candidate.addIncomingInvocation(this);
     }
   }
 
-  private receiver: NamedEntity;
-
-  public getReceiver(): NamedEntity {
-    return this.receiver;
-  }
-
-  public setReceiver(receiver: NamedEntity): void {
-    this.receiver = receiver;
-    receiver.addReceivedInvocation(this);
-  }
-
-  private sender: ContainerEntity;
-
-  public getSender(): ContainerEntity {
-    return this.sender;
-  }
-
-  public setSender(sender: ContainerEntity): void {
-    this.sender = sender;
-    sender.addOutgoingInvocation(this);
-  }
-
-  private signature: string;
-
-  public getSignature(): string {
-    return this.signature;
-  }
-
-  public setSignature(signature: string): void {
-    this.signature = signature;
-  }
-
+  private _receiver: NamedEntity;
+  private _sender: ContainerEntity;
+  private _signature: string;
 
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("Invocation", this);
@@ -60,9 +27,39 @@ export class Invocation extends Entity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("candidates", this.getCandidates());
-    exporter.addProperty("receiver", this.getReceiver());
-    exporter.addProperty("sender", this.getSender());
-    exporter.addProperty("signature", this.getSignature());
+    exporter.addProperty("candidates", this.candidates);
+    exporter.addProperty("receiver", this.receiver);
+    exporter.addProperty("sender", this.sender);
+    exporter.addProperty("signature", this.signature);
   }
+
+    get candidates() {
+        return this._candidates;
+    }
+
+    get receiver() {
+        return this._receiver;
+    }
+
+    set receiver(receiver: NamedEntity) {
+        this._receiver = receiver;
+        receiver.addReceivedInvocation(this);
+    }
+
+    get sender() {
+        return this._sender;
+    }
+
+    set sender(sender: ContainerEntity) {
+        this._sender = sender;
+        sender.addOutgoingInvocation(this);
+    }
+
+    get signature() {
+        return this._signature;
+    }
+
+    set signature(signature: string) {
+        this._signature = signature;
+    }
 }

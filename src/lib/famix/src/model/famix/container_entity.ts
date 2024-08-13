@@ -36,7 +36,7 @@ export class ContainerEntity extends NamedEntity {
     public addOutgoingInvocation(outgoingInvocation: Invocation): void {
         if (!this._outgoingInvocations.has(outgoingInvocation)) {
             this._outgoingInvocations.add(outgoingInvocation);
-            outgoingInvocation.setSender(this);
+            outgoingInvocation.sender = this;
         }
     }
 
