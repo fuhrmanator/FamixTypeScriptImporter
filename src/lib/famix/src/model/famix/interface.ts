@@ -11,7 +11,7 @@ export class Interface extends Type {
     public addProperty(property: Property): void {
         if (!this._properties.has(property)) {
             this._properties.add(property);
-            property.setParentEntity(this);
+            property.parentEntity = this;
         }
     }
 

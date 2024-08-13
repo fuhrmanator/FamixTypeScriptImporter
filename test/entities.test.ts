@@ -170,7 +170,7 @@ describe('Entities', () => {
         if (theEntityClass) {
             const userCountAttribute = Array.from(theEntityClass.properties)[6];
             expect(userCountAttribute.name).toBe("#userCount");
-            expect(userCountAttribute.getIsClassSide()).toBe(true); // static
+            expect(userCountAttribute.isClassSide).toBe(true); // static
             expect(userCountAttribute.getDeclaredType().name).toBe('number');
         }
     });

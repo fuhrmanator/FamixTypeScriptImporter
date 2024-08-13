@@ -443,7 +443,7 @@ export class EntityDictionary {
                     fmxProperty.visibility = "private";
                     break;
                 case "static":
-                    fmxProperty.setIsClassSide(true);
+                    fmxProperty.isClassSide = true;
                     break;
                 case "readonly":
                     fmxProperty.readOnly = true;
