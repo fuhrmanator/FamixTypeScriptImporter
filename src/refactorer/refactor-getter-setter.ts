@@ -2,7 +2,7 @@ import { Project, PropertyDeclaration, SyntaxKind } from "ts-morph";
 import * as path from "path";
 
 const project = new Project();
-project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/enum.ts");
+project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/import_clause.ts");
 project.getSourceFiles().forEach(sourceFile => { console.log(sourceFile.getFilePath()); });
 
 project.getSourceFiles().forEach(sourceFile => {

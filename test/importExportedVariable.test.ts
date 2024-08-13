@@ -34,7 +34,7 @@ describe('Tests for exported and imported variable', () => {
         const importClause = importClauses.values().next().value;
         expect(importClause).toBeTruthy();
         // get variable
-        const importedVariable = importClause.getImportedEntity() as Variable;
+        const importedVariable = importClause.importedEntity as Variable;
         expect(importedVariable).toBeTruthy();
         expect(importedVariable.getName()).toBe("hasBigInt");
         // check if the variable is the one in exporter2.ts

@@ -80,7 +80,7 @@ export class Module extends ScriptEntity {
   addOutgoingImport(importClause: ImportClause) {
     if (!this.outgoingImports.has(importClause)) {
       this.outgoingImports.add(importClause);
-      importClause.setImportingEntity(this);  // opposite
+      importClause.importingEntity = this;  // opposite
     }
   }
 

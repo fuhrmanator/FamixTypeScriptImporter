@@ -1072,8 +1072,8 @@ export class EntityDictionary {
 
     public createFamixImportClause(importedEntity: Famix.NamedEntity, importingEntity: Famix.Module) {
         const fmxImportClause = new Famix.ImportClause();
-        fmxImportClause.setImportedEntity(importedEntity);
-        fmxImportClause.setImportingEntity(importingEntity);
+        fmxImportClause.importedEntity = importedEntity;
+        fmxImportClause.importingEntity = importingEntity;
         importingEntity.addOutgoingImport(fmxImportClause);
         this.famixRep.addElement(fmxImportClause);
     }
@@ -1150,16 +1150,16 @@ export class EntityDictionary {
         if (!isInExports) this.famixRep.addElement(importedEntity);
         const importerFullyQualifiedName = FQNFunctions.getFQN(importer);
         const fmxImporter = this.famixRep.getFamixEntityByFullyQualifiedName(importerFullyQualifiedName) as Famix.Module;
-        fmxImportClause.setImportingEntity(fmxImporter);
-        fmxImportClause.setImportedEntity(importedEntity);
+        fmxImportClause.importingEntity = fmxImporter;
+        fmxImportClause.importedEntity = importedEntity;
         if (importDeclaration instanceof ImportEqualsDeclaration) {
-            fmxImportClause.setModuleSpecifier(importDeclaration?.getModuleReference().getText() as string);
+            fmxImportClause.moduleSpecifier = importDeclaration?.getModuleReference().getText() as string;
         } else {
-            fmxImportClause.setModuleSpecifier(importDeclaration?.getModuleSpecifierValue() as string);
+            fmxImportClause.moduleSpecifier = importDeclaration?.getModuleSpecifierValue() as string;
         }
     
-        logger.debug(`createFamixImportClause: ${fmxImportClause.getImportedEntity()?.getName()} (of type ${
-            Helpers.getSubTypeName(fmxImportClause.getImportedEntity())}) is imported by ${fmxImportClause.getImportingEntity()?.getName()}`);
+        logger.debug(`createFamixImportClause: ${fmxImportClause.importedEntity?.getName()} (of type ${
+            Helpers.getSubTypeName(fmxImportClause.importedEntity)}) is imported by ${fmxImportClause.importingEntity?.getName()}`);
 
         fmxImporter.addOutgoingImport(fmxImportClause);
 

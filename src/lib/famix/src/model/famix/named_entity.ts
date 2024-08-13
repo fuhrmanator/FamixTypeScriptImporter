@@ -39,7 +39,7 @@ export class NamedEntity extends SourcedEntity {
   public addIncomingImport(anImport: ImportClause): void {
     if (!this.incomingImports.has(anImport)) {
       this.incomingImports.add(anImport);
-      anImport.setImportedEntity(this);  // opposite
+      anImport.importedEntity = this;  // opposite
     }
   }
 
