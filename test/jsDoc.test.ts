@@ -32,7 +32,7 @@ describe('Tests for JS doc', () => {
  * Gets the name.
  * @param person - Person to get the name from.
  */`);
-        expect(theJSDoc?.getContainer()).toBe(theFunction);
-        expect(theJSDoc?.getIsJSDoc()).toBe(true);
+        expect(theJSDoc?.container).toBe(theFunction);
+        expect(theJSDoc?.isJSDoc).toBe(true);
     });
 });

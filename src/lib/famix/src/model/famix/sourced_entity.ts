@@ -39,7 +39,7 @@ export class SourcedEntity extends Entity {
   public addComment(comment: Comment): void {
     if (!this.comments.has(comment)) {
       this.comments.add(comment);
-      comment.setContainer(this);
+      comment.container = this;
     } else {
       logger.debug("Adding comment that is already in comments: " + comment.getJSON() + " to " + this.getJSON());
     }

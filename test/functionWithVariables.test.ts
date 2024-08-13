@@ -37,9 +37,9 @@ describe('Tests for function with variables', () => {
         expect(getCommentTextFromCommentViaAnchor(firstVariableComments[1], project)).toBe(`// comment 1`);
         expect(getCommentTextFromCommentViaAnchor(firstVariableComments[2], project)).toBe(`// comment 3`);
     
-        expect(firstVariableComments[0]?.getContainer()).toBe(firstVariable);
-        expect(firstVariableComments[1]?.getContainer()).toBe(firstVariable);
-        expect(firstVariableComments[2]?.getContainer()).toBe(firstVariable);
+        expect(firstVariableComments[0]?.container).toBe(firstVariable);
+        expect(firstVariableComments[1]?.container).toBe(firstVariable);
+        expect(firstVariableComments[2]?.container).toBe(firstVariable);
     });
 
     it("should be of type number", () => {
@@ -64,8 +64,8 @@ describe('Tests for function with variables', () => {
         expect(project.getSourceFileOrThrow(anchor.getFileName()).getFullText().substring(
             anchor.getStartPos() - 1, anchor.getEndPos() - 1)).toBe(`// comment 3`);
 
-        expect(secondVariableComments[0]?.getContainer()).toBe(secondVariable);
-        expect(secondVariableComments[1]?.getContainer()).toBe(secondVariable);
+        expect(secondVariableComments[0]?.container).toBe(secondVariable);
+        expect(secondVariableComments[1]?.container).toBe(secondVariable);
     });
     
     it("should be of type number", () => {

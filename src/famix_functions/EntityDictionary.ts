@@ -863,8 +863,8 @@ export class EntityDictionary {
     public createFamixComment(comment: CommentRange, fmxScope: Famix.NamedEntity, isJSDoc: boolean): Famix.Comment {
         logger.debug(`> NOTE: creating comment ${comment.getText()} in scope ${fmxScope.getName()}.`);
         const fmxComment = new Famix.Comment();
-        fmxComment.setContainer(fmxScope);  // adds comment to the container's comments collection
-        fmxComment.setIsJSDoc(isJSDoc);
+        fmxComment.container = fmxScope;  // adds comment to the container's comments collection
+        fmxComment.isJSDoc = isJSDoc;
 
         this.makeFamixIndexFileAnchor(comment, fmxComment);
 
