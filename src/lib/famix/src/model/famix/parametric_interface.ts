@@ -11,7 +11,7 @@ export class ParametricInterface extends Interface {
     public addGenericParameter(genericParameter: ParameterType): void {
         if (!this._genericParameters.has(genericParameter)) {
             this._genericParameters.add(genericParameter);
-            genericParameter.setParentGeneric(this);
+            genericParameter.parentGeneric = this;
         }
     }
 

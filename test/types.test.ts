@@ -79,13 +79,13 @@ describe('Tests for types', () => {
     });
 
     it("should have Map for base type of Map<any, boolean>", () => {
-        expect(theParameterType?.getBaseType()).toBe(theBaseType);
+        expect(theParameterType?.baseType).toBe(theBaseType);
     });
 
     it("should have any and boolean for arguments of Map<any, boolean>", () => {
-        expect(theParameterType?.getArguments().size).toBe(2);
-        expect(Array.from(theParameterType?.getArguments() as Set<Type>)[0]).toBe(theAnyType);
-        expect(Array.from(theParameterType?.getArguments() as Set<Type>)[1]).toBe(theBooleanType);
+        expect(theParameterType?.arguments.size).toBe(2);
+        expect(Array.from(theParameterType?.arguments as Set<Type>)[0]).toBe(theAnyType);
+        expect(Array.from(theParameterType?.arguments as Set<Type>)[1]).toBe(theBooleanType);
     });
 
     it("should have types.ts for container", () => {

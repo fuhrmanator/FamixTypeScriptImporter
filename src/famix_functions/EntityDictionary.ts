@@ -923,7 +923,7 @@ export class EntityDictionary {
                     (fmxType as Famix.ParameterType).addArgument(fmxParameterType);
                 });
                 const fmxBaseType = this.createOrGetFamixType(baseTypeName, element);
-                (fmxType as Famix.ParameterType).setBaseType(fmxBaseType);
+                (fmxType as Famix.ParameterType).baseType = fmxBaseType;
             }
             else {
                 fmxType = new Famix.Type();
