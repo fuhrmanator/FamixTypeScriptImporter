@@ -2,7 +2,7 @@ import { Project, SyntaxKind } from "ts-morph";
 import * as path from "path";
 
 const project = new Project();
-project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/parameter.ts");
+project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/parametric_arrow_function.ts");
 project.getSourceFiles().forEach(sourceFile => { console.log(sourceFile.getFilePath()); });
 
 project.getSourceFiles().forEach(sourceFile => {
