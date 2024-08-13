@@ -36,10 +36,10 @@ describe('Tests for enum', () => {
     it("should contain an enum with a comment before it.", () => {
         const theEnum = Array.from(enumSet)[0];
         expect(theEnum).toBeDefined();
-        expect(theEnum.getComments().size).toBe(1);
-        const comment = Array.from(theEnum.getComments())[0];
+        expect(theEnum.comments.size).toBe(1);
+        const comment = Array.from(theEnum.comments)[0];
         expect(getCommentTextFromCommentViaAnchor(comment, project)).toBe("// comment before");
-        expect((comment.getSourceAnchor() as IndexedFileAnchor).fileName.endsWith("enum.ts")).toBe(true);
+        expect((comment.sourceAnchor as IndexedFileAnchor).fileName.endsWith("enum.ts")).toBe(true);
         });
 
     it("should contain one enum with seven enum values", () => {

@@ -12,7 +12,7 @@ export const project = new Project(
 );
 
 function getIndexedFileAnchorFromComment(comment: Comment) {
-    return comment?.getSourceAnchor() as IndexedFileAnchor;
+    return comment?.sourceAnchor as IndexedFileAnchor;
 }
 
 function getCommentFromAnchor(anchor: IndexedFileAnchor, project: Project) {

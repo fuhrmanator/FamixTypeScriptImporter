@@ -24,7 +24,7 @@ export class SourceAnchor extends Entity {
     set element(element: SourcedEntity) {
         if (this._element === undefined) {
             this._element = element;
-            element.setSourceAnchor(this);
+            element.sourceAnchor = this;
         }
     }
 }

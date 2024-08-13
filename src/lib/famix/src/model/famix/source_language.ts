@@ -14,7 +14,7 @@ export class SourceLanguage extends Entity {
     public addSourcedEntity(sourcedEntity: SourcedEntity): void {
         if (!this._sourcedEntities.has(sourcedEntity)) {
             this._sourcedEntities.add(sourcedEntity);
-            sourcedEntity.setDeclaredSourceLanguage(this);
+            sourcedEntity.declaredSourceLanguage = this;
         }
     }
 

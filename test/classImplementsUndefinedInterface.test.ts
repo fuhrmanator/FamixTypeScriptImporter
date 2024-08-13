@@ -30,7 +30,7 @@ describe('Tests for class implements undefined interface', () => {
         expect(iList).toBeTruthy();
         const myInterface1 = iList.find(p => p.name === "FileSystemHost");
         expect(myInterface1).toBeTruthy();
-        expect(myInterface1?.getIsStub()).toBe(true);
+        expect(myInterface1?.isStub).toBe(true);
         const myClass = cList.find(p => p.name === "myClass");
         expect(myClass).toBeTruthy();
         if (myClass) {

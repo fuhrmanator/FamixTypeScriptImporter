@@ -48,7 +48,7 @@ describe('Tests for alias', () => {
     });
 
     it("should contain an IndexedFileAnchor", () => {
-        const sourceAnchor = theFirstAlias.getSourceAnchor();
+        const sourceAnchor = theFirstAlias.sourceAnchor;
         expect(sourceAnchor.constructor.name).toBe("IndexedFileAnchor");
         const indexedFileAnchor = sourceAnchor as IndexedFileAnchor;
         expect(indexedFileAnchor.fileName.endsWith("alias.ts")).toBe(true);
@@ -79,7 +79,7 @@ describe('Tests for alias', () => {
     });
 
     it("should contain an IndexedFileAnchor", () => {
-        const sourceAnchor = arrayOfAliases[1].getSourceAnchor();
+        const sourceAnchor = arrayOfAliases[1].sourceAnchor;
         expect(sourceAnchor.constructor.name).toBe("IndexedFileAnchor");
         const indexedFileAnchor = sourceAnchor as IndexedFileAnchor;
         expect(indexedFileAnchor.fileName.endsWith("alias.ts")).toBe(true);
@@ -106,7 +106,7 @@ describe('Tests for alias', () => {
     });
 
     it("should contain an IndexedFileAnchor", () => {
-        const sourceAnchor = arrayOfAliases[2].getSourceAnchor();
+        const sourceAnchor = arrayOfAliases[2].sourceAnchor;
         expect(sourceAnchor.constructor.name).toBe("IndexedFileAnchor");
         const indexedFileAnchor = sourceAnchor as IndexedFileAnchor;
         expect(indexedFileAnchor.fileName.endsWith("alias.ts")).toBe(true);

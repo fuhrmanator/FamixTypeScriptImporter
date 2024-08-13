@@ -32,8 +32,8 @@ describe('Tests for abstract class with comments', () => {
     });
 
     it("should have two comments for the abstract class", () => {
-        expect(theAbstractClass?.getComments().size).toBe(2);
-        const comments = Array.from(theAbstractClass?.getComments() as Set<Comment>);
+        expect(theAbstractClass?.comments.size).toBe(2);
+        const comments = Array.from(theAbstractClass?.comments as Set<Comment>);
         expect(getCommentTextFromCommentViaAnchor(comments[0], project)).toBe(`// before`);
         expect(comments[0]?.container).toBe(theAbstractClass);
         expect(getCommentTextFromCommentViaAnchor(comments[1], project)).toBe(`// a comment`);
@@ -47,8 +47,8 @@ describe('Tests for abstract class with comments', () => {
     const theFunction = fmxRep._getFamixFunction("{abstractClassWithComments.ts}.tst[FunctionDeclaration]");
 
     it("should have three comments for the function", () => {
-        expect(theFunction?.getComments().size).toBe(3);
-        const comments = Array.from(theFunction?.getComments() as Set<Comment>);
+        expect(theFunction?.comments.size).toBe(3);
+        const comments = Array.from(theFunction?.comments as Set<Comment>);
         expect(getCommentTextFromCommentViaAnchor(comments[0], project)).toBe(`// after`);
         expect(comments[0]?.container).toBe(theFunction);
         expect(comments[0]?.isJSDoc).toBe(false);

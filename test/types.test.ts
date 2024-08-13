@@ -93,7 +93,7 @@ describe('Tests for types', () => {
     });
 
     it("should have an IndexedFileAnchor with a filename of 'types.ts' for Map<any, boolean>", () => {
-        const indexedFileAnchor = theParameterType?.getSourceAnchor();
+        const indexedFileAnchor = theParameterType?.sourceAnchor;
         expect(indexedFileAnchor).toBeTruthy();
         expect((indexedFileAnchor as IndexedFileAnchor).fileName.endsWith("types.ts")).toBe(true);
     });

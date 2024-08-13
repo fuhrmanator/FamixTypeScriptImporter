@@ -23,7 +23,7 @@ describe.skip('Tests for class extends undefined class', () => {
         expect(cList).toBeTruthy();
         const myClass1 = cList.find(p => p.name === "ClassDeclaration");
         expect(myClass1).toBeTruthy();
-        expect(myClass1?.getIsStub()).toBe(true);
+        expect(myClass1?.isStub).toBe(true);
         const myClass2 = cList.find(p => p.name === "MyClass");
         expect(myClass2).toBeTruthy();
         if (myClass2) {

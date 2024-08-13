@@ -79,7 +79,7 @@ export class EntityDictionary {
 
             sourceAnchor.element = fmx;
             sourceAnchor.fileName = fileName;
-            fmx.setSourceAnchor(sourceAnchor);
+            fmx.sourceAnchor = sourceAnchor;
             this.famixRep.addElement(sourceAnchor);
 
         }
@@ -735,7 +735,7 @@ export class EntityDictionary {
             if (!this.fmxTypeMap.has(parameterTypeName)) {           
                 if (parameterTypeName === "number" || parameterTypeName === "string" || parameterTypeName === "boolean" || parameterTypeName === "bigint" || parameterTypeName === "symbol" || parameterTypeName === "undefined" || parameterTypeName === "null" || parameterTypeName === "any" || parameterTypeName === "unknown" || parameterTypeName === "never" || parameterTypeName === "void") {
                     fmxParameterType = new Famix.PrimitiveType();
-                    fmxParameterType.setIsStub(true);
+                    fmxParameterType.isStub = true;
                 } else {
                     fmxParameterType = new Famix.ParameterType();
                 } 
@@ -912,7 +912,7 @@ export class EntityDictionary {
         if (!this.fmxTypeMap.has(typeName)) {
             if (isPrimitiveType) {
                 fmxType = new Famix.PrimitiveType();
-                fmxType.setIsStub(true);
+                fmxType.isStub = true;
             }
             else if (isParameterType) {
                 fmxType = new Famix.ParameterType();
@@ -1054,7 +1054,7 @@ export class EntityDictionary {
 
             superClass.name = inhClassName;
             superClass.fullyQualifiedName = inhClassFullyQualifiedName;
-            superClass.setIsStub(true);
+            superClass.isStub = true;
 
             this.makeFamixIndexFileAnchor(inhClass, superClass);
         
@@ -1118,7 +1118,7 @@ export class EntityDictionary {
                 importedEntity = new Famix.NamedEntity();
                 importedEntity.name = importedEntityName;
                 if (!isInExports) {
-                    importedEntity.setIsStub(true);
+                    importedEntity.isStub = true;
                 }
                 importedEntity.fullyQualifiedName = pathName;
                 this.makeFamixIndexFileAnchor(importElement, importedEntity);

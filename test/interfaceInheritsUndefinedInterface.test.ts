@@ -23,7 +23,7 @@ describe('Tests for interface inherits undefined interface', () => {
         expect(cList).toBeTruthy();
         const myInterface1 = cList.find(p => p.name === "FileSystemHost");
         expect(myInterface1).toBeTruthy();
-        expect(myInterface1?.getIsStub()).toBe(true);
+        expect(myInterface1?.isStub).toBe(true);
         const myInterface2 = cList.find(p => p.name === "MyInterface");
         expect(myInterface2).toBeTruthy();
         if (myInterface2) {

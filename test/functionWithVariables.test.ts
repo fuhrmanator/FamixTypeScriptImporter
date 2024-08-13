@@ -26,12 +26,12 @@ describe('Tests for function with variables', () => {
     });
 
     const firstVariable = Array.from(theFunction?.variables).find((p) => p.name === "i");
-    const firstVariableComments = Array.from(firstVariable?.getComments() as Set<Comment>);
+    const firstVariableComments = Array.from(firstVariable?.comments as Set<Comment>);
 
     it("should have a variable 'i' with three comments", () => {
         expect(firstVariable).toBeTruthy();
         expect(firstVariable?.getParentContainerEntity()).toBe(theFunction);
-        expect(firstVariable?.getComments().size).toBe(3);
+        expect(firstVariable?.comments.size).toBe(3);
 
         expect(getCommentTextFromCommentViaAnchor(firstVariableComments[0], project)).toBe(`/*comment 2*/`);
         expect(getCommentTextFromCommentViaAnchor(firstVariableComments[1], project)).toBe(`// comment 1`);
@@ -47,19 +47,19 @@ describe('Tests for function with variables', () => {
     });
 
     const secondVariable = Array.from(theFunction?.variables).find((p) => p.name === "j");
-    const secondVariableComments = Array.from(secondVariable?.getComments() as Set<Comment>);
+    const secondVariableComments = Array.from(secondVariable?.comments as Set<Comment>);
 
     it("should have a variable 'j' with two comments", () => {
         expect(secondVariable).toBeTruthy();
         expect(secondVariable?.getParentContainerEntity()).toBe(theFunction);
         expect(secondVariableComments.length).toBe(2);
 
-        let anchor = secondVariableComments[0]?.getSourceAnchor() as IndexedFileAnchor;
+        let anchor = secondVariableComments[0]?.sourceAnchor as IndexedFileAnchor;
         expect(anchor?.fileName.endsWith("functionWithVariables.ts")).toBe(true);
         expect(project.getSourceFileOrThrow(anchor.fileName).getFullText().substring(
             anchor.startPos - 1, anchor.endPos - 1)).toBe(`// comment 1`);
 
-        anchor = secondVariableComments[1]?.getSourceAnchor() as IndexedFileAnchor;
+        anchor = secondVariableComments[1]?.sourceAnchor as IndexedFileAnchor;
         expect(anchor?.fileName.endsWith("functionWithVariables.ts")).toBe(true);
         expect(project.getSourceFileOrThrow(anchor.fileName).getFullText().substring(
             anchor.startPos - 1, anchor.endPos - 1)).toBe(`// comment 3`);
