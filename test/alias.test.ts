@@ -43,8 +43,8 @@ describe('Tests for alias', () => {
         expect(Array.from(theFile?.aliases as Set<Alias>)[0]).toBe(theFirstAlias);
         expect(theFirstAlias.aliasedEntity).toBe(theFirstType);
         expect(theFirstAlias.parentEntity).toBe(theFile);
-        expect(theFirstType.getTypeAliases().size).toBe(1);
-        expect(Array.from(theFirstType.getTypeAliases())[0]).toBe(theFirstAlias);
+        expect(theFirstType.typeAliases.size).toBe(1);
+        expect(Array.from(theFirstType.typeAliases)[0]).toBe(theFirstAlias);
     });
 
     it("should contain an IndexedFileAnchor", () => {
@@ -74,8 +74,8 @@ describe('Tests for alias', () => {
         expect(Array.from(theFile?.aliases as Set<Alias>)[1]).toBe(arrayOfAliases[1]);
         expect(arrayOfAliases[1].aliasedEntity).toBe(arrayOfTypes[1]);
         expect(arrayOfAliases[1].parentEntity).toBe(theFile);
-        expect(arrayOfTypes[1].getTypeAliases().size).toBe(1);
-        expect(Array.from(arrayOfTypes[1].getTypeAliases())[0]).toBe(arrayOfAliases[1]);
+        expect(arrayOfTypes[1].typeAliases.size).toBe(1);
+        expect(Array.from(arrayOfTypes[1].typeAliases)[0]).toBe(arrayOfAliases[1]);
     });
 
     it("should contain an IndexedFileAnchor", () => {
@@ -101,8 +101,8 @@ describe('Tests for alias', () => {
         expect(Array.from(theFile?.aliases as Set<Alias>)[2]).toBe(arrayOfAliases[2]);
         expect(arrayOfAliases[2].aliasedEntity).toBe(arrayOfTypes[2]);
         expect(arrayOfAliases[2].parentEntity).toBe(theFile);
-        expect(arrayOfTypes[2].getTypeAliases().size).toBe(1);
-        expect(Array.from(arrayOfTypes[2].getTypeAliases())[0]).toBe(arrayOfAliases[2]);
+        expect(arrayOfTypes[2].typeAliases.size).toBe(1);
+        expect(Array.from(arrayOfTypes[2].typeAliases)[0]).toBe(arrayOfAliases[2]);
     });
 
     it("should contain an IndexedFileAnchor", () => {

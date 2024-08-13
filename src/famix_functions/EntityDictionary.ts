@@ -930,7 +930,7 @@ export class EntityDictionary {
             }
 
             fmxType.name = typeName;
-            fmxType.setContainer(ancestor);
+            fmxType.container = ancestor;
             initFQN(element, fmxType);
             this.makeFamixIndexFileAnchor(element, fmxType);
 
