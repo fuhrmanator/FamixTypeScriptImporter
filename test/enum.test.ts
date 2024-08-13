@@ -47,7 +47,7 @@ describe('Tests for enum', () => {
         const theEnum = enumArray[0];
         expect(theFile.types.has(theEnum)).toBe(true);
         expect(theEnum.getName()).toBe("Weekday");
-        const enumValuesArray = Array.from(theEnum.getValues());
+        const enumValuesArray = Array.from(theEnum.values);
         expect(enumValuesArray.length).toBe(7);
         expect(enumValuesArray[0].getName()).toBe("MONDAY");
         expect(enumValuesArray[1].getName()).toBe("TUESDAY");
