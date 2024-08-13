@@ -1,5 +1,5 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
-import { ArrowFunction } from "./arrowFunction";
+import { ArrowFunction } from "./arrow_function";
 import { Class } from "./class";
 import { Interface } from "./interface";
 import { PrimitiveType } from "./primitive_type";

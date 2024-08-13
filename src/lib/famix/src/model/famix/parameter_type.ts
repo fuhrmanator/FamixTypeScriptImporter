@@ -7,7 +7,7 @@ import { Function as FamixFunction } from "./function";
 import { Accessor } from "./accessor";
 import { ParametricMethod } from "./parametric_method";
 import { ParametricFunction } from "./parametric_function";
-import { ArrowFunction } from "./arrowFunction";
+import { ArrowFunction } from "./arrow_function";
 import { ParametricArrowFunction } from "./parametric_arrow_function";
 
 export class ParameterType extends Type {
