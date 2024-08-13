@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { Function as FamixFunctionEntity } from "../src/lib/famix/src/model/famix/function";
+import { Function } from "../src/lib/famix/src/model/famix/function";
 import { project } from './testUtils';
 
 const importer = new Importer();
@@ -14,7 +14,7 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for function with parameters', () => {
     
-    const theFunction = Array.from(fmxRep._getAllEntitiesWithType('Function'))[0] as FamixFunctionEntity;
+    const theFunction = Array.from(fmxRep._getAllEntitiesWithType('Function') as Set<Function>)[0];
     it("should have two parameters", () => {
         expect(theFunction?.parameters.size).toBe(2);
     });
@@ -26,7 +26,7 @@ describe('Tests for function with parameters', () => {
 
     it("should be of type number", () => {
         expect(firstParam?.getDeclaredType().name).toBe("number");
-        expect(firstParam?.getParentEntity()).toBe(theFunction);
+        expect(firstParam?.parentEntity).toBe(theFunction);
     });
 
     const secondParam = Array.from(theFunction?.parameters).find((p) => p.name === "x");
@@ -36,6 +36,6 @@ describe('Tests for function with parameters', () => {
 
     it("should be of type string", () => {
         expect(secondParam?.getDeclaredType().name).toBe("string");
-        expect(secondParam?.getParentEntity()).toBe(theFunction);
+        expect(secondParam?.parentEntity).toBe(theFunction);
     });
 });

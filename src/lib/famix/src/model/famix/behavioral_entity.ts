@@ -13,7 +13,7 @@ export class BehavioralEntity extends ContainerEntity {
     public addParameter(parameter: Parameter): void {
         if (!this._parameters.has(parameter)) {
             this._parameters.add(parameter);
-            parameter.setParentEntity(this);
+            parameter.parentEntity = this;
         }
     }
 
