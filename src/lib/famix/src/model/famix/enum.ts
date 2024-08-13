@@ -13,7 +13,7 @@ export class Enum extends Type {
   public addValue(value: EnumValue): void {
     if (!this.values.has(value)) {
       this.values.add(value);
-      value.setParentEntity(this);
+      value.parentEntity = this;
     }
   }
   

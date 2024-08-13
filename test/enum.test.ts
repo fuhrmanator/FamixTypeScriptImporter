@@ -56,13 +56,13 @@ describe('Tests for enum', () => {
         expect(enumValuesArray[4].getName()).toBe("FRIDAY");
         expect(enumValuesArray[5].getName()).toBe("SATURDAY");
         expect(enumValuesArray[6].getName()).toBe("SUNDAY");
-        expect(enumValuesArray[0].getParentEntity()).toBe(theEnum);
-        expect(enumValuesArray[1].getParentEntity()).toBe(theEnum);
-        expect(enumValuesArray[2].getParentEntity()).toBe(theEnum);
-        expect(enumValuesArray[3].getParentEntity()).toBe(theEnum);
-        expect(enumValuesArray[4].getParentEntity()).toBe(theEnum);
-        expect(enumValuesArray[5].getParentEntity()).toBe(theEnum);
-        expect(enumValuesArray[6].getParentEntity()).toBe(theEnum);
+        expect(enumValuesArray[0].parentEntity).toBe(theEnum);
+        expect(enumValuesArray[1].parentEntity).toBe(theEnum);
+        expect(enumValuesArray[2].parentEntity).toBe(theEnum);
+        expect(enumValuesArray[3].parentEntity).toBe(theEnum);
+        expect(enumValuesArray[4].parentEntity).toBe(theEnum);
+        expect(enumValuesArray[5].parentEntity).toBe(theEnum);
+        expect(enumValuesArray[6].parentEntity).toBe(theEnum);
     });
     
     it("should contain one access", () => {
