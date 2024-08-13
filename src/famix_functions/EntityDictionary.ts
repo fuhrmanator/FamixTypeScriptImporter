@@ -13,6 +13,10 @@ export type TSMorphObjectType = ImportDeclaration | ImportEqualsDeclaration | So
 
 export type TypeDeclaration = TypeAliasDeclaration | PropertyDeclaration | PropertySignature | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | EnumMember;
 
+type ParametricVariantType = Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod;
+
+type ConcreteElementTSMorphType = ClassDeclaration | InterfaceDeclaration | FunctionDeclaration | MethodDeclaration;
+
 export class EntityDictionary {
     
     public famixRep = new FamixRepository();
@@ -25,6 +29,7 @@ export class EntityDictionary {
     private fmxFunctionAndMethodMap = new Map<string, Famix.Function | Famix.ParametricFunction | Famix.Method | Famix.ParametricMethod> // Maps the function names to their Famix model
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
     public fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
+    public tsMorphElementObjectMap = new Map<TSMorphObjectType,Famix.Entity>();
             
     constructor() {
         this.famixRep.setFmxElementObjectMap(this.fmxElementObjectMap);      
@@ -192,7 +197,8 @@ export class EntityDictionary {
 
         const fileName = f.getBaseName();
         const fullyQualifiedFilename = f.getFilePath();
-        if (!this.fmxFileMap.has(fullyQualifiedFilename)) {
+        const foundFileName = this.fmxFileMap.get(fullyQualifiedFilename);
+        if (!foundFileName) {
             if (isModule) {
                 fmxFile = new Famix.Module();
             }
@@ -211,7 +217,7 @@ export class EntityDictionary {
             this.famixRep.addElement(fmxFile);
         }
         else {
-            fmxFile = this.fmxFileMap.get(fullyQualifiedFilename);
+            fmxFile = foundFileName;
         }
 
         this.fmxElementObjectMap.set(fmxFile,f);
@@ -226,7 +232,8 @@ export class EntityDictionary {
     public createOrGetFamixModule(m: ModuleDeclaration): Famix.Module {
         let fmxModule: Famix.Module;
         const moduleName = m.getName();
-        if (!this.fmxModuleMap.has(moduleName)) {
+        const foundModuleName = this.fmxModuleMap.get(moduleName);
+        if (!foundModuleName) {
             fmxModule = new Famix.Module();
             fmxModule.name = moduleName;
             fmxModule.isAmbient = isAmbient(m);
@@ -241,7 +248,7 @@ export class EntityDictionary {
             this.famixRep.addElement(fmxModule);
         }
         else {
-            fmxModule = this.fmxModuleMap.get(moduleName);
+            fmxModule = foundModuleName;
         }
 
         this.fmxElementObjectMap.set(fmxModule,m);
@@ -257,7 +264,8 @@ export class EntityDictionary {
         let fmxAlias: Famix.Alias;
         const aliasName = a.getName();
         const aliasFullyQualifiedName = a.getType().getText(); // FQNFunctions.getFQN(a);
-        if (!this.fmxAliasMap.has(aliasFullyQualifiedName)) {
+        const foundAlias = this.fmxAliasMap.get(aliasFullyQualifiedName);
+        if (!foundAlias) {
             fmxAlias = new Famix.Alias();
             fmxAlias.name = a.getName();
             const aliasNameWithGenerics = aliasName + (a.getTypeParameters().length ? ("<" + a.getTypeParameters().map(tp => tp.getName()).join(", ") + ">") : "");
@@ -273,7 +281,7 @@ export class EntityDictionary {
             this.famixRep.addElement(fmxAlias);
         }
         else {
-            fmxAlias = this.fmxAliasMap.get(aliasFullyQualifiedName);
+            fmxAlias = foundAlias;
         }
         this.fmxElementObjectMap.set(fmxAlias,a);
 
@@ -289,9 +297,10 @@ export class EntityDictionary {
         let fmxClass: Famix.Class | Famix.ParametricClass;
         const isAbstract = cls.isAbstract();
         const classFullyQualifiedName = FQNFunctions.getFQN(cls);
-        const clsName = cls.getName();
+        const clsName = cls.getName() || this.UNKNOWN_VALUE;
         const isGeneric = cls.getTypeParameters().length;
-        if (!this.fmxClassMap.has(classFullyQualifiedName)) {
+        const foundClass = this.fmxClassMap.get(classFullyQualifiedName);
+        if (!foundClass) {
             if (isGeneric) {
                 fmxClass = new Famix.ParametricClass();
             }
@@ -312,7 +321,7 @@ export class EntityDictionary {
             this.fmxElementObjectMap.set(fmxClass,cls);
         }
         else {
-            fmxClass = this.fmxClassMap.get(classFullyQualifiedName) as (Famix.Class | Famix.ParametricClass);
+            fmxClass = foundClass;
         }
 
         return fmxClass;
@@ -324,10 +333,12 @@ export class EntityDictionary {
      * @returns The Famix model of the interface
      */
     public createOrGetFamixInterface(inter: InterfaceDeclaration): Famix.Interface | Famix.ParametricInterface {
+
         let fmxInterface: Famix.Interface | Famix.ParametricInterface;
         const interName = inter.getName();
         const interFullyQualifiedName = FQNFunctions.getFQN(inter);
-        if (!this.fmxInterfaceMap.has(interFullyQualifiedName)) {
+        const foundInterface = this.fmxInterfaceMap.get(interFullyQualifiedName);
+        if (!foundInterface) {
             const isGeneric = inter.getTypeParameters().length;
             if (isGeneric) {
                 fmxInterface = new Famix.ParametricInterface();
@@ -347,21 +358,24 @@ export class EntityDictionary {
             this.fmxElementObjectMap.set(fmxInterface,inter);
         }
         else {
-            fmxInterface = this.fmxInterfaceMap.get(interFullyQualifiedName) as (Famix.Interface | Famix.ParametricInterface);
+            fmxInterface = foundInterface;
         }
         return fmxInterface;
     }
 
+    
     /**
      * Creates or gets a Famix concrete element
-     * @param el A parametric Element   
-     * @param elDeclaration the element declaration
+     * @param concreteElement A parametric Element   
+     * @param concreteElementDeclaration the element declaration
      * @param concreteArguments concrete arguments
      * @returns A parametric Element  
      */
-    public createOrGetFamixConcreteElement(el : Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod, elDeclaration : ClassDeclaration | InterfaceDeclaration | FunctionDeclaration | MethodDeclaration, concreteArguments : any): Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod {
+    public createOrGetFamixConcreteElement(concreteElement : ParametricVariantType, 
+                                           concreteElementDeclaration : ConcreteElementTSMorphType, 
+                                           concreteArguments: TypeNode[]): ParametricVariantType {
         
-        let fullyQualifiedFilename = el.fullyQualifiedName;
+        let fullyQualifiedFilename = concreteElement.fullyQualifiedName;
         let params = "";
         
         concreteArguments.map((param) => {
@@ -372,10 +386,12 @@ export class EntityDictionary {
                 
         fullyQualifiedFilename = Helpers.replaceLastBetweenTags(fullyQualifiedFilename,params);
 
-        let concElement;
+        let concElement: ParametricVariantType;
 
-        if (!this.fmxInterfaceMap.has(fullyQualifiedFilename) && !this.fmxClassMap.has(fullyQualifiedFilename) && !this.fmxFunctionAndMethodMap.has(fullyQualifiedFilename)){
-            concElement = _.cloneDeep(el); 
+        if (!this.fmxInterfaceMap.has(fullyQualifiedFilename) && 
+            !this.fmxClassMap.has(fullyQualifiedFilename) && 
+            !this.fmxFunctionAndMethodMap.has(fullyQualifiedFilename)){
+            concElement = _.cloneDeep(concreteElement); 
             concElement.fullyQualifiedName = fullyQualifiedFilename;
             concElement.clearGenericParameters();
             concreteArguments.map((param) => {
@@ -383,26 +399,26 @@ export class EntityDictionary {
                 concElement.addConcreteParameter(parameter);
             })
             
-            if (el instanceof Famix.ParametricClass) {
+            if (concreteElement instanceof Famix.ParametricClass) {
                 this.fmxClassMap.set(fullyQualifiedFilename, concElement as Famix.ParametricClass);
-            } else if (el instanceof Famix.ParametricInterface) {
+            } else if (concreteElement instanceof Famix.ParametricInterface) {
                 this.fmxInterfaceMap.set(fullyQualifiedFilename, concElement as Famix.ParametricInterface);
-            } else if (el instanceof Famix.ParametricFunction) {
+            } else if (concreteElement instanceof Famix.ParametricFunction) {
                 this.fmxFunctionAndMethodMap.set(fullyQualifiedFilename, concElement as Famix.ParametricFunction);
-            } else if (el instanceof Famix.ParametricMethod) {
+            } else { // if (concreteElement instanceof Famix.ParametricMethod) {
                 this.fmxFunctionAndMethodMap.set(fullyQualifiedFilename, concElement as Famix.ParametricMethod);
             }
             this.famixRep.addElement(concElement);
-            this.fmxElementObjectMap.set(concElement,elDeclaration);
+            this.fmxElementObjectMap.set(concElement,concreteElementDeclaration);
         } else {
-            if (el instanceof Famix.ParametricClass) {
-                concElement = this.fmxClassMap.get(fullyQualifiedFilename);
-            } else if (el instanceof Famix.ParametricInterface) {
-                concElement = this.fmxInterfaceMap.get(fullyQualifiedFilename);
-            } else if (el instanceof Famix.ParametricFunction) {
-                concElement = this.fmxFunctionAndMethodMap.get(fullyQualifiedFilename);
-            } else if (el instanceof Famix.ParametricMethod) {
-                concElement = this.fmxFunctionAndMethodMap.get(fullyQualifiedFilename);
+            if (concreteElement instanceof Famix.ParametricClass) {
+                concElement = this.fmxClassMap.get(fullyQualifiedFilename) as Famix.ParametricClass;
+            } else if (concreteElement instanceof Famix.ParametricInterface) {
+                concElement = this.fmxInterfaceMap.get(fullyQualifiedFilename) as Famix.ParametricInterface;
+            } else if (concreteElement instanceof Famix.ParametricFunction) {
+                concElement = this.fmxFunctionAndMethodMap.get(fullyQualifiedFilename) as Famix.ParametricFunction;
+            } else {  // if (concreteElement instanceof Famix.ParametricMethod) {
+                concElement = this.fmxFunctionAndMethodMap.get(fullyQualifiedFilename) as Famix.ParametricMethod;
             }
         }
         return concElement;
@@ -479,7 +495,7 @@ export class EntityDictionary {
      * @param currentCC The cyclomatic complexity metrics of the current source file
      * @returns The Famix model of the method or the accessor
      */
-    public createOrGetFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: unknown): Famix.Method | Famix.Accessor | Famix.ParametricMethod {
+    public createOrGetFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: { [key: string]: number }): Famix.Method | Famix.Accessor | Famix.ParametricMethod {
         let fmxMethod: Famix.Method | Famix.Accessor | Famix.ParametricMethod;
         const isGeneric = method.getTypeParameters().length > 0;
         const functionFullyQualifiedName = FQNFunctions.getFQN(method);
@@ -588,7 +604,7 @@ export class EntityDictionary {
      * @param currentCC The cyclomatic complexity metrics of the current source file
      * @returns The Famix model of the function
      */
-    public createOrGetFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: unknown): Famix.Function | Famix.ParametricFunction {
+    public createOrGetFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: { [key: string]: number }): Famix.Function | Famix.ParametricFunction {
         let fmxFunction: Famix.Function | Famix.ParametricFunction;
         const isGeneric = func.getTypeParameters().length > 0;        
         const functionFullyQualifiedName = FQNFunctions.getFQN(func);
@@ -600,8 +616,9 @@ export class EntityDictionary {
                 fmxFunction = new Famix.Function();
             }
     
-            if (func.getName()) {
-                fmxFunction.name = func.getName();
+            const name = func.getName();
+            if (name) {
+                fmxFunction.name = name;
             }
             else {
                 fmxFunction.name = "anonymous";

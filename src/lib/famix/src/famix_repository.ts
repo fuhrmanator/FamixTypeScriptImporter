@@ -18,7 +18,8 @@ export class FamixRepository {
     private idCounter = 1; // Id counter
     private absolutePath: string = "";
     private fmxElementObjectMap = new Map<Famix.Entity, TSMorphObjectType>();
-
+    private tsMorphObjectMap = new Map<TSMorphObjectType, Famix.Entity>();
+    
     constructor() {
         this.addElement(new SourceLanguage());  // add the source language entity (TypeScript)
     }
