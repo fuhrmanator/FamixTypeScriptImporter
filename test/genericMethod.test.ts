@@ -48,7 +48,7 @@ describe('Tests for generics', () => {
         const pList = Array.from(i?.parameters as Set<Parameter>);
         const j = pList?.find(p => p.name === "j");
         expect(j).toBeTruthy();
-        expect(j?.getDeclaredType().name).toBe("T");
+        expect(j?.declaredType.name).toBe("T");
     });
 
     it("should contain a public method i", () => {

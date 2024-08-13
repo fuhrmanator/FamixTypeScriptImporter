@@ -175,7 +175,7 @@ describe('Tests for import clauses', () => {
         // expect the type of the importedEntity to be "StructuralEntity"
         expect((importClause?.importedEntity.constructor.name)).toBe("StructuralEntity");
         // expect the type of foo to be any
-        expect((importClause?.importedEntity as StructuralEntity).getDeclaredType()?.name).toBe("any");
+        expect((importClause?.importedEntity as StructuralEntity).declaredType?.name).toBe("any");
     });
 
 });

@@ -118,7 +118,7 @@ describe('Entities', () => {
 
     it("should contain an EntityClass with an attribute named 'name' of type string", () => {
         if (theEntityClass) {
-            expect(Array.from(theEntityClass.properties)[0].getDeclaredType().name).toBe("string");
+            expect(Array.from(theEntityClass.properties)[0].declaredType.name).toBe("string");
         }
     });
 
@@ -127,7 +127,7 @@ describe('Entities', () => {
             const p1Attribute = Array.from(theEntityClass.properties)[1];
             expect(p1Attribute.name).toBe("p1");
             expect(p1Attribute.visibility).toBe("private");
-            expect(p1Attribute.getDeclaredType().name).toBe("boolean");
+            expect(p1Attribute.declaredType.name).toBe("boolean");
         }
     });
 
@@ -135,7 +135,7 @@ describe('Entities', () => {
         if (theEntityClass) {
             const p2Attribute = Array.from(theEntityClass.properties)[2];
             expect(p2Attribute.name).toBe("#p2");
-            expect(p2Attribute.getDeclaredType().name).toBe("boolean");
+            expect(p2Attribute.declaredType.name).toBe("boolean");
         }
     });
 
@@ -144,7 +144,7 @@ describe('Entities', () => {
             const prot1Attribute = Array.from(theEntityClass.properties)[3];
             expect(prot1Attribute.name).toBe("prot1");
             expect(prot1Attribute.visibility).toBe("protected");
-            expect(prot1Attribute.getDeclaredType().name).toBe("Map<any, any>");
+            expect(prot1Attribute.declaredType.name).toBe("Map<any, any>");
         }
     });
 
@@ -153,7 +153,7 @@ describe('Entities', () => {
             const trustMeAttribute = Array.from(theEntityClass.properties)[4];
             expect(trustMeAttribute.name).toBe("trustMe");
             expect(trustMeAttribute.isDefinitelyAssigned).toBe(true);
-            expect(trustMeAttribute.getDeclaredType().name).toBe("string");
+            expect(trustMeAttribute.declaredType.name).toBe("string");
         }
     });
 
@@ -162,7 +162,7 @@ describe('Entities', () => {
             const roAttribute = Array.from(theEntityClass.properties)[5];
             expect(roAttribute.name).toBe("ro");
             expect(roAttribute.readOnly).toBe(true);
-            expect(roAttribute.getDeclaredType().name).toBe('"yes"');
+            expect(roAttribute.declaredType.name).toBe('"yes"');
         }
     });
 
@@ -171,7 +171,7 @@ describe('Entities', () => {
             const userCountAttribute = Array.from(theEntityClass.properties)[6];
             expect(userCountAttribute.name).toBe("#userCount");
             expect(userCountAttribute.isClassSide).toBe(true); // static
-            expect(userCountAttribute.getDeclaredType().name).toBe('number');
+            expect(userCountAttribute.declaredType.name).toBe('number');
         }
     });
 
@@ -180,7 +180,7 @@ describe('Entities', () => {
             const userCountAttribute = Array.from(theEntityClass.properties)[7];
             expect(userCountAttribute.name).toBe("optional");
             expect(userCountAttribute.isOptional).toBe(true);
-            expect(userCountAttribute.getDeclaredType().name).toBe('string');
+            expect(userCountAttribute.declaredType.name).toBe('string');
         }
     });
 
@@ -258,6 +258,6 @@ describe('Entities', () => {
         expect(setOfVariables).toBeTruthy();
         const someVar = setOfVariables.find(p => p.name === "someVar");
         expect(someVar).toBeTruthy();
-        expect(someVar?.getDeclaredType().name).toBe('typeof Foo');
+        expect(someVar?.declaredType.name).toBe('typeof Foo');
     });
 });

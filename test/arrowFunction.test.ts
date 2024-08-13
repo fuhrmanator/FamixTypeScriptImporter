@@ -77,11 +77,11 @@ describe('ArrowFunctions', () => {
         const firstParam = pIter?.next().value as Parameter;
         expect(firstParam).toBeTruthy();
         expect(firstParam.name).toBe("a");
-        expect(firstParam.getDeclaredType().name).toBe("number");
+        expect(firstParam.declaredType.name).toBe("number");
         const secondParam = pIter?.next().value as Parameter;
         expect(secondParam).toBeTruthy();
         expect(secondParam.name).toBe("b");
-        expect(secondParam.getDeclaredType().name).toBe("number");
+        expect(secondParam.declaredType.name).toBe("number");
     });
 
     it("should contain arrow function multiply with two parameters", () => {
@@ -98,11 +98,11 @@ describe('ArrowFunctions', () => {
         const firstParam = pIter?.next().value as Parameter;
         expect(firstParam).toBeTruthy();
         expect(firstParam.name).toBe("c");
-        expect(firstParam.getDeclaredType().name).toBe("number");
+        expect(firstParam.declaredType.name).toBe("number");
         const secondParam = pIter?.next().value as Parameter;
         expect(secondParam).toBeTruthy();
         expect(secondParam.name).toBe("d");
-        expect(secondParam.getDeclaredType().name).toBe("number");
+        expect(secondParam.declaredType.name).toBe("number");
     });
 
     it("should contain arrow function greet with no parameters", () => {
@@ -121,7 +121,7 @@ describe('ArrowFunctions', () => {
         expect(pIter).toBeTruthy();
         const p1 = pIter?.next().value as Parameter;
         expect(p1.name).toBe("x");
-        expect(p1.getDeclaredType().name).toBe("number");
+        expect(p1.declaredType.name).toBe("number");
     });
 
     it("should contain an arrow function with a single parameter t", () => {
@@ -138,7 +138,7 @@ describe('ArrowFunctions', () => {
         const firstParam = pIter?.next().value as Parameter;
         expect(firstParam).toBeTruthy();
         expect(firstParam.name).toBe("t");
-        expect(firstParam.getDeclaredType().name).toBe("any");
+        expect(firstParam.declaredType.name).toBe("any");
     });
 
     it("should contain a class User inside an arrow function", () => {

@@ -33,7 +33,7 @@ describe('Tests for generics', () => {
         const pList = Array.from(func?.parameters as Set<Parameter>);
         const arg = pList?.find(p => p.name === "arg");
         expect(arg).toBeTruthy();
-        expect(arg?.getDeclaredType().name).toBe("T");
+        expect(arg?.declaredType.name).toBe("T");
     });
 
 });

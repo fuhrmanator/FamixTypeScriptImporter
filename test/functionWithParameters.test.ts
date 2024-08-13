@@ -25,7 +25,7 @@ describe('Tests for function with parameters', () => {
     });
 
     it("should be of type number", () => {
-        expect(firstParam?.getDeclaredType().name).toBe("number");
+        expect(firstParam?.declaredType.name).toBe("number");
         expect(firstParam?.parentEntity).toBe(theFunction);
     });
 
@@ -35,7 +35,7 @@ describe('Tests for function with parameters', () => {
     });
 
     it("should be of type string", () => {
-        expect(secondParam?.getDeclaredType().name).toBe("string");
+        expect(secondParam?.declaredType.name).toBe("string");
         expect(secondParam?.parentEntity).toBe(theFunction);
     });
 });

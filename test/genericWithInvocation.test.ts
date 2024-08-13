@@ -36,7 +36,7 @@ describe('Tests for generics', () => {
         expect(pList).toBeTruthy();
         const x = pList.find(p => p.name === "x");
         expect(x).toBeTruthy();
-        expect(x?.getDeclaredType().name).toBe("AA");
+        expect(x?.declaredType.name).toBe("AA");
     });
     
     it("should contain an invocation for i", () => {

@@ -101,7 +101,7 @@ describe('Tests for generics (from FamixTypeScript)', () => {
         const parameter = parametricMethod.parameters.values().next().value as Parameter;
         expect(parameter).toBeTruthy();
         expect(parameter.name).toBe("t");
-        expect(parameter.getDeclaredType().name).toBe("T");
+        expect(parameter.declaredType.name).toBe("T");
     });
 
     let parametricFunction : ParametricFunction;
@@ -122,7 +122,7 @@ describe('Tests for generics (from FamixTypeScript)', () => {
         const parameter = parametricFunction.parameters.values().next().value as Parameter;
         expect(parameter).toBeTruthy();
         expect(parameter.name).toBe("t");
-        expect(parameter.getDeclaredType().name).toBe("T");
+        expect(parameter.declaredType.name).toBe("T");
     });
 
     let parametricArrowFunction: ParametricArrowFunction;
@@ -143,6 +143,6 @@ describe('Tests for generics (from FamixTypeScript)', () => {
         const parameter = parametricArrowFunction.parameters.values().next().value as Parameter;
         expect(parameter).toBeTruthy();
         expect(parameter.name).toBe("t");
-        expect(parameter.getDeclaredType().name).toBe("T");
+        expect(parameter.declaredType.name).toBe("T");
     });
 });

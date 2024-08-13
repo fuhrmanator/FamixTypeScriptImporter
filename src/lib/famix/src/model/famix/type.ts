@@ -40,7 +40,7 @@ export class Type extends ContainerEntity {
   public addStructureWithDeclaredType(structureWithDeclaredType: StructuralEntity): void {
     if (!this.structuresWithDeclaredType.has(structureWithDeclaredType)) {
       this.structuresWithDeclaredType.add(structureWithDeclaredType);
-      structureWithDeclaredType.setDeclaredType(this);
+      structureWithDeclaredType.declaredType = this;
     }
   }
 

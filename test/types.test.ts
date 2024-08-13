@@ -69,8 +69,8 @@ describe('Tests for types', () => {
     it("should contain a variable 'a' of type 'A'", () => {
         const aVariable = fmxRep._getFamixVariable("{types.ts}.a[VariableDeclaration]");
         expect(aVariable).toBeTruthy();
-        expect(aVariable?.getDeclaredType()).toBeTruthy();
-        expect(aVariable?.getDeclaredType()?.name).toBe("A");
+        expect(aVariable?.declaredType).toBeTruthy();
+        expect(aVariable?.declaredType?.name).toBe("A");
     });
 
     it("should contain a parameterized type", () => {

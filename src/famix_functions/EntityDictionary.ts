@@ -426,7 +426,7 @@ export class EntityDictionary {
         }
 
         const fmxType = this.createOrGetFamixType(propTypeName, property);
-        fmxProperty.setDeclaredType(fmxType);
+        fmxProperty.declaredType = fmxType;
 
         // add the visibility (public, private, etc.) to the fmxProperty
         fmxProperty.visibility = "";
@@ -655,7 +655,7 @@ export class EntityDictionary {
         }
 
         const fmxType = this.createOrGetFamixType(paramTypeName, param);
-        fmxParam.setDeclaredType(fmxType);
+        fmxParam.declaredType = fmxType;
         fmxParam.name = param.getName();
 
         initFQN(param, fmxParam);
@@ -769,7 +769,7 @@ export class EntityDictionary {
         }
     
         const fmxType = this.createOrGetFamixType(variableTypeName, variable);
-        fmxVariable.setDeclaredType(fmxType);
+        fmxVariable.declaredType = fmxType;
         fmxVariable.name = variable.getName();
         initFQN(variable, fmxVariable);
         this.makeFamixIndexFileAnchor(variable, fmxVariable);
@@ -815,7 +815,7 @@ export class EntityDictionary {
         }
 
         const fmxType = this.createOrGetFamixType(enumValueTypeName, enumMember);
-        fmxEnumValue.setDeclaredType(fmxType);
+        fmxEnumValue.declaredType = fmxType;
         fmxEnumValue.name = enumMember.getName();
         initFQN(enumMember, fmxEnumValue);
         this.makeFamixIndexFileAnchor(enumMember, fmxEnumValue);
@@ -1137,7 +1137,7 @@ export class EntityDictionary {
             this.makeFamixIndexFileAnchor(importElement, importedEntity);
             importedEntity.fullyQualifiedName = pathName;
             const anyType = this.createOrGetFamixType('any', undefined);
-            (importedEntity as Famix.StructuralEntity).setDeclaredType(anyType);
+            (importedEntity as Famix.StructuralEntity).declaredType = anyType;
         } else {  // default imports, e.g. import ClassW from "./complexExportModule";  
             importedEntityName = importElement.getText();
             pathName = pathName + (isDefaultExport ? "defaultExport" : "namespaceExport");
