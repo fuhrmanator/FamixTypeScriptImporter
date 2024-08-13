@@ -5,78 +5,14 @@ import { Interface } from "./interface";
 
 export class Method extends BehavioralEntity {
 
-  private parentEntity: Class | Interface;
+  private _parentEntity: Class | Interface;
+  private _kind: string;
+  private _isAbstract: boolean;
+  private _isClassSide: boolean;
+  private _isPrivate: boolean;
+  private _isPublic: boolean;
+  private _isProtected: boolean;
 
-  public getParentEntity(): Class | Interface {
-    return this.parentEntity;
-  }
-
-  public setParentEntity(parentEntity: Class | Interface): void {
-    this.parentEntity = parentEntity;
-    parentEntity.addMethod(this);
-  }
-
-  private kind: string;
-
-  public getKind(): string {
-    return this.kind;
-  }
-
-  public setKind(kind: string): void {
-    this.kind = kind;
-  }
-
-  private isAbstract: boolean;
-
-  public getIsAbstract(): boolean {
-    return this.isAbstract;
-  }
-
-  public setIsAbstract(isAbstract: boolean): void {
-    this.isAbstract = isAbstract;
-  }
-
-  private isClassSide: boolean;
-
-  public getIsClassSide(): boolean {
-    return this.isClassSide;
-  }
-
-  public setIsClassSide(isClassSide: boolean): void {
-    this.isClassSide = isClassSide;
-  }
-
-  private isPrivate: boolean;
-
-  public getIsPrivate(): boolean {
-    return this.isPrivate;
-  }
-
-  public setIsPrivate(isPrivate: boolean): void {
-    this.isPrivate = isPrivate;
-  }
-
-  private isPublic: boolean;
-
-  public getIsPublic(): boolean {
-    return this.isPublic;
-  }
-
-  public setIsPublic(isPublic: boolean): void {
-    this.isPublic = isPublic;
-  }
-
-  private isProtected: boolean;
-
-  public getIsProtected(): boolean {
-    return this.isProtected;
-  }
-
-  public setIsProtected(isProtected: boolean): void {
-    this.isProtected = isProtected;
-  }
-
-  
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("Method", this);
     this.addPropertiesToExporter(json);
@@ -85,12 +21,69 @@ export class Method extends BehavioralEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("parentType", this.getParentEntity());
-    exporter.addProperty("kind", this.getKind());
-    exporter.addProperty("isAbstract", this.getIsAbstract());
-    exporter.addProperty("isClassSide", this.getIsClassSide());
-    exporter.addProperty("isPrivate", this.getIsPrivate());
-    exporter.addProperty("isPublic", this.getIsPublic());
-    exporter.addProperty("isProtected", this.getIsProtected());
+    exporter.addProperty("parentType", this.parentEntity);
+    exporter.addProperty("kind", this.kind);
+    exporter.addProperty("isAbstract", this.isAbstract);
+    exporter.addProperty("isClassSide", this.isClassSide);
+    exporter.addProperty("isPrivate", this.isPrivate);
+    exporter.addProperty("isPublic", this.isPublic);
+    exporter.addProperty("isProtected", this.isProtected);
   }
+
+    get parentEntity() {
+        return this._parentEntity;
+    }
+
+    set parentEntity(parentEntity: Class | Interface) {
+        this._parentEntity = parentEntity;
+        parentEntity.addMethod(this);
+    }
+
+    get kind() {
+        return this._kind;
+    }
+
+    set kind(kind: string) {
+        this._kind = kind;
+    }
+
+    get isAbstract() {
+        return this._isAbstract;
+    }
+
+    set isAbstract(isAbstract: boolean) {
+        this._isAbstract = isAbstract;
+    }
+
+    get isClassSide() {
+        return this._isClassSide;
+    }
+
+    set isClassSide(isClassSide: boolean) {
+        this._isClassSide = isClassSide;
+    }
+
+    get isPrivate() {
+        return this._isPrivate;
+    }
+
+    set isPrivate(isPrivate: boolean) {
+        this._isPrivate = isPrivate;
+    }
+
+    get isPublic() {
+        return this._isPublic;
+    }
+
+    set isPublic(isPublic: boolean) {
+        this._isPublic = isPublic;
+    }
+
+    get isProtected() {
+        return this._isProtected;
+    }
+
+    set isProtected(isProtected: boolean) {
+        this._isProtected = isProtected;
+    }
 }

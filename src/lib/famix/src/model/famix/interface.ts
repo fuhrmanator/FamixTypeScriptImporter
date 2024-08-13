@@ -20,7 +20,7 @@ export class Interface extends Type {
     public addMethod(method: Method): void {
         if (!this._methods.has(method)) {
             this._methods.add(method);
-            method.setParentEntity(this);
+            method.parentEntity = this;
         }
     }
 

@@ -57,12 +57,12 @@ describe('Tests for generics', () => {
         const i = pList.find(p => p.getName() === "i");
         expect(i).toBeTruthy();
         if (i) {
-            expect(i.getKind()).toBe(undefined);
+            expect(i.kind).toBe(undefined);
             expect(i.isAbstract).toBe(false);
-            expect(i.getIsClassSide()).toBe(false);
-            expect(i.getIsPrivate()).toBe(false);
-            expect(i.getIsProtected()).toBe(false);
-            expect(i.getIsPublic()).toBe(true);
+            expect(i.isClassSide).toBe(false);
+            expect(i.isPrivate).toBe(false);
+            expect(i.isProtected).toBe(false);
+            expect(i.isPublic).toBe(true);
         }
     });
 });

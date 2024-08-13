@@ -489,8 +489,8 @@ export class EntityDictionary {
                 fmxMethod = new Famix.Accessor();
                 const isGetter = method instanceof GetAccessorDeclaration;
                 const isSetter = method instanceof SetAccessorDeclaration;
-                if (isGetter) {(fmxMethod as Famix.Accessor).setKind("getter");}
-                if (isSetter) {(fmxMethod as Famix.Accessor).setKind("setter");}
+                if (isGetter) {(fmxMethod as Famix.Accessor).kind = "getter";}
+                if (isSetter) {(fmxMethod as Famix.Accessor).kind = "setter";}
                 this.famixRep.addElement(fmxMethod);
             }
             else {
@@ -512,11 +512,11 @@ export class EntityDictionary {
                 isStatic = method.isStatic();
             }
 
-            if (isConstructor) {(fmxMethod as Famix.Accessor).setKind("constructor");}
-            fmxMethod.setIsAbstract(isAbstract);
-            fmxMethod.setIsClassSide(isStatic);
-            fmxMethod.setIsPrivate((method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) ? (method.getModifiers().find(x => x.getText() === 'private')) !== undefined : false);
-            fmxMethod.setIsProtected((method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) ? (method.getModifiers().find(x => x.getText() === 'protected')) !== undefined : false);
+            if (isConstructor) {(fmxMethod as Famix.Accessor).kind = "constructor";}
+            fmxMethod.isAbstract = isAbstract;
+            fmxMethod.isClassSide = isStatic;
+            fmxMethod.isPrivate = (method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) ? (method.getModifiers().find(x => x.getText() === 'private')) !== undefined : false;
+            fmxMethod.isProtected = (method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) ? (method.getModifiers().find(x => x.getText() === 'protected')) !== undefined : false;
             fmxMethod.signature = Helpers.computeSignature(method.getText());
 
             let methodName: string;
@@ -530,15 +530,15 @@ export class EntityDictionary {
 
             if (!isConstructor) {
                 if (method.getName().substring(0, 1) === "#") {
-                    fmxMethod.setIsPrivate(true);
+                    fmxMethod.isPrivate = true;
                 }
             }
 
-            if (!fmxMethod.getIsPrivate() && !fmxMethod.getIsProtected()) {
-                fmxMethod.setIsPublic(true);    
+            if (!fmxMethod.isPrivate && !fmxMethod.isProtected) {
+                fmxMethod.isPublic = true;
             }
             else {
-                fmxMethod.setIsPublic(false);
+                fmxMethod.isPublic = false;
             }
 
             if (!isSignature) {

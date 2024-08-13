@@ -75,7 +75,7 @@ describe('Entities', () => {
             const move2Method = fmxRep._getFamixMethod("{entities.ts}.MyNamespace.EntityClass.move2[MethodDeclaration]");
             expect(move2Method).toBeTruthy();
             if (move2Method) {
-                expect(move2Method.getIsPrivate()).toBe(true);
+                expect(move2Method.isPrivate).toBe(true);
             }
         } 
     });
@@ -93,7 +93,7 @@ describe('Entities', () => {
     it("should contain a constructor in EntityClass", () => {
         const theConstructor = fmxRep._getFamixMethod("{entities.ts}.MyNamespace.EntityClass.constructor[Constructor]") as Method;
         expect(theConstructor).toBeTruthy();
-        expect(theConstructor.getKind()).toBe("constructor");
+        expect(theConstructor.kind).toBe("constructor");
     });
 
     it("should have a parent relationship between EntityClass and its methods", () => {
@@ -201,7 +201,7 @@ describe('Entities', () => {
         expect(clsInNSP).toBeTruthy();
         const aStaticMethod = Array.from(clsInNSP!.methods).find(m => m.getName() === 'aStaticMethod');
         expect(aStaticMethod).toBeTruthy();
-        expect(aStaticMethod!.getIsClassSide()).toBe(true);
+        expect(aStaticMethod!.isClassSide).toBe(true);
     });
 
     it("should contain a private method named '#move3'", () => {
@@ -209,10 +209,10 @@ describe('Entities', () => {
         expect(cls).toBeTruthy();
         const aMethod = Array.from(cls!.methods).find(m => m.getName() === '#move3');
         expect(aMethod).toBeTruthy();
-        expect(aMethod!.getIsPrivate()).toBe(true);
-        expect(aMethod!.getIsProtected()).toBe(false);
-        expect(aMethod!.getIsPublic()).toBe(false);
-        expect(aMethod!.getIsClassSide()).toBe(false);
+        expect(aMethod!.isPrivate).toBe(true);
+        expect(aMethod!.isProtected).toBe(false);
+        expect(aMethod!.isPublic).toBe(false);
+        expect(aMethod!.isClassSide).toBe(false);
     });
 
     // global scope

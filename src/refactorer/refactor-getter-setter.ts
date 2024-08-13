@@ -2,7 +2,7 @@ import { Project, PropertyDeclaration, SyntaxKind } from "ts-morph";
 import * as path from "path";
 
 const project = new Project();
-project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/invocation.ts");
+project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/method.ts");
 project.getSourceFiles().forEach(sourceFile => { console.log(sourceFile.getFilePath()); });
 
 project.getSourceFiles().forEach(sourceFile => {
@@ -84,7 +84,7 @@ function refactorToGetter(cls: any, method: any, propName: string, typeMap: Map<
     cls.addGetAccessor({
         name: getterName,
         statements: getterBody,
-        returnType: simplifiedType,
+        // returnType: simplifiedType,  // don't need a return type for getter
     });
 
     method.remove();
