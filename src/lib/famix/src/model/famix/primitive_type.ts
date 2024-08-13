@@ -3,13 +3,13 @@ import { Type } from "./type";
 
 export class PrimitiveType extends Type {
 
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("PrimitiveType", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("PrimitiveType", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+    }
 }
