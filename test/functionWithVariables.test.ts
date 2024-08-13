@@ -30,7 +30,7 @@ describe('Tests for function with variables', () => {
 
     it("should have a variable 'i' with three comments", () => {
         expect(firstVariable).toBeTruthy();
-        expect(firstVariable?.getParentContainerEntity()).toBe(theFunction);
+        expect(firstVariable?.parentContainerEntity).toBe(theFunction);
         expect(firstVariable?.comments.size).toBe(3);
 
         expect(getCommentTextFromCommentViaAnchor(firstVariableComments[0], project)).toBe(`/*comment 2*/`);
@@ -51,7 +51,7 @@ describe('Tests for function with variables', () => {
 
     it("should have a variable 'j' with two comments", () => {
         expect(secondVariable).toBeTruthy();
-        expect(secondVariable?.getParentContainerEntity()).toBe(theFunction);
+        expect(secondVariable?.parentContainerEntity).toBe(theFunction);
         expect(secondVariableComments.length).toBe(2);
 
         let anchor = secondVariableComments[0]?.sourceAnchor as IndexedFileAnchor;
@@ -75,7 +75,7 @@ describe('Tests for function with variables', () => {
     const thirdVariable = Array.from(theFunction?.variables).find((p) => p.name === "x");
     it("should have a variable 'x'", () => {
         expect(thirdVariable).toBeTruthy();
-        expect(thirdVariable?.getParentContainerEntity()).toBe(theFunction);
+        expect(thirdVariable?.parentContainerEntity).toBe(theFunction);
     });
 
     it("should be of type string", () => {

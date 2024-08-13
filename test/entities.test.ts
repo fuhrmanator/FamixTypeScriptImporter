@@ -233,7 +233,7 @@ describe('Entities', () => {
         expect(setOfVariables).toBeTruthy();
         const globalVar = setOfVariables.find(p => p.name === "aInGlobalFunc");
         expect(globalVar).toBeTruthy();
-        expect(globalVar?.getParentContainerEntity().name).toBe('globalFunc');
+        expect(globalVar?.parentContainerEntity.name).toBe('globalFunc');
         expect(globalVar?.getJSON()).toMatch(/"parentBehaviouralEntity":{"ref":\d+}/);  // parentBehaviouralEntity is the name used in the Trait in Famix -- it is the parent container
     });
 
@@ -241,7 +241,7 @@ describe('Entities', () => {
         expect(setOfVariables).toBeTruthy();
         const globalVar = setOfVariables.find(p => p.name === "bInFInGlobalFunc");
         expect(globalVar).toBeTruthy();
-        expect(globalVar?.getParentContainerEntity().name).toBe('fInGlobalFunc');
+        expect(globalVar?.parentContainerEntity.name).toBe('fInGlobalFunc');
         expect(globalVar?.getJSON()).toMatch(/"parentBehaviouralEntity":{"ref":\d+}/);  // parentBehaviouralEntity is the name used in the Trait in Famix -- it is the parent container
     });
 
@@ -249,7 +249,7 @@ describe('Entities', () => {
         expect(setOfVariables).toBeTruthy();
         const globalVar = setOfVariables.find(p => p.name === "someVar");
         expect(globalVar).toBeTruthy();
-        expect(globalVar?.getParentContainerEntity().name).toBe('entities.ts');
+        expect(globalVar?.parentContainerEntity.name).toBe('entities.ts');
         expect(globalVar?.getJSON()).toMatch(/"parentBehaviouralEntity":{"ref":\d+}/);  // parentBehaviouralEntity is the name used in the Trait in Famix -- it is the parent container
     });
 

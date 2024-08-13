@@ -4,25 +4,24 @@ import { StructuralEntity } from "./structural_entity";
 
 export class Variable extends StructuralEntity {
 
-  private parentContainerEntity: ContainerEntity;
+    private _parentContainerEntity: ContainerEntity;
 
-  public getParentContainerEntity(): ContainerEntity {
-    return this.parentContainerEntity;
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("Variable", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public setParentContainerEntity(parentContainerEntity: ContainerEntity): void {
-    this.parentContainerEntity = parentContainerEntity;
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("parentBehaviouralEntity", this.parentContainerEntity);
+    }
 
+    get parentContainerEntity() {
+        return this._parentContainerEntity;
+    }
 
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("Variable", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
-
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("parentBehaviouralEntity", this.getParentContainerEntity());
-  }
+    set parentContainerEntity(parentContainerEntity: ContainerEntity) {
+        this._parentContainerEntity = parentContainerEntity;
+    }
 }

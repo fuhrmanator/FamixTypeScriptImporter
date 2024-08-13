@@ -72,7 +72,7 @@ export class ContainerEntity extends NamedEntity {
     public addVariable(variable: Variable): void {
         if (!this._variables.has(variable)) {
             this._variables.add(variable);
-            variable.setParentContainerEntity(this);
+            variable.parentContainerEntity = this;
         }
     }
 
