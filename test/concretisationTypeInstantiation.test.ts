@@ -57,8 +57,8 @@ describe('Tests for concretisation', () => {
         const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
         const iterator = theConcretisation.values();
         const firstElement = iterator.next().value;
-        expect(firstElement.getConcreteEntity().getName()).toBe("MyClass");
-        const concParameter = firstElement.getConcreteEntity().concreteParameters.values().next().value;
+        expect(firstElement.concreteEntity.getName()).toBe("MyClass");
+        const concParameter = firstElement.concreteEntity.concreteParameters.values().next().value;
         expect(concParameter.getName()).toBe("boolean");
     });
 
@@ -67,8 +67,8 @@ describe('Tests for concretisation', () => {
         const iterator = theConcretisation.values();
         const firstElement = iterator.next().value;
         const secondElement = iterator.next().value;
-        expect(secondElement.getConcreteEntity().getName()).toBe("InterfaceE");
-        const concParameter = secondElement.getConcreteEntity().concreteParameters.values().next().value;
+        expect(secondElement.concreteEntity.getName()).toBe("InterfaceE");
+        const concParameter = secondElement.concreteEntity.concreteParameters.values().next().value;
         expect(concParameter.getName()).toBe("number");
     });
 

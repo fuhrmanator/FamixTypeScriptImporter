@@ -59,8 +59,8 @@ describe('Tests for concretisation', () => {
         const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
         const iterator = theConcretisation.values();
         const firstElement = iterator.next().value;
-        expect(firstElement.getGenericEntity()).toBe(theClass);
-        const T = firstElement.getGenericEntity().genericParameters.values().next().value;
+        expect(firstElement.genericEntity).toBe(theClass);
+        const T = firstElement.genericEntity.genericParameters.values().next().value;
         expect(T.getName()).toBe("T");
     });
 

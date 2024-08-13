@@ -1240,8 +1240,8 @@ export class EntityDictionary {
         
         const fmxConcretisation : Famix.Concretisation = new Famix.Concretisation();              
         
-        fmxConcretisation.setConcreteEntity(conEntity);
-        fmxConcretisation.setGenericEntity(genEntity);
+        fmxConcretisation.concreteEntity = conEntity;
+        fmxConcretisation.genericEntity = genEntity;
         this.fmxElementObjectMap.set(fmxConcretisation,null);
         this.famixRep.addElement(fmxConcretisation);    
         const parameterConcretisation = this.createFamixParameterConcrestisation(fmxConcretisation);
@@ -1255,8 +1255,8 @@ export class EntityDictionary {
      * @returns The Famix model of the ParameterConcrestisation
      */
     public createFamixParameterConcrestisation(concretisation: Famix.Concretisation): Famix.ParameterConcretisation {
-        const conClass = concretisation.getConcreteEntity();
-        const genClass = concretisation.getGenericEntity();
+        const conClass = concretisation.concreteEntity;
+        const genClass = concretisation.genericEntity;
         const parameterConcretisations = this.famixRep._getAllEntitiesWithType("ParameterConcretisation");
         const concreteParameters = conClass.concreteParameters;
         const genericParameters = genClass.genericParameters;
@@ -1336,7 +1336,7 @@ export class EntityDictionary {
                         const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
                         let createConcretisation : boolean = true;
                         concretisations.forEach((conc : Famix.Concretisation) => {
-                            if (genEntity.getFullyQualifiedName() == conc.getGenericEntity().getFullyQualifiedName() && conc.getConcreteEntity().getFullyQualifiedName() == conEntity.getFullyQualifiedName()){
+                            if (genEntity.getFullyQualifiedName() == conc.genericEntity.getFullyQualifiedName() && conc.concreteEntity.getFullyQualifiedName() == conEntity.getFullyQualifiedName()){
                                 createConcretisation = false;
                             }
                         });
@@ -1377,7 +1377,7 @@ export class EntityDictionary {
                         const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
                         let createConcretisation : boolean = true;
                         concretisations.forEach((conc : Famix.Concretisation) => {
-                            if (genEntity.getFullyQualifiedName() == conc.getGenericEntity().getFullyQualifiedName() && conc.getConcreteEntity().getFullyQualifiedName() == conEntity.getFullyQualifiedName()){
+                            if (genEntity.getFullyQualifiedName() == conc.genericEntity.getFullyQualifiedName() && conc.concreteEntity.getFullyQualifiedName() == conEntity.getFullyQualifiedName()){
                                 createConcretisation = false;
                             }
                         });
@@ -1422,7 +1422,7 @@ export class EntityDictionary {
                                 const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
                                 let createConcretisation : boolean = true;
                                 concretisations.forEach((conc : Famix.Concretisation) => {
-                                    if (genElement.getFullyQualifiedName() == conc.getGenericEntity().getFullyQualifiedName() && conc.getConcreteEntity().getFullyQualifiedName() == concElement.getFullyQualifiedName()){
+                                    if (genElement.getFullyQualifiedName() == conc.genericEntity.getFullyQualifiedName() && conc.concreteEntity.getFullyQualifiedName() == concElement.getFullyQualifiedName()){
                                         createConcretisation = false;
                                     }
                                 });
@@ -1461,7 +1461,7 @@ export class EntityDictionary {
                     const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
                     let createConcretisation : boolean = true;
                     concretisations.forEach((conc : Famix.Concretisation) => {
-                        if (genInterface.getFullyQualifiedName() == conc.getGenericEntity().getFullyQualifiedName() && conc.getConcreteEntity().getFullyQualifiedName() == conInterface.getFullyQualifiedName()){
+                        if (genInterface.getFullyQualifiedName() == conc.genericEntity.getFullyQualifiedName() && conc.concreteEntity.getFullyQualifiedName() == conInterface.getFullyQualifiedName()){
                             createConcretisation = false;
                         }
                     });
@@ -1506,7 +1506,7 @@ export class EntityDictionary {
                                 const concretisations = this.famixRep._getAllEntitiesWithType("Concretisation");
                                 let createConcretisation : boolean = true;
                                 concretisations.forEach((conc : Famix.Concretisation) => {
-                                    if (genElement.getFullyQualifiedName() == conc.getGenericEntity().getFullyQualifiedName() && conc.getConcreteEntity().getFullyQualifiedName() == concElement.getFullyQualifiedName()){
+                                    if (genElement.getFullyQualifiedName() == conc.genericEntity.getFullyQualifiedName() && conc.concreteEntity.getFullyQualifiedName() == concElement.getFullyQualifiedName()){
                                         createConcretisation = false;
                                     }
                                 });
