@@ -27,18 +27,18 @@ describe.skip('Tests for class extends undefined class', () => {
         const myClass2 = cList.find(p => p.getName() === "MyClass");
         expect(myClass2).toBeTruthy();
         if (myClass2) {
-            expect(myClass2.getSubInheritances().size).toBe(0);
-            expect(myClass2.getSuperInheritances().size).toBe(1);
-            const theInheritance = (Array.from(myClass2.getSuperInheritances())[0]);
-            expect(theInheritance.getSuperclass()).toBeTruthy();
-            expect(theInheritance.getSuperclass()).toBe(myClass1);
+            expect(myClass2.subInheritances.size).toBe(0);
+            expect(myClass2.superInheritances.size).toBe(1);
+            const theInheritance = (Array.from(myClass2.superInheritances)[0]);
+            expect(theInheritance.superclass).toBeTruthy();
+            expect(theInheritance.superclass).toBe(myClass1);
         }
         if (myClass1) {
-            expect(myClass1.getSubInheritances().size).toBe(1);
-            expect(myClass1.getSuperInheritances().size).toBe(0);
-            const theInheritance = (Array.from(myClass1.getSubInheritances())[0]);
-            expect(theInheritance.getSubclass()).toBeTruthy();
-            expect(theInheritance.getSubclass()).toBe(myClass2);
+            expect(myClass1.subInheritances.size).toBe(1);
+            expect(myClass1.superInheritances.size).toBe(0);
+            const theInheritance = (Array.from(myClass1.subInheritances)[0]);
+            expect(theInheritance.subclass).toBeTruthy();
+            expect(theInheritance.subclass).toBe(myClass2);
         }
     });
 });

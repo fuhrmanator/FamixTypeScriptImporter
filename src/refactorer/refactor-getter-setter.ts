@@ -2,7 +2,7 @@ import { Project, PropertyDeclaration, SyntaxKind } from "ts-morph";
 import * as path from "path";
 
 const project = new Project();
-project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/indexed_file_anchor.ts");
+project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/inheritance.ts");
 project.getSourceFiles().forEach(sourceFile => { console.log(sourceFile.getFilePath()); });
 
 project.getSourceFiles().forEach(sourceFile => {

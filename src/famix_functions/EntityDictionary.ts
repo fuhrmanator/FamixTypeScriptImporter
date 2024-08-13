@@ -1061,8 +1061,8 @@ export class EntityDictionary {
             this.famixRep.addElement(superClass);
         }
 
-        fmxInheritance.setSubclass(subClass);
-        fmxInheritance.setSuperclass(superClass);
+        fmxInheritance.subclass = subClass;
+        fmxInheritance.superclass = superClass;
 
         this.famixRep.addElement(fmxInheritance);
 

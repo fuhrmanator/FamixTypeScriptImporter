@@ -189,7 +189,7 @@ describe('Entities', () => {
     });
 
     it("should contain an EntityClass with one subclass named 'class2'", () => {
-        const theClassSubclass = Array.from(theEntityClass!.subInheritances)[0].getSubclass();
+        const theClassSubclass = Array.from(theEntityClass!.subInheritances)[0].subclass;
         expect(theClassSubclass.getName()).toBe("class2");
         if (theSubclass) {
             expect(theSubclass).toBe(theClassSubclass);

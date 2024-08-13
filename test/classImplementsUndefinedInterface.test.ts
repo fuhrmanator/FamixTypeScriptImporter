@@ -37,15 +37,15 @@ describe('Tests for class implements undefined interface', () => {
             expect(myClass.subInheritances.size).toBe(0);
             expect(myClass.superInheritances.size).toBe(1);
             const theInheritance = (Array.from(myClass.superInheritances)[0]);
-            expect(theInheritance.getSuperclass()).toBeTruthy();
-            expect(theInheritance.getSuperclass()).toBe(myInterface1);
+            expect(theInheritance.superclass).toBeTruthy();
+            expect(theInheritance.superclass).toBe(myInterface1);
         }
         if (myInterface1) {
             expect(myInterface1.subInheritances.size).toBe(1);
             expect(myInterface1.superInheritances.size).toBe(0);
             const theInheritance = (Array.from(myInterface1.subInheritances)[0]);
-            expect(theInheritance.getSubclass()).toBeTruthy();
-            expect(theInheritance.getSubclass()).toBe(myClass);
+            expect(theInheritance.subclass).toBeTruthy();
+            expect(theInheritance.subclass).toBe(myClass);
         }
     });
 });

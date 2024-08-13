@@ -36,15 +36,15 @@ describe('Tests for generic class inherits interface', () => {
             expect(myDao.subInheritances.size).toBe(0);
             expect(myDao.superInheritances.size).toBe(1);
             const theInheritance = (Array.from(myDao.superInheritances)[0]);
-            expect(theInheritance.getSuperclass()).toBeTruthy();
-            expect(theInheritance.getSuperclass()).toBe(myDaoInterface);
+            expect(theInheritance.superclass).toBeTruthy();
+            expect(theInheritance.superclass).toBe(myDaoInterface);
         }
         if (myDaoInterface) {
             expect(myDaoInterface.subInheritances.size).toBe(1);
             expect(myDaoInterface.superInheritances.size).toBe(0);
             const theInheritance = (Array.from(myDaoInterface.subInheritances)[0]);
-            expect(theInheritance.getSubclass()).toBeTruthy();
-            expect(theInheritance.getSubclass()).toBe(myDao);
+            expect(theInheritance.subclass).toBeTruthy();
+            expect(theInheritance.subclass).toBe(myDao);
         }
     });
 });

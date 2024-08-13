@@ -29,7 +29,7 @@ export class Interface extends Type {
     public addSuperInheritance(superInheritance: Inheritance): void {
         if (!this._superInheritances.has(superInheritance)) {
             this._superInheritances.add(superInheritance);
-            superInheritance.setSubclass(this);
+            superInheritance.subclass = this;
         }
     }
 
@@ -38,7 +38,7 @@ export class Interface extends Type {
     public addSubInheritance(subInheritance: Inheritance): void {
         if (!this._subInheritances.has(subInheritance)) {
             this._subInheritances.add(subInheritance);
-            subInheritance.setSuperclass(this);
+            subInheritance.superclass = this;
         }
     }
 

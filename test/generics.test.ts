@@ -64,8 +64,8 @@ describe('Generics', () => {
         if (myDao) {
             expect(myDao.superInheritances.size).toBe(1);
             const theInheritance = (Array.from(myDao.superInheritances)[0]);
-            expect(theInheritance.getSuperclass()).toBeTruthy();
-            expect(theInheritance.getSuperclass()).toBe(myDaoInterface);
+            expect(theInheritance.superclass).toBeTruthy();
+            expect(theInheritance.superclass).toBe(myDaoInterface);
         }
     });
 });
