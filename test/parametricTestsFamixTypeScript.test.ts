@@ -60,7 +60,7 @@ describe('Tests for generics (from FamixTypeScript)', () => {
     });
     
     it("Class A should contain a method testMethod", () => {
-        const listOfMethodsOfClassA = fmxRep._getFamixClass("{parametricTests.ts}.A[ClassDeclaration]")?.getMethods();
+        const listOfMethodsOfClassA = fmxRep._getFamixClass("{parametricTests.ts}.A[ClassDeclaration]")?.methods;
         expect(listOfMethodsOfClassA?.size).toBe(1);
         expect(Array.from(listOfMethodsOfClassA as Set<Method>)[0].getName()).toBe("testMethod");
     });
@@ -92,13 +92,13 @@ describe('Tests for generics (from FamixTypeScript)', () => {
     });
 
     it("parametric method should have one parameter", () => {
-        const parameters = parametricMethod.getParameters();
+        const parameters = parametricMethod.parameters;
         expect(parameters).toBeTruthy();
         expect(parameters.size).toBe(1);
     });
 
     it("parametric method should have one parameter named 't' and of type 'T'", () => {
-        const parameter = parametricMethod.getParameters().values().next().value as Parameter;
+        const parameter = parametricMethod.parameters.values().next().value as Parameter;
         expect(parameter).toBeTruthy();
         expect(parameter.getName()).toBe("t");
         expect(parameter.getDeclaredType().getName()).toBe("T");
@@ -113,13 +113,13 @@ describe('Tests for generics (from FamixTypeScript)', () => {
     });
 
     it("parametric function should have one parameter", () => {
-        const parameters = parametricFunction.getParameters();
+        const parameters = parametricFunction.parameters;
         expect(parameters).toBeTruthy();
         expect(parameters.size).toBe(1);
     });
 
     it("parametric function should have one parameter named 't' and of type 'T'", () => {
-        const parameter = parametricFunction.getParameters().values().next().value as Parameter;
+        const parameter = parametricFunction.parameters.values().next().value as Parameter;
         expect(parameter).toBeTruthy();
         expect(parameter.getName()).toBe("t");
         expect(parameter.getDeclaredType().getName()).toBe("T");
@@ -134,13 +134,13 @@ describe('Tests for generics (from FamixTypeScript)', () => {
     });
 
     it("parametric arrow function should have one parameter", () => {
-        const parameters = parametricArrowFunction.getParameters();
+        const parameters = parametricArrowFunction.parameters;
         expect(parameters).toBeTruthy();
         expect(parameters.size).toBe(1);
     });
 
     it("parametric arrow function should have one parameter named 't' and of type 'T'", () => {
-        const parameter = parametricArrowFunction.getParameters().values().next().value as Parameter;
+        const parameter = parametricArrowFunction.parameters.values().next().value as Parameter;
         expect(parameter).toBeTruthy();
         expect(parameter.getName()).toBe("t");
         expect(parameter.getDeclaredType().getName()).toBe("T");

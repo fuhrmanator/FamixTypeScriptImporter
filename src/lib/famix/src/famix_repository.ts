@@ -175,7 +175,7 @@ export class FamixRepository {
    */
   public _methodNamesAsSetFromClass(className: string): Set<string> {
     const theClass = this._getFamixClass(className) as Class;
-    return new Set(Array.from(theClass.getMethods()).map(m => m.getName()));
+    return new Set(Array.from(theClass.methods).map(m => m.getName()));
   }
 
   /**
@@ -185,7 +185,7 @@ export class FamixRepository {
    */
   public _methodParentsAsSetFromClass(className: string): Set<Type> {
     const theClass = this._getFamixClass(className) as Class;
-    return new Set(Array.from(theClass.getMethods()).map(m => m.getParentEntity()));
+    return new Set(Array.from(theClass.methods).map(m => m.getParentEntity()));
   }
 
   /**

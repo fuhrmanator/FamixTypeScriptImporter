@@ -53,7 +53,7 @@ export class Type extends ContainerEntity {
   public addBehavioralEntityWithDeclaredType(behavioralEntityWithDeclaredType: BehavioralEntity): void {
     if (!this.behavioralEntitiesWithDeclaredType.has(behavioralEntityWithDeclaredType)) {
       this.behavioralEntitiesWithDeclaredType.add(behavioralEntityWithDeclaredType);
-      behavioralEntityWithDeclaredType.setDeclaredType(this);
+      behavioralEntityWithDeclaredType.declaredType = this;
     }
   }
 

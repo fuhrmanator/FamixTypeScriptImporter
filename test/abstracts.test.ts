@@ -16,11 +16,11 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Abstract classes and methods', () => {
 
     const theClass = fmxRep._getFamixClass("{abstracts.ts}.MyAbstractClass[ClassDeclaration]");
-    const theMethods = theClass?.getMethods();
+    const theMethods = theClass?.methods;
 
     it("should contain an abstract class MyAbstractClass", () => {
         expect(theClass).toBeTruthy();
-        if (theClass) expect(theClass.getIsAbstract()).toBe(true);
+        if (theClass) expect(theClass.isAbstract).toBe(true);
     });
 
     it("should contain an abstract method MyAbstractClass.abstractMethod1", () => {
@@ -31,7 +31,7 @@ describe('Abstract classes and methods', () => {
                 expect(theMethods.size).toBe(3);
                 const foundMethodName = fmxRep._getFamixMethod("{abstracts.ts}.MyAbstractClass.abstractMethod1[MethodDeclaration]") as Method;
                 expect(foundMethodName).toBeTruthy();
-                expect(foundMethodName.getIsAbstract()).toBe(true);
+                expect(foundMethodName.isAbstract).toBe(true);
             }
         }
     });
@@ -41,7 +41,7 @@ describe('Abstract classes and methods', () => {
         if (theMethods) {
             expect(theMethods.size).toBe(3);
             const foundMethodName = fmxRep._getFamixMethod("{abstracts.ts}.MyAbstractClass.abstractMethod2[MethodDeclaration]") as Method;
-            expect(foundMethodName.getIsAbstract()).toBe(true);
+            expect(foundMethodName.isAbstract).toBe(true);
         }
     });
 
@@ -50,7 +50,7 @@ describe('Abstract classes and methods', () => {
         if (theMethods) {
             expect(theMethods.size).toBe(3);
             const foundMethodName = fmxRep._getFamixMethod("{abstracts.ts}.MyAbstractClass.concreteMethod[MethodDeclaration]") as Method;
-            expect(foundMethodName.getIsAbstract()).toBe(false);
+            expect(foundMethodName.isAbstract).toBe(false);
         }
     });
 });

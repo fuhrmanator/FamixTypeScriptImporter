@@ -35,9 +35,9 @@ describe('Generics', () => {
         expect(pList).toBeTruthy();
         const myDao = pList.find(p => p.getName() === "MyDao");
         expect(myDao).toBeTruthy();
-        expect(myDao?.getGenericParameters().size).toBe(1);
+        expect(myDao?.genericParameters.size).toBe(1);
         if (myDao) {
-            expect((Array.from(myDao.getGenericParameters())[0] as ParameterType).getName()).toBe("T");
+            expect((Array.from(myDao.genericParameters)[0] as ParameterType).getName()).toBe("T");
         }
     });
     
@@ -46,9 +46,9 @@ describe('Generics', () => {
         expect(pList).toBeTruthy();
         const myDaoInterface = pList.find(p => p.getName() === "MyDaoInterface");
         expect(myDaoInterface).toBeTruthy();
-        expect(myDaoInterface?.getGenericParameters().size).toBe(1);
+        expect(myDaoInterface?.genericParameters.size).toBe(1);
         if (myDaoInterface) {
-            expect((Array.from(myDaoInterface.getGenericParameters())[0] as ParameterType).getName()).toBe("T");
+            expect((Array.from(myDaoInterface.genericParameters)[0] as ParameterType).getName()).toBe("T");
         }
     });
     
@@ -62,8 +62,8 @@ describe('Generics', () => {
         const myDaoInterface = iList.find(p => p.getName() === "MyDaoInterface");
         expect(myDaoInterface).toBeTruthy();
         if (myDao) {
-            expect(myDao.getSuperInheritances().size).toBe(1);
-            const theInheritance = (Array.from(myDao.getSuperInheritances())[0]);
+            expect(myDao.superInheritances.size).toBe(1);
+            const theInheritance = (Array.from(myDao.superInheritances)[0]);
             expect(theInheritance.getSuperclass()).toBeTruthy();
             expect(theInheritance.getSuperclass()).toBe(myDaoInterface);
         }

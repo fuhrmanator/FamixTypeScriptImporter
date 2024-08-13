@@ -7,94 +7,91 @@ import { ParameterType } from "./parameter_type";
 
 export class BehavioralEntity extends ContainerEntity {
 
-  private signature: string;
+    private _signature: string;
+    private _parameters: Set<Parameter> = new Set();
 
-  public getSignature(): string {
-    return this.signature;
-  }
-
-  public setSignature(signature: string): void {
-    this.signature = signature;
-  }
-
-  private parameters: Set<Parameter> = new Set();
-
-  public getParameters(): Set<Parameter> {
-    return this.parameters;
-  }
-
-  public addParameter(parameter: Parameter): void {
-    if (!this.parameters.has(parameter)) {
-      this.parameters.add(parameter);
-      parameter.setParentEntity(this);
+    public addParameter(parameter: Parameter): void {
+        if (!this._parameters.has(parameter)) {
+            this._parameters.add(parameter);
+            parameter.setParentEntity(this);
+        }
     }
-  }
 
-  private numberOfParameters: number;
+    private _numberOfParameters: number;
+    private _incomingInvocations: Set<Invocation> = new Set();
 
-  public getNumberOfParameters(): number {
-    return this.numberOfParameters;
-  }
-
-  public setNumberOfParameters(numberOfParameters: number): void {
-    this.numberOfParameters = numberOfParameters;
-  }
-
-  private incomingInvocations: Set<Invocation> = new Set();
-
-  public getIncomingInvocations(): Set<Invocation> {
-    return this.incomingInvocations;
-  }
-
-  public addIncomingInvocation(incomingInvocation: Invocation): void {
-    if (!this.incomingInvocations.has(incomingInvocation)) {
-      this.incomingInvocations.add(incomingInvocation);
-      incomingInvocation.addCandidate(this);
+    public addIncomingInvocation(incomingInvocation: Invocation): void {
+        if (!this._incomingInvocations.has(incomingInvocation)) {
+            this._incomingInvocations.add(incomingInvocation);
+            incomingInvocation.addCandidate(this);
+        }
     }
-  }
 
-  private declaredType: Type;
+    private _declaredType: Type;
+    private _genericParameters: Set<ParameterType> = new Set();
 
-  public getDeclaredType(): Type {
-    return this.declaredType;
-  }
-
-  public setDeclaredType(declaredType: Type): void {
-    this.declaredType = declaredType;
-    declaredType.addBehavioralEntityWithDeclaredType(this);
-  }
-
-  private genericParameters: Set<ParameterType> = new Set();
-
-  public getGenericParameters(): Set<ParameterType> {
-    return this.genericParameters;
-  }
-
-  public addGenericParameter(genericParameter: ParameterType): void {
-    if (!this.genericParameters.has(genericParameter)) {
-      this.genericParameters.add(genericParameter);
-      genericParameter.setParentGeneric(this);
+    public addGenericParameter(genericParameter: ParameterType): void {
+        if (!this._genericParameters.has(genericParameter)) {
+            this._genericParameters.add(genericParameter);
+            genericParameter.setParentGeneric(this);
+        }
     }
-  }
 
-  clearGenericParameters(): void {
-    this.genericParameters.clear();
-  }
+    clearGenericParameters(): void {
+        this._genericParameters.clear();
+    }
 
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("BehavioralEntity", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("BehavioralEntity", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("signature", this.getSignature());
-    exporter.addProperty("parameters", this.getParameters());
-    exporter.addProperty("numberOfParameters", this.getNumberOfParameters());
-    exporter.addProperty("incomingInvocations", this.getIncomingInvocations());
-    exporter.addProperty("declaredType", this.getDeclaredType());
-    /* don't add the property here, since it doesn't apply to all subclasses */
-//    exporter.addProperty("genericParameters", this.getGenericParameters());
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("signature", this.signature);
+        exporter.addProperty("parameters", this.parameters);
+        exporter.addProperty("numberOfParameters", this.numberOfParameters);
+        exporter.addProperty("incomingInvocations", this.incomingInvocations);
+        exporter.addProperty("declaredType", this.declaredType);
+        /* don't add the property here, since it doesn't apply to all subclasses */
+        //    exporter.addProperty("genericParameters", this.getGenericParameters());
+    }
+
+    get signature(): string {
+        return this._signature;
+    }
+
+    set signature(signature: string) {
+        this._signature = signature;
+    }
+
+    get parameters(): Set<Parameter> {
+        return this._parameters;
+    }
+
+    get numberOfParameters(): number {
+        return this._numberOfParameters;
+    }
+
+    set numberOfParameters(numberOfParameters: number) {
+        this._numberOfParameters = numberOfParameters;
+    }
+
+    get incomingInvocations(): Set<Invocation> {
+        return this._incomingInvocations;
+    }
+
+    get declaredType(): Type {
+        return this._declaredType;
+    }
+
+    set declaredType(declaredType: Type) {
+        this._declaredType = declaredType;
+        declaredType.addBehavioralEntityWithDeclaredType(this);
+    }
+
+    get genericParameters(): Set<ParameterType> {
+        return this._genericParameters;
+    }
 }

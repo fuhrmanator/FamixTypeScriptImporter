@@ -26,7 +26,7 @@ export class ParametricArrowFunction extends ArrowFunction {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("genericParameters", this.getGenericParameters());
+    exporter.addProperty("genericParameters", this.genericParameters);
     exporter.addProperty("concreteParameters", this.getConcreteParameters());
   }
 }

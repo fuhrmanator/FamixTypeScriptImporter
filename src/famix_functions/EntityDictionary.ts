@@ -301,7 +301,7 @@ export class EntityDictionary {
 
             fmxClass.setName(clsName);
             fmxClass.setFullyQualifiedName(classFullyQualifiedName);
-            fmxClass.setIsAbstract(isAbstract);
+            fmxClass.isAbstract = isAbstract;
 
             this.makeFamixIndexFileAnchor(cls, fmxClass);
 
@@ -517,7 +517,7 @@ export class EntityDictionary {
             fmxMethod.setIsClassSide(isStatic);
             fmxMethod.setIsPrivate((method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) ? (method.getModifiers().find(x => x.getText() === 'private')) !== undefined : false);
             fmxMethod.setIsProtected((method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) ? (method.getModifiers().find(x => x.getText() === 'protected')) !== undefined : false);
-            fmxMethod.setSignature(Helpers.computeSignature(method.getText()));
+            fmxMethod.signature = Helpers.computeSignature(method.getText());
 
             let methodName: string;
             if (isConstructor) {
@@ -556,10 +556,10 @@ export class EntityDictionary {
             }
 
             const fmxType = this.createOrGetFamixType(methodTypeName, method);
-            fmxMethod.setDeclaredType(fmxType);
+            fmxMethod.declaredType = fmxType;
             fmxMethod.setNumberOfLinesOfCode(method.getEndLineNumber() - method.getStartLineNumber());
             const parameters = method.getParameters();
-            fmxMethod.setNumberOfParameters(parameters.length);
+            fmxMethod.numberOfParameters = parameters.length;
 
             if (!isSignature) {
                 fmxMethod.setNumberOfStatements(method.getStatements().length);
@@ -607,7 +607,7 @@ export class EntityDictionary {
                 fmxFunction.setName("anonymous");
             }
 
-            fmxFunction.setSignature(Helpers.computeSignature(func.getText()));
+            fmxFunction.signature = Helpers.computeSignature(func.getText());
             fmxFunction.setCyclomaticComplexity(currentCC[fmxFunction.getName()]);
             fmxFunction.setFullyQualifiedName(functionFullyQualifiedName);
     
@@ -619,10 +619,10 @@ export class EntityDictionary {
             }
     
             const fmxType = this.createOrGetFamixType(functionTypeName, func);
-            fmxFunction.setDeclaredType(fmxType);
+            fmxFunction.declaredType = fmxType;
             fmxFunction.setNumberOfLinesOfCode(func.getEndLineNumber() - func.getStartLineNumber());
             const parameters = func.getParameters();
-            fmxFunction.setNumberOfParameters(parameters.length);
+            fmxFunction.numberOfParameters = parameters.length;
             fmxFunction.setNumberOfStatements(func.getStatements().length);
             this.makeFamixIndexFileAnchor(func, fmxFunction);
     
@@ -702,7 +702,7 @@ export class EntityDictionary {
         if (this.fmxClassMap.has(parameterTypeName)){
             this.fmxClassMap.forEach((obj, name) => {
                 if(obj instanceof Famix.ParametricClass){
-                    if (name === param.getText() && obj.getGenericParameters().size>0) {
+                    if (name === param.getText() && obj.genericParameters.size>0) {
                         fmxParameterType = obj;
                         isClassOrInterface = true;
                     } 
@@ -718,7 +718,7 @@ export class EntityDictionary {
         if (this.fmxInterfaceMap.has(parameterTypeName)){
             this.fmxInterfaceMap.forEach((obj, name) => {
                 if(obj instanceof Famix.ParametricInterface){
-                    if (name === param.getText() && obj.getGenericParameters().size>0) {
+                    if (name === param.getText() && obj.genericParameters.size>0) {
                         fmxParameterType = obj;
                         isClassOrInterface = true;
                     } 
@@ -995,7 +995,7 @@ export class EntityDictionary {
         fmxInvocation.setSender(sender);
         fmxInvocation.setReceiver(receiver);
         fmxInvocation.addCandidate(fmxMethodOrFunction);
-        fmxInvocation.setSignature(fmxMethodOrFunction.getSignature());
+        fmxInvocation.setSignature(fmxMethodOrFunction.signature);
 
         this.famixRep.addElement(fmxInvocation);
 
@@ -1207,7 +1207,7 @@ export class EntityDictionary {
         // Signature of an arrow function is (parameters) => return_type
         const parametersSignature = arrowFunction.getParameters().map(p => p.getText()).join(", ");
         const returnTypeSignature = arrowFunction.getReturnType().getText();
-        fmxArrowFunction.setSignature(`(${parametersSignature}) => ${returnTypeSignature}`);
+        fmxArrowFunction.signature = `(${parametersSignature}) => ${returnTypeSignature}`;
         fmxArrowFunction.setCyclomaticComplexity(currentCC[fmxArrowFunction.getName()]);
 
         let functionTypeName = this.UNKNOWN_VALUE;
@@ -1218,10 +1218,10 @@ export class EntityDictionary {
         }
 
         const fmxType = this.createOrGetFamixType(functionTypeName, arrowFunction as unknown as FunctionDeclaration);
-        fmxArrowFunction.setDeclaredType(fmxType);
+        fmxArrowFunction.declaredType = fmxType;
         fmxArrowFunction.setNumberOfLinesOfCode(arrowFunction.getEndLineNumber() - arrowFunction.getStartLineNumber());
         const parameters = arrowFunction.getParameters();
-        fmxArrowFunction.setNumberOfParameters(parameters.length);
+        fmxArrowFunction.numberOfParameters = parameters.length;
         fmxArrowFunction.setNumberOfStatements(arrowFunction.getStatements().length);
         initFQN(arrowExpression as unknown as TSMorphObjectType, fmxArrowFunction);
         this.makeFamixIndexFileAnchor(arrowExpression as unknown as TSMorphObjectType, fmxArrowFunction);
@@ -1258,8 +1258,8 @@ export class EntityDictionary {
         const conClass = concretisation.getConcreteEntity();
         const genClass = concretisation.getGenericEntity();
         const parameterConcretisations = this.famixRep._getAllEntitiesWithType("ParameterConcretisation");
-        const concreteParameters = conClass.getConcreteParameters();
-        const genericParameters = genClass.getGenericParameters();
+        const concreteParameters = conClass.concreteParameters;
+        const genericParameters = genClass.genericParameters;
         
         let conClassTypeParametersIterator = concreteParameters.values();
         let genClassTypeParametersIterator = genericParameters.values();

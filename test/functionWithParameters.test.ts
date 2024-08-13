@@ -16,10 +16,10 @@ describe('Tests for function with parameters', () => {
     
     const theFunction = Array.from(fmxRep._getAllEntitiesWithType('Function'))[0] as FamixFunctionEntity;
     it("should have two parameters", () => {
-        expect(theFunction?.getParameters().size).toBe(2);
+        expect(theFunction?.parameters.size).toBe(2);
     });
 
-    const firstParam = Array.from(theFunction?.getParameters()).find((p) => p.getName() === "i");
+    const firstParam = Array.from(theFunction?.parameters).find((p) => p.getName() === "i");
     it("should have a parameter 'i'", () => {
         expect(firstParam).toBeTruthy();
     });
@@ -29,7 +29,7 @@ describe('Tests for function with parameters', () => {
         expect(firstParam?.getParentEntity()).toBe(theFunction);
     });
 
-    const secondParam = Array.from(theFunction?.getParameters()).find((p) => p.getName() === "x");
+    const secondParam = Array.from(theFunction?.parameters).find((p) => p.getName() === "x");
     it("should have a parameter 'x'", () => {
         expect(secondParam).toBeTruthy();
     });

@@ -46,7 +46,7 @@ describe('EntityDictionary', () => {
   
   });
 
-  const properties = classes[0].getProperties();
+  const properties = classes[0].properties;
 
   test('should get a property and add it to the map', () => {
     
@@ -66,7 +66,7 @@ describe('EntityDictionary', () => {
   
   });
 
-  const parameters = constructors[0].getParameters();
+  const parameters = constructors[0].parameters;
 
   test('should get parameters of the constructors and add it to the map', () => {
     

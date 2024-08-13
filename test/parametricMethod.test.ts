@@ -38,7 +38,7 @@ describe('Tests for generics', () => {
 
     it("should not be an abstract class", () => {
         expect(theClass).toBeTruthy();
-        if (theClass) expect(theClass.getIsAbstract()).toBe(false);
+        if (theClass) expect(theClass.isAbstract).toBe(false);
     });
 
     it("should contain one ParametricMethod", () => {
@@ -63,7 +63,7 @@ describe('Tests for generics', () => {
         const pmList = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod") as Set<ParametricMethod>)
         expect(pmList).toBeTruthy();
         const parametricMethod = pmList.find(m => m.getName() === "methodParametric");
-        const parameterTypes = parametricMethod?.getGenericParameters();
+        const parameterTypes = parametricMethod?.genericParameters;
         expect(parameterTypes?.values().next().value.getName()).toBe('V')
     });
 

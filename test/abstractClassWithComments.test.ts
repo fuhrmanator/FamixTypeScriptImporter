@@ -27,7 +27,7 @@ describe('Tests for abstract class with comments', () => {
     it("should contain an abstract class MyAbstractClass", () => {
         expect(theAbstractClass).toBeTruthy();
         if (theAbstractClass) {
-            expect(theAbstractClass.getIsAbstract()).toBe(true);
+            expect(theAbstractClass.isAbstract).toBe(true);
         }
     });
 

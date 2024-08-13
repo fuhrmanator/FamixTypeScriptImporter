@@ -30,16 +30,16 @@ describe('Tests for generic class', () => {
         expect(pList).toBeTruthy();
         const MyClass = pList.find(p => p.getName() === "MyClass");
         expect(MyClass).toBeTruthy();
-        expect(MyClass?.getGenericParameters().size).toBe(1);
+        expect(MyClass?.genericParameters.size).toBe(1);
         if (MyClass) {
-            expect((Array.from(MyClass.getGenericParameters())[0] as ParameterType).getName()).toBe("T");
-            expect((Array.from(MyClass.getGenericParameters())[0] as ParameterType).getParentGeneric()).toBe(MyClass);
+            expect((Array.from(MyClass.genericParameters)[0] as ParameterType).getName()).toBe("T");
+            expect((Array.from(MyClass.genericParameters)[0] as ParameterType).getParentGeneric()).toBe(MyClass);
         }
     });
 
     const theClass = fmxRep._getFamixClass("{genericClass.ts}.MyClass<T>[ClassDeclaration]");
     it ("should not be an abstract class", () => {
         expect(theClass).toBeTruthy();
-        if (theClass) expect(theClass.getIsAbstract()).toBe(false);
+        if (theClass) expect(theClass.isAbstract).toBe(false);
     });
 });

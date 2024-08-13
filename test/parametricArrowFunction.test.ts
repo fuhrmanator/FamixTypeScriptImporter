@@ -22,7 +22,7 @@ describe('ArrowFunctions', () => {
     const theFunction = functionList.values().next().value;
     it("should contain arrow function arrayLength", () => {
         expect(theFunction).toBeTruthy();
-        expect(theFunction?.getDeclaredType().getName()).toBe("number");
+        expect(theFunction?.declaredType.getName()).toBe("number");
         expect(theFunction?.getFullyQualifiedName()).toBe("{parametricArrowFunctions.ts}.arrayLength.ArrowFunction(2:25)[ArrowFunction]");
     });
 
@@ -31,15 +31,15 @@ describe('ArrowFunctions', () => {
     });
 
     it("should return number", () => {
-        expect(theFunction?.getDeclaredType().getName()).toBe("number");
+        expect(theFunction?.declaredType.getName()).toBe("number");
     });
 
     it("should have one parameter", () => {
-        expect(theFunction?.getParameters().size).toBe(1);
+        expect(theFunction?.parameters.size).toBe(1);
     });
 
     it("should contain a type parameter T", () => {
-        expect(theFunction?.getGenericParameters()?.values().next().value.getName()).toBe('T')
+        expect(theFunction?.genericParameters?.values().next().value.getName()).toBe('T')
     });
 
 });

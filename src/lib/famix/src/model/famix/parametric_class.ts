@@ -6,32 +6,24 @@ import { PrimitiveType } from "./primitive_type";
 
 export class ParametricClass extends Class {
 
-  private genericParameters: Set<ParameterType> = new Set();
-
-  public getGenericParameters(): Set<ParameterType> {
-    return this.genericParameters;
-  }
+  private _genericParameters: Set<ParameterType> = new Set();
 
   public addGenericParameter(genericParameter: ParameterType): void {
-    if (!this.genericParameters.has(genericParameter)) {
-      this.genericParameters.add(genericParameter);
+    if (!this._genericParameters.has(genericParameter)) {
+      this._genericParameters.add(genericParameter);
       genericParameter.setParentGeneric(this);
     }
   }
 
   clearGenericParameters(): void {
-    this.genericParameters.clear();
+    this._genericParameters.clear();
   }
 
-  private concreteParameters: Set<PrimitiveType | Class | Interface> = new Set();
-
-  public getConcreteParameters(): Set<PrimitiveType | Class | Interface> {
-    return this.concreteParameters;
-  }
+  private _concreteParameters: Set<PrimitiveType | Class | Interface> = new Set();
 
   public addConcreteParameter(concreteParameter: PrimitiveType | Class | Interface ): void {
-    if (!this.concreteParameters.has(concreteParameter)) {
-      this.concreteParameters.add(concreteParameter);
+    if (!this._concreteParameters.has(concreteParameter)) {
+      this._concreteParameters.add(concreteParameter);
     }
   }
 
@@ -43,7 +35,15 @@ export class ParametricClass extends Class {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("genericParameters", this.getGenericParameters());
-    exporter.addProperty("concreteParameters", this.getConcreteParameters());
+    exporter.addProperty("genericParameters", this.genericParameters);
+    exporter.addProperty("concreteParameters", this.concreteParameters);
   }
+
+    get genericParameters(): Set<ParameterType> {
+        return this._genericParameters;
+    }
+
+    get concreteParameters(): Set<PrimitiveType | Class | Interface> {
+        return this._concreteParameters;
+    }
 }

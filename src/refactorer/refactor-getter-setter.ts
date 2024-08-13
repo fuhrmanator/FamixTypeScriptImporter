@@ -2,12 +2,12 @@ import { Project, PropertyDeclaration, SyntaxKind } from "ts-morph";
 import * as path from "path";
 
 const project = new Project();
-project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/.ts");
+project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/interface.ts");
 project.getSourceFiles().forEach(sourceFile => { console.log(sourceFile.getFilePath()); });
 
 project.getSourceFiles().forEach(sourceFile => {
     const typeMap = createTypeMap(sourceFile);
-    
+
     const classes = sourceFile.getClasses();
     classes.forEach(cls => {
         const properties = cls.getProperties();

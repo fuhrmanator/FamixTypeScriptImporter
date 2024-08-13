@@ -33,19 +33,19 @@ describe('Tests for generics', () => {
 
     it("should not be an abstract class", () => {
         expect(theClass).toBeTruthy();
-        if (theClass) expect(theClass.getIsAbstract()).toBe(false);
+        if (theClass) expect(theClass.isAbstract).toBe(false);
     });
 
     it("should contain a generic method i for class AA with type parameter T", () => {
         const cList = Array.from(fmxRep._getAllEntitiesWithType("Class") as Set<Class>);
         expect(cList).toBeTruthy();
         const AA = cList.find(c => c.getName() === "AA");
-        const mList = Array.from(AA?.getMethods() as Set<ParametricMethod>);
+        const mList = Array.from(AA?.methods as Set<ParametricMethod>);
         const i = mList?.find(m => m.getName() === "i");
         expect(i).toBeTruthy();
-        expect(i?.getDeclaredType().getName()).toBe("void");
-        expect(i?.getParameters().size).toBe(1);
-        const pList = Array.from(i?.getParameters() as Set<Parameter>);
+        expect(i?.declaredType.getName()).toBe("void");
+        expect(i?.parameters.size).toBe(1);
+        const pList = Array.from(i?.parameters as Set<Parameter>);
         const j = pList?.find(p => p.getName() === "j");
         expect(j).toBeTruthy();
         expect(j?.getDeclaredType().getName()).toBe("T");
@@ -58,7 +58,7 @@ describe('Tests for generics', () => {
         expect(i).toBeTruthy();
         if (i) {
             expect(i.getKind()).toBe(undefined);
-            expect(i.getIsAbstract()).toBe(false);
+            expect(i.isAbstract).toBe(false);
             expect(i.getIsClassSide()).toBe(false);
             expect(i.getIsPrivate()).toBe(false);
             expect(i.getIsProtected()).toBe(false);

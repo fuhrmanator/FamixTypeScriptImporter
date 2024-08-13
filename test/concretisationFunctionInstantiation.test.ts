@@ -71,7 +71,7 @@ describe('Tests for concretisation', () => {
         const firstElement = iterator.next().value;
         const secondElement = iterator.next().value;
         expect(secondElement.getConcreteEntity().getName()).toBe("createInstance");
-        const concParameter = secondElement.getConcreteEntity().getConcreteParameters().values().next().value;
+        const concParameter = secondElement.getConcreteEntity().concreteParameters.values().next().value;
         expect(concParameter.getName()).toBe(theInterface?.getName());
     });
 
@@ -80,7 +80,7 @@ describe('Tests for concretisation', () => {
         const iterator = theConcretisation.values();
         const firstElement = iterator.next().value;
         expect(firstElement.getConcreteEntity().getName()).toBe("process");
-        const concParameter = firstElement.getConcreteEntity().getConcreteParameters().values().next().value;
+        const concParameter = firstElement.getConcreteEntity().concreteParameters.values().next().value;
         expect(concParameter.getName()).toBe("string");
     });
 

@@ -6,64 +6,39 @@ import { Inheritance } from "./inheritance";
 
 export class Class extends Type {
 
-  private isAbstract: boolean;
-
-  public getIsAbstract(): boolean {
-    return this.isAbstract;
-  }
-
-  public setIsAbstract(isAbstract: boolean): void {
-    this.isAbstract = isAbstract;
-  }
-
-  private properties: Set<Property> = new Set();
-
-  public getProperties(): Set<Property> {
-    return this.properties;
-  }
+  private _isAbstract: boolean;
+  private _properties: Set<Property> = new Set();
 
   public addProperty(property: Property): void {
-    if (!this.properties.has(property)) {
-      this.properties.add(property);
+    if (!this._properties.has(property)) {
+      this._properties.add(property);
       property.setParentEntity(this);
     }
   }
 
-  private methods: Set<Method> = new Set();
-
-  public getMethods(): Set<Method> {
-    return this.methods;
-  }
+  private _methods: Set<Method> = new Set();
 
   public addMethod(method: Method): void {
-    if (!this.methods.has(method)) {
-      this.methods.add(method);
+    if (!this._methods.has(method)) {
+      this._methods.add(method);
       method.setParentEntity(this);
     }
   }
 
-  private superInheritances: Set<Inheritance> = new Set();
-
-  public getSuperInheritances(): Set<Inheritance> {
-    return this.superInheritances;
-  }
+  private _superInheritances: Set<Inheritance> = new Set();
 
   public addSuperInheritance(superInheritance: Inheritance): void {
-    if (!this.superInheritances.has(superInheritance)) {
-      this.superInheritances.add(superInheritance);
+    if (!this._superInheritances.has(superInheritance)) {
+      this._superInheritances.add(superInheritance);
       superInheritance.setSubclass(this);
     }
   }
 
-  private subInheritances: Set<Inheritance> = new Set();
-
-  public getSubInheritances(): Set<Inheritance> {
-    return this.subInheritances;
-  }
+  private _subInheritances: Set<Inheritance> = new Set();
 
   public addSubInheritance(subInheritance: Inheritance): void {
-    if (!this.subInheritances.has(subInheritance)) {
-      this.subInheritances.add(subInheritance);
+    if (!this._subInheritances.has(subInheritance)) {
+      this._subInheritances.add(subInheritance);
       subInheritance.setSuperclass(this);
     }
   }
@@ -77,10 +52,34 @@ export class Class extends Type {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("isAbstract", this.getIsAbstract());
-    exporter.addProperty("attributes", this.getProperties()); // Moose (10) codes them as attributes
-    exporter.addProperty("methods", this.getMethods());
-    exporter.addProperty("superInheritances", this.getSuperInheritances());
-    exporter.addProperty("subInheritances", this.getSubInheritances());  
+    exporter.addProperty("isAbstract", this.isAbstract);
+    exporter.addProperty("attributes", this.properties); // Moose (10) codes them as attributes
+    exporter.addProperty("methods", this.methods);
+    exporter.addProperty("superInheritances", this.superInheritances);
+    exporter.addProperty("subInheritances", this.subInheritances);  
   }
+
+    get isAbstract(): boolean {
+        return this._isAbstract;
+    }
+
+    set isAbstract(isAbstract: boolean) {
+        this._isAbstract = isAbstract;
+    }
+
+    get properties(): Set<Property> {
+        return this._properties;
+    }
+
+    get methods(): Set<Method> {
+        return this._methods;
+    }
+
+    get superInheritances(): Set<Inheritance> {
+        return this._superInheritances;
+    }
+
+    get subInheritances(): Set<Inheritance> {
+        return this._subInheritances;
+    }
 }

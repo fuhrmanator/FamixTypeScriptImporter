@@ -27,16 +27,16 @@ describe('Tests for methods', () => {
 
 
     it("should return void", () => {
-        expect(theMethod?.getDeclaredType().getName()).toBe("void");
+        expect(theMethod?.declaredType.getName()).toBe("void");
     });
 
     it("should have no parameter", () => {
-        expect(theMethod?.getParameters().size).toBe(0);
+        expect(theMethod?.parameters.size).toBe(0);
     });
 
     it("should be a public method 'method", () => {
         expect(theMethod.getKind()).toBe(undefined);
-        expect(theMethod.getIsAbstract()).toBe(false);
+        expect(theMethod.isAbstract).toBe(false);
         expect(theMethod.getIsClassSide()).toBe(false);
         expect(theMethod.getIsPrivate()).toBe(false);
         expect(theMethod.getIsProtected()).toBe(false);

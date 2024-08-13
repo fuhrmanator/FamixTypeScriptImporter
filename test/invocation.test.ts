@@ -38,22 +38,22 @@ describe('Tests for invocation', () => {
         const cList = Array.from(fmxRep._getAllEntitiesWithType("Class") as Set<Class>);
         expect(cList).toBeTruthy();
         const A = cList.find(c => c.getName() === "A");
-        const mList = Array.from(A?.getMethods() as Set<Method>);
+        const mList = Array.from(A?.methods as Set<Method>);
         const x = mList?.find(m => m.getName() === "x");
         expect(x).toBeTruthy();
-        expect(x?.getDeclaredType().getName()).toBe("void");
-        expect(x?.getParameters().size).toBe(0);
+        expect(x?.declaredType.getName()).toBe("void");
+        expect(x?.parameters.size).toBe(0);
     });
 
     it("should contain a method y for class B", () => {
         const cList = Array.from(fmxRep._getAllEntitiesWithType("Class") as Set<Class>);
         expect(cList).toBeTruthy();
         const B = cList.find(c => c.getName() === "B");
-        const mList = Array.from(B?.getMethods() as Set<Method>);
+        const mList = Array.from(B?.methods as Set<Method>);
         const y = mList?.find(m => m.getName() === "y");
         expect(y).toBeTruthy();
-        expect(y?.getDeclaredType().getName()).toBe("void");
-        expect(y?.getParameters().size).toBe(0);
+        expect(y?.declaredType.getName()).toBe("void");
+        expect(y?.parameters.size).toBe(0);
     });
 
     it("should contain an invocation for x", () => {

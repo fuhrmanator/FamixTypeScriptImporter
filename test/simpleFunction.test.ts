@@ -25,10 +25,10 @@ describe('Tests for simple function', () => {
     });
 
     it("should return number", () => {
-        expect(theFunction?.getDeclaredType().getName()).toBe("number");
+        expect(theFunction?.declaredType.getName()).toBe("number");
     });
 
     it("should have no parameter", () => {
-        expect(theFunction?.getParameters().size).toBe(0);
+        expect(theFunction?.parameters.size).toBe(0);
     });
 });

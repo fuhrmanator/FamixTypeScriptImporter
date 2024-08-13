@@ -48,7 +48,7 @@ describe('Tests for concretisation', () => {
 
     it ("should not be an abstract class", () => {
         expect(theClass).toBeTruthy();
-        if (theClass) expect(theClass.getIsAbstract()).toBe(false);
+        if (theClass) expect(theClass.isAbstract).toBe(false);
     });
 
     it("should contain 3 concretisations", () => {
@@ -60,7 +60,7 @@ describe('Tests for concretisation', () => {
         const iterator = theConcretisation.values();
         const firstElement = iterator.next().value;
         expect(firstElement.getGenericEntity()).toBe(theClass);
-        const T = firstElement.getGenericEntity().getGenericParameters().values().next().value;
+        const T = firstElement.getGenericEntity().genericParameters.values().next().value;
         expect(T.getName()).toBe("T");
     });
 
