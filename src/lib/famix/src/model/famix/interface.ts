@@ -57,19 +57,19 @@ export class Interface extends Type {
         exporter.addProperty("subInheritances", this.subInheritances);
     }
 
-    get properties(): Set<Property> {
+    get properties() {
         return this._properties;
     }
 
-    get methods(): Set<Method> {
+    get methods() {
         return this._methods;
     }
 
-    get superInheritances(): Set<Inheritance> {
+    get superInheritances() {
         return this._superInheritances;
     }
 
-    get subInheritances(): Set<Inheritance> {
+    get subInheritances() {
         return this._subInheritances;
     }
 }
