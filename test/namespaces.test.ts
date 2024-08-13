@@ -80,7 +80,7 @@ describe('Tests for namespaces', () => {
     // see if CREATE_ACTION is nested in Actions
     const theVariable = fmxRep._getFamixVariable("{namespaces.ts}.ToolbarConstants.Actions.CREATE_ACTION[VariableDeclaration]");
     it("should have CREATE_ACTION nested in Actions", () => {
-        expect(theVariable?.getParentContainerEntity()).toBe(theNamespace8);
+        expect(theVariable?.parentContainerEntity).toBe(theNamespace8);
     });
 
     // fmxRep._getFamixModules().forEach(m => { console.log(m.getFullyQualifiedName()) });

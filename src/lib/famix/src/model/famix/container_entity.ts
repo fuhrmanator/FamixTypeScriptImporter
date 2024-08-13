@@ -9,157 +9,153 @@ import { Variable } from "./variable";
 
 export class ContainerEntity extends NamedEntity {
 
-  private parentContainerEntity: ContainerEntity;
+    private _parentContainerEntity: ContainerEntity;
+    private _childrenContainerEntities: Set<ContainerEntity> = new Set();
 
-  public getParentContainerEntity(): ContainerEntity {
-    return this.parentContainerEntity;
-  }
-
-  public setParentContainerEntity(parentContainerEntity: ContainerEntity): void {
-    this.parentContainerEntity = parentContainerEntity;
-    parentContainerEntity.addChildContainerEntity(this);
-  }
-
-  private childrenContainerEntities: Set<ContainerEntity> = new Set();
-
-  public getChildrenContainerEntities(): Set<ContainerEntity> {
-    return this.childrenContainerEntities;
-  }
-
-  public addChildContainerEntity(childContainerEntity: ContainerEntity): void {
-    if (!this.childrenContainerEntities.has(childContainerEntity)) {
-      this.childrenContainerEntities.add(childContainerEntity);
-      childContainerEntity.setParentContainerEntity(this);
+    public addChildContainerEntity(childContainerEntity: ContainerEntity): void {
+        if (!this._childrenContainerEntities.has(childContainerEntity)) {
+            this._childrenContainerEntities.add(childContainerEntity);
+            childContainerEntity.parentContainerEntity = this;
+        }
     }
-  }
 
-  private cyclomaticComplexity: number;
+    private _cyclomaticComplexity: number;
+    private _numberOfStatements: number;
+    private _outgoingReferences: Set<Reference> = new Set();
 
-  public getCyclomaticComplexity(): number {
-    return this.cyclomaticComplexity;
-  }
-
-  public setCyclomaticComplexity(cyclomaticComplexity: number): void {
-    this.cyclomaticComplexity = cyclomaticComplexity;
-  }
-
-  private numberOfStatements: number;
-
-  public getNumberOfStatements(): number {
-    return this.numberOfStatements;
-  }
-
-  public setNumberOfStatements(numberOfStatements: number): void {
-    this.numberOfStatements = numberOfStatements;
-  }
-
-  private outgoingReferences: Set<Reference> = new Set();
-
-  public getOutgoingReferences(): Set<Reference> {
-    return this.outgoingReferences;
-  }
-
-  public addOutgoingReference(outgoingReference: Reference): void {
-    if (!this.outgoingReferences.has(outgoingReference)) {
-      this.outgoingReferences.add(outgoingReference);
-      outgoingReference.setSource(this);
+    public addOutgoingReference(outgoingReference: Reference): void {
+        if (!this._outgoingReferences.has(outgoingReference)) {
+            this._outgoingReferences.add(outgoingReference);
+            outgoingReference.setSource(this);
+        }
     }
-  }
 
-  private numberOfLinesOfCode: number;
+    private _numberOfLinesOfCode: number;
+    private _outgoingInvocations: Set<Invocation> = new Set();
 
-  public getNumberOfLinesOfCode(): number {
-    return this.numberOfLinesOfCode;
-  }
-
-  public setNumberOfLinesOfCode(numberOfLinesOfCode: number): void {
-    this.numberOfLinesOfCode = numberOfLinesOfCode;
-  }
-
-  private outgoingInvocations: Set<Invocation> = new Set();
-
-  public getOutgoingInvocations(): Set<Invocation> {
-    return this.outgoingInvocations;
-  }
-
-  public addOutgoingInvocation(outgoingInvocation: Invocation): void {
-    if (!this.outgoingInvocations.has(outgoingInvocation)) {
-      this.outgoingInvocations.add(outgoingInvocation);
-      outgoingInvocation.setSender(this);
+    public addOutgoingInvocation(outgoingInvocation: Invocation): void {
+        if (!this._outgoingInvocations.has(outgoingInvocation)) {
+            this._outgoingInvocations.add(outgoingInvocation);
+            outgoingInvocation.setSender(this);
+        }
     }
-  }
 
-  private accesses: Set<Access> = new Set();
+    private _accesses: Set<Access> = new Set();
 
-  public getAccesses(): Set<Access> {
-    return this.accesses;
-  }
-
-  public addAccess(access: Access): void {
-    if (!this.accesses.has(access)) {
-      this.accesses.add(access);
-      access.accessor = this;
+    public addAccess(access: Access): void {
+        if (!this._accesses.has(access)) {
+            this._accesses.add(access);
+            access.accessor = this;
+        }
     }
-  }
 
-  private childrenTypes: Set<Type> = new Set();
+    private childrenTypes: Set<Type> = new Set();
 
-  public getTypes(): Set<Type> {
-    return this.childrenTypes;
-  }
-
-  public addType(childType: Type): void {
-    if (!this.childrenTypes.has(childType)) {
-      this.childrenTypes.add(childType);
-      childType.setParentContainerEntity(this);
+    public addType(childType: Type): void {
+        if (!this.childrenTypes.has(childType)) {
+            this.childrenTypes.add(childType);
+            childType.parentContainerEntity = this;
+        }
     }
-  }
 
-  private childrenFunctions: Set<FamixFunctionEntity> = new Set();
+    private childrenFunctions: Set<FamixFunctionEntity> = new Set();
 
-  public getFunctions(): Set<FamixFunctionEntity> {
-    return this.childrenFunctions;
-  }
-
-  public addFunction(childFunction: FamixFunctionEntity): void {
-    if (!this.childrenFunctions.has(childFunction)) {
-      this.childrenFunctions.add(childFunction);
-      childFunction.setParentContainerEntity(this);
+    public addFunction(childFunction: FamixFunctionEntity): void {
+        if (!this.childrenFunctions.has(childFunction)) {
+            this.childrenFunctions.add(childFunction);
+            childFunction.parentContainerEntity = this;
+        }
     }
-  }
 
-  private variables: Set<Variable> = new Set();
+    private _variables: Set<Variable> = new Set();
 
-  public getVariables(): Set<Variable> {
-    return this.variables;
-  }
-
-  public addVariable(variable: Variable): void {
-    if (!this.variables.has(variable)) {
-      this.variables.add(variable);
-      variable.setParentContainerEntity(this);
+    public addVariable(variable: Variable): void {
+        if (!this._variables.has(variable)) {
+            this._variables.add(variable);
+            variable.setParentContainerEntity(this);
+        }
     }
-  }
 
 
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("ContainerEntity", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("ContainerEntity", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-//    exporter.addProperty("parentBehaviouralEntity", this.getParentContainerEntity());
-//    exporter.addProperty("childrenContainerEntities", this.getChildrenContainerEntities());
-    exporter.addProperty("cyclomaticComplexity", this.getCyclomaticComplexity());
-    exporter.addProperty("numberOfStatements", this.getNumberOfStatements());
-//    exporter.addProperty("outgoingReferences", this.getOutgoingReferences());  /* derived ?*/
-    exporter.addProperty("numberOfLinesOfCode", this.getNumberOfLinesOfCode());
-//    exporter.addProperty("outgoingInvocations", this.getOutgoingInvocations());  /* derived ?*/
-//    exporter.addProperty("accesses", this.getAccesses());  /* derived ?*/
-    exporter.addProperty("types", this.getTypes());
-    exporter.addProperty("functions", this.getFunctions());
-    exporter.addProperty("localVariables", this.getVariables());
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        //    exporter.addProperty("parentBehaviouralEntity", this.getParentContainerEntity());
+        //    exporter.addProperty("childrenContainerEntities", this.getChildrenContainerEntities());
+        exporter.addProperty("cyclomaticComplexity", this.cyclomaticComplexity);
+        exporter.addProperty("numberOfStatements", this.numberOfStatements);
+        //    exporter.addProperty("outgoingReferences", this.getOutgoingReferences());  /* derived ?*/
+        exporter.addProperty("numberOfLinesOfCode", this.numberOfLinesOfCode);
+        //    exporter.addProperty("outgoingInvocations", this.getOutgoingInvocations());  /* derived ?*/
+        //    exporter.addProperty("accesses", this.getAccesses());  /* derived ?*/
+        exporter.addProperty("types", this.types);
+        exporter.addProperty("functions", this.functions);
+        exporter.addProperty("localVariables", this.variables);
+    }
+
+    get parentContainerEntity() {
+        return this._parentContainerEntity;
+    }
+
+    set parentContainerEntity(parentContainerEntity: ContainerEntity) {
+        this._parentContainerEntity = parentContainerEntity;
+        parentContainerEntity.addChildContainerEntity(this);
+    }
+
+    get childrenContainerEntities(): Set<import("C:/Users/Cris/Documents/GitHub/FamixTypeScriptImporter/src/lib/famix/src/model/famix/container_entity").ContainerEntity> {
+        return this._childrenContainerEntities;
+    }
+
+    get cyclomaticComplexity(): number {
+        return this._cyclomaticComplexity;
+    }
+
+    set cyclomaticComplexity(cyclomaticComplexity: number) {
+        this._cyclomaticComplexity = cyclomaticComplexity;
+    }
+
+    get numberOfStatements(): number {
+        return this._numberOfStatements;
+    }
+
+    set numberOfStatements(numberOfStatements: number) {
+        this._numberOfStatements = numberOfStatements;
+    }
+
+    get outgoingReferences() {
+        return this._outgoingReferences;
+    }
+
+    get numberOfLinesOfCode(): number {
+        return this._numberOfLinesOfCode;
+    }
+
+    set numberOfLinesOfCode(numberOfLinesOfCode: number) {
+        this._numberOfLinesOfCode = numberOfLinesOfCode;
+    }
+
+    get outgoingInvocations() {
+        return this._outgoingInvocations;
+    }
+
+    get accesses() {
+        return this._accesses;
+    }
+
+    get types() {
+        return this.childrenTypes;
+    }
+
+    get functions() {
+        return this.childrenFunctions;
+    }
+
+    get variables() {
+        return this._variables;
+    }
 }

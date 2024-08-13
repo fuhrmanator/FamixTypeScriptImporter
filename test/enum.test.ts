@@ -45,7 +45,7 @@ describe('Tests for enum', () => {
     it("should contain one enum with seven enum values", () => {
         expect(enumSet.size).toBe(1);
         const theEnum = enumArray[0];
-        expect(theFile.getTypes().has(theEnum)).toBe(true);
+        expect(theFile.types.has(theEnum)).toBe(true);
         expect(theEnum.getName()).toBe("Weekday");
         const enumValuesArray = Array.from(theEnum.getValues());
         expect(enumValuesArray.length).toBe(7);
@@ -68,7 +68,7 @@ describe('Tests for enum', () => {
     it("should contain one access", () => {
         expect(fmxRep._getAllEntitiesWithType("Access").size).toBe(1);
         const theAccess = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>)[0];
-        expect(theFile.getAccesses().has(theAccess)).toBe(true);
+        expect(theFile.accesses.has(theAccess)).toBe(true);
         expect(theAccess.accessor.getName()).toBe("enum.ts");
         expect(theAccess.variable.getName()).toBe("MONDAY");
     });    

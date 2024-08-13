@@ -69,7 +69,7 @@ describe('Tests for source text', () => {
 
     it("should have a Variable 'a' with the proper source text", () => {
         const theFile = Array.from(fmxRep._getAllEntitiesWithType("Module") as Set<Module>)[0];
-        const theVariable = Array.from(theFile.getVariables())[0];
+        const theVariable = Array.from(theFile.variables)[0];
         const sourceAnchor = theVariable.getSourceAnchor() as IndexedFileAnchor;
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.getStartPos()).toBe(4 + 1);
@@ -83,7 +83,7 @@ describe('Tests for source text', () => {
 
     it("should have a Variable 'currentSquareIndex' with the proper source text", () => {
         const theMethod = Array.from(fmxRep._getAllEntitiesWithType("Method") as Set<Method>)[0];
-        const theVariable = Array.from(theMethod.getVariables())[0];
+        const theVariable = Array.from(theMethod.variables)[0];
         const sourceAnchor = theVariable.getSourceAnchor() as IndexedFileAnchor;
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.getStartPos()).toBe(320 + 1);
@@ -100,7 +100,7 @@ describe('Tests for source text', () => {
 
     it("should have variable 'c' with the proper source text", () => {
         expect(abFile).toBeDefined();
-        const theVariable = Array.from(abFile.getVariables())[0];
+        const theVariable = Array.from(abFile.variables)[0];
         const sourceAnchor = theVariable.getSourceAnchor() as IndexedFileAnchor;
         const testSourceWithGraphemes = splitter.splitGraphemes('c = "💷"');
         expect(testSourceWithGraphemes.length).toBe(7);
@@ -113,7 +113,7 @@ describe('Tests for source text', () => {
     });
 
     it("should have variable 'd' with the proper source text", () => {
-        const theVariable = Array.from(abFile.getVariables())[1];
+        const theVariable = Array.from(abFile.variables)[1];
         const sourceAnchor = theVariable.getSourceAnchor() as IndexedFileAnchor;
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.getStartPos()).toBe(13 + 1);

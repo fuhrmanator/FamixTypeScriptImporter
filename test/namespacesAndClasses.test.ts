@@ -35,7 +35,7 @@ describe('Tests for namespaces and classes', () => {
     });
 
     it("should contain two classes", () => {
-        expect(Array.from(theNamespace1?.getTypes() as Set<Type>).filter(t => (t instanceof Class)).length).toBe(2);
+        expect(Array.from(theNamespace1?.types as Set<Type>).filter(t => (t instanceof Class)).length).toBe(2);
     });
 
     const theNamespace2 = fmxRep._getFamixModule("{namespacesAndClasses.ts}.Nsp3[ModuleDeclaration]");
@@ -45,7 +45,7 @@ describe('Tests for namespaces and classes', () => {
     });
     
     it("should contain one class", () => {
-        expect(Array.from(theNamespace2?.getTypes() as Set<Type>).filter(t => (t instanceof Class)).length).toBe(1);
+        expect(Array.from(theNamespace2?.types as Set<Type>).filter(t => (t instanceof Class)).length).toBe(1);
     });
 
     it("should contain four classes", () => {

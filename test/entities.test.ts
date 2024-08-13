@@ -220,7 +220,7 @@ describe('Entities', () => {
         const globalFunc = fmxRep._getFamixFunction('{entities.ts}.globalFunc[FunctionDeclaration]') as FamixFunctionEntity;
         expect(globalFunc).toBeTruthy();
         expect(globalFunc.getName()).toBe('globalFunc');
-        expect(globalFunc.getParentContainerEntity().getName()).toBe('entities.ts');
+        expect(globalFunc.parentContainerEntity.getName()).toBe('entities.ts');
     });
 
     it("should contain a variable 'globalA'", () => {

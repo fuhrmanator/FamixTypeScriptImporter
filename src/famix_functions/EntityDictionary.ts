@@ -542,10 +542,10 @@ export class EntityDictionary {
             }
 
             if (!isSignature) {
-                fmxMethod.setCyclomaticComplexity(currentCC[fmxMethod.getName()]);
+                fmxMethod.cyclomaticComplexity = currentCC[fmxMethod.getName()];
             }
             else {
-                fmxMethod.setCyclomaticComplexity(0);
+                fmxMethod.cyclomaticComplexity = 0;
             }
 
             let methodTypeName = this.UNKNOWN_VALUE; 
@@ -557,15 +557,15 @@ export class EntityDictionary {
 
             const fmxType = this.createOrGetFamixType(methodTypeName, method);
             fmxMethod.declaredType = fmxType;
-            fmxMethod.setNumberOfLinesOfCode(method.getEndLineNumber() - method.getStartLineNumber());
+            fmxMethod.numberOfLinesOfCode = method.getEndLineNumber() - method.getStartLineNumber();
             const parameters = method.getParameters();
             fmxMethod.numberOfParameters = parameters.length;
 
             if (!isSignature) {
-                fmxMethod.setNumberOfStatements(method.getStatements().length);
+                fmxMethod.numberOfStatements = method.getStatements().length;
             }
             else {
-                fmxMethod.setNumberOfStatements(0);
+                fmxMethod.numberOfStatements = 0;
             }
             
             initFQN(method, fmxMethod);
@@ -608,7 +608,7 @@ export class EntityDictionary {
             }
 
             fmxFunction.signature = Helpers.computeSignature(func.getText());
-            fmxFunction.setCyclomaticComplexity(currentCC[fmxFunction.getName()]);
+            fmxFunction.cyclomaticComplexity = currentCC[fmxFunction.getName()];
             fmxFunction.setFullyQualifiedName(functionFullyQualifiedName);
     
             let functionTypeName = this.UNKNOWN_VALUE;
@@ -620,10 +620,10 @@ export class EntityDictionary {
     
             const fmxType = this.createOrGetFamixType(functionTypeName, func);
             fmxFunction.declaredType = fmxType;
-            fmxFunction.setNumberOfLinesOfCode(func.getEndLineNumber() - func.getStartLineNumber());
+            fmxFunction.numberOfLinesOfCode = func.getEndLineNumber() - func.getStartLineNumber();
             const parameters = func.getParameters();
             fmxFunction.numberOfParameters = parameters.length;
-            fmxFunction.setNumberOfStatements(func.getStatements().length);
+            fmxFunction.numberOfStatements = func.getStatements().length;
             this.makeFamixIndexFileAnchor(func, fmxFunction);
     
             this.famixRep.addElement(fmxFunction);
@@ -1208,7 +1208,7 @@ export class EntityDictionary {
         const parametersSignature = arrowFunction.getParameters().map(p => p.getText()).join(", ");
         const returnTypeSignature = arrowFunction.getReturnType().getText();
         fmxArrowFunction.signature = `(${parametersSignature}) => ${returnTypeSignature}`;
-        fmxArrowFunction.setCyclomaticComplexity(currentCC[fmxArrowFunction.getName()]);
+        fmxArrowFunction.cyclomaticComplexity = currentCC[fmxArrowFunction.getName()];
 
         let functionTypeName = this.UNKNOWN_VALUE;
         try {
@@ -1219,10 +1219,10 @@ export class EntityDictionary {
 
         const fmxType = this.createOrGetFamixType(functionTypeName, arrowFunction as unknown as FunctionDeclaration);
         fmxArrowFunction.declaredType = fmxType;
-        fmxArrowFunction.setNumberOfLinesOfCode(arrowFunction.getEndLineNumber() - arrowFunction.getStartLineNumber());
+        fmxArrowFunction.numberOfLinesOfCode = arrowFunction.getEndLineNumber() - arrowFunction.getStartLineNumber();
         const parameters = arrowFunction.getParameters();
         fmxArrowFunction.numberOfParameters = parameters.length;
-        fmxArrowFunction.setNumberOfStatements(arrowFunction.getStatements().length);
+        fmxArrowFunction.numberOfStatements = arrowFunction.getStatements().length;
         initFQN(arrowExpression as unknown as TSMorphObjectType, fmxArrowFunction);
         this.makeFamixIndexFileAnchor(arrowExpression as unknown as TSMorphObjectType, fmxArrowFunction);
         this.famixRep.addElement(fmxArrowFunction);

@@ -22,10 +22,10 @@ describe('Tests for function with variables', () => {
     
     const theFunction = Array.from(fmxRep._getAllEntitiesWithType('Function'))[0] as FamixFunctionEntity;
     it("should have three variables", () => {
-        expect(theFunction?.getVariables().size).toBe(3);
+        expect(theFunction?.variables.size).toBe(3);
     });
 
-    const firstVariable = Array.from(theFunction?.getVariables()).find((p) => p.getName() === "i");
+    const firstVariable = Array.from(theFunction?.variables).find((p) => p.getName() === "i");
     const firstVariableComments = Array.from(firstVariable?.getComments() as Set<Comment>);
 
     it("should have a variable 'i' with three comments", () => {
@@ -46,7 +46,7 @@ describe('Tests for function with variables', () => {
         expect(firstVariable?.getDeclaredType().getName()).toBe("number");
     });
 
-    const secondVariable = Array.from(theFunction?.getVariables()).find((p) => p.getName() === "j");
+    const secondVariable = Array.from(theFunction?.variables).find((p) => p.getName() === "j");
     const secondVariableComments = Array.from(secondVariable?.getComments() as Set<Comment>);
 
     it("should have a variable 'j' with two comments", () => {
@@ -72,7 +72,7 @@ describe('Tests for function with variables', () => {
         expect(secondVariable?.getDeclaredType().getName()).toBe("number");
     });
 
-    const thirdVariable = Array.from(theFunction?.getVariables()).find((p) => p.getName() === "x");
+    const thirdVariable = Array.from(theFunction?.variables).find((p) => p.getName() === "x");
     it("should have a variable 'x'", () => {
         expect(thirdVariable).toBeTruthy();
         expect(thirdVariable?.getParentContainerEntity()).toBe(theFunction);

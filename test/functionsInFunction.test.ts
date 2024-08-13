@@ -25,19 +25,19 @@ describe('Tests for functions in function', () => {
     it("should have one function 'fct' with a function 'fct2'", () => {
         expect(theFunction1).toBeTruthy();
         expect(theFunction2).toBeTruthy();
-        expect(theFunction1?.getFunctions().size).toBe(1);
-        expect(Array.from(theFunction1?.getFunctions() as Set<FamixFunctionEntity>)[0]).toBe(theFunction2);
+        expect(theFunction1?.functions.size).toBe(1);
+        expect(Array.from(theFunction1?.functions as Set<FamixFunctionEntity>)[0]).toBe(theFunction2);
     });
 
     it("should have one function 'fct2' with a function 'fct3'", () => {
         expect(theFunction2).toBeTruthy();
         expect(theFunction3).toBeTruthy();
-        expect(theFunction2?.getFunctions().size).toBe(1);
-        expect(Array.from(theFunction2?.getFunctions() as Set<FamixFunctionEntity>)[0]).toBe(theFunction3);
+        expect(theFunction2?.functions.size).toBe(1);
+        expect(Array.from(theFunction2?.functions as Set<FamixFunctionEntity>)[0]).toBe(theFunction3);
     });
 
     it("should have one function 'fct3' with no function", () => {
         expect(theFunction3).toBeTruthy();
-        expect(theFunction3?.getFunctions().size).toBe(0);
+        expect(theFunction3?.functions.size).toBe(0);
     });
 });
