@@ -76,7 +76,6 @@ export class ContainerEntity extends NamedEntity {
         }
     }
 
-
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("ContainerEntity", this);
         this.addPropertiesToExporter(json);
@@ -107,7 +106,7 @@ export class ContainerEntity extends NamedEntity {
         parentContainerEntity.addChildContainerEntity(this);
     }
 
-    get childrenContainerEntities(): Set<import("C:/Users/Cris/Documents/GitHub/FamixTypeScriptImporter/src/lib/famix/src/model/famix/container_entity").ContainerEntity> {
+    get childrenContainerEntities(): Set<ContainerEntity> {
         return this._childrenContainerEntities;
     }
 
