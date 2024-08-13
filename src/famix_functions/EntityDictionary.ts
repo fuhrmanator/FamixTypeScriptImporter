@@ -1271,15 +1271,15 @@ export class EntityDictionary {
             let createParameterConcretisation : boolean = true;
             if(conClassTypeParameter && genClassTypeParameter && conClassTypeParameter.name != genClassTypeParameter.name){
                 parameterConcretisations.forEach((param : Famix.ParameterConcretisation) => {
-                    if (conClassTypeParameter.name == param.getConcreteParameter().name && genClassTypeParameter.name == param.getGenericParameter().name) {
+                    if (conClassTypeParameter.name == param.concreteParameter.name && genClassTypeParameter.name == param.genericParameter.name) {
                         createParameterConcretisation = false;
                         fmxParameterConcretisation = param;
                     }
                 })
                 if (createParameterConcretisation) {
                     fmxParameterConcretisation = new Famix.ParameterConcretisation();
-                    fmxParameterConcretisation.setGenericParameter(genClassTypeParameter);
-                    fmxParameterConcretisation.setConcreteParameter(conClassTypeParameter);
+                    fmxParameterConcretisation.genericParameter = genClassTypeParameter;
+                    fmxParameterConcretisation.concreteParameter = conClassTypeParameter;
                     fmxParameterConcretisation.addConcretisation(concretisation);
                     this.fmxElementObjectMap.set(fmxParameterConcretisation,null);
                 } else {
