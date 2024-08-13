@@ -41,8 +41,8 @@ describe('Tests for alias', () => {
     it("should contain an alias on type Point", () => {
         expect(theFile?.getAliases().size).toBe(NUMBER_OF_ALIASES);
         expect(Array.from(theFile?.getAliases() as Set<Alias>)[0]).toBe(theFirstAlias);
-        expect(theFirstAlias.getAliasedEntity()).toBe(theFirstType);
-        expect(theFirstAlias.getParentEntity()).toBe(theFile);
+        expect(theFirstAlias.aliasedEntity).toBe(theFirstType);
+        expect(theFirstAlias.parentEntity).toBe(theFile);
         expect(theFirstType.getTypeAliases().size).toBe(1);
         expect(Array.from(theFirstType.getTypeAliases())[0]).toBe(theFirstAlias);
     });
@@ -72,8 +72,8 @@ describe('Tests for alias', () => {
     it("should contain an alias on type Text", () => {
         expect(theFile?.getAliases().size).toBe(NUMBER_OF_ALIASES);
         expect(Array.from(theFile?.getAliases() as Set<Alias>)[1]).toBe(arrayOfAliases[1]);
-        expect(arrayOfAliases[1].getAliasedEntity()).toBe(arrayOfTypes[1]);
-        expect(arrayOfAliases[1].getParentEntity()).toBe(theFile);
+        expect(arrayOfAliases[1].aliasedEntity).toBe(arrayOfTypes[1]);
+        expect(arrayOfAliases[1].parentEntity).toBe(theFile);
         expect(arrayOfTypes[1].getTypeAliases().size).toBe(1);
         expect(Array.from(arrayOfTypes[1].getTypeAliases())[0]).toBe(arrayOfAliases[1]);
     });
@@ -99,8 +99,8 @@ describe('Tests for alias', () => {
     it("should contain an alias on type Callback", () => {
         expect(theFile?.getAliases().size).toBe(NUMBER_OF_ALIASES);
         expect(Array.from(theFile?.getAliases() as Set<Alias>)[2]).toBe(arrayOfAliases[2]);
-        expect(arrayOfAliases[2].getAliasedEntity()).toBe(arrayOfTypes[2]);
-        expect(arrayOfAliases[2].getParentEntity()).toBe(theFile);
+        expect(arrayOfAliases[2].aliasedEntity).toBe(arrayOfTypes[2]);
+        expect(arrayOfAliases[2].parentEntity).toBe(theFile);
         expect(arrayOfTypes[2].getTypeAliases().size).toBe(1);
         expect(Array.from(arrayOfTypes[2].getTypeAliases())[0]).toBe(arrayOfAliases[2]);
     });

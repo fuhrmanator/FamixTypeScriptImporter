@@ -264,7 +264,7 @@ export class EntityDictionary {
             logger.debug(`> NOTE: alias ${aliasName} has fully qualified name ${aliasFullyQualifiedName} and name with generics ${aliasNameWithGenerics}.`);
 
             const fmxType = this.createOrGetFamixType(aliasNameWithGenerics, a);
-            fmxAlias.setAliasedEntity(fmxType);
+            fmxAlias.aliasedEntity = fmxType;
             initFQN(a, fmxAlias);
             this.makeFamixIndexFileAnchor(a, fmxAlias);
 

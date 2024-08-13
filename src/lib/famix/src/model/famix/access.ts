@@ -5,22 +5,22 @@ import { Entity } from "./entity";
 
 export class Access extends Entity {
 
-  private _accessor: ContainerEntity;
-  private _variable: StructuralEntity;
-  private _isWrite: boolean;
+    private _accessor: ContainerEntity;
+    private _variable: StructuralEntity;
+    private _isWrite: boolean;
 
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("Access", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("Access", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("accessor", this.accessor);
-    exporter.addProperty("variable", this.variable);
-    exporter.addProperty("isWrite", this.isWrite);
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("accessor", this.accessor);
+        exporter.addProperty("variable", this.variable);
+        exporter.addProperty("isWrite", this.isWrite);
+    }
 
     get accessor(): ContainerEntity {
         return this._accessor;

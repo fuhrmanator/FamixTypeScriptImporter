@@ -27,7 +27,7 @@ export class Type extends ContainerEntity {
   public addTypeAlias(typeAlias: Alias): void {
     if (!this.typeAliases.has(typeAlias)) {
       this.typeAliases.add(typeAlias);
-      typeAlias.setAliasedEntity(this);
+      typeAlias.aliasedEntity = this;
     }
   }
 
