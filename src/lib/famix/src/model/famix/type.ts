@@ -66,7 +66,7 @@ export class Type extends ContainerEntity {
   public addIncomingReference(incomingReference: Reference): void {
     if (!this.incomingReferences.has(incomingReference)) {
       this.incomingReferences.add(incomingReference);
-      incomingReference.setTarget(this);
+      incomingReference.target = this;
     }
   }
 

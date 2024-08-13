@@ -26,7 +26,7 @@ export class ContainerEntity extends NamedEntity {
     public addOutgoingReference(outgoingReference: Reference): void {
         if (!this._outgoingReferences.has(outgoingReference)) {
             this._outgoingReferences.add(outgoingReference);
-            outgoingReference.setSource(this);
+            outgoingReference.source = this;
         }
     }
 
