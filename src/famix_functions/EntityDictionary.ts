@@ -77,7 +77,7 @@ export class EntityDictionary {
 
             const fileName = node.getSourceFile().getFilePath();
 
-            sourceAnchor.setElement(fmx);
+            sourceAnchor.element = fmx;
             sourceAnchor.fileName = fileName;
             fmx.setSourceAnchor(sourceAnchor);
             this.famixRep.addElement(sourceAnchor);
@@ -103,7 +103,7 @@ export class EntityDictionary {
 
         logger.debug("making index file anchor for '" + sourceElement?.getText() + "' with famixElement " + famixElement.getJSON());
         const fmxIndexFileAnchor = new Famix.IndexedFileAnchor();
-        fmxIndexFileAnchor.setElement(famixElement);
+        fmxIndexFileAnchor.element = famixElement;
         this.fmxElementObjectMap.set(famixElement, sourceElement);
 
         if (sourceElement !== null) {
