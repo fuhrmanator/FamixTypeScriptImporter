@@ -52,7 +52,7 @@ describe('Tests for parameter with decorators', () => {
 
     it("should contain a parameter with two decorators", () => {
         expect(theParam?.getDecorators().size).toBe(2);
-        expect(d1?.getDecoratedEntity()).toBe(theParam);
-        expect(d2?.getDecoratedEntity()).toBe(theParam);
+        expect(d1?.decoratedEntity).toBe(theParam);
+        expect(d2?.decoratedEntity).toBe(theParam);
     });
 });

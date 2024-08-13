@@ -60,9 +60,9 @@ describe('Tests for class with decorators', () => {
 
     it("should contain a class with four decorators", () => {
         expect(theClass?.getDecorators().size).toBe(4);
-        expect(d1?.getDecoratedEntity()).toBe(theClass);
-        expect(d2?.getDecoratedEntity()).toBe(theClass);
-        expect(d3?.getDecoratedEntity()).toBe(theClass);
-        expect(d4?.getDecoratedEntity()).toBe(theClass);
+        expect(d1?.decoratedEntity).toBe(theClass);
+        expect(d2?.decoratedEntity).toBe(theClass);
+        expect(d3?.decoratedEntity).toBe(theClass);
+        expect(d4?.decoratedEntity).toBe(theClass);
     });
 });

@@ -73,10 +73,10 @@ describe('Tests for property with decorators', () => {
 
     it("should contain a property with five decorators", () => {
         expect(theProperty?.getDecorators().size).toBe(5);
-        expect(d1?.getDecoratedEntity()).toBe(theProperty);
-        expect(d2?.getDecoratedEntity()).toBe(theProperty);
-        expect(d3?.getDecoratedEntity()).toBe(theProperty);
-        expect(d4?.getDecoratedEntity()).toBe(theProperty);
-        expect(d5?.getDecoratedEntity()).toBe(theProperty);
+        expect(d1?.decoratedEntity).toBe(theProperty);
+        expect(d2?.decoratedEntity).toBe(theProperty);
+        expect(d3?.decoratedEntity).toBe(theProperty);
+        expect(d4?.decoratedEntity).toBe(theProperty);
+        expect(d5?.decoratedEntity).toBe(theProperty);
     });
 });

@@ -76,14 +76,14 @@ describe('Tests for accessors with decorators', () => {
         expect(fmxRep._getAllEntitiesWithType("Decorator").size).toBe(6);
 
         expect(theMethod1?.getDecorators().size).toBe(3);
-        expect(d1[0]?.getDecoratedEntity()).toBe(theMethod1);
-        expect(d2[0]?.getDecoratedEntity()).toBe(theMethod1);
-        expect(d3[0]?.getDecoratedEntity()).toBe(theMethod1);
+        expect(d1[0]?.decoratedEntity).toBe(theMethod1);
+        expect(d2[0]?.decoratedEntity).toBe(theMethod1);
+        expect(d3[0]?.decoratedEntity).toBe(theMethod1);
 
         expect(theMethod2?.getDecorators().size).toBe(3);
-        expect(d1[1]?.getDecoratedEntity()).toBe(theMethod2);
-        expect(d2[1]?.getDecoratedEntity()).toBe(theMethod2);
-        expect(d3[1]?.getDecoratedEntity()).toBe(theMethod2);
+        expect(d1[1]?.decoratedEntity).toBe(theMethod2);
+        expect(d2[1]?.decoratedEntity).toBe(theMethod2);
+        expect(d3[1]?.decoratedEntity).toBe(theMethod2);
     });
 
     it("should contain two accesses to '_x'", () => {

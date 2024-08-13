@@ -76,7 +76,7 @@ describe('EntityDictionary', () => {
   
   });
 
-  const functions = modules[0].functions;
+  const functions = modules[0].getFunctions();
 
   test('should get a function and add it to the map', () => {
     

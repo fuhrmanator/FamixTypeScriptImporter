@@ -75,7 +75,7 @@ export class NamedEntity extends SourcedEntity {
   public addDecorator(decorator: Decorator): void {
     if (!this.decorators.has(decorator)) {
       this.decorators.add(decorator);
-      decorator.setDecoratedEntity(this);
+      decorator.decoratedEntity = this;
     }
   }
 

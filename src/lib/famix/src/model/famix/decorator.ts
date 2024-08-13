@@ -3,37 +3,35 @@ import { NamedEntity } from "./named_entity";
 
 export class Decorator extends NamedEntity {
 
-  private decoratorExpression: string;
+    private _decoratorExpression: string;
+    private _decoratedEntity: NamedEntity;
 
-  public getDecoratorExpression(): string {
-    return this.decoratorExpression;
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("Decorator", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public setDecoratorExpression(decoratorExpression: string) {
-    this.decoratorExpression = decoratorExpression;
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("expression", this.decoratorExpression);
+        exporter.addProperty("decoratedEntity", this.decoratedEntity);
+    }
 
-  private decoratedEntity: NamedEntity;
-  
-  public getDecoratedEntity(): NamedEntity {
-    return this.decoratedEntity;
-  }
+    get decoratorExpression(): string {
+        return this._decoratorExpression;
+    }
 
-  public setDecoratedEntity(decoratedEntity: NamedEntity): void {
-    this.decoratedEntity = decoratedEntity;
-    decoratedEntity.addDecorator(this);
-  }
+    set decoratorExpression(decoratorExpression: string) {
+        this._decoratorExpression = decoratorExpression;
+    }
 
+    get decoratedEntity(): NamedEntity {
+        return this._decoratedEntity;
+    }
 
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("Decorator", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
-
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("expression", this.getDecoratorExpression());
-    exporter.addProperty("decoratedEntity", this.getDecoratedEntity());
-  }
+    set decoratedEntity(decoratedEntity: NamedEntity) {
+        this._decoratedEntity = decoratedEntity;
+        decoratedEntity.addDecorator(this);
+    }
 }

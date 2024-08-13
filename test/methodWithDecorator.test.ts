@@ -41,7 +41,7 @@ describe('Tests for method with decorator', () => {
 
     it("should contain a method with one decorator", () => {
         expect(theMethod?.getDecorators().size).toBe(1);
-        expect(d?.getDecoratedEntity()).toBe(theMethod);
-        expect(d?.getDecoratorExpression()).toBe("first()");
+        expect(d?.decoratedEntity).toBe(theMethod);
+        expect(d?.decoratorExpression).toBe("first()");
     });
 });

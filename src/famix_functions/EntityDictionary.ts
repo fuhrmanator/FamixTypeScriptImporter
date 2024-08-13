@@ -839,10 +839,10 @@ export class EntityDictionary {
         const decoratorExpression = decorator.getText().substring(1);
 
         fmxDecorator.setName(decoratorName);
-        fmxDecorator.setDecoratorExpression(decoratorExpression);
+        fmxDecorator.decoratorExpression = decoratorExpression;
         const decoratedEntityFullyQualifiedName = FQNFunctions.getFQN(decoratedEntity);
         const fmxDecoratedEntity = this.famixRep.getFamixEntityByFullyQualifiedName(decoratedEntityFullyQualifiedName) as Famix.NamedEntity;
-        fmxDecorator.setDecoratedEntity(fmxDecoratedEntity);
+        fmxDecorator.decoratedEntity = fmxDecoratedEntity;
         initFQN(decorator, fmxDecorator);
         this.makeFamixIndexFileAnchor(decorator, fmxDecorator);
 
