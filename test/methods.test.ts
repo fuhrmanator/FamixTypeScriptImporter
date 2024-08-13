@@ -22,24 +22,24 @@ describe('Tests for methods', () => {
     const theMethod = Array.from(methodList)[0] as Method;
     it("should contain a method 'method'", () => {
         expect(theMethod).toBeTruthy();
-        expect(theMethod?.getName()).toBe('method');
+        expect(theMethod?.name).toBe('method');
     });
 
 
     it("should return void", () => {
-        expect(theMethod?.getDeclaredType().getName()).toBe("void");
+        expect(theMethod?.declaredType.name).toBe("void");
     });
 
     it("should have no parameter", () => {
-        expect(theMethod?.getParameters().size).toBe(0);
+        expect(theMethod?.parameters.size).toBe(0);
     });
 
     it("should be a public method 'method", () => {
-        expect(theMethod.getKind()).toBe(undefined);
-        expect(theMethod.getIsAbstract()).toBe(false);
-        expect(theMethod.getIsClassSide()).toBe(false);
-        expect(theMethod.getIsPrivate()).toBe(false);
-        expect(theMethod.getIsProtected()).toBe(false);
-        expect(theMethod.getIsPublic()).toBe(true);
+        expect(theMethod.kind).toBe(undefined);
+        expect(theMethod.isAbstract).toBe(false);
+        expect(theMethod.isClassSide).toBe(false);
+        expect(theMethod.isPrivate).toBe(false);
+        expect(theMethod.isProtected).toBe(false);
+        expect(theMethod.isPublic).toBe(true);
     });
 });

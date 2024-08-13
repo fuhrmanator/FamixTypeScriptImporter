@@ -5,49 +5,46 @@ import { Entity } from "./entity";
 
 export class Access extends Entity {
 
-  private accessor: ContainerEntity;
+    private _accessor: ContainerEntity;
+    private _variable: StructuralEntity;
+    private _isWrite: boolean;
 
-  public getAccessor(): ContainerEntity {
-    return this.accessor;
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("Access", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public setAccessor(accessor: ContainerEntity): void {
-    this.accessor = accessor;
-    accessor.addAccess(this);
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("accessor", this.accessor);
+        exporter.addProperty("variable", this.variable);
+        exporter.addProperty("isWrite", this.isWrite);
+    }
 
-  private variable: StructuralEntity;
+    get accessor(): ContainerEntity {
+        return this._accessor;
+    }
 
-  public getVariable(): StructuralEntity {
-    return this.variable;
-  }
+    set accessor(accessor: ContainerEntity) {
+        this._accessor = accessor;
+        accessor.addAccess(this);
+    }
 
-  public setVariable(variable: StructuralEntity): void {
-    this.variable = variable;
-    variable.addIncomingAccess(this);
-  }
+    get variable(): StructuralEntity {
+        return this._variable;
+    }
 
-  private isWrite: boolean;
+    set variable(variable: StructuralEntity) {
+        this._variable = variable;
+        variable.addIncomingAccess(this);
+    }
 
-  public getIsWrite(): boolean {
-    return this.isWrite;
-  }
+    get isWrite(): boolean {
+        return this._isWrite;
+    }
 
-  public setIsWrite(isWrite: boolean): void {
-    this.isWrite = isWrite;
-  }
-
-
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("Access", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
-
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("accessor", this.getAccessor());
-    exporter.addProperty("variable", this.getVariable());
-    exporter.addProperty("isWrite", this.getIsWrite());
-  }
+    set isWrite(isWrite: boolean) {
+        this._isWrite = isWrite;
+    }
 }

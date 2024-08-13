@@ -46,13 +46,13 @@ describe('Tests for parameter with decorators', () => {
         expect(fmxRep._getAllEntitiesWithType("Decorator").size).toBe(2);
     });
 
-    const theParam = (Array.from(fmxRep._getFamixMethod("{parameterWithDecorators.ts}.BugReport2.print[MethodDeclaration]")?.getParameters() as Set<Parameter>) as Array<Parameter>).find((f) => f.getName() === "verbose");
-    const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@tes");
-    const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.getName() === "@deco2");
+    const theParam = (Array.from(fmxRep._getFamixMethod("{parameterWithDecorators.ts}.BugReport2.print[MethodDeclaration]")?.parameters as Set<Parameter>) as Array<Parameter>).find((f) => f.name === "verbose");
+    const d1 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.name === "@tes");
+    const d2 = (Array.from(fmxRep._getAllEntitiesWithType("Decorator")) as Array<Decorator>).find((d) => d.name === "@deco2");
 
     it("should contain a parameter with two decorators", () => {
-        expect(theParam?.getDecorators().size).toBe(2);
-        expect(d1?.getDecoratedEntity()).toBe(theParam);
-        expect(d2?.getDecoratedEntity()).toBe(theParam);
+        expect(theParam?.decorators.size).toBe(2);
+        expect(d1?.decoratedEntity).toBe(theParam);
+        expect(d2?.decoratedEntity).toBe(theParam);
     });
 });

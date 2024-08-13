@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { ParametricInterface } from '../src/lib/famix/src/model/famix';
+import { Concretisation, ParameterConcretisation, ParametricInterface } from '../src/lib/famix/src/model/famix';
 import { project } from './testUtils';
 
 const importer = new Importer();
@@ -41,14 +41,14 @@ describe('Tests for concretisation', () => {
     });
 
     it("should contain generic interfaces named InterfaceA", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).name);
         expect(listOfNames).toContain("InterfaceA");
         const numberOfInterfaceA = listOfNames.filter(name => name === "InterfaceA").length;
         expect(numberOfInterfaceA).toBe(4); 
     });
 
     it("should contain generic interfaces named InterfaceE", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).name);
         expect(listOfNames).toContain("InterfaceE");
         const numberOfInterfaceE = listOfNames.filter(name => name === "InterfaceE").length;
         expect(numberOfInterfaceE).toBe(3); 
@@ -61,21 +61,21 @@ describe('Tests for concretisation', () => {
     });
 
     it("The generic Class should be InterfaceA<T> with genericParameter T", () => {
-        const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
-        const iterator = theConcretisation.values();
-        const firstElement = iterator.next().value;
-        expect(firstElement.getGenericEntity()).toBe(theInterface);
-        const T = firstElement.getGenericEntity().getGenericParameters().values().next().value;
-        expect(T.getName()).toBe("T");
+        const theConcretisations = fmxRep._getAllEntitiesWithType("Concretisation") as Set<Concretisation>;
+        const iterator = theConcretisations.values();
+        const firstElement = iterator.next().value as Concretisation;
+        expect(firstElement.genericEntity).toBe(theInterface);
+        const T = firstElement.genericEntity.genericParameters.values().next().value as ParametricInterface;
+        expect(T.name).toBe("T");
     });
 
     it("The concrete Class should be InterfaceA<string> with concreteParameter string", () => {
-        const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
-        const iterator = theConcretisation.values();
-        const firstElement = iterator.next().value;
-        expect(firstElement.getConcreteEntity().getName()).toBe("InterfaceA");
-        const concParameter = firstElement.getConcreteEntity().getConcreteParameters().values().next().value;
-        expect(concParameter.getName()).toBe("string");
+        const theConcretisations = fmxRep._getAllEntitiesWithType("Concretisation") as Set<Concretisation>;
+        const iterator = theConcretisations.values();
+        const firstElement = iterator.next().value as Concretisation;
+        expect(firstElement.concreteEntity.name).toBe("InterfaceA");
+        const concParameter = firstElement.concreteEntity.concreteParameters.values().next().value as ParametricInterface;
+        expect(concParameter.name).toBe("string");
     });
 
     it("should contain two parameter concretisation", () => {
@@ -83,14 +83,14 @@ describe('Tests for concretisation', () => {
     });
 
     it("The first parameter concretisation should contain two concretisations", () => {
-        const theConcretisation = fmxRep._getAllEntitiesWithType("ParameterConcretisation");
+        const theConcretisation = fmxRep._getAllEntitiesWithType("ParameterConcretisation") as Set<ParameterConcretisation>;
         const iterator = theConcretisation.values();
-        const firstElement = iterator.next().value;
-        const genericParameter = firstElement.getGenericParameter();
-        const concParameter = firstElement.getConcreteParameter();
-        expect(genericParameter.getName()).toBe("T");
-        expect(concParameter.getName()).toBe("string");
-        expect(firstElement.getConcretisations().size).toBe(2);
+        const firstElement = iterator.next().value as ParameterConcretisation;
+        const genericParameter = firstElement.genericParameter;
+        const concParameter = firstElement.concreteParameter;
+        expect(genericParameter.name).toBe("T");
+        expect(concParameter.name).toBe("string");
+        expect(firstElement.concretisations.size).toBe(2);
     });
 
 });

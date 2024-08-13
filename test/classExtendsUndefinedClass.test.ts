@@ -21,24 +21,24 @@ describe.skip('Tests for class extends undefined class', () => {
     it("should contain a class MyClass that extends a class ClassDeclaration", () => {
         const cList = Array.from(fmxRep._getAllEntitiesWithType("Class") as Set<Interface>);
         expect(cList).toBeTruthy();
-        const myClass1 = cList.find(p => p.getName() === "ClassDeclaration");
+        const myClass1 = cList.find(p => p.name === "ClassDeclaration");
         expect(myClass1).toBeTruthy();
-        expect(myClass1?.getIsStub()).toBe(true);
-        const myClass2 = cList.find(p => p.getName() === "MyClass");
+        expect(myClass1?.isStub).toBe(true);
+        const myClass2 = cList.find(p => p.name === "MyClass");
         expect(myClass2).toBeTruthy();
         if (myClass2) {
-            expect(myClass2.getSubInheritances().size).toBe(0);
-            expect(myClass2.getSuperInheritances().size).toBe(1);
-            const theInheritance = (Array.from(myClass2.getSuperInheritances())[0]);
-            expect(theInheritance.getSuperclass()).toBeTruthy();
-            expect(theInheritance.getSuperclass()).toBe(myClass1);
+            expect(myClass2.subInheritances.size).toBe(0);
+            expect(myClass2.superInheritances.size).toBe(1);
+            const theInheritance = (Array.from(myClass2.superInheritances)[0]);
+            expect(theInheritance.superclass).toBeTruthy();
+            expect(theInheritance.superclass).toBe(myClass1);
         }
         if (myClass1) {
-            expect(myClass1.getSubInheritances().size).toBe(1);
-            expect(myClass1.getSuperInheritances().size).toBe(0);
-            const theInheritance = (Array.from(myClass1.getSubInheritances())[0]);
-            expect(theInheritance.getSubclass()).toBeTruthy();
-            expect(theInheritance.getSubclass()).toBe(myClass2);
+            expect(myClass1.subInheritances.size).toBe(1);
+            expect(myClass1.superInheritances.size).toBe(0);
+            const theInheritance = (Array.from(myClass1.subInheritances)[0]);
+            expect(theInheritance.subclass).toBeTruthy();
+            expect(theInheritance.subclass).toBe(myClass2);
         }
     });
 });

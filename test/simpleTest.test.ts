@@ -12,7 +12,7 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Tests for simple test', () => {
     
     const scriptEntityList = Array.from(fmxRep._getAllEntitiesWithType('ScriptEntity')) as Array<ScriptEntity>;
-    const theFile = scriptEntityList.find(e => e.getName() === 'simpleTest.ts');
+    const theFile = scriptEntityList.find(e => e.name === 'simpleTest.ts');
     it("should have one file", () => {
         expect(scriptEntityList?.length).toBe(1);
         expect(theFile).toBeTruthy();

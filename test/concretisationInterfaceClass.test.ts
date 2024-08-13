@@ -26,7 +26,7 @@ describe('Tests for concretisation', () => {
     });
 
     it("should contain generic interfaces named InterfaceD", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).name);
         expect(listOfNames).toContain("InterfaceD");
 
         const numberOfInterfaceD = listOfNames.filter(name => name === "InterfaceD").length;

@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { ParametricInterface } from '../src/lib/famix/src/model/famix';
+import { Concretisation, ParametricInterface } from '../src/lib/famix/src/model/famix';
 import { project } from './testUtils';
 
 const importer = new Importer();
@@ -37,7 +37,7 @@ describe('Tests for concretisation', () => {
     });
 
     it("should contain generic interfaces named InterfaceE", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).name);
         expect(listOfNames).toContain("InterfaceE");
         const numberOfInterfaceE = listOfNames.filter(name => name === "InterfaceE").length;
         expect(numberOfInterfaceE).toBe(2); 
@@ -54,22 +54,22 @@ describe('Tests for concretisation', () => {
     const theInterface = fmxRep._getFamixInterface("{concretisationTypeInstantiation.ts}.InterfaceE<T>");
 
     it("The concrete Class should be MyClass with concreteParameter boolean", () => {
-        const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
-        const iterator = theConcretisation.values();
-        const firstElement = iterator.next().value;
-        expect(firstElement.getConcreteEntity().getName()).toBe("MyClass");
-        const concParameter = firstElement.getConcreteEntity().getConcreteParameters().values().next().value;
-        expect(concParameter.getName()).toBe("boolean");
+        const theConcretisations = fmxRep._getAllEntitiesWithType("Concretisation") as Set<Concretisation>;
+        const iterator = theConcretisations.values();
+        const firstElement = iterator.next().value as Concretisation;
+        expect(firstElement.concreteEntity.name).toBe("MyClass");
+        const concParameter = firstElement.concreteEntity.concreteParameters.values().next().value as ParametricInterface;
+        expect(concParameter.name).toBe("boolean");
     });
 
     it("The concrete Interface should be InterfaceE with concreteParameter number", () => {
-        const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
-        const iterator = theConcretisation.values();
-        const firstElement = iterator.next().value;
-        const secondElement = iterator.next().value;
-        expect(secondElement.getConcreteEntity().getName()).toBe("InterfaceE");
-        const concParameter = secondElement.getConcreteEntity().getConcreteParameters().values().next().value;
-        expect(concParameter.getName()).toBe("number");
+        const theConcretisations = fmxRep._getAllEntitiesWithType("Concretisation") as Set<Concretisation>;
+        const iterator = theConcretisations.values();
+        const firstElement = iterator.next().value as Concretisation;
+        const secondElement = iterator.next().value as Concretisation;
+        expect(secondElement.concreteEntity.name).toBe("InterfaceE");
+        const concParameter = secondElement.concreteEntity.concreteParameters.values().next().value as ParametricInterface;
+        expect(concParameter.name).toBe("number");
     });
 
 });

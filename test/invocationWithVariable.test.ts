@@ -22,9 +22,9 @@ describe('Tests for invocation with variable', () => {
     it("should contain a variable 'x1' instance of 'AAA'", () => {
         const pList = Array.from(fmxRep._getAllEntitiesWithType("Variable") as Set<Variable>);
         expect(pList).toBeTruthy();
-        const x1 = pList.find(p => p.getName() === "x1");
+        const x1 = pList.find(p => p.name === "x1");
         expect(x1).toBeTruthy();
-        expect(x1?.getDeclaredType().getName()).toBe("AAA");
+        expect(x1?.declaredType.name).toBe("AAA");
     });
     
     const theMethod = fmxRep._getFamixMethod("{invocationWithVariable.ts}.AAA.method[MethodDeclaration]") as Method;
@@ -36,14 +36,14 @@ describe('Tests for invocation with variable', () => {
     });
 
     it("should contain an invocation for 'method'", () => {
-        expect((invocations[0] as Invocation).getCandidates().has(theMethod));
+        expect((invocations[0] as Invocation).candidates.has(theMethod));
     });
 
     it("should contain an invocation with a sender 'invocationWithVariable.ts'", () => {
-        expect((invocations[0] as Invocation).getSender()).toBe(fmxRep._getFamixFile("invocationWithVariable.ts"));
+        expect((invocations[0] as Invocation).sender).toBe(fmxRep._getFamixFile("invocationWithVariable.ts"));
     });
 
     it("should contain an invocation with a receiver 'AAA'", () => {
-        expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{invocationWithVariable.ts}.AAA[ClassDeclaration]"));
+        expect((invocations[0] as Invocation).receiver).toBe(fmxRep._getFamixClass("{invocationWithVariable.ts}.AAA[ClassDeclaration]"));
     });
 });

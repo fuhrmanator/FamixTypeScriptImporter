@@ -37,7 +37,7 @@ describe('Invocations', () => {
         const theClass = fmxRep._getFamixClass(clsName);
         expect(theClass).toBeTruthy();
         if (theClass) {
-            const methodFqn = Array.from(theClass.getMethods())[0].getFullyQualifiedName();
+            const methodFqn = Array.from(theClass.methods)[0].fullyQualifiedName;
             expect(methodFqn).toBe("{invocations.ts}.Class1.returnHi[MethodDeclaration]");
             const theMethod = fmxRep.getFamixEntityByFullyQualifiedName(methodFqn);
             expect(theMethod).toBeTruthy();    
@@ -49,7 +49,7 @@ describe('Invocations', () => {
         const theClass = fmxRep._getFamixClass(clsName);
         expect(theClass).toBeTruthy();
         if (theClass) {
-            const methodFqn = Array.from(theClass.getMethods())[0].getFullyQualifiedName();
+            const methodFqn = Array.from(theClass.methods)[0].fullyQualifiedName;
             expect(methodFqn).toBe("{invocations.ts}.Class2.returnName[MethodDeclaration]");
             const theMethod = fmxRep.getFamixEntityByFullyQualifiedName(methodFqn);
             expect(theMethod).toBeTruthy();    
@@ -61,7 +61,7 @@ describe('Invocations', () => {
         const theClass = fmxRep._getFamixClass(clsName);
         expect(theClass).toBeTruthy();
         if (theClass) {
-            const methodFqn = Array.from(theClass.getMethods())[0].getFullyQualifiedName();
+            const methodFqn = Array.from(theClass.methods)[0].fullyQualifiedName;
             expect(methodFqn).toBe("{invocations.ts}.Class3.getString[MethodDeclaration]");
             const theMethod = fmxRep.getFamixEntityByFullyQualifiedName(methodFqn);
             expect(theMethod).toBeTruthy();    
@@ -73,7 +73,7 @@ describe('Invocations', () => {
         const theClass = fmxRep._getFamixClass(clsName);
         expect(theClass).toBeTruthy();
         if (theClass) {
-            const methodFqn = Array.from(theClass.getMethods())[0].getFullyQualifiedName();
+            const methodFqn = Array.from(theClass.methods)[0].fullyQualifiedName;
             const theMethod = fmxRep.getFamixEntityByFullyQualifiedName(methodFqn) as Method;
             expect(theMethod).toBeTruthy();
             const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
@@ -81,7 +81,7 @@ describe('Invocations', () => {
             expect(invocations.length).toBeTruthy();
             const candidates = invocations.filter(i => {
                 const invocation = i as Invocation;
-                return invocation.getCandidates().has(theMethod);
+                return invocation.candidates.has(theMethod);
             });
             expect(candidates).toHaveLength(1);
         }
@@ -92,14 +92,14 @@ describe('Invocations', () => {
         const theClass = fmxRep._getFamixClass(clsName);
         expect(theClass).toBeTruthy();
         if (theClass) {
-            const methodFqn = Array.from(theClass.getMethods())[0].getFullyQualifiedName();
+            const methodFqn = Array.from(theClass.methods)[0].fullyQualifiedName;
             const theMethod = fmxRep.getFamixEntityByFullyQualifiedName(methodFqn) as Method;
             expect(theMethod).toBeTruthy();
             const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
             expect(invocations).toBeTruthy();
             expect(invocations.length).toBeTruthy();
-            expect((invocations[0] as Invocation).getReceiver()).toBeTruthy();
-            expect((invocations[0] as Invocation).getReceiver()).toBe(fmxRep._getFamixClass("{invocations.ts}.Class1[ClassDeclaration]"));
+            expect((invocations[0] as Invocation).receiver).toBeTruthy();
+            expect((invocations[0] as Invocation).receiver).toBe(fmxRep._getFamixClass("{invocations.ts}.Class1[ClassDeclaration]"));
         }
     });
 
@@ -108,14 +108,14 @@ describe('Invocations', () => {
         const theClass = fmxRep._getFamixClass(clsName);
         expect(theClass).toBeTruthy();
         if (theClass) {
-            const methodFqn = Array.from(theClass.getMethods())[0].getFullyQualifiedName();
+            const methodFqn = Array.from(theClass.methods)[0].fullyQualifiedName;
             const theMethod = fmxRep.getFamixEntityByFullyQualifiedName(methodFqn) as Method;
             expect(theMethod).toBeTruthy();
             const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
             expect(invocations).toBeTruthy();
             expect(invocations.length).toBeTruthy();
-            expect((invocations[0] as Invocation).getSignature()).toBeTruthy();
-            expect((invocations[0] as Invocation).getSignature()).toBe('public returnHi(): string');
+            expect((invocations[0] as Invocation).signature).toBeTruthy();
+            expect((invocations[0] as Invocation).signature).toBe('public returnHi(): string');
         }
     });
 
@@ -125,7 +125,7 @@ describe('Invocations', () => {
         const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
         expect(invocations).toBeTruthy();
         expect(invocations.length).toBeTruthy();
-        expect((invocations[0] as Invocation).getSignature()).toBeTruthy();
-        expect((invocations[0] as Invocation).getSignature()).toBe('public returnHi(): string');
+        expect((invocations[0] as Invocation).signature).toBeTruthy();
+        expect((invocations[0] as Invocation).signature).toBe('public returnHi(): string');
     });
 });

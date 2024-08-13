@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { ParametricClass } from '../src/lib/famix/src/model/famix';
+import { Concretisation, ParameterConcretisation, ParametricClass } from '../src/lib/famix/src/model/famix';
 import { project } from './testUtils';
 
 const importer = new Importer();
@@ -37,7 +37,7 @@ describe('Tests for concretisation', () => {
     });
 
     it("should contain generic classes named ClassA", () => {
-        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass")).map(e => (e as ParametricClass).getName());
+        const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass")).map(e => (e as ParametricClass).name);
         expect(listOfNames).toContain("ClassA");
 
         const numberOfClassA = listOfNames.filter(name => name === "ClassA").length;
@@ -48,7 +48,7 @@ describe('Tests for concretisation', () => {
 
     it ("should not be an abstract class", () => {
         expect(theClass).toBeTruthy();
-        if (theClass) expect(theClass.getIsAbstract()).toBe(false);
+        if (theClass) expect(theClass.isAbstract).toBe(false);
     });
 
     it("should contain 3 concretisations", () => {
@@ -56,12 +56,12 @@ describe('Tests for concretisation', () => {
     });
 
     it("The generic Class should be ClassA<T> with genericParameter T", () => {
-        const theConcretisation = fmxRep._getAllEntitiesWithType("Concretisation");
-        const iterator = theConcretisation.values();
-        const firstElement = iterator.next().value;
-        expect(firstElement.getGenericEntity()).toBe(theClass);
-        const T = firstElement.getGenericEntity().getGenericParameters().values().next().value;
-        expect(T.getName()).toBe("T");
+        const theConcretisations = fmxRep._getAllEntitiesWithType("Concretisation") as Set<Concretisation>;
+        const iterator = theConcretisations.values();
+        const firstElement = iterator.next().value as Concretisation;
+        expect(firstElement.genericEntity).toBe(theClass);
+        const T = firstElement.genericEntity.genericParameters.values().next().value as ParametricClass;
+        expect(T.name).toBe("T");
     });
 
     it("should contain two parameter concretisation", () => {
@@ -69,14 +69,14 @@ describe('Tests for concretisation', () => {
     });
 
     it("The first parameter concretisation should contain two concretisations", () => {
-        const theConcretisation = fmxRep._getAllEntitiesWithType("ParameterConcretisation");
-        const iterator = theConcretisation.values();
-        const firstElement = iterator.next().value;
-        const genericParameter = firstElement.getGenericParameter();
-        const concParameter = firstElement.getConcreteParameter();
-        expect(genericParameter.getName()).toBe("T");
-        expect(concParameter.getName()).toBe("string");
-        expect(firstElement.getConcretisations().size).toBe(2);
+        const theConcretisations = fmxRep._getAllEntitiesWithType("ParameterConcretisation") as Set<ParameterConcretisation>;
+        const iterator = theConcretisations.values();
+        const firstElement = iterator.next().value as ParameterConcretisation;
+        const genericParameter = firstElement.genericParameter;
+        const concParameter = firstElement.concreteParameter;
+        expect(genericParameter.name).toBe("T");
+        expect(concParameter.name).toBe("string");
+        expect(firstElement.concretisations.size).toBe(2);
     });
 
 });

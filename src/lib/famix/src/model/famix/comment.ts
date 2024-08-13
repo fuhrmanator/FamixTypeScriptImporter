@@ -3,37 +3,9 @@ import { SourcedEntity } from "./sourced_entity";
 
 export class Comment extends SourcedEntity {
 
-  private isJSDoc: boolean;
-
-  public getIsJSDoc(): boolean {
-    return this.isJSDoc;
-  }
-
-  public setIsJSDoc(isJSDoc: boolean): void {
-    this.isJSDoc = isJSDoc;
-  }
-
-  private container: SourcedEntity;
-
-  public getContainer(): SourcedEntity {
-    return this.container;
-  }
-
-  public setContainer(container: SourcedEntity): void {
-    this.container = container;
-    container.addComment(this);
-  }
-
-  private content: string;
-
-  public getContent(): string {
-    return this.content;
-  }
-
-  public setContent(content: string): void {
-    this.content = content;
-  }
-
+  private _isJSDoc: boolean;
+  private _container: SourcedEntity;
+  private _content: string;
 
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("Comment", this);
@@ -43,8 +15,33 @@ export class Comment extends SourcedEntity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("isJSDoc", this.getIsJSDoc());
-    exporter.addProperty("commentedEntity", this.getContainer());
-    exporter.addProperty("content", this.getContent());
+    exporter.addProperty("isJSDoc", this.isJSDoc);
+    exporter.addProperty("commentedEntity", this.container);
+    exporter.addProperty("content", this.content);
   }
+
+    get isJSDoc(): boolean {
+        return this._isJSDoc;
+    }
+
+    set isJSDoc(isJSDoc: boolean) {
+        this._isJSDoc = isJSDoc;
+    }
+
+    get container(): SourcedEntity {
+        return this._container;
+    }
+
+    set container(container: SourcedEntity) {
+        this._container = container;
+        container.addComment(this);
+    }
+
+    get content(): string {
+        return this._content;
+    }
+
+    set content(content: string) {
+        this._content = content;
+    }
 }

@@ -6,35 +6,13 @@ import { PrimitiveType } from "./primitive_type";
 
 export class ParameterConcretisation extends Entity {
 
-    private genericParameter: ParameterType;
-
-    public getGenericParameter(): ParameterType {
-      return this.genericParameter;
-    }
-  
-    public setGenericParameter(genericEntity: ParameterType): void {
-      this.genericParameter = genericEntity;
-    }
-  
-    private concreteParameter: PrimitiveType;
-  
-    public getConcreteParameter(): PrimitiveType {
-      return this.concreteParameter;
-    }
-  
-    public setConcreteParameter(concreteParameter: PrimitiveType): void {
-      this.concreteParameter = concreteParameter;
-    }
-
-    private concretisations: Set<Concretisation> = new Set();
-
-    public getConcretisations(): Set<Concretisation> {
-      return this.concretisations;
-    }
+    private _genericParameter: ParameterType;
+    private _concreteParameter: PrimitiveType;
+    private _concretisations: Set<Concretisation> = new Set();
 
     public addConcretisation(concretisation: Concretisation): void {
-      if (!this.concretisations.has(concretisation)) {
-        this.concretisations.add(concretisation);
+      if (!this._concretisations.has(concretisation)) {
+        this._concretisations.add(concretisation);
       }
     }
   
@@ -46,9 +24,28 @@ export class ParameterConcretisation extends Entity {
   
     public addPropertiesToExporter(exporter: FamixJSONExporter): void {
       super.addPropertiesToExporter(exporter);
-      exporter.addProperty("genericEntity", this.getGenericParameter());
-      exporter.addProperty("concreteEntity", this.getConcreteParameter());
-      exporter.addProperty("concretisations", this.getConcretisations());
+      exporter.addProperty("genericEntity", this.genericParameter);
+      exporter.addProperty("concreteEntity", this.concreteParameter);
+      exporter.addProperty("concretisations", this.concretisations);
     }
 
+    get genericParameter() {
+        return this._genericParameter;
+    }
+
+    set genericParameter(genericEntity: ParameterType) {
+        this._genericParameter = genericEntity;
+    }
+
+    get concreteParameter() {
+        return this._concreteParameter;
+    }
+
+    set concreteParameter(concreteParameter: PrimitiveType) {
+        this._concreteParameter = concreteParameter;
+    }
+
+    get concretisations() {
+        return this._concretisations;
+    }
 }

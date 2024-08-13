@@ -97,6 +97,6 @@ describe('Tests for famix objects and ts-morph objects', () => {
         const accesses = fmxRep._getAllEntitiesWithType("Access") as Set<Access>;
         expect(accesses.size).toBe(1);
         const access: Access = accesses.values().next().value;
-        expect(access.getVariable().getName()).toBe("param");
+        expect(access.variable.name).toBe("param");
     });
 });

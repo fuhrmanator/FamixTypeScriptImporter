@@ -5,38 +5,36 @@ import { Entity } from "./entity";
 
 export class Reference extends Entity {
 
-  private source: ContainerEntity;
+    private _source: ContainerEntity;
+    private _target: Type;
 
-  public getSource(): ContainerEntity {
-    return this.source;
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("Reference", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public setSource(source: ContainerEntity): void {
-    this.source = source;
-    source.addOutgoingReference(this);
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("source", this.source);
+        exporter.addProperty("target", this.target);
+    }
 
-  private target: Type;
+    get source() {
+        return this._source;
+    }
 
-  public getTarget(): Type {
-    return this.target;
-  }
+    set source(source: ContainerEntity) {
+        this._source = source;
+        source.addOutgoingReference(this);
+    }
 
-  public setTarget(target: Type): void {
-    this.target = target;
-    target.addIncomingReference(this);
-  }
+    get target() {
+        return this._target;
+    }
 
-
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("Reference", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
-
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("source", this.getSource());
-    exporter.addProperty("target", this.getTarget());
-  }
+    set target(target: Type) {
+        this._target = target;
+        target.addIncomingReference(this);
+    }
 }

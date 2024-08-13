@@ -4,38 +4,36 @@ import { Type } from "./type";
 
 export class Alias extends NamedEntity {
 
-  private parentEntity: NamedEntity;
+    private _parentEntity: NamedEntity;
+    private _aliasedEntity: Type;
 
-  public getParentEntity(): NamedEntity {
-    return this.parentEntity;
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("Alias", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public setParentEntity(parentEntity: NamedEntity): void {
-    this.parentEntity = parentEntity;
-    parentEntity.addAlias(this);
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("parentType", this.parentEntity);
+        exporter.addProperty("aliasedEntity", this.aliasedEntity);
+    }
 
-  private aliasedEntity: Type;
+    get parentEntity(): NamedEntity {
+        return this._parentEntity;
+    }
 
-  public getAliasedEntity(): Type {
-    return this.aliasedEntity;
-  }
+    set parentEntity(parentEntity: NamedEntity) {
+        this._parentEntity = parentEntity;
+        parentEntity.addAlias(this);
+    }
 
-  public setAliasedEntity(aliasedEntity: Type): void {
-    this.aliasedEntity = aliasedEntity;
-    aliasedEntity.addTypeAlias(this);
-  }
+    get aliasedEntity(): Type {
+        return this._aliasedEntity;
+    }
 
-
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("Alias", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
-
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("parentType", this.getParentEntity());
-    exporter.addProperty("aliasedEntity", this.getAliasedEntity());
-  }
+    set aliasedEntity(aliasedEntity: Type) {
+        this._aliasedEntity = aliasedEntity;
+        aliasedEntity.addTypeAlias(this);
+    }
 }

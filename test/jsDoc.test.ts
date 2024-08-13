@@ -26,13 +26,13 @@ describe('Tests for JS doc', () => {
     const theJSDoc = Array.from(fmxRep._getAllEntitiesWithType("Comment") as Set<Comment>)[0];
 
     it("should have one comment for the function", () => {
-        expect(theFunction?.getComments().size).toBe(1);
-        expect(theFunction?.getComments().has(theJSDoc)).toBe(true);
+        expect(theFunction?.comments.size).toBe(1);
+        expect(theFunction?.comments.has(theJSDoc)).toBe(true);
         expect(getCommentTextFromCommentViaAnchor(theJSDoc, project)).toBe(`/**
  * Gets the name.
  * @param person - Person to get the name from.
  */`);
-        expect(theJSDoc?.getContainer()).toBe(theFunction);
-        expect(theJSDoc?.getIsJSDoc()).toBe(true);
+        expect(theJSDoc?.container).toBe(theFunction);
+        expect(theJSDoc?.isJSDoc).toBe(true);
     });
 });

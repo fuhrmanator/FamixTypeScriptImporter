@@ -27,17 +27,17 @@ describe('Tests for abstract class with comments', () => {
     it("should contain an abstract class MyAbstractClass", () => {
         expect(theAbstractClass).toBeTruthy();
         if (theAbstractClass) {
-            expect(theAbstractClass.getIsAbstract()).toBe(true);
+            expect(theAbstractClass.isAbstract).toBe(true);
         }
     });
 
     it("should have two comments for the abstract class", () => {
-        expect(theAbstractClass?.getComments().size).toBe(2);
-        const comments = Array.from(theAbstractClass?.getComments() as Set<Comment>);
+        expect(theAbstractClass?.comments.size).toBe(2);
+        const comments = Array.from(theAbstractClass?.comments as Set<Comment>);
         expect(getCommentTextFromCommentViaAnchor(comments[0], project)).toBe(`// before`);
-        expect(comments[0]?.getContainer()).toBe(theAbstractClass);
+        expect(comments[0]?.container).toBe(theAbstractClass);
         expect(getCommentTextFromCommentViaAnchor(comments[1], project)).toBe(`// a comment`);
-        expect(comments[1]?.getContainer()).toBe(theAbstractClass);
+        expect(comments[1]?.container).toBe(theAbstractClass);
     });
 
     it("should contain one function", () => {
@@ -47,18 +47,18 @@ describe('Tests for abstract class with comments', () => {
     const theFunction = fmxRep._getFamixFunction("{abstractClassWithComments.ts}.tst[FunctionDeclaration]");
 
     it("should have three comments for the function", () => {
-        expect(theFunction?.getComments().size).toBe(3);
-        const comments = Array.from(theFunction?.getComments() as Set<Comment>);
+        expect(theFunction?.comments.size).toBe(3);
+        const comments = Array.from(theFunction?.comments as Set<Comment>);
         expect(getCommentTextFromCommentViaAnchor(comments[0], project)).toBe(`// after`);
-        expect(comments[0]?.getContainer()).toBe(theFunction);
-        expect(comments[0]?.getIsJSDoc()).toBe(false);
+        expect(comments[0]?.container).toBe(theFunction);
+        expect(comments[0]?.isJSDoc).toBe(false);
         expect(getCommentTextFromCommentViaAnchor(comments[1], project)).toBe(`/* test */`);
-        expect(comments[1]?.getContainer()).toBe(theFunction);
-        expect(comments[1]?.getIsJSDoc()).toBe(false);
+        expect(comments[1]?.container).toBe(theFunction);
+        expect(comments[1]?.isJSDoc).toBe(false);
         expect(getCommentTextFromCommentViaAnchor(comments[2], project)).toBe(`/**
  * test2
  */`);
-        expect(comments[2]?.getContainer()).toBe(theFunction); 
-        expect(comments[2]?.getIsJSDoc()).toBe(true);
+        expect(comments[2]?.container).toBe(theFunction); 
+        expect(comments[2]?.isJSDoc).toBe(true);
     });
 });

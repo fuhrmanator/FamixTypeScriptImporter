@@ -16,7 +16,7 @@ describe('Tests for properties in a Class', () => {
         expect(fmxRep._getAllEntitiesWithType("Class").size).toBe(1);
     });
 
-    const pointProperties = Array.from(fmxRep._getFamixClass("{propertyDefinedInConstructorSignature.ts}.Point[ClassDeclaration]")?.getProperties() as Set<Property>) as Array<Property>;
+    const pointProperties = Array.from(fmxRep._getFamixClass("{propertyDefinedInConstructorSignature.ts}.Point[ClassDeclaration]")?.properties as Set<Property>) as Array<Property>;
     const allProperties =  fmxRep._getAllEntitiesWithType("Property");
 
     it("should contain two properties", () => {
@@ -24,21 +24,21 @@ describe('Tests for properties in a Class', () => {
     });
 
     it("should contain a private property 'x'", () => {
-        const theProperty = pointProperties.find((f) => f.getName() === "x");
+        const theProperty = pointProperties.find((f) => f.name === "x");
         expect(theProperty).toBeTruthy();
         expect(theProperty?.readOnly).toBe(false);
         expect(theProperty?.visibility).toBe("private");
     });
 
     it("should contain a public readonly property 'y'", () => {
-        const theProperty = pointProperties.find((f) => f.getName() === "y");
+        const theProperty = pointProperties.find((f) => f.name === "y");
         expect(theProperty).toBeTruthy();
         expect(theProperty?.readOnly).toBe(true);
         expect(theProperty?.visibility).toBe("public");
     });
 
     it("should contain a protected property 'z'", () => {
-        const theProperty = pointProperties.find((f) => f.getName() === "z");
+        const theProperty = pointProperties.find((f) => f.name === "z");
         expect(theProperty).toBeTruthy();
         expect(theProperty?.readOnly).toBe(false);
         expect(theProperty?.visibility).toBe("protected");

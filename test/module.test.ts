@@ -51,11 +51,11 @@ const fmxRep = importer.famixRepFromProject(project);
 describe('Tests for module', () => {
     
     const moduleList = Array.from(fmxRep._getAllEntitiesWithType('Module')) as Array<Module>;
-    const moduleBecauseExports = moduleList.find(e => e.getName() === 'moduleBecauseExports.ts');
-    const moduleBecauseImports = moduleList.find(e => e.getName() === 'moduleBecauseImports.ts');
-    const moduleImportFromFileWithExtension = moduleList.find(e => e.getName() === 'moduleImportFromFileWithExtension.ts');
-    const ambientModule = moduleList.find(e => e.getName() === '"module-a"');
-    const exportedNsp = moduleList.find(e => e.getName() === 'Nsp');
+    const moduleBecauseExports = moduleList.find(e => e.name === 'moduleBecauseExports.ts');
+    const moduleBecauseImports = moduleList.find(e => e.name === 'moduleBecauseImports.ts');
+    const moduleImportFromFileWithExtension = moduleList.find(e => e.name === 'moduleImportFromFileWithExtension.ts');
+    const ambientModule = moduleList.find(e => e.name === '"module-a"');
+    const exportedNsp = moduleList.find(e => e.name === 'Nsp');
     it("should have five modules", () => {
         expect(moduleList?.length).toBe(5);
         expect(moduleBecauseExports).toBeTruthy();
@@ -66,29 +66,29 @@ describe('Tests for module', () => {
     });
 
     it("should have a module with isAmbient property set to true", () => {
-        expect(ambientModule?.$isAmbient).toBeTruthy();
-        expect(ambientModule?.$isModule).toBeFalsy();
-        expect(ambientModule?.$isNamespace).toBeFalsy();
+        expect(ambientModule?.isAmbient).toBeTruthy();
+        expect(ambientModule?.isModule).toBeFalsy();
+        expect(ambientModule?.isNamespace).toBeFalsy();
     });
 
     it("should have a module with isNamespace property set to true", () => {
-        expect(exportedNsp?.$isNamespace).toBeTruthy();
-        expect(exportedNsp?.$isModule).toBeFalsy();
-        expect(exportedNsp?.$isAmbient).toBeFalsy();
+        expect(exportedNsp?.isNamespace).toBeTruthy();
+        expect(exportedNsp?.isModule).toBeFalsy();
+        expect(exportedNsp?.isAmbient).toBeFalsy();
     });
 
     it("should have modules with isModule property set to true", () => {
-        expect(moduleBecauseExports?.$isModule).toBeTruthy();
-        expect(moduleBecauseExports?.$isAmbient).toBeFalsy();
-        expect(moduleBecauseExports?.$isNamespace).toBeFalsy();
+        expect(moduleBecauseExports?.isModule).toBeTruthy();
+        expect(moduleBecauseExports?.isAmbient).toBeFalsy();
+        expect(moduleBecauseExports?.isNamespace).toBeFalsy();
 
-        expect(moduleBecauseImports?.$isModule).toBeTruthy();
-        expect(moduleBecauseImports?.$isAmbient).toBeFalsy();
-        expect(moduleBecauseImports?.$isNamespace).toBeFalsy();
+        expect(moduleBecauseImports?.isModule).toBeTruthy();
+        expect(moduleBecauseImports?.isAmbient).toBeFalsy();
+        expect(moduleBecauseImports?.isNamespace).toBeFalsy();
 
-        expect(moduleImportFromFileWithExtension?.$isModule).toBeTruthy();
-        expect(moduleImportFromFileWithExtension?.$isAmbient).toBeFalsy();
-        expect(moduleImportFromFileWithExtension?.$isNamespace).toBeFalsy();
+        expect(moduleImportFromFileWithExtension?.isModule).toBeTruthy();
+        expect(moduleImportFromFileWithExtension?.isAmbient).toBeFalsy();
+        expect(moduleImportFromFileWithExtension?.isNamespace).toBeFalsy();
 
     });
 

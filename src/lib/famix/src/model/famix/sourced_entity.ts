@@ -7,67 +7,64 @@ import { logger } from "../../../../../analyze";
 
 export class SourcedEntity extends Entity {
 
-  private isStub: boolean;
+    private _isStub: boolean;
+    private _sourceAnchor: SourceAnchor;
+    private _comments: Set<Comment> = new Set();
 
-  public getIsStub(): boolean {
-    return this.isStub;
-  }
-
-  public setIsStub(isStub: boolean): void {
-    this.isStub = isStub;
-  }
-
-  private sourceAnchor: SourceAnchor;
-
-  public getSourceAnchor(): SourceAnchor {
-    return this.sourceAnchor;
-  }
-
-  public setSourceAnchor(sourceAnchor: SourceAnchor): void {
-    if (this.sourceAnchor === undefined) {
-      this.sourceAnchor = sourceAnchor;
-      sourceAnchor.setElement(this);
+    public addComment(comment: Comment): void {
+        if (!this._comments.has(comment)) {
+            this._comments.add(comment);
+            comment.container = this;
+        } else {
+            logger.debug("Adding comment that is already in comments: " + comment.getJSON() + " to " + this.getJSON());
+        }
     }
-  }
 
-  private comments: Set<Comment> = new Set();
+    private _declaredSourceLanguage: SourceLanguage;
 
-  public getComments(): Set<Comment> {
-    return this.comments;
-  }
-
-  public addComment(comment: Comment): void {
-    if (!this.comments.has(comment)) {
-      this.comments.add(comment);
-      comment.setContainer(this);
-    } else {
-      logger.debug("Adding comment that is already in comments: " + comment.getJSON() + " to " + this.getJSON());
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("SourcedEntity", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
     }
-  }
 
-  private declaredSourceLanguage: SourceLanguage;
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("isStub", this.isStub);
+        exporter.addProperty("sourceAnchor", this.sourceAnchor);
+        exporter.addProperty("comments", this.comments);
+        exporter.addProperty("declaredSourceLanguage", this.declaredSourceLanguage);
+    }
 
-  public getDeclaredSourceLanguage(): SourceLanguage {
-    return this.declaredSourceLanguage;
-  }
+    get isStub() {
+        return this._isStub;
+    }
 
-  public setDeclaredSourceLanguage(declaredSourceLanguage: SourceLanguage): void {
-    this.declaredSourceLanguage = declaredSourceLanguage;
-    declaredSourceLanguage.addSourcedEntity(this);
-  }
+    set isStub(isStub: boolean) {
+        this._isStub = isStub;
+    }
 
+    get sourceAnchor() {
+        return this._sourceAnchor;
+    }
 
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("SourcedEntity", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
+    set sourceAnchor(sourceAnchor: SourceAnchor) {
+        if (this._sourceAnchor === undefined) {
+            this._sourceAnchor = sourceAnchor;
+            sourceAnchor.element = this;
+        }
+    }
 
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("isStub", this.getIsStub());
-    exporter.addProperty("sourceAnchor", this.getSourceAnchor());
-    exporter.addProperty("comments", this.getComments());
-    exporter.addProperty("declaredSourceLanguage", this.getDeclaredSourceLanguage());
-  }
+    get comments() {
+        return this._comments;
+    }
+
+    get declaredSourceLanguage() {
+        return this._declaredSourceLanguage;
+    }
+
+    set declaredSourceLanguage(declaredSourceLanguage: SourceLanguage) {
+        this._declaredSourceLanguage = declaredSourceLanguage;
+        declaredSourceLanguage.addSourcedEntity(this);
+    }
 }

@@ -21,14 +21,14 @@ describe('Tests for simple function', () => {
     const theFunction = Array.from(functionList)[0] as FamixFunctionEntity;
     it("should contain a function 'fct'", () => {
         expect(theFunction).toBeTruthy();
-        expect(theFunction?.getName()).toBe('fct');
+        expect(theFunction?.name).toBe('fct');
     });
 
     it("should return number", () => {
-        expect(theFunction?.getDeclaredType().getName()).toBe("number");
+        expect(theFunction?.declaredType.name).toBe("number");
     });
 
     it("should have no parameter", () => {
-        expect(theFunction?.getParameters().size).toBe(0);
+        expect(theFunction?.parameters.size).toBe(0);
     });
 });

@@ -12,11 +12,11 @@ export const project = new Project(
 );
 
 function getIndexedFileAnchorFromComment(comment: Comment) {
-    return comment?.getSourceAnchor() as IndexedFileAnchor;
+    return comment?.sourceAnchor as IndexedFileAnchor;
 }
 
 function getCommentFromAnchor(anchor: IndexedFileAnchor, project: Project) {
-    return project.getSourceFileOrThrow(anchor.getFileName()).getFullText().substring(anchor.getStartPos() - 1, anchor.getEndPos() - 1);
+    return project.getSourceFileOrThrow(anchor.fileName).getFullText().substring(anchor.startPos - 1, anchor.endPos - 1);
 }
 
 export function getCommentTextFromCommentViaAnchor(comment: Comment, project: Project) {
@@ -24,5 +24,5 @@ export function getCommentTextFromCommentViaAnchor(comment: Comment, project: Pr
 }
 
 export function getTextFromAnchor(anchor: IndexedFileAnchor, project: Project) {
-    return project.getSourceFileOrThrow(anchor.getFileName()).getFullText().substring(anchor.getStartPos() - 1, anchor.getEndPos() - 1);
+    return project.getSourceFileOrThrow(anchor.fileName).getFullText().substring(anchor.startPos - 1, anchor.endPos - 1);
 }

@@ -4,26 +4,25 @@ import { Enum } from "./enum";
 
 export class EnumValue extends StructuralEntity {
 
-  private parentEntity: Enum;
+    private _parentEntity: Enum;
 
-  public getParentEntity(): Enum {
-    return this.parentEntity;
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("EnumValue", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public setParentEntity(parentEntity: Enum): void {
-    this.parentEntity = parentEntity;
-    parentEntity.addValue(this);
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("parentEnum", this.parentEntity);
+    }
 
+    get parentEntity(): Enum {
+        return this._parentEntity;
+    }
 
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("EnumValue", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
-
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("parentEnum", this.getParentEntity());
-  }
+    set parentEntity(parentEntity: Enum) {
+        this._parentEntity = parentEntity;
+        parentEntity.addValue(this);
+    }
 }

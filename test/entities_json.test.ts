@@ -37,7 +37,7 @@ describe('Entities json', () => {
         const mNames: Set<string> = new Set();
         theClass.methods.forEach(m => {
             const entityCls = fmxRep.getFamixEntityById(m.ref as number) as Method;
-            mNames.add(entityCls.getName());
+            mNames.add(entityCls.name);
         });
         expect(mNames.has("move") &&
             mNames.has("move2") &&

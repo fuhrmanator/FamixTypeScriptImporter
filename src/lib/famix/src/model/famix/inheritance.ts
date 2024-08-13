@@ -5,37 +5,36 @@ import { Interface } from "./interface";
 
 export class Inheritance extends Entity {
 
-  private superclass: Class | Interface;
+    private _superclass: Class | Interface;
+    private _subclass: Class | Interface;
 
-  public getSuperclass(): Class  | Interface {
-    return this.superclass;
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("Inheritance", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public setSuperclass(superclass: Class | Interface): void {
-    this.superclass = superclass;
-    superclass.addSubInheritance(this);
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("superclass", this.superclass);
+        exporter.addProperty("subclass", this.subclass);
+    }
 
-  private subclass: Class | Interface;
+    get superclass() {
+        return this._superclass;
+    }
 
-  public getSubclass(): Class | Interface {
-    return this.subclass;
-  }
+    set superclass(superclass: Class | Interface) {
+        this._superclass = superclass;
+        superclass.addSubInheritance(this);
+    }
 
-  public setSubclass(subclass: Class | Interface): void {
-    this.subclass = subclass;
-    subclass.addSuperInheritance(this);
-  }
+    get subclass() {
+        return this._subclass;
+    }
 
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("Inheritance", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
-
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("superclass", this.getSuperclass());
-    exporter.addProperty("subclass", this.getSubclass());
-  }
+    set subclass(subclass: Class | Interface) {
+        this._subclass = subclass;
+        subclass.addSuperInheritance(this);
+    }
 }

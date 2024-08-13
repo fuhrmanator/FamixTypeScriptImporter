@@ -34,22 +34,22 @@ describe('Tests for exported and imported variable', () => {
         const importClause = importClauses.values().next().value;
         expect(importClause).toBeTruthy();
         // get variable
-        const importedVariable = importClause.getImportedEntity() as Variable;
+        const importedVariable = importClause.importedEntity as Variable;
         expect(importedVariable).toBeTruthy();
-        expect(importedVariable.getName()).toBe("hasBigInt");
+        expect(importedVariable.name).toBe("hasBigInt");
         // check if the variable is the one in exporter2.ts
         const variables = fmxRep._getAllEntitiesWithType("Variable") as Set<Variable>;
         expect(variables).toBeTruthy();
         const variableIterator = variables.values();
         let variable = variableIterator.next().value as Variable;
         while (variable) {
-            if (variable.getName() === "hasBigInt") {
+            if (variable.name === "hasBigInt") {
                 break;
             }
             variable = variableIterator.next().value as Variable;
         }
         expect(variable).toBeTruthy();
-        expect(variable.getFullyQualifiedName()).toBe("{test_src/exporter2.ts}.hasBigInt[VariableDeclaration]");
+        expect(variable.fullyQualifiedName).toBe("{test_src/exporter2.ts}.hasBigInt[VariableDeclaration]");
     });
 
 });

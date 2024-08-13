@@ -4,19 +4,19 @@ import { FamixJSONExporter } from "./famix_JSON_exporter";
 
 export abstract class FamixBaseElement {
 
-  public id: number;
+    public id: number;
 
-  // constructor(repo: FamixRepository) {
-  //   repo.addElement(this);
-  // }
+    // constructor(repo: FamixRepository) {
+    //   repo.addElement(this);
+    // }
 
-  constructor(){
-  }
+    constructor() {
+    }
 
-  public abstract getJSON(): string;
+    public abstract getJSON(): string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    logger.debug("addPropertiesToExporter not implemented for " + this.constructor.name + `(${exporter})`);
-  }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        logger.debug("addPropertiesToExporter not implemented for " + this.constructor.name + `(${exporter})`);
+    }
 }

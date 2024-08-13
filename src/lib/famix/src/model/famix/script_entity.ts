@@ -3,34 +3,32 @@ import { ScopingEntity } from "./scoping_entity";
 
 export class ScriptEntity extends ScopingEntity {
 
-  private numberOfLinesOfText: number;
+    private _numberOfLinesOfText: number;
+    private _numberOfCharacters: number;
 
-  public getNumberOfLinesOfText(): number {
-    return this.numberOfLinesOfText;
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("ScriptEntity", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public setNumberOfLinesOfText(numberOfLinesOfText: number): void {
-    this.numberOfLinesOfText = numberOfLinesOfText;
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+    }
 
-  private numberOfCharacters: number;
+    get numberOfLinesOfText() {
+        return this._numberOfLinesOfText;
+    }
 
-  public getNumberOfCharacters(): number {
-    return this.numberOfCharacters;
-  }
+    set numberOfLinesOfText(numberOfLinesOfText: number) {
+        this._numberOfLinesOfText = numberOfLinesOfText;
+    }
 
-  public setNumberOfCharacters(numberOfCharacters: number): void {
-    this.numberOfCharacters = numberOfCharacters;
-  }
+    get numberOfCharacters() {
+        return this._numberOfCharacters;
+    }
 
-
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("ScriptEntity", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
-
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-  }
+    set numberOfCharacters(numberOfCharacters: number) {
+        this._numberOfCharacters = numberOfCharacters;
+    }
 }

@@ -7,26 +7,9 @@ import { ParametricMethod } from "./parametric_method";
 
 export class Concretisation extends Entity {
 
-    private genericEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod;
+    private _genericEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod;
+    private _concreteEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod;  // is this correct?
 
-    public getGenericEntity(): ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod {
-      return this.genericEntity;
-    }
-  
-    public setGenericEntity(genericEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod): void {
-      this.genericEntity = genericEntity;
-    }
-  
-    private concreteEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod;
-  
-    public getConcreteEntity(): ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod {
-      return this.concreteEntity;
-    }
-  
-    public setConcreteEntity(concreteEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod): void {
-      this.concreteEntity = concreteEntity;
-    }
-  
     public getJSON(): string {
       const json: FamixJSONExporter = new FamixJSONExporter("Concretisation", this);
       this.addPropertiesToExporter(json);
@@ -35,8 +18,23 @@ export class Concretisation extends Entity {
   
     public addPropertiesToExporter(exporter: FamixJSONExporter): void {
       super.addPropertiesToExporter(exporter);
-      exporter.addProperty("genericEntity", this.getGenericEntity());
-      exporter.addProperty("concreteEntity", this.getConcreteEntity());
+      exporter.addProperty("genericEntity", this.genericEntity);
+      exporter.addProperty("concreteEntity", this.concreteEntity);
     }
 
+    get genericEntity() {
+        return this._genericEntity;
+    }
+
+    set genericEntity(genericEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod) {
+        this._genericEntity = genericEntity;
+    }
+
+    get concreteEntity() {
+        return this._concreteEntity;
+    }
+
+    set concreteEntity(concreteEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod) {
+        this._concreteEntity = concreteEntity;
+    }
 }

@@ -5,50 +5,47 @@ import { NamedEntity } from "./named_entity";
 
 export class ImportClause extends Entity {
 
-  private importingEntity: Module;
+    private _importingEntity: Module;
+    private _importedEntity: NamedEntity;
+    private _moduleSpecifier: string;
 
-  public getImportingEntity(): Module {
-    return this.importingEntity;
-  }
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("ImportClause", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public setImportingEntity(importer: Module): void {
-    this.importingEntity = importer;
-    importer.addOutgoingImport(this); // opposite
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("importingEntity", this.importingEntity);
+        exporter.addProperty("importedEntity", this.importedEntity);
+        // unknown property below
+        //    exporter.addProperty("moduleSpecifier", this.getModuleSpecifier());
+    }
 
-  private importedEntity: NamedEntity;
+    get importingEntity(): Module {
+        return this._importingEntity;
+    }
 
-  public getImportedEntity(): NamedEntity {
-    return this.importedEntity;
-  }
+    set importingEntity(importer: Module) {
+        this._importingEntity = importer;
+        importer.addOutgoingImport(this); // opposite
+    }
 
-  public setImportedEntity(importedEntity: NamedEntity): void {
-    this.importedEntity = importedEntity;
-    importedEntity.addIncomingImport(this); // incomingImports in Famix TImportable/TImport
-  }
+    get importedEntity(): NamedEntity {
+        return this._importedEntity;
+    }
 
-  private moduleSpecifier: string;
+    set importedEntity(importedEntity: NamedEntity) {
+        this._importedEntity = importedEntity;
+        importedEntity.addIncomingImport(this); // incomingImports in Famix TImportable/TImport
+    }
 
-  public getModuleSpecifier(): string {
-    return this.moduleSpecifier;
-  }
+    get moduleSpecifier(): string {
+        return this._moduleSpecifier;
+    }
 
-  public setModuleSpecifier(moduleSpecifier: string): void {
-    this.moduleSpecifier = moduleSpecifier;
-  }
-
-
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("ImportClause", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
-
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("importingEntity", this.getImportingEntity());
-    exporter.addProperty("importedEntity", this.getImportedEntity());
-    // unknown property below
-//    exporter.addProperty("moduleSpecifier", this.getModuleSpecifier());
-  }
+    set moduleSpecifier(moduleSpecifier: string) {
+        this._moduleSpecifier = moduleSpecifier;
+    }
 }

@@ -7,83 +7,81 @@ import { Alias } from "./alias";
 
 export class Type extends ContainerEntity {
 
-  private container: ContainerEntity;
+    private _container: ContainerEntity;
+    private _typeAliases: Set<Alias> = new Set();
 
-  public getContainer(): ContainerEntity {
-    return this.container;
-  }
-
-  public setContainer(container: ContainerEntity): void {
-    this.container = container;
-    container.addType(this);
-  }
-
-  private typeAliases: Set<Alias> = new Set();
-
-  public getTypeAliases(): Set<Alias> {
-    return this.typeAliases;
-  }
-
-  public addTypeAlias(typeAlias: Alias): void {
-    if (!this.typeAliases.has(typeAlias)) {
-      this.typeAliases.add(typeAlias);
-      typeAlias.setAliasedEntity(this);
+    public addTypeAlias(typeAlias: Alias): void {
+        if (!this._typeAliases.has(typeAlias)) {
+            this._typeAliases.add(typeAlias);
+            typeAlias.aliasedEntity = this;
+        }
     }
-  }
 
-  private structuresWithDeclaredType: Set<StructuralEntity> = new Set();
+    private _structuresWithDeclaredType: Set<StructuralEntity> = new Set();
 
-  public getStructuresWithDeclaredType(): Set<StructuralEntity> {
-    return this.structuresWithDeclaredType;
-  }
-
-  public addStructureWithDeclaredType(structureWithDeclaredType: StructuralEntity): void {
-    if (!this.structuresWithDeclaredType.has(structureWithDeclaredType)) {
-      this.structuresWithDeclaredType.add(structureWithDeclaredType);
-      structureWithDeclaredType.setDeclaredType(this);
+    public addStructureWithDeclaredType(structureWithDeclaredType: StructuralEntity): void {
+        if (!this._structuresWithDeclaredType.has(structureWithDeclaredType)) {
+            this._structuresWithDeclaredType.add(structureWithDeclaredType);
+            structureWithDeclaredType.declaredType = this;
+        }
     }
-  }
 
-  private behavioralEntitiesWithDeclaredType: Set<BehavioralEntity> = new Set();
+    private _behavioralEntitiesWithDeclaredType: Set<BehavioralEntity> = new Set();
 
-  public getBehavioralEntitiesWithDeclaredType(): Set<BehavioralEntity> {
-    return this.behavioralEntitiesWithDeclaredType;
-  }
-
-  public addBehavioralEntityWithDeclaredType(behavioralEntityWithDeclaredType: BehavioralEntity): void {
-    if (!this.behavioralEntitiesWithDeclaredType.has(behavioralEntityWithDeclaredType)) {
-      this.behavioralEntitiesWithDeclaredType.add(behavioralEntityWithDeclaredType);
-      behavioralEntityWithDeclaredType.setDeclaredType(this);
+    public addBehavioralEntityWithDeclaredType(behavioralEntityWithDeclaredType: BehavioralEntity): void {
+        if (!this._behavioralEntitiesWithDeclaredType.has(behavioralEntityWithDeclaredType)) {
+            this._behavioralEntitiesWithDeclaredType.add(behavioralEntityWithDeclaredType);
+            behavioralEntityWithDeclaredType.declaredType = this;
+        }
     }
-  }
 
-  private incomingReferences: Set<Reference> = new Set();
+    private _incomingReferences: Set<Reference> = new Set();
 
-  public getIncomingReferences(): Set<Reference> {
-    return this.incomingReferences;
-  }
-
-  public addIncomingReference(incomingReference: Reference): void {
-    if (!this.incomingReferences.has(incomingReference)) {
-      this.incomingReferences.add(incomingReference);
-      incomingReference.setTarget(this);
+    public addIncomingReference(incomingReference: Reference): void {
+        if (!this._incomingReferences.has(incomingReference)) {
+            this._incomingReferences.add(incomingReference);
+            incomingReference.target = this;
+        }
     }
-  }
 
+    public getJSON(): string {
+        const json: FamixJSONExporter = new FamixJSONExporter("Type", this);
+        this.addPropertiesToExporter(json);
+        return json.getJSON();
+    }
 
-  public getJSON(): string {
-    const json: FamixJSONExporter = new FamixJSONExporter("Type", this);
-    this.addPropertiesToExporter(json);
-    return json.getJSON();
-  }
+    public addPropertiesToExporter(exporter: FamixJSONExporter): void {
+        super.addPropertiesToExporter(exporter);
+        exporter.addProperty("typeContainer", this.container);
+        /* unsupported properties in MM so far */
+        // exporter.addProperty("typeAliases", this.getTypeAliases());
+        // exporter.addProperty("structuresWithDeclaredType", this.getStructuresWithDeclaredType());
+        // exporter.addProperty("behavioralEntitiesWithDeclaredType", this.getBehavioralEntitiesWithDeclaredType());
+        exporter.addProperty("incomingReferences", this.incomingReferences);
+    }
 
-  public addPropertiesToExporter(exporter: FamixJSONExporter): void {
-    super.addPropertiesToExporter(exporter);
-    exporter.addProperty("typeContainer", this.getContainer());
-    /* unsupported properties in MM so far */
-    // exporter.addProperty("typeAliases", this.getTypeAliases());
-    // exporter.addProperty("structuresWithDeclaredType", this.getStructuresWithDeclaredType());
-    // exporter.addProperty("behavioralEntitiesWithDeclaredType", this.getBehavioralEntitiesWithDeclaredType());
-    exporter.addProperty("incomingReferences", this.getIncomingReferences());
-  }
+    get container() {
+        return this._container;
+    }
+
+    set container(container: ContainerEntity) {
+        this._container = container;
+        container.addType(this);
+    }
+
+    get typeAliases() {
+        return this._typeAliases;
+    }
+
+    get structuresWithDeclaredType() {
+        return this._structuresWithDeclaredType;
+    }
+
+    get behavioralEntitiesWithDeclaredType() {
+        return this._behavioralEntitiesWithDeclaredType;
+    }
+
+    get incomingReferences() {
+        return this._incomingReferences;
+    }
 }

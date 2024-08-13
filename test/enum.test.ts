@@ -36,40 +36,40 @@ describe('Tests for enum', () => {
     it("should contain an enum with a comment before it.", () => {
         const theEnum = Array.from(enumSet)[0];
         expect(theEnum).toBeDefined();
-        expect(theEnum.getComments().size).toBe(1);
-        const comment = Array.from(theEnum.getComments())[0];
+        expect(theEnum.comments.size).toBe(1);
+        const comment = Array.from(theEnum.comments)[0];
         expect(getCommentTextFromCommentViaAnchor(comment, project)).toBe("// comment before");
-        expect((comment.getSourceAnchor() as IndexedFileAnchor).getFileName().endsWith("enum.ts")).toBe(true);
+        expect((comment.sourceAnchor as IndexedFileAnchor).fileName.endsWith("enum.ts")).toBe(true);
         });
 
     it("should contain one enum with seven enum values", () => {
         expect(enumSet.size).toBe(1);
         const theEnum = enumArray[0];
-        expect(theFile.getTypes().has(theEnum)).toBe(true);
-        expect(theEnum.getName()).toBe("Weekday");
-        const enumValuesArray = Array.from(theEnum.getValues());
+        expect(theFile.types.has(theEnum)).toBe(true);
+        expect(theEnum.name).toBe("Weekday");
+        const enumValuesArray = Array.from(theEnum.values);
         expect(enumValuesArray.length).toBe(7);
-        expect(enumValuesArray[0].getName()).toBe("MONDAY");
-        expect(enumValuesArray[1].getName()).toBe("TUESDAY");
-        expect(enumValuesArray[2].getName()).toBe("WEDNESDAY");
-        expect(enumValuesArray[3].getName()).toBe("THURSDAY");
-        expect(enumValuesArray[4].getName()).toBe("FRIDAY");
-        expect(enumValuesArray[5].getName()).toBe("SATURDAY");
-        expect(enumValuesArray[6].getName()).toBe("SUNDAY");
-        expect(enumValuesArray[0].getParentEntity()).toBe(theEnum);
-        expect(enumValuesArray[1].getParentEntity()).toBe(theEnum);
-        expect(enumValuesArray[2].getParentEntity()).toBe(theEnum);
-        expect(enumValuesArray[3].getParentEntity()).toBe(theEnum);
-        expect(enumValuesArray[4].getParentEntity()).toBe(theEnum);
-        expect(enumValuesArray[5].getParentEntity()).toBe(theEnum);
-        expect(enumValuesArray[6].getParentEntity()).toBe(theEnum);
+        expect(enumValuesArray[0].name).toBe("MONDAY");
+        expect(enumValuesArray[1].name).toBe("TUESDAY");
+        expect(enumValuesArray[2].name).toBe("WEDNESDAY");
+        expect(enumValuesArray[3].name).toBe("THURSDAY");
+        expect(enumValuesArray[4].name).toBe("FRIDAY");
+        expect(enumValuesArray[5].name).toBe("SATURDAY");
+        expect(enumValuesArray[6].name).toBe("SUNDAY");
+        expect(enumValuesArray[0].parentEntity).toBe(theEnum);
+        expect(enumValuesArray[1].parentEntity).toBe(theEnum);
+        expect(enumValuesArray[2].parentEntity).toBe(theEnum);
+        expect(enumValuesArray[3].parentEntity).toBe(theEnum);
+        expect(enumValuesArray[4].parentEntity).toBe(theEnum);
+        expect(enumValuesArray[5].parentEntity).toBe(theEnum);
+        expect(enumValuesArray[6].parentEntity).toBe(theEnum);
     });
     
     it("should contain one access", () => {
         expect(fmxRep._getAllEntitiesWithType("Access").size).toBe(1);
         const theAccess = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>)[0];
-        expect(theFile.getAccesses().has(theAccess)).toBe(true);
-        expect(theAccess.getAccessor().getName()).toBe("enum.ts");
-        expect(theAccess.getVariable().getName()).toBe("MONDAY");
+        expect(theFile.accesses.has(theAccess)).toBe(true);
+        expect(theAccess.accessor.name).toBe("enum.ts");
+        expect(theAccess.variable.name).toBe("MONDAY");
     });    
 });

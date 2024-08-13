@@ -60,27 +60,27 @@ describe('Tests for generics (from FamixTypeScript)', () => {
     });
     
     it("Class A should contain a method testMethod", () => {
-        const listOfMethodsOfClassA = fmxRep._getFamixClass("{parametricTests.ts}.A[ClassDeclaration]")?.getMethods();
+        const listOfMethodsOfClassA = fmxRep._getFamixClass("{parametricTests.ts}.A[ClassDeclaration]")?.methods;
         expect(listOfMethodsOfClassA?.size).toBe(1);
-        expect(Array.from(listOfMethodsOfClassA as Set<Method>)[0].getName()).toBe("testMethod");
+        expect(Array.from(listOfMethodsOfClassA as Set<Method>)[0].name).toBe("testMethod");
     });
     
     it("should contain a function testFunction", () => {
         const listOfFunctions = fmxRep._getAllEntitiesWithType("Function") as Set<Function>;
         expect(listOfFunctions.size).toBe(1);
-        expect(Array.from(listOfFunctions)[0].getName()).toBe("testFunction");
+        expect(Array.from(listOfFunctions)[0].name).toBe("testFunction");
     });
 
     it("should contain an arrow function testArrowFunction", () => {
         const listOfFunctions = fmxRep._getAllEntitiesWithType("ArrowFunction") as Set<ArrowFunction>;
         expect(listOfFunctions.size).toBe(3);
-        expect(Array.from(listOfFunctions)[0].getName()).toBe("testArrowFunction");
+        expect(Array.from(listOfFunctions)[0].name).toBe("testArrowFunction");
     });
 
     it("should contain a class GenA", () => {
         const listOfClasses = fmxRep._getAllEntitiesWithType("ParametricClass") as Set<ParametricClass>;
         expect(listOfClasses.size).toBe(4);
-        expect(Array.from(listOfClasses)[0].getName()).toBe("GenA");
+        expect(Array.from(listOfClasses)[0].name).toBe("GenA");
     });
 
     let parametricMethod : ParametricMethod;
@@ -88,20 +88,20 @@ describe('Tests for generics (from FamixTypeScript)', () => {
         const listOfMethods = fmxRep._getAllEntitiesWithType("ParametricMethod") as Set<ParametricMethod>;
         expect(listOfMethods.size).toBe(1);
         parametricMethod = Array.from(listOfMethods)[0];
-        expect(parametricMethod.getName()).toBe("genericMethod");
+        expect(parametricMethod.name).toBe("genericMethod");
     });
 
     it("parametric method should have one parameter", () => {
-        const parameters = parametricMethod.getParameters();
+        const parameters = parametricMethod.parameters;
         expect(parameters).toBeTruthy();
         expect(parameters.size).toBe(1);
     });
 
     it("parametric method should have one parameter named 't' and of type 'T'", () => {
-        const parameter = parametricMethod.getParameters().values().next().value as Parameter;
+        const parameter = parametricMethod.parameters.values().next().value as Parameter;
         expect(parameter).toBeTruthy();
-        expect(parameter.getName()).toBe("t");
-        expect(parameter.getDeclaredType().getName()).toBe("T");
+        expect(parameter.name).toBe("t");
+        expect(parameter.declaredType.name).toBe("T");
     });
 
     let parametricFunction : ParametricFunction;
@@ -109,20 +109,20 @@ describe('Tests for generics (from FamixTypeScript)', () => {
         const listOfFunctions = fmxRep._getAllEntitiesWithType("ParametricFunction") as Set<ParametricFunction>;
         expect(listOfFunctions.size).toBe(1);
         parametricFunction = Array.from(listOfFunctions)[0];
-        expect(parametricFunction.getName()).toBe("genericFunction");
+        expect(parametricFunction.name).toBe("genericFunction");
     });
 
     it("parametric function should have one parameter", () => {
-        const parameters = parametricFunction.getParameters();
+        const parameters = parametricFunction.parameters;
         expect(parameters).toBeTruthy();
         expect(parameters.size).toBe(1);
     });
 
     it("parametric function should have one parameter named 't' and of type 'T'", () => {
-        const parameter = parametricFunction.getParameters().values().next().value as Parameter;
+        const parameter = parametricFunction.parameters.values().next().value as Parameter;
         expect(parameter).toBeTruthy();
-        expect(parameter.getName()).toBe("t");
-        expect(parameter.getDeclaredType().getName()).toBe("T");
+        expect(parameter.name).toBe("t");
+        expect(parameter.declaredType.name).toBe("T");
     });
 
     let parametricArrowFunction: ParametricArrowFunction;
@@ -130,19 +130,19 @@ describe('Tests for generics (from FamixTypeScript)', () => {
         const listOfParametricArrowFunctions = fmxRep._getAllEntitiesWithType("ParametricArrowFunction") as Set<ParametricArrowFunction>;
         expect(listOfParametricArrowFunctions.size).toBe(1);
         parametricArrowFunction = Array.from(listOfParametricArrowFunctions)[0];
-        expect(parametricArrowFunction.getName()).toBe("genericArrowFunction");
+        expect(parametricArrowFunction.name).toBe("genericArrowFunction");
     });
 
     it("parametric arrow function should have one parameter", () => {
-        const parameters = parametricArrowFunction.getParameters();
+        const parameters = parametricArrowFunction.parameters;
         expect(parameters).toBeTruthy();
         expect(parameters.size).toBe(1);
     });
 
     it("parametric arrow function should have one parameter named 't' and of type 'T'", () => {
-        const parameter = parametricArrowFunction.getParameters().values().next().value as Parameter;
+        const parameter = parametricArrowFunction.parameters.values().next().value as Parameter;
         expect(parameter).toBeTruthy();
-        expect(parameter.getName()).toBe("t");
-        expect(parameter.getDeclaredType().getName()).toBe("T");
+        expect(parameter.name).toBe("t");
+        expect(parameter.declaredType.name).toBe("T");
     });
 });

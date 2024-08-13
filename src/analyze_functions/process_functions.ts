@@ -111,7 +111,7 @@ function processFile(f: SourceFile): void {
 
     const fmxFile = entityDictionary.createOrGetFamixFile(f, isModule);
 
-    logger.debug(`processFile: file: ${f.getBaseName()}, fqn = ${fmxFile.getFullyQualifiedName()}`);
+    logger.debug(`processFile: file: ${f.getBaseName()}, fqn = ${fmxFile.fullyQualifiedName}`);
 
     processComments(f, fmxFile);
 
@@ -149,7 +149,7 @@ export function isNamespace(node: ModuleDeclaration): boolean {
 function processModule(m: ModuleDeclaration): Famix.Module {
     const fmxModule = entityDictionary.createOrGetFamixModule(m);
 
-    logger.debug(`module: ${m.getName()}, (${m.getType().getText()}), ${fmxModule.getFullyQualifiedName()}`);
+    logger.debug(`module: ${m.getName()}, (${m.getType().getText()}), ${fmxModule.fullyQualifiedName}`);
 
     processComments(m, fmxModule);
 
@@ -310,7 +310,7 @@ function processModules(m: SourceFile | ModuleDeclaration, fmxScope: Famix.Scrip
 function processAlias(a: TypeAliasDeclaration): Famix.Alias {
     const fmxAlias = entityDictionary.createFamixAlias(a);
 
-    logger.debug(`Alias: ${a.getName()}, (${a.getType().getText()}), fqn = ${fmxAlias.getFullyQualifiedName()}`);
+    logger.debug(`Alias: ${a.getName()}, (${a.getType().getText()}), fqn = ${fmxAlias.fullyQualifiedName}`);
 
     processComments(a, fmxAlias);
 
@@ -327,7 +327,7 @@ function processClass(c: ClassDeclaration): Famix.Class | Famix.ParametricClass 
 
     const fmxClass = entityDictionary.createOrGetFamixClass(c);
 
-    logger.debug(`Class: ${c.getName()}, (${c.getType().getText()}), fqn = ${fmxClass.getFullyQualifiedName()}`);
+    logger.debug(`Class: ${c.getName()}, (${c.getType().getText()}), fqn = ${fmxClass.fullyQualifiedName}`);
 
     processComments(c, fmxClass);
 
@@ -363,7 +363,7 @@ function processInterface(i: InterfaceDeclaration): Famix.Interface | Famix.Para
 
     const fmxInterface = entityDictionary.createOrGetFamixInterface(i);
 
-    logger.debug(`Interface: ${i.getName()}, (${i.getType().getText()}), fqn = ${fmxInterface.getFullyQualifiedName()}`);
+    logger.debug(`Interface: ${i.getName()}, (${i.getType().getText()}), fqn = ${fmxInterface.fullyQualifiedName}`);
 
     processComments(i, fmxInterface);
 
@@ -402,7 +402,7 @@ function processStructuredType(c: ClassDeclaration | InterfaceDeclaration, fmxSc
 function processProperty(p: PropertyDeclaration | PropertySignature): Famix.Property {
     const fmxProperty = entityDictionary.createFamixProperty(p);
 
-    logger.debug(`property: ${p.getName()}, (${p.getType().getText()}), fqn = ${fmxProperty.getFullyQualifiedName()}`);
+    logger.debug(`property: ${p.getName()}, (${p.getType().getText()}), fqn = ${fmxProperty.fullyQualifiedName}`);
     logger.debug(` ---> It's a Property${(p instanceof PropertySignature) ? "Signature" : "Declaration"}!`);
     const ancestor = p.getFirstAncestorOrThrow();
     logger.debug(` ---> Its first ancestor is a ${ancestor.getKindName()}`);
@@ -412,7 +412,7 @@ function processProperty(p: PropertyDeclaration | PropertySignature): Famix.Prop
         processDecorators(p, fmxProperty);
         // only add access if the p's first ancestor is not a PropertyDeclaration
         if (ancestor.getKindName() !== "PropertyDeclaration") {
-            logger.debug(`adding access to map: ${p.getName()}, (${p.getType().getText()}) Famix ${fmxProperty.getName()} id: ${fmxProperty.id}`);
+            logger.debug(`adding access to map: ${p.getName()}, (${p.getType().getText()}) Famix ${fmxProperty.name} id: ${fmxProperty.id}`);
             accessMap.set(fmxProperty.id, p);
         }
     }
@@ -430,7 +430,7 @@ function processProperty(p: PropertyDeclaration | PropertySignature): Famix.Prop
 function processMethod(m: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration): Famix.Method | Famix.Accessor {
     const fmxMethod = entityDictionary.createOrGetFamixMethod(m, currentCC);
 
-    logger.debug(`Method: ${!(m instanceof ConstructorDeclaration) ? m.getName() : "constructor"}, (${m.getType().getText()}), parent: ${(m.getParent() as ClassDeclaration | InterfaceDeclaration).getName()}, fqn = ${fmxMethod.getFullyQualifiedName()}`);
+    logger.debug(`Method: ${!(m instanceof ConstructorDeclaration) ? m.getName() : "constructor"}, (${m.getType().getText()}), parent: ${(m.getParent() as ClassDeclaration | InterfaceDeclaration).getName()}, fqn = ${fmxMethod.fullyQualifiedName}`);
 
     processComments(m, fmxMethod);
 
@@ -603,7 +603,7 @@ function convertParameterToPropertyRepresentation(param: ParameterDeclaration) {
 function processParameter(p: ParameterDeclaration): Famix.Parameter {
     const fmxParam = entityDictionary.createFamixParameter(p);
 
-    logger.debug(`parameter: ${p.getName()}, (${p.getType().getText()}), fqn = ${fmxParam.getFullyQualifiedName()}`);
+    logger.debug(`parameter: ${p.getName()}, (${p.getType().getText()}), fqn = ${fmxParam.fullyQualifiedName}`);
 
     processComments(p, fmxParam);
 
@@ -612,7 +612,7 @@ function processParameter(p: ParameterDeclaration): Famix.Parameter {
     const parent = p.getParent();
 
     if (!(parent instanceof MethodSignature)) {
-        logger.debug(`adding access: ${p.getName()}, (${p.getType().getText()}) Famix ${fmxParam.getName()}`);
+        logger.debug(`adding access: ${p.getName()}, (${p.getType().getText()}) Famix ${fmxParam.name}`);
         accessMap.set(fmxParam.id, p);
     }
 
@@ -640,7 +640,7 @@ function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | Meth
 function processTypeParameter(tp: TypeParameterDeclaration): Famix.ParameterType {
     const fmxTypeParameter = entityDictionary.createFamixParameterType(tp);
 
-    logger.debug(`type parameter: ${tp.getName()}, (${tp.getType().getText()}), fqn = ${fmxTypeParameter.getFullyQualifiedName()}`);
+    logger.debug(`type parameter: ${tp.getName()}, (${tp.getType().getText()}), fqn = ${fmxTypeParameter.fullyQualifiedName}`);
 
     processComments(tp, fmxTypeParameter);
 
@@ -674,11 +674,11 @@ function processVariableStatement(v: VariableStatement): Array<Famix.Variable> {
 function processVariable(v: VariableDeclaration): Famix.Variable {
     const fmxVar = entityDictionary.createFamixVariable(v);
 
-    logger.debug(`variable: ${v.getName()}, (${v.getType().getText()}), ${v.getInitializer() ? "initializer: " + v.getInitializer().getText() : "initializer: "}, fqn = ${fmxVar.getFullyQualifiedName()}`);
+    logger.debug(`variable: ${v.getName()}, (${v.getType().getText()}), ${v.getInitializer() ? "initializer: " + v.getInitializer().getText() : "initializer: "}, fqn = ${fmxVar.fullyQualifiedName}`);
 
     processComments(v, fmxVar);
 
-    logger.debug(`adding access: ${v.getName()}, (${v.getType().getText()}) Famix ${fmxVar.getName()}`);
+    logger.debug(`adding access: ${v.getName()}, (${v.getType().getText()}) Famix ${fmxVar.name}`);
     accessMap.set(fmxVar.id, v);
 
     return fmxVar;
@@ -692,7 +692,7 @@ function processVariable(v: VariableDeclaration): Famix.Variable {
 function processEnum(e: EnumDeclaration): Famix.Enum {
     const fmxEnum = entityDictionary.createFamixEnum(e);
 
-    logger.debug(`enum: ${e.getName()}, (${e.getType().getText()}), fqn = ${fmxEnum.getFullyQualifiedName()}`);
+    logger.debug(`enum: ${e.getName()}, (${e.getType().getText()}), fqn = ${fmxEnum.fullyQualifiedName}`);
 
     processComments(e, fmxEnum);
 
@@ -712,11 +712,11 @@ function processEnum(e: EnumDeclaration): Famix.Enum {
 function processEnumValue(v: EnumMember): Famix.EnumValue {
     const fmxEnumValue = entityDictionary.createFamixEnumValue(v);
 
-    logger.debug(`enum value: ${v.getName()}, (${v.getType().getText()}), fqn = ${fmxEnumValue.getFullyQualifiedName()}`);
+    logger.debug(`enum value: ${v.getName()}, (${v.getType().getText()}), fqn = ${fmxEnumValue.fullyQualifiedName}`);
 
     processComments(v, fmxEnumValue);
 
-    logger.debug(`adding access: ${v.getName()}, (${v.getType().getText()}) Famix ${fmxEnumValue.getName()}`);
+    logger.debug(`adding access: ${v.getName()}, (${v.getType().getText()}) Famix ${fmxEnumValue.name}`);
     accessMap.set(fmxEnumValue.id, v);
 
     return fmxEnumValue;
@@ -744,7 +744,7 @@ function processDecorators(e: ClassDeclaration | MethodDeclaration | GetAccessor
 function processDecorator(d: Decorator, e: ClassDeclaration | MethodDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | ParameterDeclaration | PropertyDeclaration): Famix.Decorator {
     const fmxDec = entityDictionary.createOrGetFamixDecorator(d, e);
 
-    logger.debug(`decorator: ${d.getName()}, (${d.getType().getText()}), fqn = ${fmxDec.getFullyQualifiedName()}`);
+    logger.debug(`decorator: ${d.getName()}, (${d.getType().getText()}), fqn = ${fmxDec.fullyQualifiedName}`);
 
     processComments(d, fmxDec);
 
@@ -819,7 +819,7 @@ function processNodeForAccesses(n: Identifier, id: number): void {
         entityDictionary.createFamixAccess(n, id);
         logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})`);
     // } catch (error) {
-    //     logger.error(`> Got exception "${error}".\nScopeDeclaration invalid for "${n.getSymbol().getFullyQualifiedName()}".\nContinuing...`);
+    //     logger.error(`> Got exception "${error}".\nScopeDeclaration invalid for "${n.getSymbol().fullyQualifiedName}".\nContinuing...`);
     // }
 }
 

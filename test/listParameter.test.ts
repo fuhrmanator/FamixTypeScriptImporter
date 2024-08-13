@@ -18,7 +18,7 @@ describe('Tests for parameters in function', () => {
     });
 
     it("should contain parameter 'list'", () => {
-        const theParam = Array.from(fmxRep._getAllEntitiesWithType("Parameter") as Set<Parameter>).find(v => v.getName() === "list");
+        const theParam = Array.from(fmxRep._getAllEntitiesWithType("Parameter") as Set<Parameter>).find(v => v.name === "list");
         expect(theParam).toBeTruthy();
     });
 
