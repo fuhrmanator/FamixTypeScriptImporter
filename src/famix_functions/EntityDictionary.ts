@@ -969,8 +969,8 @@ export class EntityDictionary {
         }
 
         const fmxAccess = new Famix.Access();
-        fmxAccess.setAccessor(accessor);
-        fmxAccess.setVariable(fmxVar);
+        fmxAccess.accessor = accessor;
+        fmxAccess.variable = fmxVar;
 
         this.famixRep.addElement(fmxAccess);
 

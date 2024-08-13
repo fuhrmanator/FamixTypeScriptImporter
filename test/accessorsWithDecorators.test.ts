@@ -92,8 +92,8 @@ describe('Tests for accessors with decorators', () => {
         expect(theMethod1?.getKind()).toBe("constructor");
         const theMethod2 = fmxRep._getFamixMethod("{accessorsWithDecorators.ts}.Point.x[GetAccessor]");
         expect(theMethod2?.getKind()).toBe("getter");
-        const theAccess1 = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>).find(a => a.getVariable() === theProperty && a.getAccessor() === theMethod1);
-        const theAccess2 = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>).find(a => a.getVariable() === theProperty && a.getAccessor() === theMethod2);
+        const theAccess1 = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>).find(a => a.variable === theProperty && a.accessor === theMethod1);
+        const theAccess2 = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>).find(a => a.variable === theProperty && a.accessor === theMethod2);
         expect(theAccess1).toBeTruthy();
         expect(theAccess2).toBeTruthy();
     });
@@ -103,8 +103,8 @@ describe('Tests for accessors with decorators', () => {
         const theMethod1 = fmxRep._getFamixMethod("{accessorsWithDecorators.ts}.Point.constructor[Constructor]");
         const theMethod2 = fmxRep._getFamixMethod("{accessorsWithDecorators.ts}.Point.y[SetAccessor]");
         expect(theMethod2?.getKind()).toBe("setter");
-        const theAccess1 = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>).find(a => a.getVariable() === theProperty && a.getAccessor() === theMethod1);
-        const theAccess2 = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>).find(a => a.getVariable() === theProperty && a.getAccessor() === theMethod2);
+        const theAccess1 = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>).find(a => a.variable === theProperty && a.accessor === theMethod1);
+        const theAccess2 = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>).find(a => a.variable === theProperty && a.accessor === theMethod2);
         expect(theAccess1).toBeTruthy();
         expect(theAccess2).toBeTruthy();
     });

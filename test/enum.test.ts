@@ -69,7 +69,7 @@ describe('Tests for enum', () => {
         expect(fmxRep._getAllEntitiesWithType("Access").size).toBe(1);
         const theAccess = Array.from(fmxRep._getAllEntitiesWithType("Access") as Set<Access>)[0];
         expect(theFile.getAccesses().has(theAccess)).toBe(true);
-        expect(theAccess.getAccessor().getName()).toBe("enum.ts");
-        expect(theAccess.getVariable().getName()).toBe("MONDAY");
+        expect(theAccess.accessor.getName()).toBe("enum.ts");
+        expect(theAccess.variable.getName()).toBe("MONDAY");
     });    
 });

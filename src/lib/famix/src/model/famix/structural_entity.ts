@@ -14,7 +14,7 @@ export class StructuralEntity extends NamedEntity {
   public addIncomingAccess(incomingAccess: Access): void {
     if (!this.incomingAccesses.has(incomingAccess)) {
       this.incomingAccesses.add(incomingAccess);
-      incomingAccess.setVariable(this);
+      incomingAccess.variable = this;
     }
   }
 

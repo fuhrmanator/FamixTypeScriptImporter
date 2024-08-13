@@ -98,7 +98,7 @@ export class ContainerEntity extends NamedEntity {
   public addAccess(access: Access): void {
     if (!this.accesses.has(access)) {
       this.accesses.add(access);
-      access.setAccessor(this);
+      access.accessor = this;
     }
   }
 

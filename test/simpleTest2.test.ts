@@ -30,7 +30,7 @@ describe('Tests for simple test 2', () => {
     });
     
     const accessList = Array.from(fmxRep._getAllEntitiesWithType('Access')) as Array<Access>;
-    const theAccess = accessList.find(e => e.getVariable() === theVariable && e.getAccessor() === theFile);
+    const theAccess = accessList.find(e => e.variable === theVariable && e.accessor === theFile);
     it("should have one access", () => {
         expect(accessList?.length).toBe(1);
         expect(theAccess).toBeTruthy();

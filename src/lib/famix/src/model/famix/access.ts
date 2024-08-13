@@ -5,38 +5,9 @@ import { Entity } from "./entity";
 
 export class Access extends Entity {
 
-  private accessor: ContainerEntity;
-
-  public getAccessor(): ContainerEntity {
-    return this.accessor;
-  }
-
-  public setAccessor(accessor: ContainerEntity): void {
-    this.accessor = accessor;
-    accessor.addAccess(this);
-  }
-
-  private variable: StructuralEntity;
-
-  public getVariable(): StructuralEntity {
-    return this.variable;
-  }
-
-  public setVariable(variable: StructuralEntity): void {
-    this.variable = variable;
-    variable.addIncomingAccess(this);
-  }
-
-  private isWrite: boolean;
-
-  public getIsWrite(): boolean {
-    return this.isWrite;
-  }
-
-  public setIsWrite(isWrite: boolean): void {
-    this.isWrite = isWrite;
-  }
-
+  private _accessor: ContainerEntity;
+  private _variable: StructuralEntity;
+  private _isWrite: boolean;
 
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("Access", this);
@@ -46,8 +17,34 @@ export class Access extends Entity {
 
   public addPropertiesToExporter(exporter: FamixJSONExporter): void {
     super.addPropertiesToExporter(exporter);
-    exporter.addProperty("accessor", this.getAccessor());
-    exporter.addProperty("variable", this.getVariable());
-    exporter.addProperty("isWrite", this.getIsWrite());
+    exporter.addProperty("accessor", this.accessor);
+    exporter.addProperty("variable", this.variable);
+    exporter.addProperty("isWrite", this.isWrite);
   }
+
+    get accessor(): ContainerEntity {
+        return this._accessor;
+    }
+
+    set accessor(accessor: ContainerEntity) {
+        this._accessor = accessor;
+        accessor.addAccess(this);
+    }
+
+    get variable(): StructuralEntity {
+        return this._variable;
+    }
+
+    set variable(variable: StructuralEntity) {
+        this._variable = variable;
+        variable.addIncomingAccess(this);
+    }
+
+    get isWrite(): boolean {
+        return this._isWrite;
+    }
+
+    set isWrite(isWrite: boolean) {
+        this._isWrite = isWrite;
+    }
 }
