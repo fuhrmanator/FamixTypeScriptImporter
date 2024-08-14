@@ -1,6 +1,5 @@
 import { FamixBaseElement } from "./famix_base_element";
 import { Class, Interface, Variable, Method, ArrowFunction, Function as FamixFunctionEntity, Type, NamedEntity, ScriptEntity, Module, SourceLanguage } from "./model/famix";
-// import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration } from "ts-morph";
 import * as Famix from "./model/famix";
 import { TSMorphObjectType } from "../../../famix_functions/EntityDictionary";
 /**
@@ -18,7 +17,7 @@ export class FamixRepository {
     private idCounter = 1; // Id counter
     private absolutePath: string = "";
     private fmxElementObjectMap = new Map<Famix.Entity, TSMorphObjectType>();
-    private tsMorphObjectMap = new Map<TSMorphObjectType, Famix.Entity>();
+    private tsMorphObjectMap = new Map<TSMorphObjectType, Famix.Entity>(); // TODO: add this map to have two-way mapping between Famix and TS Morph objects
     
     constructor() {
         this.addElement(new SourceLanguage());  // add the source language entity (TypeScript)

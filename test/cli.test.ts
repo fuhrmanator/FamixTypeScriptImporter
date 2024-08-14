@@ -2,7 +2,7 @@ import { execSync } from 'child_process';
 
 const commandLineStart = 'ts-node src/ts2famix-cli.ts';
 
-describe.skip('ts2famix should handle command line options', () => {
+describe('ts2famix should handle command line options', () => {
     test('should show help option', () => {
         try {
             const output = execSync(commandLineStart, {
