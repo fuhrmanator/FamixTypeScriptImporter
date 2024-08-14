@@ -500,7 +500,7 @@ class ParameterConcretisation extends Entity {
 interface SearchParameters {
     +searchArray: string[]
     +targetArray: string[]
-    +start?: number
+    +start?: number | undefined
 }
 class EntityDictionary {
     +famixRep: FamixRepository
@@ -513,6 +513,7 @@ class EntityDictionary {
     -fmxFunctionAndMethodMap: Map<string, Famix.Method | Famix.ParametricMethod | Famix.Function | Famix.ParametricFunction>
     -UNKNOWN_VALUE: string
     +fmxElementObjectMap: Map<Famix.Entity, TSMorphObjectType>
+    +tsMorphElementObjectMap: Map<TSMorphObjectType, Famix.Entity>
     +addSourceAnchor(fmx: Famix.SourcedEntity, node: TSMorphObjectType): Famix.IndexedFileAnchor
     +makeFamixIndexFileAnchor(sourceElement: TSMorphObjectType, famixElement: Famix.SourcedEntity): void
     +createOrGetFamixFile(f: SourceFile, isModule: boolean): Famix.Module | Famix.ScriptEntity
@@ -520,10 +521,10 @@ class EntityDictionary {
     +createFamixAlias(a: TypeAliasDeclaration): Famix.Alias
     +createOrGetFamixClass(cls: ClassDeclaration): Famix.Class | Famix.ParametricClass
     +createOrGetFamixInterface(inter: InterfaceDeclaration): Famix.Interface | Famix.ParametricInterface
-    +createOrGetFamixConcreteElement(el: Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricMethod | Famix.ParametricFunction, elDeclaration: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | FunctionDeclaration, concreteArguments: any): Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricMethod | Famix.ParametricFunction
+    +createOrGetFamixConcreteElement(concreteElement: ParametricVariantType, concreteElementDeclaration: ConcreteElementTSMorphType, concreteArguments: TypeNode<ts.TypeNode>[]): ParametricVariantType
     +createFamixProperty(property: PropertyDeclaration | PropertySignature): Famix.Property
-    +createOrGetFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: unknown): Famix.Method | Famix.ParametricMethod | Famix.Accessor
-    +createOrGetFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: unknown): Famix.Function | Famix.ParametricFunction
+    +createOrGetFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: { [key: string]: number; }): Famix.Method | Famix.ParametricMethod | Famix.Accessor
+    +createOrGetFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: { [key: string]: number; }): Famix.Function | Famix.ParametricFunction
     +createFamixParameter(param: ParameterDeclaration): Famix.Parameter
     +createFamixParameterType(tp: TypeParameterDeclaration): Famix.ParameterType
     +createOrGetFamixConcreteType(param: TypeNode<ts.TypeNode>): Famix.Class | Famix.Interface | Famix.ParameterType | Famix.PrimitiveType
@@ -537,10 +538,10 @@ class EntityDictionary {
     +createFamixInvocation(node: Identifier, m: MethodDeclaration | ConstructorDeclaration | FunctionDeclaration | FunctionExpression | GetAccessorDeclaration | SetAccessorDeclaration, id: number): void
     +createFamixInheritance(cls: ClassDeclaration | InterfaceDeclaration, inhClass: ClassDeclaration | InterfaceDeclaration | ExpressionWithTypeArguments): void
     +createFamixImportClause(importedEntity: Famix.NamedEntity, importingEntity: Famix.Module): void
-    +oldCreateFamixImportClause(importClauseInfo: { importDeclaration?: ImportDeclaration | ImportEqualsDeclaration; importerSourceFile: SourceFile; moduleSpecifierFilePath: string; importElement: ImportSpecifier | Identifier; isInExports: boolean; isDefaultExport: boolean; }): void
-    +createFamixArrowFunction(arrowExpression: Expression<ts.Expression>, currentCC: unknown): Famix.ParametricArrowFunction | Famix.ArrowFunction
+    +oldCreateFamixImportClause(importClauseInfo: { importDeclaration?: ImportDeclaration | ImportEqualsDeclaration | undefined; importerSourceFile: SourceFile; moduleSpecifierFilePath: string; importElement: ImportSpecifier | Identifier; isInExports: boolean; isDefaultExport: boolean; }): void
+    +createFamixArrowFunction(arrowExpression: Expression<ts.Expression>, currentCC: { [key: string]: number; }): Famix.ParametricArrowFunction | Famix.ArrowFunction
     +createFamixConcretisation(conEntity: Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricMethod | Famix.ParametricFunction, genEntity: Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricMethod | Famix.ParametricFunction): Famix.Concretisation
-    +createFamixParameterConcrestisation(concretisation: Famix.Concretisation): Famix.ParameterConcretisation
+    +createFamixParameterConcretisation(concretisation: Famix.Concretisation): Famix.ParameterConcretisation | undefined
     +createFamixConcretisationClassOrInterfaceSpecialisation(element: ClassDeclaration | InterfaceDeclaration): void
     +createFamixConcretisationGenericInstantiation(cls: ClassDeclaration): void
     +createFamixConcretisationFunctionInstantiation(element: MethodDeclaration | FunctionDeclaration): void
@@ -560,23 +561,24 @@ class FamixRepository {
     -idCounter: number
     -absolutePath: string
     -fmxElementObjectMap: Map<Famix.Entity, TSMorphObjectType>
+    -tsMorphObjectMap: Map<TSMorphObjectType, Famix.Entity>
     +setFmxElementObjectMap(fmxElementObjectMap: Map<Famix.Entity, TSMorphObjectType>): void
     +getFmxElementObjectMap(): Map<Famix.Entity, TSMorphObjectType>
     +getAbsolutePath(): string
     +setAbsolutePath(path: string): void
-    +getFamixEntityById(id: number): FamixBaseElement
-    +getFamixEntityByFullyQualifiedName(fullyQualifiedName: string): FamixBaseElement
+    +getFamixEntityById(id: number): FamixBaseElement | undefined
+    +getFamixEntityByFullyQualifiedName(fullyQualifiedName: string): FamixBaseElement | undefined
     +export(arg0: { format: string; }): string
     +_getAllEntities(): Set<FamixBaseElement>
     +_getAllEntitiesWithType(theType: string): Set<FamixBaseElement>
-    +_getFamixClass(fullyQualifiedName: string): Class
-    +_getFamixInterface(fullyQualifiedName: string): Interface
-    +_getFamixMethod(fullyQualifiedName: string): Method
-    +_getFamixFunction(fullyQualifiedName: string): FamixFunctionEntity
-    +_getFamixVariable(fullyQualifiedName: string): Variable
-    +_getFamixModule(fullyQualifiedName: string): Module
+    +_getFamixClass(fullyQualifiedName: string): Class | undefined
+    +_getFamixInterface(fullyQualifiedName: string): Interface | undefined
+    +_getFamixMethod(fullyQualifiedName: string): Method | undefined
+    +_getFamixFunction(fullyQualifiedName: string): FamixFunctionEntity | undefined
+    +_getFamixVariable(fullyQualifiedName: string): Variable | undefined
+    +_getFamixModule(fullyQualifiedName: string): Module | undefined
     +_getFamixModules(): Set<Module>
-    +_getFamixFile(fullyQualifiedName: string): Module | ScriptEntity
+    +_getFamixFile(fullyQualifiedName: string): Module | ScriptEntity | undefined
     +_getFamixFiles(): Set<Module | ScriptEntity>
     +_methodNamesAsSetFromClass(className: string): Set<string>
     +_methodParentsAsSetFromClass(className: string): Set<Type>
@@ -587,7 +589,7 @@ class FamixRepository {
 class Importer {
     -project: Project
     +famixRepFromPaths(paths: string[]): FamixRepository
-    -processEntities(project: any): void
+    -processEntities(project: Project): void
     +famixRepFromSource(filename: string, source: string): FamixRepository
     +famixRepFromProject(project: Project): FamixRepository
 }
