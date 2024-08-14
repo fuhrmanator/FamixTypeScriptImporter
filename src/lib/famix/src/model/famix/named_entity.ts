@@ -7,7 +7,7 @@ import { Decorator } from "./decorator";
 
 export class NamedEntity extends SourcedEntity {
 
-    private _fullyQualifiedName: string;
+    private _fullyQualifiedName!: string;
     private _receivedInvocations: Set<Invocation> = new Set();
 
     public addReceivedInvocation(receivedInvocation: Invocation): void {
@@ -26,7 +26,7 @@ export class NamedEntity extends SourcedEntity {
         }
     }
 
-    private _name: string;
+    private _name!: string;
     private _aliases: Set<Alias> = new Set();
 
     public addAlias(alias: Alias): void {

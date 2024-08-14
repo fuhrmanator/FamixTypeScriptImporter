@@ -5,13 +5,13 @@ import { Interface } from "./interface";
 
 export class Method extends BehavioralEntity {
 
-  private _parentEntity: Class | Interface;
-  private _kind: string;
-  private _isAbstract: boolean;
-  private _isClassSide: boolean;
-  private _isPrivate: boolean;
-  private _isPublic: boolean;
-  private _isProtected: boolean;
+  private _parentEntity!: Class | Interface;
+  private _kind!: string;
+  private _isAbstract!: boolean;
+  private _isClassSide!: boolean;
+  private _isPrivate!: boolean;
+  private _isPublic!: boolean;
+  private _isProtected!: boolean;
 
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("Method", this);

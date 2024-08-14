@@ -4,7 +4,7 @@ import { Enum } from "./enum";
 
 export class EnumValue extends StructuralEntity {
 
-    private _parentEntity: Enum;
+    private _parentEntity!: Enum;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("EnumValue", this);

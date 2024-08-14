@@ -3,8 +3,8 @@ import { ScopingEntity } from "./scoping_entity";
 
 export class ScriptEntity extends ScopingEntity {
 
-    private _numberOfLinesOfText: number;
-    private _numberOfCharacters: number;
+    private _numberOfLinesOfText!: number;
+    private _numberOfCharacters!: number;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("ScriptEntity", this);

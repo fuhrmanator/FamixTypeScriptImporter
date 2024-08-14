@@ -9,7 +9,7 @@ import { Variable } from "./variable";
 
 export class ContainerEntity extends NamedEntity {
 
-    private _parentContainerEntity: ContainerEntity;
+    private _parentContainerEntity!: ContainerEntity;
     private _childrenContainerEntities: Set<ContainerEntity> = new Set();
 
     public addChildContainerEntity(childContainerEntity: ContainerEntity): void {
@@ -19,8 +19,8 @@ export class ContainerEntity extends NamedEntity {
         }
     }
 
-    private _cyclomaticComplexity: number;
-    private _numberOfStatements: number;
+    private _cyclomaticComplexity!: number;
+    private _numberOfStatements!: number;
     private _outgoingReferences: Set<Reference> = new Set();
 
     public addOutgoingReference(outgoingReference: Reference): void {
@@ -30,7 +30,7 @@ export class ContainerEntity extends NamedEntity {
         }
     }
 
-    private _numberOfLinesOfCode: number;
+    private _numberOfLinesOfCode!: number;
     private _outgoingInvocations: Set<Invocation> = new Set();
 
     public addOutgoingInvocation(outgoingInvocation: Invocation): void {

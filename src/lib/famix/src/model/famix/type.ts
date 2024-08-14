@@ -7,7 +7,7 @@ import { Alias } from "./alias";
 
 export class Type extends ContainerEntity {
 
-    private _container: ContainerEntity;
+    private _container!: ContainerEntity;
     private _typeAliases: Set<Alias> = new Set();
 
     public addTypeAlias(typeAlias: Alias): void {

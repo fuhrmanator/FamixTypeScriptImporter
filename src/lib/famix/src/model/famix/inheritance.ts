@@ -5,8 +5,8 @@ import { Interface } from "./interface";
 
 export class Inheritance extends Entity {
 
-    private _superclass: Class | Interface;
-    private _subclass: Class | Interface;
+    private _superclass!: Class | Interface;
+    private _subclass!: Class | Interface;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("Inheritance", this);

@@ -12,21 +12,21 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { forEachChild, isIdentifier, SyntaxKind, createSourceFile, ScriptTarget } from 'typescript';
+import { forEachChild, isIdentifier, SyntaxKind, createSourceFile, ScriptTarget, Node, CaseClause, BinaryExpression, FunctionLikeDeclaration } from 'typescript';
 import { isFunctionWithBody } from 'tsutils';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, PathLike, readFileSync } from 'fs';
 
-const getNodeName = (node) => {
+const getNodeName = (node: FunctionLikeDeclaration) => {
   const { name, pos, end } = node;
   const key = name !== undefined && isIdentifier(name) ? name.text : JSON.stringify({ pos, end });
   return key;
 };
 
-const increasesComplexity = (node) => {
+const increasesComplexity = (node: Node) => {
   /* eslint-disable indent */
   switch (node.kind) {
     case SyntaxKind.CaseClause:
-      return node.statements.length > 0;
+      return (node as CaseClause).statements.length > 0;
     case SyntaxKind.CatchClause:
     case SyntaxKind.ConditionalExpression:
     case SyntaxKind.DoStatement:
@@ -38,7 +38,7 @@ const increasesComplexity = (node) => {
       return true;
 
     case SyntaxKind.BinaryExpression:
-      switch (node.operatorToken.kind) {
+      switch ((node as BinaryExpression).operatorToken.kind) {
         case SyntaxKind.BarBarToken:
         case SyntaxKind.AmpersandAmpersandToken:
           return true;
@@ -52,9 +52,9 @@ const increasesComplexity = (node) => {
   /* eslint-enable indent */
 };
 
-const calculateFromSource = (ctx) => {
+const calculateFromSource = (ctx: Node) => {
   let complexity = 0;
-  const output = {};
+  const output: { [key: string]: number } = {};
   forEachChild(ctx, function cb(node) {
     if (isFunctionWithBody(node)) {
       const old = complexity;
@@ -73,11 +73,11 @@ const calculateFromSource = (ctx) => {
   return output;
 };
 
-export const calculate = (filePath) => {
+export const calculate = (filePath: PathLike) => {
   if (!existsSync(filePath)) {
     throw new Error(`File "${filePath}" does not exists`);
   }
   const sourceText = readFileSync(filePath).toString();
-  const source = createSourceFile(filePath, sourceText, ScriptTarget.ES2015);
+  const source = createSourceFile(filePath.toString(), sourceText, ScriptTarget.ES2015);
   return calculateFromSource(source);
 };

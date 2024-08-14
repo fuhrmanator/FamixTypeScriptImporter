@@ -7,8 +7,8 @@ import { ParametricMethod } from "./parametric_method";
 
 export class Concretisation extends Entity {
 
-    private _genericEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod;
-    private _concreteEntity: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod;  // is this correct?
+    private _genericEntity!: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod;
+    private _concreteEntity!: ParametricClass | ParametricInterface | ParametricFunction | ParametricMethod;  // is this correct?
 
     public getJSON(): string {
       const json: FamixJSONExporter = new FamixJSONExporter("Concretisation", this);

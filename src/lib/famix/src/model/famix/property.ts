@@ -16,8 +16,8 @@ export class Property extends StructuralEntity {
     public set readOnly(value: boolean) {
         this._readOnly = value;
     }
-    private _readOnly: boolean;
-    private _parentEntity: Class | Interface;
+    private _readOnly: boolean = false;
+    private _parentEntity!: Class | Interface;
 
     public get isDefinitelyAssigned() {
         return this._isDefinitelyAssigned;
@@ -42,11 +42,11 @@ export class Property extends StructuralEntity {
     public set isJavaScriptPrivate(value: boolean) {
         this._isJavaScriptPrivate = value;
     }
-    private _isDefinitelyAssigned: boolean;
+    private _isDefinitelyAssigned!: boolean;
 
-    private _isOptional: boolean;
+    private _isOptional!: boolean;
 
-    private _isJavaScriptPrivate: boolean;
+    private _isJavaScriptPrivate!: boolean;
 
     public get visibility() {
         return this._visibility;

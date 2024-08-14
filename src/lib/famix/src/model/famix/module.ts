@@ -5,60 +5,36 @@ import { ScriptEntity } from "./script_entity";
 
 export class Module extends ScriptEntity {
 
-    /**
-     * Getter $isAmbient
-     * @return {boolean }
-     */
     public get isAmbient() {
         return this._isAmbient;
     }
 
-    /**
-     * Setter $isAmbient
-     * @param {boolean } value
-     */
     public set isAmbient(value: boolean) {
         this._isAmbient = value;
     }
 
     private _isAmbient: boolean = false;
 
-    /**
-     * Getter $isNamespace
-     * @return {boolean }
-     */
     public get isNamespace() {
         return this._isNamespace;
     }
 
-    /**
-     * Setter $isNamespace
-     * @param {boolean } value
-     */
     public set isNamespace(value: boolean) {
         this._isNamespace = value;
     }
     private _isNamespace: boolean = false;
 
-    /**
-     * Getter $isModule
-     * @return {boolean }
-     */
     public get isModule() {
         return this._isModule;
     }
 
-    /**
-     * Setter $isModule
-     * @param {boolean } value
-     */
     public set isModule(value: boolean) {
         this._isModule = value;
     }
 
     private _isModule: boolean = true;
 
-    private _parentScope: ScopingEntity;
+    private _parentScope!: ScopingEntity;
     // incomingImports are in NamedEntity
     private _outgoingImports: Set<ImportClause> = new Set();
 

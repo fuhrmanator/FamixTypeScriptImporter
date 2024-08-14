@@ -5,8 +5,8 @@ import { Entity } from "./entity";
 
 export class Reference extends Entity {
 
-    private _source: ContainerEntity;
-    private _target: Type;
+    private _source!: ContainerEntity;
+    private _target!: Type;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("Reference", this);

@@ -4,7 +4,7 @@ import { SourcedEntity } from "./sourced_entity";
 
 export class SourceAnchor extends Entity {
 
-    private _element: SourcedEntity;
+    private _element!: SourcedEntity;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("SourceAnchor", this);

@@ -3,9 +3,9 @@ import { SourceAnchor } from "./source_anchor";
 
 export class IndexedFileAnchor extends SourceAnchor {
 
-  private _startPos: number;
-  private _endPos: number;
-  private _fileName: string;
+  private _startPos!: number;
+  private _endPos!: number;
+  private _fileName!: string;
 
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("IndexedFileAnchor", this);

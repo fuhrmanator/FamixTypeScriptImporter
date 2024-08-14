@@ -6,8 +6,8 @@ import { PrimitiveType } from "./primitive_type";
 
 export class ParameterConcretisation extends Entity {
 
-    private _genericParameter: ParameterType;
-    private _concreteParameter: PrimitiveType;
+    private _genericParameter!: ParameterType;
+    private _concreteParameter!: PrimitiveType;
     private _concretisations: Set<Concretisation> = new Set();
 
     public addConcretisation(concretisation: Concretisation): void {

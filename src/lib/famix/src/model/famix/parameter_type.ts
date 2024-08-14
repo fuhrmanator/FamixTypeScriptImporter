@@ -12,8 +12,8 @@ import { ParametricArrowFunction } from "./parametric_arrow_function";
 
 export class ParameterType extends Type {
 
-    private _parentGeneric: ParametricClass | ParametricInterface | Method | ParametricMethod | Accessor | FamixFunction | ParametricFunction | ArrowFunction | ParametricArrowFunction;
-    private _baseType: Type;
+    private _parentGeneric!: ParametricClass | ParametricInterface | Method | ParametricMethod | Accessor | FamixFunction | ParametricFunction | ArrowFunction | ParametricArrowFunction;
+    private _baseType!: Type;
     private _arguments: Set<Type> = new Set();
 
     public addArgument(argument: Type): void {

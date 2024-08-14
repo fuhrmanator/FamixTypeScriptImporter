@@ -5,9 +5,9 @@ import { NamedEntity } from "./named_entity";
 
 export class ImportClause extends Entity {
 
-    private _importingEntity: Module;
-    private _importedEntity: NamedEntity;
-    private _moduleSpecifier: string;
+    private _importingEntity!: Module;
+    private _importedEntity!: NamedEntity;
+    private _moduleSpecifier!: string;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("ImportClause", this);

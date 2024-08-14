@@ -3,7 +3,7 @@ import { NamedEntity } from "./named_entity";
 
 export class Decorator extends NamedEntity {
 
-    private _decoratorExpression: string;
+    private _decoratorExpression!: string;
     private _decoratedEntity: NamedEntity;
 
     public getJSON(): string {
