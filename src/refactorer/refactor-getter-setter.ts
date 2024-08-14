@@ -1,4 +1,4 @@
-import { Project, SyntaxKind } from "ts-morph";
+import { ClassDeclaration, Project, SourceFile, SyntaxKind } from "ts-morph";
 import * as path from "path";
 
 const project = new Project();
@@ -49,7 +49,7 @@ function renamePropertyIfExists(cls: any, propName: string, properties: any[]) {
     }
 }
 
-function createTypeMap(sourceFile: any): Map<string, string> {
+function createTypeMap(sourceFile: SourceFile): Map<string, string> {
     const typeMap = new Map<string, string>();
     const importDeclarations = sourceFile.getImportDeclarations();
 
@@ -124,7 +124,7 @@ function normalizePath(filePath: string): string {
     return filePath.replace(/\\/g, '/');
 }
 
-function replaceMethodCalls(cls: any, methodName: string, propName: string) {
+function replaceMethodCalls(cls: ClassDeclaration, methodName: string, propName: string) {
     cls.getDescendantsOfKind(SyntaxKind.CallExpression).forEach(callExpr => {
         const expr = callExpr.getExpression();
         if (expr.getText() === `this.${methodName}`) {

@@ -7,7 +7,7 @@ import { ParameterType } from "./parameter_type";
 
 export class BehavioralEntity extends ContainerEntity {
 
-    private _signature: string;
+    private _signature!: string;
     private _parameters: Set<Parameter> = new Set();
 
     public addParameter(parameter: Parameter): void {
@@ -17,7 +17,7 @@ export class BehavioralEntity extends ContainerEntity {
         }
     }
 
-    private _numberOfParameters: number;
+    private _numberOfParameters!: number;
     private _incomingInvocations: Set<Invocation> = new Set();
 
     public addIncomingInvocation(incomingInvocation: Invocation): void {
@@ -27,7 +27,7 @@ export class BehavioralEntity extends ContainerEntity {
         }
     }
 
-    private _declaredType: Type;
+    private _declaredType!: Type;
     private _genericParameters: Set<ParameterType> = new Set();
 
     public addGenericParameter(genericParameter: ParameterType): void {

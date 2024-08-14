@@ -15,9 +15,9 @@ export class Invocation extends Entity {
     }
   }
 
-  private _receiver: NamedEntity;
-  private _sender: ContainerEntity;
-  private _signature: string;
+  private _receiver!: NamedEntity;
+  private _sender!: ContainerEntity;
+  private _signature!: string;
 
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("Invocation", this);

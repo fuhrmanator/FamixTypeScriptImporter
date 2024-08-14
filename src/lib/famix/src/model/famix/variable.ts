@@ -4,7 +4,7 @@ import { StructuralEntity } from "./structural_entity";
 
 export class Variable extends StructuralEntity {
 
-    private _parentContainerEntity: ContainerEntity;
+    private _parentContainerEntity!: ContainerEntity;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("Variable", this);

@@ -15,7 +15,7 @@ export const classes = new Array<ClassDeclaration>(); // Array of all the classe
 export const interfaces = new Array<InterfaceDeclaration>(); // Array of all the interfaces of the source files
 export const modules = new Array<SourceFile>(); // Array of all the source files which are modules
 export const listOfExportMaps = new Array<ReadonlyMap<string, ExportedDeclarations[]>>(); // Array of all the export maps
-export let currentCC: unknown; // Stores the cyclomatic complexity metrics for the current source file
+export let currentCC: { [key: string]: number }; // Stores the cyclomatic complexity metrics for the current source file
 
 /**
  * Checks if the file has any imports or exports to be considered a module
@@ -28,21 +28,21 @@ function isSourceFileAModule(sourceFile: SourceFile): boolean {
 
 /**
  * Gets the path of a module to be imported
- * @param i An import declaration
+ * @param importDecl An import declaration
  * @returns The path of the module to be imported
  */
-export function getModulePath(i: ImportDeclaration): string {
+export function getModulePath(importDecl: ImportDeclaration): string {
     let path: string;
-    if (i.getModuleSpecifierSourceFile() === undefined) {
-        if (i.getModuleSpecifierValue().substring(i.getModuleSpecifierValue().length - 3) === ".ts") {
-            path = i.getModuleSpecifierValue();
+    if (importDecl.getModuleSpecifierSourceFile() === undefined) {
+        if (importDecl.getModuleSpecifierValue().substring(importDecl.getModuleSpecifierValue().length - 3) === ".ts") {
+            path = importDecl.getModuleSpecifierValue();
         }
         else {
-            path = i.getModuleSpecifierValue() + ".ts";
+            path = importDecl.getModuleSpecifierValue() + ".ts";
         }
     }
     else {
-        path = i.getModuleSpecifierSourceFile().getFilePath();
+        path = importDecl.getModuleSpecifierSourceFile()!.getFilePath();
     }
     return path;
 }
@@ -89,7 +89,7 @@ export function processFiles(sourceFiles: Array<SourceFile>): void {
         if (fs.existsSync(file.getFilePath()))
             currentCC = calculate(file.getFilePath());
         else
-            currentCC = 0;
+            currentCC = {};
 
         processFile(file);
     });
@@ -539,26 +539,29 @@ function processParameters(m: MethodDeclaration | ConstructorDeclaration | Metho
 
 // This function should create a Famix.Property model from a ParameterDeclaration
 // You'll need to implement it according to your Famix model structure
-function processParameterAsProperty(param: ParameterDeclaration, c: ClassDeclaration | ClassExpression): Famix.Property {
+function processParameterAsProperty(param: ParameterDeclaration, classDecl: ClassDeclaration | ClassExpression): Famix.Property {
     // Convert the parameter into a Property
     const propertyRepresentation = convertParameterToPropertyRepresentation(param);
 
     // Add the property to the class so we can have a PropertyDeclaration object
-    c.addProperty(propertyRepresentation);
+    classDecl.addProperty(propertyRepresentation);
 
-    const p = c.getProperty(propertyRepresentation.name);
-    const fmxProperty = entityDictionary.createFamixProperty(p);
-    if (c instanceof ClassDeclaration) {
-        const fmxClass = entityDictionary.createOrGetFamixClass(c);
+    const property = classDecl.getProperty(propertyRepresentation.name);
+    if (!property) {
+        throw new Error(`Property ${propertyRepresentation.name} not found in class ${classDecl.getName()}`);
+    }
+    const fmxProperty = entityDictionary.createFamixProperty(property);
+    if (classDecl instanceof ClassDeclaration) {
+        const fmxClass = entityDictionary.createOrGetFamixClass(classDecl);
         fmxClass.addProperty(fmxProperty);
     } else { 
         throw new Error("Unexpected type ClassExpression.");
     }
 
-    processComments(p, fmxProperty);
+    processComments(property, fmxProperty);
 
     // remove the property from the class
-    p.remove();
+    property.remove();
 
     return fmxProperty;
 
@@ -579,6 +582,8 @@ function convertParameterToPropertyRepresentation(param: ParameterDeclaration) {
         scope = Scope.Protected;
     } else if (param.hasModifier(SyntaxKind.PublicKeyword)) {
         scope = Scope.Public;
+    } else {
+        throw new Error(`Parameter property ${paramName} in constructor does not have a visibility modifier.`);
     }
 
     // Determine if readonly
@@ -597,23 +602,23 @@ function convertParameterToPropertyRepresentation(param: ParameterDeclaration) {
 
 /**
  * Builds a Famix model for a parameter
- * @param p A parameter
+ * @param paramDecl A parameter
  * @returns A Famix.Parameter representing the parameter
  */
-function processParameter(p: ParameterDeclaration): Famix.Parameter {
-    const fmxParam = entityDictionary.createFamixParameter(p);
+function processParameter(paramDecl: ParameterDeclaration): Famix.Parameter {
+    const fmxParam = entityDictionary.createFamixParameter(paramDecl);
 
-    logger.debug(`parameter: ${p.getName()}, (${p.getType().getText()}), fqn = ${fmxParam.fullyQualifiedName}`);
+    logger.debug(`parameter: ${paramDecl.getName()}, (${paramDecl.getType().getText()}), fqn = ${fmxParam.fullyQualifiedName}`);
 
-    processComments(p, fmxParam);
+    processComments(paramDecl, fmxParam);
 
-    processDecorators(p, fmxParam);
+    processDecorators(paramDecl, fmxParam);
 
-    const parent = p.getParent();
+    const parent = paramDecl.getParent();
 
     if (!(parent instanceof MethodSignature)) {
-        logger.debug(`adding access: ${p.getName()}, (${p.getType().getText()}) Famix ${fmxParam.name}`);
-        accessMap.set(fmxParam.id, p);
+        logger.debug(`adding access: ${paramDecl.getName()}, (${paramDecl.getType().getText()}) Famix ${fmxParam.name}`);
+        accessMap.set(fmxParam.id, paramDecl);
     }
 
     return fmxParam;
@@ -674,7 +679,7 @@ function processVariableStatement(v: VariableStatement): Array<Famix.Variable> {
 function processVariable(v: VariableDeclaration): Famix.Variable {
     const fmxVar = entityDictionary.createFamixVariable(v);
 
-    logger.debug(`variable: ${v.getName()}, (${v.getType().getText()}), ${v.getInitializer() ? "initializer: " + v.getInitializer().getText() : "initializer: "}, fqn = ${fmxVar.fullyQualifiedName}`);
+    logger.debug(`variable: ${v.getName()}, (${v.getType().getText()}), ${v.getInitializer() ? "initializer: " + v.getInitializer()!.getText() : "initializer: "}, fqn = ${fmxVar.fullyQualifiedName}`);
 
     processComments(v, fmxVar);
 
@@ -981,7 +986,7 @@ function processNodeForInvocations(n: Identifier, m: MethodDeclaration | Constru
 
         logger.debug(`node: node, (${n.getType().getText()})`);
     } catch (error) {
-        logger.error(`> WARNING: got exception ${error}. ScopeDeclaration invalid for ${n.getSymbol().getFullyQualifiedName()}. Continuing...`);
+        logger.error(`> WARNING: got exception ${error}. ScopeDeclaration invalid for ${n.getSymbol()!.getFullyQualifiedName()}. Continuing...`);
     }
 }
 

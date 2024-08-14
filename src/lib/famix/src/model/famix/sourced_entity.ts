@@ -7,8 +7,8 @@ import { logger } from "../../../../../analyze";
 
 export class SourcedEntity extends Entity {
 
-    private _isStub: boolean;
-    private _sourceAnchor: SourceAnchor;
+    private _isStub!: boolean;
+    private _sourceAnchor!: SourceAnchor;
     private _comments: Set<Comment> = new Set();
 
     public addComment(comment: Comment): void {
@@ -20,7 +20,7 @@ export class SourcedEntity extends Entity {
         }
     }
 
-    private _declaredSourceLanguage: SourceLanguage;
+    private _declaredSourceLanguage!: SourceLanguage;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("SourcedEntity", this);

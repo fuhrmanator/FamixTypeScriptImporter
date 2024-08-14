@@ -5,9 +5,9 @@ import { Entity } from "./entity";
 
 export class Access extends Entity {
 
-    private _accessor: ContainerEntity;
-    private _variable: StructuralEntity;
-    private _isWrite: boolean;
+    private _accessor!: ContainerEntity;
+    private _variable!: StructuralEntity;
+    private _isWrite!: boolean;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("Access", this);

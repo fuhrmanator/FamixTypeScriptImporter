@@ -3,9 +3,9 @@ import { SourcedEntity } from "./sourced_entity";
 
 export class Comment extends SourcedEntity {
 
-  private _isJSDoc: boolean;
-  private _container: SourcedEntity;
-  private _content: string;
+  private _isJSDoc!: boolean;
+  private _container!: SourcedEntity;
+  private _content!: string;
 
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("Comment", this);

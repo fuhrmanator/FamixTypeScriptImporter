@@ -61,7 +61,7 @@ describe('EntityDictionary', () => {
   test('should get a constructor and add it to the map', () => {
     
     //Create a type constructor declaration   
-    const constructor : Famix.Method | Famix.Accessor = entityDictionary.createOrGetFamixMethod(constructors[0],0);
+    const constructor : Famix.Method | Famix.Accessor = entityDictionary.createOrGetFamixMethod(constructors[0], {});
     expect(constructors[0]).toBe(entityDictionary.fmxElementObjectMap.get(constructor));  
   
   });
@@ -81,7 +81,7 @@ describe('EntityDictionary', () => {
   test('should get a function and add it to the map', () => {
     
     //Create a type function declaration   
-    const famixFunction : Famix.Function = entityDictionary.createOrGetFamixFunction(functions[0],0);
+    const famixFunction : Famix.Function = entityDictionary.createOrGetFamixFunction(functions[0], {});
 
     expect(functions[0]).toBe(entityDictionary.fmxElementObjectMap.get(famixFunction));  
   

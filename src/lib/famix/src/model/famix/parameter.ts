@@ -4,7 +4,7 @@ import { BehavioralEntity } from "./behavioral_entity";
 
 export class Parameter extends StructuralEntity {
 
-  private _parentEntity: BehavioralEntity;
+  private _parentEntity!: BehavioralEntity;
 
   public getJSON(): string {
     const json: FamixJSONExporter = new FamixJSONExporter("Parameter", this);
