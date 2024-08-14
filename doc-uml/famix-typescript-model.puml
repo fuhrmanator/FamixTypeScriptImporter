@@ -1,4 +1,11 @@
 @startuml
+class FamixJSONExporter {
+    -element: FamixBaseElement
+    -bufferArray: any
+    -FamixPrefix: string
+    +addProperty(name: string, prop: unknown): void
+    +getJSON(): string
+}
 class Entity extends FamixBaseElement {
     +getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
@@ -597,12 +604,5 @@ abstract class FamixBaseElement {
     +id: number
     +{abstract} getJSON(): string
     +addPropertiesToExporter(exporter: FamixJSONExporter): void
-}
-class FamixJSONExporter {
-    -element: FamixBaseElement
-    -bufferArray: any
-    -FamixPrefix: string
-    +addProperty(name: string, prop: unknown): void
-    +getJSON(): string
 }
 @enduml
