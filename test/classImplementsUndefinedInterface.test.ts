@@ -1,6 +1,6 @@
 import { Importer } from '../src/analyze';
-import { Class } from '../src/lib/famix/src/model/famix/class';
-import { Interface } from '../src/lib/famix/src/model/famix/interface';
+import { Class } from '../src/lib/famix/model/famix/class';
+import { Interface } from '../src/lib/famix/model/famix/interface';
 import { project } from './testUtils';
 
 const importer = new Importer();

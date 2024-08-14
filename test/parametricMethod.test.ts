@@ -1,6 +1,6 @@
 import { Importer } from '../src/analyze';
-import { ParametricClass } from "../src/lib/famix/src/model/famix/parametric_class";
-import { ParametricMethod } from "../src/lib/famix/src/model/famix/parametric_method";
+import { ParametricClass } from "../src/lib/famix/model/famix/parametric_class";
+import { ParametricMethod } from "../src/lib/famix/model/famix/parametric_method";
 import { project } from './testUtils';
 
 const importer = new Importer();

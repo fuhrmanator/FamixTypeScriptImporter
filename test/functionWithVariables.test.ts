@@ -1,7 +1,7 @@
 import { Importer } from '../src/analyze';
-import { Function as FamixFunctionEntity } from "../src/lib/famix/src/model/famix/function";
-import { Comment } from '../src/lib/famix/src/model/famix/comment';
-import { IndexedFileAnchor } from '../src/lib/famix/src/model/famix/indexed_file_anchor';
+import { Function as FamixFunctionEntity } from "../src/lib/famix/model/famix/function";
+import { Comment } from '../src/lib/famix/model/famix/comment';
+import { IndexedFileAnchor } from '../src/lib/famix/model/famix/indexed_file_anchor';
 import { getCommentTextFromCommentViaAnchor } from './testUtils';
 import { project } from './testUtils';
 

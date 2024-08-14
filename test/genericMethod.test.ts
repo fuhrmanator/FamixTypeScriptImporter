@@ -1,7 +1,7 @@
 import { Importer } from '../src/analyze';
-import { Class } from "../src/lib/famix/src/model/famix/class";
-import { Parameter } from "../src/lib/famix/src/model/famix/parameter";
-import { ParametricMethod } from '../src/lib/famix/src/model/famix';
+import { Class } from "../src/lib/famix/model/famix/class";
+import { Parameter } from "../src/lib/famix/model/famix/parameter";
+import { ParametricMethod } from '../src/lib/famix/model/famix';
 import { project } from './testUtils';
 
 const importer = new Importer();

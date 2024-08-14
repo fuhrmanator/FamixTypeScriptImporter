@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { ScriptEntity } from '../src/lib/famix/src/model/famix/script_entity';
+import { ScriptEntity } from '../src/lib/famix/model/famix/script_entity';
 import { project } from './testUtils';
 
 const importer = new Importer();

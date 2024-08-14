@@ -1,7 +1,7 @@
 import { FamixBaseElement } from "./famix_base_element";
 import { Class, Interface, Variable, Method, ArrowFunction, Function as FamixFunctionEntity, Type, NamedEntity, ScriptEntity, Module, SourceLanguage } from "./model/famix";
 import * as Famix from "./model/famix";
-import { TSMorphObjectType } from "../../../famix_functions/EntityDictionary";
+import { TSMorphObjectType } from "../../famix_functions/EntityDictionary";
 /**
  * This class is used to store all Famix elements
  */

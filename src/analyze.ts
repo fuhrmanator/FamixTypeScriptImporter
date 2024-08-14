@@ -1,6 +1,6 @@
 import { Project } from "ts-morph";
 import * as fs from 'fs';
-import { FamixRepository } from "./lib/famix/src/famix_repository";
+import { FamixRepository } from "./lib/famix/famix_repository";
 import { Logger } from "tslog";
 import * as processFunctions from "./analyze_functions/process_functions";
 import { EntityDictionary } from "./famix_functions/EntityDictionary";

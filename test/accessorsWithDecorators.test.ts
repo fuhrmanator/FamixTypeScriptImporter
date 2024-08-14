@@ -1,8 +1,8 @@
 import { Importer } from '../src/analyze';
-import { Access } from '../src/lib/famix/src/model/famix/access';
-import { Decorator } from '../src/lib/famix/src/model/famix/decorator';
-import { Property } from '../src/lib/famix/src/model/famix/property';
-import { Accessor } from '../src/lib/famix/src/model/famix';
+import { Access } from '../src/lib/famix/model/famix/access';
+import { Decorator } from '../src/lib/famix/model/famix/decorator';
+import { Property } from '../src/lib/famix/model/famix/property';
+import { Accessor } from '../src/lib/famix/model/famix';
 import { project } from './testUtils';
 
 const importer = new Importer();

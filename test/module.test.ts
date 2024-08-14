@@ -1,5 +1,5 @@
 import { Importer, logger } from '../src/analyze';
-import { Module } from '../src/lib/famix/src/model/famix/module';
+import { Module } from '../src/lib/famix/model/famix/module';
 import { project } from './testUtils';
 
 const importer = new Importer();
@@ -18,7 +18,7 @@ export namespace Nsp {}
 `);
 
 project.createSourceFile("/test_src/moduleBecauseImports.ts", `
-import * as Famix from "../src/lib/famix/src/model/famix";
+import * as Famix from "../src/lib/famix/model/famix";
 import { ClassDeclaration, ConstructorDeclaration } from "ts-morph";
 import { Importer } from "../test_src/sampleForModule";
 import { ClassZ } from "../test_src/sampleForModule";

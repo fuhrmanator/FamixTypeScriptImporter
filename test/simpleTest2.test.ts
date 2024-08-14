@@ -1,7 +1,7 @@
 import { Importer } from '../src/analyze';
-import { Access } from '../src/lib/famix/src/model/famix/access';
-import { ScriptEntity } from '../src/lib/famix/src/model/famix/script_entity';
-import { Variable } from '../src/lib/famix/src/model/famix/variable';
+import { Access } from '../src/lib/famix/model/famix/access';
+import { ScriptEntity } from '../src/lib/famix/model/famix/script_entity';
+import { Variable } from '../src/lib/famix/model/famix/variable';
 import { project } from './testUtils';
 
 const importer = new Importer();

@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { Parameter, ParametricArrowFunction } from '../src/lib/famix/src/model/famix';
+import { Parameter, ParametricArrowFunction } from '../src/lib/famix/model/famix';
 import { project } from './testUtils';
 
 const importer = new Importer();

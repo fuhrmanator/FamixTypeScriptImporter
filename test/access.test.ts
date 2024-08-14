@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { Property, Method } from "../src/lib/famix/src/model/famix";
+import { Property, Method } from "../src/lib/famix/model/famix";
 import { project } from './testUtils';
 
 const importer = new Importer();

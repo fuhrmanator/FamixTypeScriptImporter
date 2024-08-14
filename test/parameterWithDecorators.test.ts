@@ -1,6 +1,6 @@
 import { Importer } from '../src/analyze';
-import { Decorator } from '../src/lib/famix/src/model/famix/decorator';
-import { Parameter } from '../src/lib/famix/src/model/famix/parameter';
+import { Decorator } from '../src/lib/famix/model/famix/decorator';
+import { Parameter } from '../src/lib/famix/model/famix/parameter';
 import { project } from './testUtils';
 
 const path = require('path');

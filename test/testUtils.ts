@@ -1,5 +1,5 @@
-import { IndexedFileAnchor } from "../src/lib/famix/src/model/famix/indexed_file_anchor";
-import { Comment } from "../src/lib/famix/src/model/famix/comment";
+import { IndexedFileAnchor } from "../src/lib/famix/model/famix/indexed_file_anchor";
+import { Comment } from "../src/lib/famix/model/famix/comment";
 import { Project } from "ts-morph";
 
 export const project = new Project(

@@ -1,8 +1,8 @@
 import { Importer } from '../src/analyze';
-import { ParameterType } from '../src/lib/famix/src/model/famix/parameter_type';
-import { PrimitiveType } from '../src/lib/famix/src/model/famix/primitive_type';
-import { Type } from '../src/lib/famix/src/model/famix/type';
-import { IndexedFileAnchor } from '../src/lib/famix/src/model/famix';
+import { ParameterType } from '../src/lib/famix/model/famix/parameter_type';
+import { PrimitiveType } from '../src/lib/famix/model/famix/primitive_type';
+import { Type } from '../src/lib/famix/model/famix/type';
+import { IndexedFileAnchor } from '../src/lib/famix/model/famix';
 import { project } from './testUtils';
 
 const importer = new Importer();

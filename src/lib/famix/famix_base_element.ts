@@ -1,4 +1,4 @@
-import { logger } from "../../../analyze";
+import { logger } from "../../analyze";
 import { FamixJSONExporter } from "./famix_JSON_exporter";
 // import { FamixRepository } from "./famix_repository";
 

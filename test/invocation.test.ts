@@ -1,7 +1,7 @@
 import { Importer } from '../src/analyze';
-import { Class } from "../src/lib/famix/src/model/famix/class";
-import { Method } from "../src/lib/famix/src/model/famix/method";
-import { Invocation } from "../src/lib/famix/src/model/famix/invocation";
+import { Class } from "../src/lib/famix/model/famix/class";
+import { Method } from "../src/lib/famix/model/famix/method";
+import { Invocation } from "../src/lib/famix/model/famix/invocation";
 import { project } from './testUtils';
 
 const importer = new Importer();
