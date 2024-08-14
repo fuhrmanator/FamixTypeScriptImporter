@@ -1299,7 +1299,7 @@ export class EntityDictionary {
     public createFamixParameterConcretisation(concretisation: Famix.Concretisation): Famix.ParameterConcretisation | undefined{
         const conClass = concretisation.concreteEntity;
         const genClass = concretisation.genericEntity;
-        console.debug(`Creating parameter concretisation between ${conClass.fullyQualifiedName} and ${genClass.fullyQualifiedName}`);
+        logger.debug(`Creating parameter concretisation between ${conClass.fullyQualifiedName} and ${genClass.fullyQualifiedName}`);
         const parameterConcretisations = this.famixRep._getAllEntitiesWithType("ParameterConcretisation") as Set<Famix.ParameterConcretisation>;
         const concreteParameters = conClass.concreteParameters;
         const genericParameters = genClass.genericParameters;
