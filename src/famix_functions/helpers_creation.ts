@@ -65,7 +65,21 @@ export function computeSignature(text: string): string {
  * @returns The ancestor of the node
  */
 export function findAncestor(node: Identifier): Node {
-    return node.getAncestors().find(a => a.getKind() === SyntaxKind.MethodDeclaration || a.getKind() === SyntaxKind.Constructor || a.getKind() === SyntaxKind.FunctionDeclaration || a.getKind() === SyntaxKind.FunctionExpression || a.getKind() === SyntaxKind.ModuleDeclaration || a.getKind() === SyntaxKind.SourceFile || a.getKindName() === "GetAccessor" || a.getKindName() === "SetAccessor" || a.getKind() === SyntaxKind.ClassDeclaration);
+    let ancestor: Node | undefined;
+    ancestor = node.getAncestors().find(a => 
+        a.getKind() === SyntaxKind.MethodDeclaration || 
+        a.getKind() === SyntaxKind.Constructor || 
+        a.getKind() === SyntaxKind.FunctionDeclaration || 
+        a.getKind() === SyntaxKind.FunctionExpression || 
+        a.getKind() === SyntaxKind.ModuleDeclaration || 
+        a.getKind() === SyntaxKind.SourceFile || 
+        a.getKindName() === "GetAccessor" || 
+        a.getKindName() === "SetAccessor" || 
+        a.getKind() === SyntaxKind.ClassDeclaration);
+    if (!ancestor) {
+        throw new Error(`Ancestor not found for ${node.getText()}`);
+    }
+    return ancestor
 }
 
 /**
@@ -74,12 +88,30 @@ export function findAncestor(node: Identifier): Node {
  * @returns The ancestor of the ts-morph element
  */
 export function findTypeAncestor(element: TypeDeclaration): Node {
-    return element.getAncestors().find(a => a.getKind() === SyntaxKind.MethodDeclaration || a.getKind() === SyntaxKind.Constructor || a.getKind() === SyntaxKind.MethodSignature || a.getKind() === SyntaxKind.FunctionDeclaration || a.getKind() === SyntaxKind.FunctionExpression || a.getKind() === SyntaxKind.ModuleDeclaration || a.getKind() === SyntaxKind.SourceFile || a.getKindName() === "GetAccessor" || a.getKindName() === "SetAccessor" || a.getKind() === SyntaxKind.ClassDeclaration || a.getKind() === SyntaxKind.InterfaceDeclaration);
+    let ancestor: Node | undefined;
+    ancestor = element.getAncestors().find(a => 
+        a.getKind() === SyntaxKind.MethodDeclaration || 
+        a.getKind() === SyntaxKind.Constructor || 
+        a.getKind() === SyntaxKind.MethodSignature || 
+        a.getKind() === SyntaxKind.FunctionDeclaration || 
+        a.getKind() === SyntaxKind.FunctionExpression || 
+        a.getKind() === SyntaxKind.ModuleDeclaration || 
+        a.getKind() === SyntaxKind.SourceFile || 
+        a.getKindName() === "GetAccessor" || 
+        a.getKindName() === "SetAccessor" || 
+        a.getKind() === SyntaxKind.ClassDeclaration || 
+        a.getKind() === SyntaxKind.InterfaceDeclaration);
+    if (!ancestor) {
+        throw new Error(`Type ancestor not found for ${element.getKindName()}`);
+    }
+    return ancestor;
 }
 
 export function arraysAreEqual(array1: string[], array2: string[]): boolean {
     if (array1 && array2 ) {
         return array1.length === array2.length && array1.every((value, index) => value === array2[index]);
+    } else {
+        return false;
     }
 }
 

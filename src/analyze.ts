@@ -51,7 +51,7 @@ export class Importer {
         return famixRep;
     }
 
-    private processEntities(project) {
+    private processEntities(project: Project): void {
         const onlyTypeScriptFiles = project.getSourceFiles().filter(f => f.getFilePath().endsWith('.ts'));
         processFunctions.processFiles(onlyTypeScriptFiles);
         const accesses = processFunctions.accessMap;

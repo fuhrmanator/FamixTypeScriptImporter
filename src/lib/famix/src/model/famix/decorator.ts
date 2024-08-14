@@ -4,7 +4,7 @@ import { NamedEntity } from "./named_entity";
 export class Decorator extends NamedEntity {
 
     private _decoratorExpression!: string;
-    private _decoratedEntity: NamedEntity;
+    private _decoratedEntity!: NamedEntity;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("Decorator", this);

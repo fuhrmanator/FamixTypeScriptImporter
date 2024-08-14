@@ -4,8 +4,8 @@ import { Type } from "./type";
 
 export class Alias extends NamedEntity {
 
-    private _parentEntity: NamedEntity;
-    private _aliasedEntity: Type;
+    private _parentEntity!: NamedEntity;
+    private _aliasedEntity!: Type;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("Alias", this);

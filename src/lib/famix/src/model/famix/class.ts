@@ -6,7 +6,7 @@ import { Inheritance } from "./inheritance";
 
 export class Class extends Type {
 
-    private _isAbstract: boolean;
+    private _isAbstract!: boolean;
     private _properties: Set<Property> = new Set();
 
     public addProperty(property: Property): void {

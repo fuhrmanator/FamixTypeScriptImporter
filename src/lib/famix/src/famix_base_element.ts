@@ -4,7 +4,7 @@ import { FamixJSONExporter } from "./famix_JSON_exporter";
 
 export abstract class FamixBaseElement {
 
-    public id: number;
+    public id!: number;
 
     // constructor(repo: FamixRepository) {
     //   repo.addElement(this);
