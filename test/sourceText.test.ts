@@ -1,5 +1,5 @@
 import { Importer, config } from "../src/analyze";
-import { IndexedFileAnchor, Method, Module, ScriptEntity } from "../src/lib/famix/src/model/famix";
+import { IndexedFileAnchor, Method, Module, ScriptEntity } from "../src/lib/famix/model/famix";
 import GraphemeSplitter from "grapheme-splitter";
 import { project } from './testUtils';
 

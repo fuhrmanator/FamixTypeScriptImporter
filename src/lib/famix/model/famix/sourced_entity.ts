@@ -3,7 +3,7 @@ import { SourceLanguage } from "./source_language";
 import { Entity } from "./entity";
 import { Comment } from "./comment";
 import { SourceAnchor } from "./source_anchor";
-import { logger } from "../../../../../analyze";
+import { logger } from "../../../../analyze";
 
 export class SourcedEntity extends Entity {
 

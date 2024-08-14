@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { Decorator } from '../src/lib/famix/src/model/famix/decorator';
+import { Decorator } from '../src/lib/famix/model/famix/decorator';
 import { project } from './testUtils';
 
 const importer = new Importer();

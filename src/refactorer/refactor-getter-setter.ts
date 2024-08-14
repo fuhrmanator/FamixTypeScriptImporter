@@ -2,7 +2,7 @@ import { ClassDeclaration, Project, SourceFile, SyntaxKind } from "ts-morph";
 import * as path from "path";
 
 const project = new Project();
-project.addSourceFilesAtPaths("src/lib/famix/src/model/famix/famix_base_element.ts");
+project.addSourceFilesAtPaths("src/lib/famix/model/famix/famix_base_element.ts");
 project.getSourceFiles().forEach(sourceFile => { console.log(sourceFile.getFilePath()); });
 
 project.getSourceFiles().forEach(sourceFile => {

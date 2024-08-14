@@ -1,5 +1,5 @@
 import { entityDictionary } from "../src/analyze";
-import * as Famix from "../src/lib/famix/src/model/famix";
+import * as Famix from "../src/lib/famix/model/famix";
 import { project } from './testUtils';
 
 const sourceFile = project.createSourceFile("/entityDictionaryUnit.ts",

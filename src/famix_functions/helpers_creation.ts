@@ -1,4 +1,4 @@
-import * as Famix from "../lib/famix/src/model/famix";
+import * as Famix from "../lib/famix/model/famix";
 import { logger } from "../analyze";
 import { ConstructorDeclaration, Identifier, FunctionDeclaration, MethodDeclaration, MethodSignature, PropertyDeclaration, PropertySignature, VariableDeclaration, ParameterDeclaration, GetAccessorDeclaration, SetAccessorDeclaration, EnumMember, TypeAliasDeclaration, Node, SyntaxKind, FunctionExpression } from "ts-morph";
 import { TypeDeclaration } from "./EntityDictionary";

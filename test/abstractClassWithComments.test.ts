@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { Comment } from '../src/lib/famix/src/model/famix/comment';
+import { Comment } from '../src/lib/famix/model/famix/comment';
 import { getCommentTextFromCommentViaAnchor } from './testUtils';
 import { project } from './testUtils';
 

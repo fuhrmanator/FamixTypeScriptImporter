@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { ParametricClass, ParametricInterface, ParameterType } from '../src/lib/famix/src/model/famix';
+import { ParametricClass, ParametricInterface, ParameterType } from '../src/lib/famix/model/famix';
 import { project } from './testUtils';
 
 const importer = new Importer();

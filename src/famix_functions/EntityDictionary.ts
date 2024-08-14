@@ -1,11 +1,11 @@
 import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ExpressionWithTypeArguments, ImportDeclaration, ImportEqualsDeclaration, SyntaxKind, Expression, TypeNode, Node, ts, Scope, Type, ArrowFunction } from "ts-morph";
 import { isAmbient, isNamespace } from "../analyze_functions/process_functions";
-import * as Famix from "../lib/famix/src/model/famix";
+import * as Famix from "../lib/famix/model/famix";
+import { FamixRepository } from "../lib/famix/famix_repository";
 import { logger, config } from "../analyze";
 import GraphemeSplitter from "grapheme-splitter";
 import * as Helpers from "./helpers_creation";
 import * as FQNFunctions from "../fqn";
-import { FamixRepository } from "../lib/famix/src/famix_repository";
 import path from "path";
 import _ from 'lodash';
 

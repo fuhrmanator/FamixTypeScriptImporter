@@ -1,6 +1,6 @@
 import { Importer } from '../src/analyze';
-import { Alias, IndexedFileAnchor } from '../src/lib/famix/src/model/famix';
-import { Type } from '../src/lib/famix/src/model/famix';
+import { Alias, IndexedFileAnchor } from '../src/lib/famix/model/famix';
+import { Type } from '../src/lib/famix/model/famix';
 import { getTextFromAnchor } from './testUtils';
 import { project } from './testUtils';
 

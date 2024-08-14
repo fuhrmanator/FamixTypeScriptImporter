@@ -2,7 +2,7 @@
 import * as fs from "fs";
 import yargs from "yargs";
 import { Importer } from './analyze';
-import { FamixRepository } from "./lib/famix/src/famix_repository";
+import { FamixRepository } from "./lib/famix/famix_repository";
 import { Project } from "ts-morph";
 import { config } from "./analyze";
 

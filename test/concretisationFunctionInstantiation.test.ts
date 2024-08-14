@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { Concretisation, ParametricFunction, ParametricMethod } from '../src/lib/famix/src/model/famix';
+import { Concretisation, ParametricFunction, ParametricMethod } from '../src/lib/famix/model/famix';
 import { project } from './testUtils';
 
 const importer = new Importer();

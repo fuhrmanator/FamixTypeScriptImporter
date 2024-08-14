@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { ScriptEntity, Class, PrimitiveType, Method, Parameter, Comment, Access, Variable, Function } from '../src/lib/famix/src/model/famix';
+import { ScriptEntity, Class, PrimitiveType, Method, Parameter, Comment, Access, Variable, Function } from '../src/lib/famix/model/famix';
 import { project } from './testUtils';
 
 const importer = new Importer();

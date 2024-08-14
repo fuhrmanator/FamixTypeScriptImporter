@@ -1,6 +1,6 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { ContainerEntity } from "./container_entity";
-import { logger } from "../../../../../analyze";
+import { logger } from "../../../../analyze";
 import { Module } from "./module";
 
 export class ScopingEntity extends ContainerEntity {
