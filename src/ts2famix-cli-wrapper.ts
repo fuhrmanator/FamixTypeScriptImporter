@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 
 import { spawn } from 'child_process';
+import * as path from 'path';
 
-// allow tslog to display the proper typescript files and line numbers
+// Resolve the path to ts2famix-cli.js relative to the wrapper script
+const cliPath = path.resolve(__dirname, 'ts2famix-cli.js');
+
+// Allow tslog to display the proper TypeScript files and line numbers
 const args = [
   '--enable-source-maps',
   '--experimental-specifier-resolution=node',
-  'dist/ts2famix-cli.js',
+  cliPath,
   ...process.argv.slice(2)
 ];
 
