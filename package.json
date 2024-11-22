@@ -18,8 +18,16 @@
   "bin": {
     "ts2famix": "dist/ts2famix-cli-wrapper.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["TypeScript", "famix", "static analysis", "moose"],
+  "author": "Christopher Fuhrman <christopher.fuhrman@etsmtl.ca>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fuhrmanator/FamixTypeScriptImporter.git"
+  },
+  "bugs":{
+    "url": "https://github.com/fuhrmanator/FamixTypeScriptImporter/issues"
+  },
+  "homepage": "https://github.com/fuhrmanator/FamixTypeScriptImporter?tab=readme-ov-file#famixtypescriptimporter",
   "nodemonConfig": {
     "ignore": [
       "dist/*"
@@ -46,5 +54,8 @@
     "tsutils": "^3.21.0",
     "typescript": "^5.5.4",
     "yargs": "^17.7.2"
+  },
+  "engines": {
+    "node": ">=18.20.4"
   }
 }
