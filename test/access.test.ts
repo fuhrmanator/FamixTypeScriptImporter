@@ -14,6 +14,7 @@ project.createSourceFile("/access.ts",
     }
     
     private privateMethod() {
+        let tempAccess = this.privateAttribute; // second access
         return this.privateAttribute;
     }
 }`);
@@ -60,5 +61,14 @@ describe('Accesses', () => {
                 && ((fmxRep.getFamixEntityById(el.variable.ref) as Property).name === "publicAttribute")
                 ))[0];
         expect(famixAccess).toBeTruthy();
+    });
+
+    it("should have only one access to privateAttribute in privateMethod", () => {
+        const famixAccess = parsedModel.filter(el =>
+            (el.accessor !== undefined && el.variable !== undefined && el.FM3 === "FamixTypeScript.Access"
+                && ((fmxRep.getFamixEntityById(el.accessor.ref) as Method).name === "privateMethod") 
+                && ((fmxRep.getFamixEntityById(el.variable.ref) as Property).name === "privateAttribute")
+                ));
+        expect(famixAccess.length).toBe(1);
     });
 });
