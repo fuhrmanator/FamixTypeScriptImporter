@@ -17,6 +17,8 @@ type ParametricVariantType = Famix.ParametricClass | Famix.ParametricInterface |
 
 type ConcreteElementTSMorphType = ClassDeclaration | InterfaceDeclaration | FunctionDeclaration | MethodDeclaration;
 
+export type InvocableType = MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction;
+
 export class EntityDictionary {
     
     public famixRep = new FamixRepository();
@@ -25,8 +27,10 @@ export class EntityDictionary {
     private fmxInterfaceMap = new Map<string, Famix.Interface | Famix.ParametricInterface>(); // Maps the interface names to their Famix model
     private fmxModuleMap = new Map<string, Famix.Module>(); // Maps the namespace names to their Famix model
     private fmxFileMap = new Map<string, Famix.ScriptEntity | Famix.Module>(); // Maps the source file names to their Famix model
-    private fmxTypeMap = new Map<string, Famix.Type | Famix.PrimitiveType | Famix.ParameterType>(); // Maps the type names to their Famix model
+    private fmxTypeMap = new Map<string, Famix.Type | Famix.ParameterType>(); // Maps the types declarations to their Famix model
+    private fmxPrimitiveTypeMap = new Map<string, Famix.PrimitiveType>(); // Maps the primitive type names to their Famix model
     private fmxFunctionAndMethodMap = new Map<string, Famix.Function | Famix.ParametricFunction | Famix.Method | Famix.ParametricMethod> // Maps the function names to their Famix model
+    private fmxArrowFunctionMap = new Map<string, Famix.ArrowFunction> // Maps the function names to their Famix model
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
     public fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
     public tsMorphElementObjectMap = new Map<TSMorphObjectType,Famix.Entity>();
@@ -516,7 +520,6 @@ export class EntityDictionary {
                 else {
                     fmxMethod = new Famix.Method();
                 }
-                this.famixRep.addElement(fmxMethod);
             }
             const isConstructor = method instanceof ConstructorDeclaration;
             const isSignature = method instanceof MethodSignature;
@@ -585,6 +588,7 @@ export class EntityDictionary {
             }
             
             initFQN(method, fmxMethod);
+            this.famixRep.addElement(fmxMethod);
             this.makeFamixIndexFileAnchor(method, fmxMethod);
 
             this.fmxFunctionAndMethodMap.set(functionFullyQualifiedName, fmxMethod);
@@ -905,55 +909,52 @@ export class EntityDictionary {
      * @param element A ts-morph element
      * @returns The Famix model of the type
      */
-    public createOrGetFamixType(typeName: string, element: TypeDeclaration): Famix.Type | Famix.PrimitiveType | Famix.ParameterType {
-        let fmxType: Famix.Type | Famix.PrimitiveType | Famix.ParameterType;
-        let isPrimitiveType = false;
-        let isParameterType = false;
+    public createOrGetFamixType(typeName: string, element: TypeDeclaration): Famix.Type {
+        let fmxType: Famix.Type;
+        let isPrimitiveType = (typeName === "number" || 
+                               typeName === "string" || 
+                               typeName === "boolean" || 
+                               typeName === "bigint" || 
+                               typeName === "symbol" || 
+                               typeName === "undefined" || 
+                               typeName === "null" || 
+                               typeName === "any" || 
+                               typeName === "unknown" || 
+                               typeName === "never" || 
+                               typeName === "void");
+        let isParameterType = (typeName.includes("<") && 
+                               typeName.includes(">") && 
+                               !(typeName.includes("=>")));
 
         logger.debug("Creating (or getting) type: '" + typeName + "' of element: " + element?.getText() + " of kind: " + element?.getKindName());
-        let ancestor: Famix.ContainerEntity | undefined = undefined;
-        if (element !== undefined) {
-            const typeAncestor = Helpers.findTypeAncestor(element);
-            if (!typeAncestor) {
-                throw new Error(`Ancestor not found for element ${element.getText()}.`);
-            }
-            const ancestorFullyQualifiedName = FQNFunctions.getFQN(typeAncestor);
-            ancestor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
-            if (!ancestor) {
-                logger.debug(`Ancestor ${FQNFunctions.getFQN(typeAncestor)} not found. Adding the new type.`);
-                ancestor = this.createOrGetFamixType(typeAncestor.getText(), typeAncestor as TypeDeclaration);
-            }
+
+        if (isPrimitiveType) {
+            return this.createOrGetFamixPrimitiveType(typeName);
         }
 
-        if (typeName === "number" || typeName === "string" || typeName === "boolean" || typeName === "bigint" || typeName === "symbol" || typeName === "undefined" || typeName === "null" || typeName === "any" || typeName === "unknown" || typeName === "never" || typeName === "void") {
-            isPrimitiveType = true;
-        }
-
-        if(!isPrimitiveType && typeName.includes("<") && typeName.includes(">") && !(typeName.includes("=>"))) {
-            isParameterType = true;
-        }
+        if (isParameterType) {
+            return this.createOrGetFamixParameterType(typeName, element);
+        }        
 
         if (!this.fmxTypeMap.has(typeName)) {
-            if (isPrimitiveType) {
-                fmxType = new Famix.PrimitiveType();
-                fmxType.isStub = true;
-            }
-            else if (isParameterType) {
-                fmxType = new Famix.ParameterType();
-                const parameterTypeNames = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">")).split(",").map(s => s.trim());
-                const baseTypeName = typeName.substring(0, typeName.indexOf("<")).trim();
-                parameterTypeNames.forEach(parameterTypeName => {
-                    const fmxParameterType = this.createOrGetFamixType(parameterTypeName, element);
-                    (fmxType as Famix.ParameterType).addArgument(fmxParameterType);
-                });
-                const fmxBaseType = this.createOrGetFamixType(baseTypeName, element);
-                (fmxType as Famix.ParameterType).baseType = fmxBaseType;
-            }
-            else {
-                fmxType = new Famix.Type();
+            let ancestor: Famix.ContainerEntity | undefined = undefined;
+ 
+            if (element !== undefined) {
+                const typeAncestor = Helpers.findTypeAncestor(element);
+                if (!typeAncestor) {
+                    throw new Error(`Ancestor not found for element ${element.getText()}.`);
+                }
+                const ancestorFullyQualifiedName = FQNFunctions.getFQN(typeAncestor);
+                ancestor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
+                if (!ancestor) {
+                    logger.debug(`Ancestor ${FQNFunctions.getFQN(typeAncestor)} not found. Adding the new type.`);
+                    ancestor = this.createOrGetFamixType(typeAncestor.getText(), typeAncestor as TypeDeclaration);
+                }
             }
 
+            fmxType = new Famix.Type();
             fmxType.name = typeName;
+
             if (!ancestor) {
                 throw new Error(`Ancestor not found for type ${typeName}.`);
             }
@@ -980,6 +981,42 @@ export class EntityDictionary {
     }
 
     /**
+     * Creates or gets a Famix parameter type
+     * @param arg0 A type parameter declaration
+     * @returns The Famix model of the parameter type
+     */
+    createOrGetFamixParameterType(typeName: string, element: TypeDeclaration): Famix.ParameterType {
+        let fmxType = new Famix.ParameterType();
+        const parameterTypeNames = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">"))
+            .split(",").map(s => s.trim());
+        const baseTypeName = typeName.substring(0, typeName.indexOf("<")).trim();
+        parameterTypeNames.forEach(parameterTypeName => {
+            const fmxParameterType = this.createOrGetFamixType(parameterTypeName, element);
+            (fmxType as Famix.ParameterType).addArgument(fmxParameterType);
+        });
+        const fmxBaseType = this.createOrGetFamixType(baseTypeName, element);
+        (fmxType as Famix.ParameterType).baseType = fmxBaseType;
+        return fmxType;
+    }
+
+    /**
+     * Creates or gets a Famix primitive type
+     * @param typeName A type name
+     * @returns The Famix model of the primitive type
+     */
+    createOrGetFamixPrimitiveType(typeName: string): Famix.PrimitiveType {
+        let fmxType: Famix.PrimitiveType = new Famix.PrimitiveType();
+        if (!this.fmxPrimitiveTypeMap.has(typeName)) {
+            fmxType = new Famix.PrimitiveType();
+            fmxType.isStub = true;
+            fmxType.name = typeName;
+        } else {
+            fmxType = this.fmxPrimitiveTypeMap.get(typeName) as Famix.PrimitiveType;
+        }
+        return fmxType;
+    }
+
+    /**
      * Creates a Famix access
      * @param node A node
      * @param id An id of a parameter, a variable, a property or an enum member
@@ -1000,6 +1037,20 @@ export class EntityDictionary {
             // accessor = this.createOrGetFamixType(ancestorFullyQualifiedName, nodeReferenceAncestor as TypeDeclaration);
         }
 
+        logger.debug(`Found accessor to be ${accessor.fullyQualifiedName}.`);
+
+        // make sure accessor is a method, function, script or module
+        if (!(accessor instanceof Famix.Method) && !(accessor instanceof Famix.ArrowFunction) && !(accessor instanceof Famix.Function) && !(accessor instanceof Famix.ScriptEntity) && !(accessor instanceof Famix.Module)) {
+            logger.error(`Accessor ${accessor.fullyQualifiedName} is not a method, function, etc.`);
+            return;
+        }
+
+        // don't create any duplicates (e.g. if the same variable is accessed multiple times by same accessor)
+        const foundAccess = this.famixRep.getFamixAccessByAccessorAndVariable(accessor, fmxVar);
+        if (foundAccess) {
+            logger.debug(`FamixAccess already exists for accessor ${accessor.fullyQualifiedName} and variable ${fmxVar.fullyQualifiedName}.`);
+            return;
+        }
         const fmxAccess = new Famix.Access();
         fmxAccess.accessor = accessor;
         fmxAccess.variable = fmxVar;
@@ -1011,27 +1062,39 @@ export class EntityDictionary {
 
     /**
      * Creates a Famix invocation
-     * @param node A node
-     * @param m A method or a function
+     * @param nodeReferringToInvocable A node
+     * @param invocable A method or a function
      * @param id The id of the method or the function
      */
-    public createFamixInvocation(node: Identifier, m: MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression, id: number): void {
-        const fmxMethodOrFunction = this.famixRep.getFamixEntityById(id) as Famix.BehavioralEntity;
-        const nodeReferenceAncestor = Helpers.findAncestor(node);
-        const ancestorFullyQualifiedName = FQNFunctions.getFQN(nodeReferenceAncestor);
-        const sender = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
-        const receiverFullyQualifiedName = FQNFunctions.getFQN(m.getParent());
+    public createFamixInvocation(nodeReferringToInvocable: Identifier, invocable: InvocableType, id: number): void {
+        const fmxInvocable = this.famixRep.getFamixEntityById(id) as Famix.BehavioralEntity;
+        // since the node is in the AST, we need to find the ancestor that is in the Famix model
+        const containerOfNode = Helpers.findAncestor(nodeReferringToInvocable);
+        logger.debug(`Found container (ancestor) ${containerOfNode.getKindName()} for AST node ${nodeReferringToInvocable.getText()}.`);
+        const containerFQN = FQNFunctions.getFQN(containerOfNode);
+        logger.debug(`Found containerFQN ${containerFQN}.`);
+        let sender = this.famixRep.getFamixEntityByFullyQualifiedName(containerFQN) as Famix.ContainerEntity;
+        logger.debug(`Found a sender that matches ${sender.fullyQualifiedName}.`);
+        if (sender instanceof Famix.Type) {
+            // TODO this might be an error in getFamixEntityByFullyQualifiedName
+            logger.debug(`Oops! Sender is a type, which is not valid for an Invocation. Trying to find a container for ${sender.fullyQualifiedName}.`);
+            const senderContainer = sender.container;
+            if (senderContainer) {
+                sender = senderContainer;
+            }
+        }
+        const receiverFullyQualifiedName = FQNFunctions.getFQN(invocable.getParent());
         const receiver = this.famixRep.getFamixEntityByFullyQualifiedName(receiverFullyQualifiedName) as Famix.NamedEntity;
 
         const fmxInvocation = new Famix.Invocation();
         fmxInvocation.sender = sender;
         fmxInvocation.receiver = receiver;
-        fmxInvocation.addCandidate(fmxMethodOrFunction);
-        fmxInvocation.signature = fmxMethodOrFunction.signature;
+        fmxInvocation.addCandidate(fmxInvocable);
+        fmxInvocation.signature = fmxInvocable.signature;
 
         this.famixRep.addElement(fmxInvocation);
 
-        this.fmxElementObjectMap.set(fmxInvocation,node);
+        this.fmxElementObjectMap.set(fmxInvocation,nodeReferringToInvocable);
     }
 
     /**
@@ -1215,60 +1278,67 @@ export class EntityDictionary {
      * @param arrowExpression An Expression
      * @returns The Famix model of the variable
      */
-    public createFamixArrowFunction(arrowExpression: Expression, currentCC: { [key: string]: number } ): Famix.ArrowFunction | Famix.ParametricArrowFunction {
+    public createOrGetFamixArrowFunction(arrowExpression: Expression, currentCC: { [key: string]: number } ): Famix.ArrowFunction | Famix.ParametricArrowFunction {
         
         let fmxArrowFunction: Famix.ArrowFunction | Famix.ParametricArrowFunction;
+        const functionFullyQualifiedName = FQNFunctions.getFQN(arrowExpression);
 
-        const arrowFunction = arrowExpression.asKindOrThrow(SyntaxKind.ArrowFunction);
+        if (!this.fmxFunctionAndMethodMap.has(functionFullyQualifiedName)) {
 
-        const isGeneric = arrowFunction.getTypeParameters().length > 0;
+            const arrowFunction = arrowExpression.asKindOrThrow(SyntaxKind.ArrowFunction);
 
-        if (isGeneric) {
-            fmxArrowFunction = new Famix.ParametricArrowFunction();
+            const isGeneric = arrowFunction.getTypeParameters().length > 0;
+
+            if (isGeneric) {
+                fmxArrowFunction = new Famix.ParametricArrowFunction();
+            }
+            else {
+                fmxArrowFunction = new Famix.ArrowFunction();
+            }
+
+            // Get the parent of the arrow function (the variable declaration)
+            const parent = arrowFunction.getParentIfKind(SyntaxKind.VariableDeclaration);
+            let functionName = '(NO_NAME)';
+
+            if (parent && parent instanceof VariableDeclaration) {
+                // Get the name of the variable
+                functionName = parent.getName();
+            }
+
+            if (functionName) {
+                fmxArrowFunction.name = functionName;
+            }
+            else {
+                fmxArrowFunction.name = "anonymous";
+            }
+
+            // Signature of an arrow function is (parameters) => return_type
+            const parametersSignature = arrowFunction.getParameters().map(p => p.getText()).join(", ");
+            const returnTypeSignature = arrowFunction.getReturnType().getText();
+            fmxArrowFunction.signature = `(${parametersSignature}) => ${returnTypeSignature}`;
+            fmxArrowFunction.cyclomaticComplexity = currentCC[fmxArrowFunction.name];
+
+            let functionTypeName = this.UNKNOWN_VALUE;
+            try {
+                functionTypeName = arrowFunction.getReturnType().getText().trim();
+            } catch (error) {
+                logger.error(`> WARNING: got exception ${error}. Failed to get usable name for return type of function: ${functionName}. Continuing...`);
+            }
+
+            const fmxType = this.createOrGetFamixType(functionTypeName, arrowFunction as unknown as FunctionDeclaration);
+            fmxArrowFunction.declaredType = fmxType;
+            fmxArrowFunction.numberOfLinesOfCode = arrowFunction.getEndLineNumber() - arrowFunction.getStartLineNumber();
+            const parameters = arrowFunction.getParameters();
+            fmxArrowFunction.numberOfParameters = parameters.length;
+            fmxArrowFunction.numberOfStatements = arrowFunction.getStatements().length;
+            initFQN(arrowExpression as unknown as TSMorphObjectType, fmxArrowFunction);
+            this.makeFamixIndexFileAnchor(arrowExpression as unknown as TSMorphObjectType, fmxArrowFunction);
+            this.famixRep.addElement(fmxArrowFunction);
+            this.fmxElementObjectMap.set(fmxArrowFunction,arrowFunction as unknown as TSMorphObjectType);
+            this.fmxFunctionAndMethodMap.set(functionFullyQualifiedName, fmxArrowFunction);
+        } else {
+            fmxArrowFunction = this.fmxFunctionAndMethodMap.get(functionFullyQualifiedName) as Famix.ArrowFunction;
         }
-        else {
-            fmxArrowFunction = new Famix.ArrowFunction();
-        }
-
-        // Get the parent of the arrow function (the variable declaration)
-        const parent = arrowFunction.getParentIfKind(SyntaxKind.VariableDeclaration);
-        let functionName = '(NO_NAME)';
-
-        if (parent && parent instanceof VariableDeclaration) {
-            // Get the name of the variable
-            functionName = parent.getName();
-        }
-
-        if (functionName) {
-            fmxArrowFunction.name = functionName;
-        }
-        else {
-            fmxArrowFunction.name = "anonymous";
-        }
-
-        // Signature of an arrow function is (parameters) => return_type
-        const parametersSignature = arrowFunction.getParameters().map(p => p.getText()).join(", ");
-        const returnTypeSignature = arrowFunction.getReturnType().getText();
-        fmxArrowFunction.signature = `(${parametersSignature}) => ${returnTypeSignature}`;
-        fmxArrowFunction.cyclomaticComplexity = currentCC[fmxArrowFunction.name];
-
-        let functionTypeName = this.UNKNOWN_VALUE;
-        try {
-            functionTypeName = arrowFunction.getReturnType().getText().trim();
-        } catch (error) {
-            logger.error(`> WARNING: got exception ${error}. Failed to get usable name for return type of function: ${functionName}. Continuing...`);
-        }
-
-        const fmxType = this.createOrGetFamixType(functionTypeName, arrowFunction as unknown as FunctionDeclaration);
-        fmxArrowFunction.declaredType = fmxType;
-        fmxArrowFunction.numberOfLinesOfCode = arrowFunction.getEndLineNumber() - arrowFunction.getStartLineNumber();
-        const parameters = arrowFunction.getParameters();
-        fmxArrowFunction.numberOfParameters = parameters.length;
-        fmxArrowFunction.numberOfStatements = arrowFunction.getStatements().length;
-        initFQN(arrowExpression as unknown as TSMorphObjectType, fmxArrowFunction);
-        this.makeFamixIndexFileAnchor(arrowExpression as unknown as TSMorphObjectType, fmxArrowFunction);
-        this.famixRep.addElement(fmxArrowFunction);
-        this.fmxElementObjectMap.set(fmxArrowFunction,arrowFunction as unknown as TSMorphObjectType);
 
         return fmxArrowFunction;
     }
@@ -1584,10 +1654,26 @@ export class EntityDictionary {
     }
 }
 function initFQN(sourceElement: TSMorphObjectType, famixElement: Famix.SourcedEntity) {
-    if (!(sourceElement instanceof CommentRange)) {
+    if (sourceElement instanceof FunctionDeclaration && famixElement instanceof Famix.Type) {
+        // special case for function types (return type)
+        let fqn = FQNFunctions.getFQN(sourceElement);
+        // replace [FunctionDeclaration] with [FunctionTypeDeclaration]
+        fqn = fqn.replace("FunctionDeclaration", "FunctionTypeDeclaration");
+        logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+        famixElement.fullyQualifiedName = fqn;
+    }
+    else if (sourceElement instanceof ParameterDeclaration && famixElement instanceof Famix.Type) {
+        // special case for parameter types
+        let fqn = FQNFunctions.getFQN(sourceElement);
+        fqn = fqn.replace("Parameter", "ParameterTypeDeclaration");
+        logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+        famixElement.fullyQualifiedName = fqn;
+    }
+    else if (!(sourceElement instanceof CommentRange)) {
         const fqn = FQNFunctions.getFQN(sourceElement);
         logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
         (famixElement as Famix.NamedEntity).fullyQualifiedName = fqn;
-    }
+    } 
 }
+
 

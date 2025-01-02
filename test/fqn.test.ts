@@ -33,6 +33,10 @@ describe('getFQN functionality', () => {
       };
       const instance1 = createClassA1();
       const instance2 = createClassA2();
+
+      export function a(c: MyClass) {
+        return () => (c.myMethod());
+      }
 `);
     });
 
@@ -64,4 +68,10 @@ describe('getFQN functionality', () => {
         expect(a1fqn).not.toBe(a2fqn);
     });
 
+    it(`should generate unique FQN for function a`, () => {
+        const functionDeclaration = sourceFile.getFunctionOrThrow('a');
+        const result = getFQN(functionDeclaration);
+        expect(result).toBe('{sampleFile.ts}.a[FunctionDeclaration]');
+    });
+    
 });

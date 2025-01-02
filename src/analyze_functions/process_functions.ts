@@ -4,11 +4,12 @@ import { calculate } from "../lib/ts-complex/cyclomatic-service";
 import * as fs from 'fs';
 import { logger , entityDictionary } from "../analyze";
 import { getFQN } from "../fqn";
+import { InvocableType } from "src/famix_functions/EntityDictionary";
 
 export type AccessibleTSMorphElement = ParameterDeclaration | VariableDeclaration | PropertyDeclaration | EnumMember;
 export type FamixID = number;
 
-export const methodsAndFunctionsWithId = new Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction>(); // Maps the Famix method, constructor, getter, setter and function ids to their ts-morph method, constructor, getter, setter or function object
+export const methodsAndFunctionsWithId = new Map<number, InvocableType>(); // Maps the Famix method, constructor, getter, setter and function ids to their ts-morph method, constructor, getter, setter or function object
 
 export const accessMap = new Map<FamixID, AccessibleTSMorphElement>(); // Maps the Famix parameter, variable, property and enum value ids to their ts-morph parameter, variable, property or enum member object
 export const classes = new Array<ClassDeclaration>(); // Array of all the classes of the source files
@@ -470,7 +471,7 @@ function processFunction(f: FunctionDeclaration | FunctionExpression | ArrowFunc
 
     let fmxFunction;
     if( f instanceof ArrowFunction) {
-        fmxFunction = entityDictionary.createFamixArrowFunction(f, currentCC);
+        fmxFunction = entityDictionary.createOrGetFamixArrowFunction(f, currentCC);
     } else {
         fmxFunction = entityDictionary.createOrGetFamixFunction(f, currentCC);
     }
@@ -959,34 +960,36 @@ export function processInheritances(classes: ClassDeclaration[], interfaces: Int
  * Builds a Famix model for the invocations of the methods and functions of the source files
  * @param methodsAndFunctionsWithId A map of methods and functions with their id
  */
-export function processInvocations(methodsAndFunctionsWithId: Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction>): void {
+export function processInvocations(methodsAndFunctionsWithId: Map<number, InvocableType>): void {
     logger.info(`Creating invocations:`);
-    methodsAndFunctionsWithId.forEach((m, id) => {
-        if (!(m instanceof ArrowFunction)) {
-            logger.debug(`Invocations to ${(m instanceof MethodDeclaration || m instanceof GetAccessorDeclaration || m instanceof SetAccessorDeclaration || m instanceof FunctionDeclaration) ? m.getName() : ((m instanceof ConstructorDeclaration) ? 'constructor' : (m.getName() ? m.getName() : 'anonymous'))}`);
+    methodsAndFunctionsWithId.forEach((invocable, id) => {
+        if (!(invocable instanceof ArrowFunction)) {  // ArrowFunctions are not directly invoked
+            logger.debug(`Invocations to ${(invocable instanceof MethodDeclaration || invocable instanceof GetAccessorDeclaration || invocable instanceof SetAccessorDeclaration || invocable instanceof FunctionDeclaration) ? invocable.getName() : ((invocable instanceof ConstructorDeclaration) ? 'constructor' : (invocable.getName() ? invocable.getName() : 'anonymous'))} (${invocable.getType().getText()})`);
             try {
-                const temp_nodes = m.findReferencesAsNodes() as Array<Identifier>;
-                temp_nodes.forEach(node => processNodeForInvocations(node, m, id));
+                const nodesReferencingInvocable = invocable.findReferencesAsNodes() as Array<Identifier>;
+                nodesReferencingInvocable.forEach(
+                    nodeReferencingInvocable => processNodeForInvocations(nodeReferencingInvocable, invocable, id));
             } catch (error) {
                 logger.error(`> WARNING: got exception ${error}. Continuing...`);
             }
+        } else {
+            logger.debug(`Skipping invocation to ArrowFunction: ${(invocable.getBodyText())}`);
         }
     });
 }
 
 /**
  * Builds a Famix model for an invocation of a method or a function
- * @param n A node
- * @param m A method or a function
+ * @param nodeReferencingInvocable A node
+ * @param invocable A method or a function
  * @param id The id of the method or the function
  */
-function processNodeForInvocations(n: Identifier, m: MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression, id: number): void {
+function processNodeForInvocations(nodeReferencingInvocable: Identifier, invocable: InvocableType, id: number): void {
     try {
-        entityDictionary.createFamixInvocation(n, m, id);
-
-        logger.debug(`node: node, (${n.getType().getText()})`);
+        entityDictionary.createFamixInvocation(nodeReferencingInvocable, invocable, id);
+        logger.debug(`node: ${nodeReferencingInvocable.getKindName()}, (${nodeReferencingInvocable.getType().getText()})`);
     } catch (error) {
-        logger.error(`> WARNING: got exception ${error}. ScopeDeclaration invalid for ${n.getSymbol()!.getFullyQualifiedName()}. Continuing...`);
+        logger.error(`> WARNING: got exception ${error}. ScopeDeclaration invalid for ${nodeReferencingInvocable.getSymbol()!.getFullyQualifiedName()}. Continuing...`);
     }
 }
 

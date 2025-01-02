@@ -60,6 +60,19 @@ export class FamixRepository {
         return entity;
     }
 
+    // Method to get Famix access by accessor and variable
+    public getFamixAccessByAccessorAndVariable(accessor: Famix.ContainerEntity, variable: Famix.StructuralEntity): Famix.Access | undefined {
+        // Iterate through the list of Famix accesses to find the matching one
+        for (const access of Array.from(this.elements.values()).filter(e => e instanceof Famix.Access) as Array<Famix.Access>) {
+            if (access.accessor === accessor && access.variable === variable) {
+                return access;
+            }
+        }
+        // Return undefined if no matching access is found
+        return undefined;
+    }
+
+
     export(arg0: { format: string; }) {
         if (arg0.format === "json") {
             return this.getJSON();
@@ -226,7 +239,23 @@ export class FamixRepository {
         this.elements.add(element);
         element.id = this.idCounter;
         this.idCounter++;
+        this.validateFQNs();
     }
+
+    /**
+     * Validates the fully qualified names of all Famix elements
+     */
+    private validateFQNs(): void {
+        // make sure all elements have unique fully qualified names
+        const fqns = new Set<string>();
+        for (const element of Array.from(this.elements.values())) {
+            if (element instanceof NamedEntity && element.fullyQualifiedName && fqns.has(element.fullyQualifiedName)) {
+                throw new Error(`The fully qualified name ${element.fullyQualifiedName} is not unique`);
+            }
+            fqns.add((element as NamedEntity).fullyQualifiedName);
+        }
+    }
+
 
     /**
      * Gets a JSON representation of the repository

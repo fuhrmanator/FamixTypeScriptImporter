@@ -29,6 +29,7 @@ export function getFQN(node: FQNNode | Node): string {
             Node.isVariableDeclaration(currentNode) || 
             Node.isGetAccessorDeclaration(currentNode) ||
             Node.isSetAccessorDeclaration(currentNode) ||
+            Node.isTypeParameterDeclaration(currentNode) ||
             Node.isIdentifier(currentNode)) {
             let name = Node.isIdentifier(currentNode) ? currentNode.getText() 
                 : getNameOfNode(currentNode) /* currentNode.getName() */ || 'Unnamed_' + currentNode.getKindName() + `(${lc})`;
