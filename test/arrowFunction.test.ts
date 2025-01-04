@@ -26,7 +26,7 @@ project.createSourceFile("arrowFunctions.ts",
     // Arrow function declaring a class inside its body
     test('blah', t => {
       class Person {
-        @JsonProperty() @JsonClassType({type: () => [Number]})
+        @JsonProperty() 
         @JsonClassType({type: () => [Number]})
         age: number;
       }
@@ -60,7 +60,8 @@ describe('ArrowFunctions', () => {
     const methodList = fmxRep._getAllEntitiesWithType('ArrowFunction');
     
     it("should have several Arrow Functions", () => {
-        expect(methodList?.size).toBe(10);
+        // hint: count the number of '=>' in the test file
+        expect(methodList?.size).toBe(7);
     });
 
     it("should contain arrow function add and should return number should have two parameters", () => {

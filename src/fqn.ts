@@ -30,6 +30,12 @@ export function getFQN(node: FQNNode | Node): string {
             Node.isGetAccessorDeclaration(currentNode) ||
             Node.isSetAccessorDeclaration(currentNode) ||
             Node.isTypeParameterDeclaration(currentNode) ||
+            Node.isPropertyDeclaration(currentNode) ||
+            Node.isParameterDeclaration(currentNode) ||
+            Node.isDecorator(currentNode) ||
+            Node.isTypeAliasDeclaration(currentNode) ||
+            Node.isEnumMember(currentNode) ||
+            Node.isParameter(currentNode) ||
             Node.isIdentifier(currentNode)) {
             let name = Node.isIdentifier(currentNode) ? currentNode.getText() 
                 : getNameOfNode(currentNode) /* currentNode.getName() */ || 'Unnamed_' + currentNode.getKindName() + `(${lc})`;
@@ -59,7 +65,7 @@ export function getFQN(node: FQNNode | Node): string {
     parts.unshift(`{${relativePath}}`);
     const fqn = parts.join(".") + `[${node.getKindName()}]`;  // disambiguate
 
-    logger.debug(fqn);
+    logger.debug(`Generated FQN: ${fqn} for node: ${node.getKindName()}`);
     return fqn;
 }
 
@@ -172,6 +178,11 @@ export function getNameOfNode(a: Node): string {
             return a.asKind(SyntaxKind.EnumMember)!.getName();
 
         case SyntaxKind.TypeAliasDeclaration:
+            // special case for parameterized types
+            let alias = a.asKind(SyntaxKind.TypeAliasDeclaration);
+            if (alias && alias.getTypeParameters().length > 0) {
+                return alias.getName() + "<" + alias.getTypeParameters().map(tp => tp.getName()).join(", ") + ">";
+            }
             return a.asKind(SyntaxKind.TypeAliasDeclaration)!.getName();
 
         case SyntaxKind.Constructor:
