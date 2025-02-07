@@ -36,6 +36,7 @@ export function getFQN(node: FQNNode | Node): string {
             Node.isTypeAliasDeclaration(currentNode) ||
             Node.isEnumMember(currentNode) ||
             Node.isParametered(currentNode) ||
+            Node.isPropertySignature(currentNode) ||
             Node.isIdentifier(currentNode)) {
             const name = Node.isIdentifier(currentNode) ? currentNode.getText() 
                 : getNameOfNode(currentNode) /* currentNode.getName() */ || 'Unnamed_' + currentNode.getKindName() + `(${lc})`;
@@ -195,7 +196,7 @@ export function getNameOfNode(a: Node): string {
             
         default:
             // ancestor hasn't got a useful name
-            return "";
+            return "noname";
         }
 }
 

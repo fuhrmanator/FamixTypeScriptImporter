@@ -1767,61 +1767,104 @@ export function isPrimitiveType(typeName: string) {
 }
 
 function initFQN(sourceElement: TSMorphObjectType, famixElement: Famix.SourcedEntity) {
-    if (sourceElement instanceof FunctionDeclaration && famixElement instanceof Famix.Type) {
-        // special case for function types (return type)
+    // handle special cases where an element is a Type -- need to change its name
+    if (famixElement instanceof Famix.Type && !(sourceElement instanceof CommentRange) && isTypeContext(sourceElement)) {
         let fqn = FQNFunctions.getFQN(sourceElement);
-        // replace [FunctionDeclaration] with [FunctionTypeDeclaration]
-        fqn = fqn.replace("FunctionDeclaration", "FunctionTypeDeclaration");
+        // using regex, replace [blah] with [blahType]
+        fqn = fqn.replace(/\[([^\]]+)\]/g, "[$1Type]");
         logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
         famixElement.fullyQualifiedName = fqn;
+        return;
     }
-    else if (sourceElement instanceof ParameterDeclaration && famixElement instanceof Famix.Type) {
-        // special case for parameter types
-        let fqn = FQNFunctions.getFQN(sourceElement);
-        fqn = fqn.replace("Parameter", "ParameterTypeDeclaration");
-        logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-        famixElement.fullyQualifiedName = fqn;
-    }
-    else if (sourceElement instanceof ConstructorDeclaration && famixElement instanceof Famix.Type) {
-        // special case for constructor return types
-        let fqn = FQNFunctions.getFQN(sourceElement);
-        fqn = fqn.replace("Constructor", "ConstructorType");
-        logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-        famixElement.fullyQualifiedName = fqn;
-    }
-    else if (sourceElement instanceof VariableDeclaration && famixElement instanceof Famix.Type) {
-        // special case for variable types
-        let fqn = FQNFunctions.getFQN(sourceElement);
-        fqn = fqn.replace("VariableDeclaration", "VariableType");
-        logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-        famixElement.fullyQualifiedName = fqn;
-    }
-    else if (sourceElement instanceof TypeAliasDeclaration && famixElement instanceof Famix.Type) {
-        // special case for type alias types
-        let fqn = FQNFunctions.getFQN(sourceElement);
-        fqn = fqn.replace("TypeAliasDeclaration", "TypeAliasType");
-        logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-        famixElement.fullyQualifiedName = fqn;
-    }
-    else if (sourceElement instanceof ArrowFunction && famixElement instanceof Famix.Type) {
-        // special case for arrow function types
-        let fqn = FQNFunctions.getFQN(sourceElement);
-        fqn = fqn.replace("ArrowFunction", "ArrowFunctionType");
-        logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-        famixElement.fullyQualifiedName = fqn;
-    }
-    else if (sourceElement instanceof EnumMember && famixElement instanceof Famix.Type) {
-        // special case for enum member types
-        let fqn = FQNFunctions.getFQN(sourceElement);
-        fqn = fqn.replace("EnumMember", "EnumMemberType");
-        logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-        famixElement.fullyQualifiedName = fqn;
-    }
-    else if (!(sourceElement instanceof CommentRange)) {
+
+
+    // if (sourceElement instanceof FunctionDeclaration && famixElement instanceof Famix.Type) {
+    //     // special case for function types (return type)
+    //     let fqn = FQNFunctions.getFQN(sourceElement);
+    //     // replace [FunctionDeclaration] with [FunctionTypeDeclaration]
+    //     fqn = fqn.replace("FunctionDeclaration", "FunctionTypeDeclaration");
+    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+    //     famixElement.fullyQualifiedName = fqn;
+    // }
+    // else if (sourceElement instanceof ParameterDeclaration && famixElement instanceof Famix.Type) {
+    //     // special case for parameter types
+    //     let fqn = FQNFunctions.getFQN(sourceElement);
+    //     fqn = fqn.replace("Parameter", "ParameterTypeDeclaration");
+    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+    //     famixElement.fullyQualifiedName = fqn;
+    // }
+    // else if (sourceElement instanceof ConstructorDeclaration && famixElement instanceof Famix.Type) {
+    //     // special case for constructor return types
+    //     let fqn = FQNFunctions.getFQN(sourceElement);
+    //     fqn = fqn.replace("Constructor", "ConstructorType");
+    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+    //     famixElement.fullyQualifiedName = fqn;
+    // }
+    // else if (sourceElement instanceof VariableDeclaration && famixElement instanceof Famix.Type) {
+    //     // special case for variable types
+    //     let fqn = FQNFunctions.getFQN(sourceElement);
+    //     fqn = fqn.replace("VariableDeclaration", "VariableType");
+    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+    //     famixElement.fullyQualifiedName = fqn;
+    // }
+    // else if (sourceElement instanceof TypeAliasDeclaration && famixElement instanceof Famix.Type) {
+    //     // special case for type alias types
+    //     let fqn = FQNFunctions.getFQN(sourceElement);
+    //     fqn = fqn.replace("TypeAliasDeclaration", "TypeAliasType");
+    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+    //     famixElement.fullyQualifiedName = fqn;
+    // }
+    // else if (sourceElement instanceof ArrowFunction && famixElement instanceof Famix.Type) {
+    //     // special case for arrow function types
+    //     let fqn = FQNFunctions.getFQN(sourceElement);
+    //     fqn = fqn.replace("ArrowFunction", "ArrowFunctionType");
+    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+    //     famixElement.fullyQualifiedName = fqn;
+    // }
+    // else if (sourceElement instanceof EnumMember && famixElement instanceof Famix.Type) {
+    //     // special case for enum member types
+    //     let fqn = FQNFunctions.getFQN(sourceElement);
+    //     fqn = fqn.replace("EnumMember", "EnumMemberType");
+    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+    //     famixElement.fullyQualifiedName = fqn;
+    // }
+    // else if (sourceElement instanceof PropertySignature && famixElement instanceof Famix.Type) {
+    //     // special case for PropertySignature types
+    //     let fqn = FQNFunctions.getFQN(sourceElement);
+    //     fqn = fqn.replace("PropertySignature", "PropertySignatureType");
+    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+    //     famixElement.fullyQualifiedName = fqn;
+    // }
+    // catch all (except comments)
+    // else 
+    if (!(sourceElement instanceof CommentRange)) {
         const fqn = FQNFunctions.getFQN(sourceElement);
         logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
         (famixElement as Famix.NamedEntity).fullyQualifiedName = fqn;
     } 
 }
 
+
+function isTypeContext(sourceElement: ImportDeclaration | ImportEqualsDeclaration | SourceFile | ModuleDeclaration | ConstructorDeclaration | MethodSignature | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | TypeParameterDeclaration | Identifier | Decorator | GetAccessorDeclaration | SetAccessorDeclaration | ImportSpecifier | EnumDeclaration | EnumMember | TypeAliasDeclaration | ExpressionWithTypeArguments | TSMorphParametricType) {
+    return sourceElement instanceof ConstructorDeclaration
+        || sourceElement instanceof MethodDeclaration  
+        || sourceElement instanceof FunctionDeclaration 
+        || sourceElement instanceof FunctionExpression 
+        || sourceElement instanceof ArrowFunction
+        ||
+        sourceElement instanceof ParameterDeclaration ||
+        sourceElement instanceof VariableDeclaration ||
+        sourceElement instanceof PropertyDeclaration ||
+        sourceElement instanceof PropertySignature ||
+        sourceElement instanceof TypeParameterDeclaration ||
+        sourceElement instanceof Identifier ||
+        sourceElement instanceof Decorator ||
+        sourceElement instanceof GetAccessorDeclaration ||
+        sourceElement instanceof SetAccessorDeclaration ||
+        sourceElement instanceof ImportSpecifier ||
+        sourceElement instanceof EnumDeclaration ||
+        sourceElement instanceof EnumMember ||
+        sourceElement instanceof TypeAliasDeclaration ||
+        sourceElement instanceof ExpressionWithTypeArguments;
+}
 
