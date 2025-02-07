@@ -206,7 +206,7 @@ function processClasses(m: SourceFile | ModuleDeclaration, fmxScope: Famix.Scrip
 function getArrowFunctionClasses(f: ArrowFunction): ClassDeclaration[] {
     const classes: ClassDeclaration[] = [];
 
-    function findClasses(node: any) {
+    function findClasses(node: Node) {
         if (node.getKind() === SyntaxKind.ClassDeclaration) {
             classes.push(node as ClassDeclaration);
         }
@@ -287,7 +287,7 @@ function processFunctions(m: ContainerTypes, fmxScope: ScopedTypes): void {
     arrowFunctions.forEach(af => {
         const fmxFunction = processFunction(af);
         fmxScope.addFunction(fmxFunction);
-    })
+    });
 }
 
 /**
@@ -874,7 +874,7 @@ export function processImportClausesForModules(modules: Array<SourceFile>, expor
             impDecl.getNamedImports().forEach(namedImport => {
                 logger.info(`Importing (named) ${namedImport.getName()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
                 const importedEntityName = namedImport.getName();
-                let importFoundInExports = isInExports(exports, importedEntityName);
+                const importFoundInExports = isInExports(exports, importedEntityName);
                 entityDictionary.oldCreateFamixImportClause({importDeclaration: impDecl,
                     importerSourceFile: module, 
                     moduleSpecifierFilePath: path, 
@@ -998,25 +998,25 @@ function processNodeForInvocations(nodeReferencingInvocable: Identifier, invocab
  * @param classes An array of classes
  * @param interfaces An array of interfaces
  */
-export function processConcretisations(classes: ClassDeclaration[], interfaces: InterfaceDeclaration[], functions: Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction>): void {
-    logger.info(`processConcretisations: Creating concretisations:`);
-    classes.forEach(cls => {
-        logger.debug(`processConcretisations: Checking class concretisation for ${cls.getName()}`);
-        entityDictionary.createFamixConcretisationClassOrInterfaceSpecialisation(cls);
-        entityDictionary.createFamixConcretisationGenericInstantiation(cls);
-        entityDictionary.createFamixConcretisationInterfaceClass(cls);
-        entityDictionary.createFamixConcretisationTypeInstanciation(cls); 
+// export function processConcretisations(classes: ClassDeclaration[], interfaces: InterfaceDeclaration[], functions: Map<number, MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction>): void {
+//     logger.info(`processConcretisations: Creating concretisations:`);
+//     classes.forEach(cls => {
+//         logger.debug(`processConcretisations: Checking class concretisation for ${cls.getName()}`);
+//         entityDictionary.createFamixConcretisationClassOrInterfaceSpecialisation(cls);
+//         entityDictionary.createFamixConcretisationGenericInstantiation(cls);
+//         entityDictionary.createFamixConcretisationInterfaceClass(cls);
+//         entityDictionary.createFamixConcretisationTypeInstanciation(cls); 
 
-    });
-    interfaces.forEach(inter => {
-        logger.debug(`processConcretisations: Checking interface concretisation for ${inter.getName()}`);
-        entityDictionary.createFamixConcretisationTypeInstanciation(inter); 
-        entityDictionary.createFamixConcretisationClassOrInterfaceSpecialisation(inter)
-    });
-    functions.forEach(func => {
-        if(func instanceof FunctionDeclaration || func instanceof MethodDeclaration ){
-            logger.debug(`processConcretisations: Checking Method concretisation`);
-            entityDictionary.createFamixConcretisationFunctionInstantiation(func);
-        }
-    })
-}
+//     });
+//     interfaces.forEach(inter => {
+//         logger.debug(`processConcretisations: Checking interface concretisation for ${inter.getName()}`);
+//         entityDictionary.createFamixConcretisationTypeInstanciation(inter); 
+//         entityDictionary.createFamixConcretisationClassOrInterfaceSpecialisation(inter);
+//     });
+//     functions.forEach(func => {
+//         if(func instanceof FunctionDeclaration || func instanceof MethodDeclaration ){
+//             logger.debug(`processConcretisations: Checking Method concretisation`);
+//             entityDictionary.createFamixConcretisationFunctionInstantiation(func);
+//         }
+//     });
+// }

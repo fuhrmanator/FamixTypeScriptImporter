@@ -10,10 +10,10 @@ project.createSourceFile("/parametricMethod.ts",
 class ClassParametric<T> {
 
     methodNotParametric(t: T): void {
-    }
+    };
 
     methodParametric<V>(v: V): void {
-    }
+    };
 }
 `);
 
@@ -60,11 +60,11 @@ describe('Tests for generics', () => {
     });
 
     it("should contain a ParametricMethod methodParametric with type parameter V", () => {
-        const pmList = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod") as Set<ParametricMethod>)
+        const pmList = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod") as Set<ParametricMethod>);
         expect(pmList).toBeTruthy();
         const parametricMethod = pmList.find(m => m.name === "methodParametric");
         const parameterTypes = parametricMethod?.genericParameters;
-        expect(parameterTypes?.values().next().value.name).toBe('V')
+        expect(parameterTypes?.values().next().value.name).toBe('V');
     });
 
 });

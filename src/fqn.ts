@@ -1,20 +1,20 @@
-import { ArrowFunction, CallExpression, ClassDeclaration, ClassExpression, ConstructorDeclaration, Decorator, EnumDeclaration, FunctionDeclaration, FunctionExpression, GetAccessorDeclaration, Identifier, ImportDeclaration, ImportEqualsDeclaration, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, Node, PropertyDeclaration, SetAccessorDeclaration, SourceFile, SyntaxKind, TypeParameterDeclaration, VariableDeclaration } from "ts-morph";
+import { ArrowFunction, CallExpression, ClassDeclaration, ConstructorDeclaration, Decorator, EnumDeclaration, FunctionDeclaration, FunctionExpression, GetAccessorDeclaration, Identifier, ImportDeclaration, ImportEqualsDeclaration, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, Node, PropertyDeclaration, SetAccessorDeclaration, SourceFile, SyntaxKind, TypeParameterDeclaration, VariableDeclaration } from "ts-morph";
 import { entityDictionary, logger } from "./analyze";
 import path from "path";
-import { TypeDeclaration } from "./famix_functions/EntityDictionary";
+import { TSMorphTypeDeclaration } from "./famix_functions/EntityDictionary";
 
-type FQNNode = SourceFile | VariableDeclaration | ArrowFunction | Identifier | MethodDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | PropertyDeclaration | TypeDeclaration | EnumDeclaration | ImportDeclaration | ImportEqualsDeclaration | CallExpression | GetAccessorDeclaration | SetAccessorDeclaration | ConstructorDeclaration | TypeParameterDeclaration | ClassDeclaration | InterfaceDeclaration | Decorator | ModuleDeclaration;
+type FQNNode = SourceFile | VariableDeclaration | ArrowFunction | Identifier | MethodDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | PropertyDeclaration | TSMorphTypeDeclaration | EnumDeclaration | ImportDeclaration | ImportEqualsDeclaration | CallExpression | GetAccessorDeclaration | SetAccessorDeclaration | ConstructorDeclaration | TypeParameterDeclaration | ClassDeclaration | InterfaceDeclaration | Decorator | ModuleDeclaration;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function isFQNNode(node: Node): node is FQNNode {
     return Node.isVariableDeclaration(node) || Node.isArrowFunction(node) || Node.isIdentifier(node) || Node.isMethodDeclaration(node) || Node.isClassDeclaration(node) || Node.isClassExpression(node) || Node.isDecorator(node) || Node.isModuleDeclaration(node) || Node.isCallExpression(node);
-
 }
 
 export function getFQN(node: FQNNode | Node): string {
     const absolutePathProject = entityDictionary.famixRep.getAbsolutePath();
 
     const sourceFile = node.getSourceFile();
-    let parts: string[] = [];
+    const parts: string[] = [];
     let currentNode: Node | undefined = node;
 
     while (currentNode && !Node.isSourceFile(currentNode)) {
@@ -35,9 +35,9 @@ export function getFQN(node: FQNNode | Node): string {
             Node.isDecorator(currentNode) ||
             Node.isTypeAliasDeclaration(currentNode) ||
             Node.isEnumMember(currentNode) ||
-            Node.isParameter(currentNode) ||
+            Node.isParametered(currentNode) ||
             Node.isIdentifier(currentNode)) {
-            let name = Node.isIdentifier(currentNode) ? currentNode.getText() 
+            const name = Node.isIdentifier(currentNode) ? currentNode.getText() 
                 : getNameOfNode(currentNode) /* currentNode.getName() */ || 'Unnamed_' + currentNode.getKindName() + `(${lc})`;
             parts.unshift(name);
         } else if (Node.isArrowFunction(currentNode) || 
@@ -72,7 +72,7 @@ export function getFQN(node: FQNNode | Node): string {
 
 export function getUniqueFQN(node: Node): string | undefined {
     const absolutePathProject = entityDictionary.famixRep.getAbsolutePath();
-    let parts: string[] = [];
+    const parts: string[] = [];
 
     if (node instanceof SourceFile) {
         return entityDictionary.convertToRelativePath(path.normalize(node.getFilePath()), absolutePathProject).replace(/\\/g, "/");
@@ -102,6 +102,11 @@ export function getUniqueFQN(node: Node): string | undefined {
  * @returns The name of the node, or an empty string if it doesn't have one
  */
 export function getNameOfNode(a: Node): string {
+    let cKind: ClassDeclaration | undefined;
+    let iKind: InterfaceDeclaration | undefined;
+    let mKind: MethodDeclaration | undefined;
+    let fKind: FunctionDeclaration | undefined; 
+    let alias: TSMorphTypeDeclaration | undefined;
     switch (a.getKind()) {
         case SyntaxKind.SourceFile:
             return a.asKind(SyntaxKind.SourceFile)!.getBaseName();
@@ -110,7 +115,7 @@ export function getNameOfNode(a: Node): string {
             return a.asKind(SyntaxKind.ModuleDeclaration)!.getName(); 
 
         case SyntaxKind.ClassDeclaration:
-            const cKind = a.asKind(SyntaxKind.ClassDeclaration);
+            cKind = a.asKind(SyntaxKind.ClassDeclaration);
             if (cKind && cKind.getTypeParameters().length > 0) {
                 return cKind.getName() + getParameters(a);
             } else {
@@ -118,7 +123,7 @@ export function getNameOfNode(a: Node): string {
             }
 
         case SyntaxKind.InterfaceDeclaration:
-            const iKind = a.asKind(SyntaxKind.InterfaceDeclaration);
+            iKind = a.asKind(SyntaxKind.InterfaceDeclaration);
             if (iKind && iKind.getTypeParameters().length > 0) {
                 return iKind.getName() + getParameters(a);
             } else {
@@ -132,7 +137,7 @@ export function getNameOfNode(a: Node): string {
             return a.asKind(SyntaxKind.PropertySignature)!.getName();    
     
         case SyntaxKind.MethodDeclaration:
-            const mKind = a.asKind(SyntaxKind.MethodDeclaration);
+            mKind = a.asKind(SyntaxKind.MethodDeclaration);
             if (mKind && mKind.getTypeParameters().length > 0) {
                 return mKind.getName() + getParameters(a);
             } else {
@@ -149,7 +154,7 @@ export function getNameOfNode(a: Node): string {
             return a.asKind(SyntaxKind.SetAccessor)!.getName();
     
         case SyntaxKind.FunctionDeclaration:
-            const fKind = a.asKind(SyntaxKind.FunctionDeclaration);
+            fKind = a.asKind(SyntaxKind.FunctionDeclaration);
             if (fKind && fKind.getTypeParameters().length > 0) {
                 return fKind.getName() + getParameters(a);
             } else {
@@ -179,7 +184,7 @@ export function getNameOfNode(a: Node): string {
 
         case SyntaxKind.TypeAliasDeclaration:
             // special case for parameterized types
-            let alias = a.asKind(SyntaxKind.TypeAliasDeclaration);
+            alias = a.asKind(SyntaxKind.TypeAliasDeclaration);
             if (alias && alias.getTypeParameters().length > 0) {
                 return alias.getName() + "<" + alias.getTypeParameters().map(tp => tp.getName()).join(", ") + ">";
             }

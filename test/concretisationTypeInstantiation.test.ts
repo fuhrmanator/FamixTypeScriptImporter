@@ -51,7 +51,6 @@ describe('Tests for concretisation', () => {
         expect(fmxRep._getAllEntitiesWithType("ParameterConcretisation").size).toBe(2);
     });
 
-    const theInterface = fmxRep._getFamixInterface("{concretisationTypeInstantiation.ts}.InterfaceE<T>");
 
     it("The concrete Class should be MyClass with concreteParameter boolean", () => {
         const theConcretisations = fmxRep._getAllEntitiesWithType("Concretisation") as Set<Concretisation>;
@@ -65,7 +64,6 @@ describe('Tests for concretisation', () => {
     it("The concrete Interface should be InterfaceE with concreteParameter number", () => {
         const theConcretisations = fmxRep._getAllEntitiesWithType("Concretisation") as Set<Concretisation>;
         const iterator = theConcretisations.values();
-        const firstElement = iterator.next().value as Concretisation;
         const secondElement = iterator.next().value as Concretisation;
         expect(secondElement.concreteEntity.name).toBe("InterfaceE");
         const concParameter = secondElement.concreteEntity.concreteParameters.values().next().value as ParametricInterface;
