@@ -607,7 +607,7 @@ function convertParameterToPropertyRepresentation(param: ParameterDeclaration) {
  * @returns A Famix.Parameter representing the parameter
  */
 function processParameter(paramDecl: ParameterDeclaration): Famix.Parameter {
-    const fmxParam = entityDictionary.createFamixParameter(paramDecl);
+    const fmxParam = entityDictionary.createOrGetFamixParameter(paramDecl);  // create or GET
 
     logger.debug(`parameter: ${paramDecl.getName()}, (${paramDecl.getType().getText()}), fqn = ${fmxParam.fullyQualifiedName}`);
 
@@ -678,7 +678,7 @@ function processVariableStatement(v: VariableStatement): Array<Famix.Variable> {
  * @returns A Famix.Variable representing the variable
  */
 function processVariable(v: VariableDeclaration): Famix.Variable {
-    const fmxVar = entityDictionary.createFamixVariable(v);
+    const fmxVar = entityDictionary.createOrGetFamixVariable(v);
 
     logger.debug(`variable: ${v.getName()}, (${v.getType().getText()}), ${v.getInitializer() ? "initializer: " + v.getInitializer()!.getText() : "initializer: "}, fqn = ${fmxVar.fullyQualifiedName}`);
 
@@ -845,7 +845,7 @@ export function processImportClausesForImportEqualsDeclarations(sourceFiles: Arr
                 // const importedEntity = node.getName();
                 // create a famix import clause
                 const namedImport = node.getNameNode();
-                entityDictionary.oldCreateFamixImportClause({importDeclaration: node,
+                entityDictionary.oldCreateOrGetFamixImportClause({importDeclaration: node,
                     importerSourceFile: sourceFile, 
                     moduleSpecifierFilePath: node.getModuleReference().getText(), 
                     importElement: namedImport, 
@@ -866,7 +866,7 @@ export function processImportClausesForImportEqualsDeclarations(sourceFiles: Arr
 export function processImportClausesForModules(modules: Array<SourceFile>, exports: Array<ReadonlyMap<string, ExportedDeclarations[]>>): void {
     logger.info(`Creating import clauses from ${modules.length} modules:`);
     modules.forEach(module => {
-        const modulePath = module.getFilePath() + module.getBaseName();
+        const modulePath = module.getFilePath(); // + module.getBaseName();
         module.getImportDeclarations().forEach(impDecl => {
             logger.info(`Importing ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
             const path = getModulePath(impDecl);
@@ -875,7 +875,7 @@ export function processImportClausesForModules(modules: Array<SourceFile>, expor
                 logger.info(`Importing (named) ${namedImport.getName()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
                 const importedEntityName = namedImport.getName();
                 const importFoundInExports = isInExports(exports, importedEntityName);
-                entityDictionary.oldCreateFamixImportClause({importDeclaration: impDecl,
+                entityDictionary.oldCreateOrGetFamixImportClause({importDeclaration: impDecl,
                     importerSourceFile: module, 
                     moduleSpecifierFilePath: path, 
                     importElement: namedImport, 
@@ -887,7 +887,7 @@ export function processImportClausesForModules(modules: Array<SourceFile>, expor
             if (defaultImport !== undefined) {
                 logger.info(`Importing (default) ${defaultImport.getText()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
                 // call with module, impDecl.getModuleSpecifierValue(), path, defaultImport, false, true
-                entityDictionary.oldCreateFamixImportClause({importDeclaration: impDecl,
+                entityDictionary.oldCreateOrGetFamixImportClause({importDeclaration: impDecl,
                     importerSourceFile: module,
                     moduleSpecifierFilePath: path,
                     importElement: defaultImport,
@@ -898,7 +898,7 @@ export function processImportClausesForModules(modules: Array<SourceFile>, expor
             const namespaceImport = impDecl.getNamespaceImport();
             if (namespaceImport !== undefined) {
                 logger.info(`Importing (namespace) ${namespaceImport.getText()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
-                entityDictionary.oldCreateFamixImportClause({importDeclaration: impDecl,
+                entityDictionary.oldCreateOrGetFamixImportClause({importDeclaration: impDecl,
                     importerSourceFile: module, 
                     moduleSpecifierFilePath: path, 
                     importElement: namespaceImport, 

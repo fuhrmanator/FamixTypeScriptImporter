@@ -37,11 +37,15 @@ export function getFQN(node: FQNNode | Node): string {
             Node.isEnumMember(currentNode) ||
             Node.isParametered(currentNode) ||
             Node.isPropertySignature(currentNode) ||
+            Node.isArrayLiteralExpression(currentNode) ||
+            Node.isImportSpecifier(currentNode) ||
             Node.isIdentifier(currentNode)) {
             const name = Node.isIdentifier(currentNode) ? currentNode.getText() 
                 : getNameOfNode(currentNode) /* currentNode.getName() */ || 'Unnamed_' + currentNode.getKindName() + `(${lc})`;
             parts.unshift(name);
-        } else if (Node.isArrowFunction(currentNode) || 
+        }
+        // unnamed nodes
+        else if (Node.isArrowFunction(currentNode) || 
                    Node.isBlock(currentNode) || 
                    Node.isForInStatement(currentNode) || 
                    Node.isForOfStatement(currentNode) || 
@@ -52,7 +56,7 @@ export function getFQN(node: FQNNode | Node): string {
             parts.unshift(`constructor`);
         } else {
             // For other kinds, you might want to handle them specifically or ignore
-            //console.log(`Ignoring node kind: ${currentNode.getKindName()}`);
+            logger.debug(`Ignoring node kind: ${currentNode.getKindName()}`);
         }
         currentNode = currentNode.getParent();
     }
@@ -60,9 +64,16 @@ export function getFQN(node: FQNNode | Node): string {
 
 
     // Prepend the relative path of the source file
-    const relativePath = entityDictionary.convertToRelativePath(
+    let relativePath = entityDictionary.convertToRelativePath(
         path.normalize(sourceFile.getFilePath()), 
                        absolutePathProject).replace(/\\/sg, "/");
+                       
+    if (relativePath.includes("..")) {
+        logger.error(`Relative path contains ../: ${relativePath}`);
+    }
+    if (relativePath.startsWith("/")) {
+        relativePath = relativePath.substring(1);
+    }
     parts.unshift(`{${relativePath}}`);
     const fqn = parts.join(".") + `[${node.getKindName()}]`;  // disambiguate
 
@@ -83,6 +94,9 @@ export function getUniqueFQN(node: Node): string | undefined {
     while (currentNode) {
         if (Node.isSourceFile(currentNode)) {
             const relativePath = entityDictionary.convertToRelativePath(path.normalize(currentNode.getFilePath()), absolutePathProject).replace(/\\/g, "/");
+            if (relativePath.includes("..")) {
+                logger.error(`Relative path contains ../: ${relativePath}`);
+            }
             parts.unshift(relativePath); // Add file path at the start
             break;
         } else if (currentNode.getSymbol()) {
@@ -193,10 +207,11 @@ export function getNameOfNode(a: Node): string {
 
         case SyntaxKind.Constructor:
             return "constructor";   
-            
+        
         default:
+            // throw new Error(`getNameOfNode called on a node that doesn't have a name: ${a.getKindName()}`);
             // ancestor hasn't got a useful name
-            return "noname";
+            return "";
         }
 }
 

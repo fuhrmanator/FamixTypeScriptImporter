@@ -42,6 +42,9 @@ export class EntityDictionary {
     private fmxPrimitiveTypeMap = new Map<string, Famix.PrimitiveType>(); // Maps the primitive type names to their Famix model
     private fmxFunctionAndMethodMap = new Map<string, Famix.Function | Famix.ParametricFunction | Famix.Method | Famix.ParametricMethod>; // Maps the function names to their Famix model
     private fmxArrowFunctionMap = new Map<string, Famix.ArrowFunction>; // Maps the function names to their Famix model
+    private fmxParameterMap = new Map<ParameterDeclaration, Famix.Parameter>(); // Maps the parameters to their Famix model
+    private fmxVariableMap = new Map<VariableDeclaration, Famix.Variable>(); // Maps the variables to their Famix model
+    private fmxImportClauseMap = new Map<ImportDeclaration | ImportEqualsDeclaration, Famix.ImportClause>(); // Maps the import clauses to their Famix model
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
     public fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
     public tsMorphElementObjectMap = new Map<TSMorphObjectType,Famix.Entity>();
@@ -95,8 +98,10 @@ export class EntityDictionary {
             sourceAnchor.startPos = sourceStart + 1;
             sourceAnchor.endPos = sourceEnd + 1;
 
-            const fileName = node.getSourceFile().getFilePath();
-
+            let fileName = node.getSourceFile().getFilePath() as string;
+            if (fileName.startsWith("/")) {
+                fileName = fileName.substring(1);
+            }
             sourceAnchor.element = fmx;
             sourceAnchor.fileName = fileName;
             fmx.sourceAnchor = sourceAnchor;
@@ -144,6 +149,10 @@ export class EntityDictionary {
 
             // revert any backslashes to forward slashes (path.normalize on windows introduces them)
             pathInProject = pathInProject.replace(/\\/g, "/");
+
+            if (pathInProject.startsWith("/")) {
+                pathInProject = pathInProject.substring(1);
+            }
 
             fmxIndexFileAnchor.fileName = pathInProject;
             let sourceStart, sourceEnd
@@ -327,7 +336,8 @@ export class EntityDictionary {
             }
 
             fmxClass.name = clsName;
-            fmxClass.fullyQualifiedName = classFullyQualifiedName;
+            initFQN(cls, fmxClass);
+            // fmxClass.fullyQualifiedName = classFullyQualifiedName;
             fmxClass.isAbstract = isAbstract;
 
             this.makeFamixIndexFileAnchor(cls, fmxClass);
@@ -679,7 +689,16 @@ export class EntityDictionary {
      * @param param A parameter
      * @returns The Famix model of the parameter
      */
-    public createFamixParameter(param: ParameterDeclaration): Famix.Parameter {
+    public createOrGetFamixParameter(param: ParameterDeclaration): Famix.Parameter {
+        if (this.fmxParameterMap.has(param)) {
+            const rParameter = this.fmxParameterMap.get(param);
+            if (rParameter) { 
+               return rParameter;
+            } else {
+                throw new Error(`Famix parameter ${param.getName()} is not found in the parameter map.`);
+            }
+        }
+
         const fmxParam = new Famix.Parameter();
 
         let paramTypeName = this.UNKNOWN_VALUE;
@@ -698,7 +717,8 @@ export class EntityDictionary {
 
         this.famixRep.addElement(fmxParam);
 
-        this.fmxElementObjectMap.set(fmxParam,param);
+        this.fmxElementObjectMap.set(fmxParam, param);
+        this.fmxParameterMap.set(param, fmxParam);
 
         return fmxParam;
     }
@@ -809,7 +829,15 @@ export class EntityDictionary {
      * @param variable A variable
      * @returns The Famix model of the variable
      */
-    public createFamixVariable(variable: VariableDeclaration): Famix.Variable {
+    public createOrGetFamixVariable(variable: VariableDeclaration): Famix.Variable {
+        if (this.fmxVariableMap.has(variable)) {
+            const rVariable = this.fmxVariableMap.get(variable);
+            if (rVariable) { 
+               return rVariable;
+            } else {
+                throw new Error(`Famix parameter ${variable.getName()} is not found in the variable map.`);
+            }
+        }
         const fmxVariable = new Famix.Variable();
     
         let variableTypeName = this.UNKNOWN_VALUE;
@@ -828,6 +856,7 @@ export class EntityDictionary {
         this.famixRep.addElement(fmxVariable);
     
         this.fmxElementObjectMap.set(fmxVariable,variable);
+        this.fmxVariableMap.set(variable, fmxVariable);
     
         return fmxVariable;
     }
@@ -1133,9 +1162,11 @@ export class EntityDictionary {
         if (!accessor) {
             logger.error(`Ancestor ${ancestorFullyQualifiedName} of kind ${nodeReferenceAncestor.getKindName()} not found.`);
             // accessor = this.createOrGetFamixType(ancestorFullyQualifiedName, nodeReferenceAncestor as TypeDeclaration);
+            return; // bail out TODO: this is probably wrong
+        } else {
+            logger.debug(`Found accessor to be ${accessor.fullyQualifiedName}.`);
         }
 
-        logger.debug(`Found accessor to be ${accessor.fullyQualifiedName}.`);
 
         // make sure accessor is a method, function, script or module
         if (!(accessor instanceof Famix.Method) && !(accessor instanceof Famix.ArrowFunction) && !(accessor instanceof Famix.Function) && !(accessor instanceof Famix.ScriptEntity) && !(accessor instanceof Famix.Module)) {
@@ -1291,8 +1322,17 @@ export class EntityDictionary {
      * @param isInExports A boolean indicating if the imported entity is in the exports
      * @param isDefaultExport A boolean indicating if the imported entity is a default export
      */
-    public oldCreateFamixImportClause(importClauseInfo: {importDeclaration?: ImportDeclaration | ImportEqualsDeclaration, importerSourceFile: SourceFile, moduleSpecifierFilePath: string, importElement: ImportSpecifier | Identifier, isInExports: boolean, isDefaultExport: boolean}): void {
+    public oldCreateOrGetFamixImportClause(importClauseInfo: {importDeclaration?: ImportDeclaration | ImportEqualsDeclaration, importerSourceFile: SourceFile, moduleSpecifierFilePath: string, importElement: ImportSpecifier | Identifier, isInExports: boolean, isDefaultExport: boolean}): void {
         const {importDeclaration, importerSourceFile: importer, moduleSpecifierFilePath, importElement, isInExports, isDefaultExport} = importClauseInfo;
+        if (importDeclaration && this.fmxImportClauseMap.has(importDeclaration)) {
+            const rImportClause = this.fmxImportClauseMap.get(importDeclaration);
+            if (rImportClause) { 
+               return; // don't do anything
+            } else {
+                throw new Error(`Import clause ${importElement.getText()} is not found in the import clause map.`);
+            }
+        }
+
         logger.debug(`createFamixImportClause: Creating import clause:`);
         const fmxImportClause = new Famix.ImportClause();
 
@@ -1303,8 +1343,12 @@ export class EntityDictionary {
         
         const absolutePath = path.normalize(moduleSpecifierFilePath);
         // convert the path and remove any windows backslashes introduced by path.normalize
+        logger.debug(`createFamixImportClause: absolutePath: ${absolutePath}`);
+        logger.debug(`createFamixImportClause: convertToRelativePath: ${this.convertToRelativePath(absolutePath, absolutePathProject)}`);
         const pathInProject: string = this.convertToRelativePath(absolutePath, absolutePathProject).replace(/\\/g, "/");
+        logger.debug(`createFamixImportClause: pathInProject: ${pathInProject}`);
         let pathName = "{" + pathInProject + "}.";
+        logger.debug(`createFamixImportClause: pathName: ${pathName}`);
 
         // Named imports, e.g. import { ClassW } from "./complexExportModule";
 
@@ -1323,7 +1367,10 @@ export class EntityDictionary {
                 if (!isInExports) {
                     importedEntity.isStub = true;
                 }
-                importedEntity.fullyQualifiedName = pathName;
+                // logger.debug(`createFamixImportClause: Creating named entity ${importedEntityName} with FQN ${pathName}`);
+                // importedEntity.fullyQualifiedName = pathName;
+                initFQN(importElement, importedEntity);
+
                 this.makeFamixIndexFileAnchor(importElement, importedEntity);
                 // must add entity to repository
                 this.famixRep.addElement(importedEntity);
@@ -1368,7 +1415,10 @@ export class EntityDictionary {
 
         this.famixRep.addElement(fmxImportClause);
 
-        if (importDeclaration) this.fmxElementObjectMap.set(fmxImportClause, importDeclaration);
+        if (importDeclaration) {
+            this.fmxElementObjectMap.set(fmxImportClause, importDeclaration);
+            this.fmxImportClauseMap.set(importDeclaration, fmxImportClause);
+        }
     }
 
     /**
@@ -1748,7 +1798,14 @@ export class EntityDictionary {
     // }
 
     public convertToRelativePath(absolutePath: string, absolutePathProject: string) {
-        return absolutePath.replace(absolutePathProject, "").slice(1);
+        logger.debug(`convertToRelativePath: absolutePath: '${absolutePath}', absolutePathProject: '${absolutePathProject}'`);
+        if (absolutePath.startsWith(absolutePathProject)) {
+            return absolutePath.replace(absolutePathProject, "").slice(1);
+        } else if (absolutePath.startsWith("/")) {
+            return absolutePath.slice(1);
+        } else {
+            return absolutePath;
+        }
     }
 }
 
@@ -1776,67 +1833,7 @@ function initFQN(sourceElement: TSMorphObjectType, famixElement: Famix.SourcedEn
         famixElement.fullyQualifiedName = fqn;
         return;
     }
-
-
-    // if (sourceElement instanceof FunctionDeclaration && famixElement instanceof Famix.Type) {
-    //     // special case for function types (return type)
-    //     let fqn = FQNFunctions.getFQN(sourceElement);
-    //     // replace [FunctionDeclaration] with [FunctionTypeDeclaration]
-    //     fqn = fqn.replace("FunctionDeclaration", "FunctionTypeDeclaration");
-    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-    //     famixElement.fullyQualifiedName = fqn;
-    // }
-    // else if (sourceElement instanceof ParameterDeclaration && famixElement instanceof Famix.Type) {
-    //     // special case for parameter types
-    //     let fqn = FQNFunctions.getFQN(sourceElement);
-    //     fqn = fqn.replace("Parameter", "ParameterTypeDeclaration");
-    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-    //     famixElement.fullyQualifiedName = fqn;
-    // }
-    // else if (sourceElement instanceof ConstructorDeclaration && famixElement instanceof Famix.Type) {
-    //     // special case for constructor return types
-    //     let fqn = FQNFunctions.getFQN(sourceElement);
-    //     fqn = fqn.replace("Constructor", "ConstructorType");
-    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-    //     famixElement.fullyQualifiedName = fqn;
-    // }
-    // else if (sourceElement instanceof VariableDeclaration && famixElement instanceof Famix.Type) {
-    //     // special case for variable types
-    //     let fqn = FQNFunctions.getFQN(sourceElement);
-    //     fqn = fqn.replace("VariableDeclaration", "VariableType");
-    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-    //     famixElement.fullyQualifiedName = fqn;
-    // }
-    // else if (sourceElement instanceof TypeAliasDeclaration && famixElement instanceof Famix.Type) {
-    //     // special case for type alias types
-    //     let fqn = FQNFunctions.getFQN(sourceElement);
-    //     fqn = fqn.replace("TypeAliasDeclaration", "TypeAliasType");
-    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-    //     famixElement.fullyQualifiedName = fqn;
-    // }
-    // else if (sourceElement instanceof ArrowFunction && famixElement instanceof Famix.Type) {
-    //     // special case for arrow function types
-    //     let fqn = FQNFunctions.getFQN(sourceElement);
-    //     fqn = fqn.replace("ArrowFunction", "ArrowFunctionType");
-    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-    //     famixElement.fullyQualifiedName = fqn;
-    // }
-    // else if (sourceElement instanceof EnumMember && famixElement instanceof Famix.Type) {
-    //     // special case for enum member types
-    //     let fqn = FQNFunctions.getFQN(sourceElement);
-    //     fqn = fqn.replace("EnumMember", "EnumMemberType");
-    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-    //     famixElement.fullyQualifiedName = fqn;
-    // }
-    // else if (sourceElement instanceof PropertySignature && famixElement instanceof Famix.Type) {
-    //     // special case for PropertySignature types
-    //     let fqn = FQNFunctions.getFQN(sourceElement);
-    //     fqn = fqn.replace("PropertySignature", "PropertySignatureType");
-    //     logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
-    //     famixElement.fullyQualifiedName = fqn;
-    // }
     // catch all (except comments)
-    // else 
     if (!(sourceElement instanceof CommentRange)) {
         const fqn = FQNFunctions.getFQN(sourceElement);
         logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);

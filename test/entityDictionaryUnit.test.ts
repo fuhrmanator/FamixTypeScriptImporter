@@ -71,7 +71,7 @@ describe('EntityDictionary', () => {
   test('should get parameters of the constructors and add it to the map', () => {
     
     //Create a type parameter declaration   
-    const parameter : Famix.Parameter = entityDictionary.createFamixParameter(parameters[0]);
+    const parameter : Famix.Parameter = entityDictionary.createOrGetFamixParameter(parameters[0]);
     expect(parameters[0]).toBe(entityDictionary.fmxElementObjectMap.get(parameter));  
   
   });

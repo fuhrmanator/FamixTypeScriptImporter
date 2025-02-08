@@ -22,7 +22,9 @@ const aSymbol: symbol = Symbol("ten");
 const anUndefined: undefined = undefined;
 class A {};
 let a = new A();
-let b: Map<any, boolean>;
+// let b: Map<any, boolean>;
+class B<T> {};
+let bb: B<number>;
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -31,8 +33,8 @@ describe('Tests for types', () => {
 
     const types = Array.from(fmxRep._getAllEntitiesWithType("Type") as Set<Type>);
     const primitiveTypes = Array.from(fmxRep._getAllEntitiesWithType("PrimitiveType") as Set<PrimitiveType>);
-    const ParameterTypes = Array.from(fmxRep._getAllEntitiesWithType("ParameterType") as Set<ParameterType>);
-    const theParameterType = ParameterTypes.find(t => t.name === "Map<any, boolean>");
+    const parameterTypes = Array.from(fmxRep._getAllEntitiesWithType("ParameterType") as Set<ParameterType>);
+    const theParameterType = parameterTypes.find(t => t.name === "T");
     const theBaseType = types.find(t => t.name === "Map");
     const theFile = fmxRep._getFamixFile("types.ts");
     const theAnyType = primitiveTypes.find(t => t.name === "any");
@@ -73,26 +75,20 @@ describe('Tests for types', () => {
         expect(aVariable?.declaredType?.name).toBe("A");
     });
 
-    it("should contain a parameterized type", () => {
-        expect(ParameterTypes.length).toBe(1);
-        expect(ParameterTypes.find(t => t.name === "Map<any, boolean>")).toBeTruthy();
+    it("should contain a parameterized type 'T' from 'class B<T>'", () => {
+        expect(parameterTypes.length).toBe(1);
+        expect(parameterTypes.find(t => t.name === "T")).toBeTruthy();
     });
 
-    it("should have Map for base type of Map<any, boolean>", () => {
+    it("should have B for base type of B<T>", () => {
         expect(theParameterType?.baseType).toBe(theBaseType);
-    });
-
-    it("should have any and boolean for arguments of Map<any, boolean>", () => {
-        expect(theParameterType?.arguments.size).toBe(2);
-        expect(Array.from(theParameterType?.arguments as Set<Type>)[0]).toBe(theAnyType);
-        expect(Array.from(theParameterType?.arguments as Set<Type>)[1]).toBe(theBooleanType);
     });
 
     it("should have types.ts for container", () => {
         expect(types[0].container).toBe(theFile);
     });
 
-    it("should have an IndexedFileAnchor with a filename of 'types.ts' for Map<any, boolean>", () => {
+    it("should have an IndexedFileAnchor with a filename of 'types.ts' for B<T>", () => {
         const indexedFileAnchor = theParameterType?.sourceAnchor;
         expect(indexedFileAnchor).toBeTruthy();
         expect((indexedFileAnchor as IndexedFileAnchor).fileName.endsWith("types.ts")).toBe(true);

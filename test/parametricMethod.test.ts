@@ -34,6 +34,14 @@ describe('Tests for generics', () => {
         expect(listOfNames).toContain("ClassParametric");
     });
 
+    it("should contain a ParametricClass ClassParametric with type parameter T", () => {
+        const pcList = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass") as Set<ParametricClass>);
+        expect(pcList).toBeTruthy();
+        const parametricClass = pcList.find(c => c.name === "ClassParametric");
+        const parameterTypes = parametricClass?.genericParameters;
+        expect(parameterTypes?.values().next().value.name).toBe('T');
+    });
+
     const theClass = fmxRep._getFamixClass("{parametricMethod.ts}.ClassParametric<T>[ClassDeclaration]");
 
     it("should not be an abstract class", () => {

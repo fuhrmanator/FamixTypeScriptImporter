@@ -56,7 +56,12 @@ export class FamixRepository {
      */
     public getFamixEntityByFullyQualifiedName(fullyQualifiedName: string): FamixBaseElement | undefined {
         const allEntities = Array.from(this.elements.values()).filter(e => e instanceof NamedEntity) as Array<NamedEntity>;
-        const entity = allEntities.find(e => e.fullyQualifiedName === fullyQualifiedName);
+        const entity = allEntities.find(e => 
+            // {console.log(`namedEntity: ${e.fullyQualifiedName}`); 
+            // return 
+            e.fullyQualifiedName === fullyQualifiedName
+        // }
+        );
         return entity;
     }
 
@@ -250,7 +255,8 @@ export class FamixRepository {
         const fqns = new Set<string>();
         for (const element of Array.from(this.elements.values())) {
             if (element instanceof NamedEntity && element.fullyQualifiedName && fqns.has(element.fullyQualifiedName)) {
-                throw new Error(`The fully qualified name ${element.fullyQualifiedName} is not unique`);
+                const theExistingElement = Array.from(this.elements.values()).find(e => (e as NamedEntity).fullyQualifiedName === element.fullyQualifiedName);
+                throw new Error(`The fully qualified name ${element.fullyQualifiedName} is not unique.\nIt exists for ${theExistingElement?.getJSON()}`);
             }
             fqns.add((element as NamedEntity).fullyQualifiedName);
         }

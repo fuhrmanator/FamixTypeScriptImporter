@@ -1,4 +1,5 @@
 import { Importer } from '../src/analyze';
+import { Class } from '../src/lib/famix/model/famix/class';
 import { Comment } from '../src/lib/famix/model/famix/comment';
 import { getCommentTextFromCommentViaAnchor } from './testUtils';
 import { project } from './testUtils';
@@ -25,10 +26,12 @@ describe('Tests for abstract class with comments', () => {
     const theAbstractClass = fmxRep._getFamixClass("{abstractClassWithComments.ts}.MyAbstractClass[ClassDeclaration]");
 
     it("should contain an abstract class MyAbstractClass", () => {
-        expect(theAbstractClass).toBeTruthy();
-        if (theAbstractClass) {
-            expect(theAbstractClass.isAbstract).toBe(true);
-        }
+        const classes = Array.from(fmxRep._getAllEntitiesWithType("Class") as Set<Class>);
+        const myAbstractClass = classes.find(c => c.name === "MyAbstractClass");
+        expect(myAbstractClass).toBeTruthy();
+        expect(myAbstractClass?.name).toBe("MyAbstractClass");
+        expect(myAbstractClass?.fullyQualifiedName).toBe("{abstractClassWithComments.ts}.MyAbstractClass[ClassDeclaration]");
+        expect(myAbstractClass?.isAbstract).toBe(true);
     });
 
     it("should have two comments for the abstract class", () => {
