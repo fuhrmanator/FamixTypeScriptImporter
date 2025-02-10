@@ -34,6 +34,7 @@ export function getFQN(node: FQNNode | Node): string {
             Node.isParameterDeclaration(currentNode) ||
             Node.isDecorator(currentNode) ||
             Node.isTypeAliasDeclaration(currentNode) ||
+            Node.isEnumDeclaration(currentNode) ||
             Node.isEnumMember(currentNode) ||
             Node.isParametered(currentNode) ||
             Node.isPropertySignature(currentNode) ||

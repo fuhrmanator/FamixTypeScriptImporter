@@ -696,7 +696,7 @@ function processVariable(v: VariableDeclaration): Famix.Variable {
  * @returns A Famix.Enum representing the enum
  */
 function processEnum(e: EnumDeclaration): Famix.Enum {
-    const fmxEnum = entityDictionary.createFamixEnum(e);
+    const fmxEnum = entityDictionary.createOrGetFamixEnum(e);
 
     logger.debug(`enum: ${e.getName()}, (${e.getType().getText()}), fqn = ${fmxEnum.fullyQualifiedName}`);
 
@@ -931,7 +931,7 @@ export function processInheritances(classes: ClassDeclaration[], interfaces: Int
         logger.debug(`processInheritances: Checking class inheritance for ${cls.getName()}`);
         const extClass = cls.getBaseClass();
         if (extClass !== undefined) {
-            entityDictionary.createFamixInheritance(cls, extClass);
+            entityDictionary.createOrGetFamixInheritance(cls, extClass);
             
             logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), extClass: ${extClass.getName()}, (${extClass.getType().getText()})`);
         }
@@ -939,7 +939,7 @@ export function processInheritances(classes: ClassDeclaration[], interfaces: Int
         logger.debug(`processInheritances: Checking interface inheritance for ${cls.getName()}`);
         const implementedInterfaces = getImplementedOrExtendedInterfaces(interfaces, cls);
         implementedInterfaces.forEach(impInter => {
-            entityDictionary.createFamixInheritance(cls, impInter);
+            entityDictionary.createOrGetFamixInheritance(cls, impInter);
 
             logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), impInter: ${(impInter instanceof InterfaceDeclaration) ? impInter.getName() : impInter.getExpression().getText()}, (${(impInter instanceof InterfaceDeclaration) ? impInter.getType().getText() : impInter.getExpression().getText()})`);
         });
@@ -949,7 +949,7 @@ export function processInheritances(classes: ClassDeclaration[], interfaces: Int
         logger.debug(`processInheritances: Checking interface inheritance for ${inter.getName()}`);
         const extendedInterfaces = getImplementedOrExtendedInterfaces(interfaces, inter);
         extendedInterfaces.forEach(extInter => {
-            entityDictionary.createFamixInheritance(inter, extInter);
+            entityDictionary.createOrGetFamixInheritance(inter, extInter);
 
             logger.debug(`processInheritances: inter: ${inter.getName()}, (${inter.getType().getText()}), extInter: ${(extInter instanceof InterfaceDeclaration) ? extInter.getName() : extInter.getExpression().getText()}, (${(extInter instanceof InterfaceDeclaration) ? extInter.getType().getText() : extInter.getExpression().getText()})`);
         });

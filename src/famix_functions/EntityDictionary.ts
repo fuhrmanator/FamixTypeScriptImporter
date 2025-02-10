@@ -36,7 +36,7 @@ export class EntityDictionary {
     private fmxAliasMap = new Map<string, Famix.Alias>(); // Maps the alias names to their Famix model
     private fmxClassMap = new Map<string, Famix.Class | Famix.ParametricClass>(); // Maps the fully qualified class names to their Famix model
     private fmxInterfaceMap = new Map<string, Famix.Interface | Famix.ParametricInterface>(); // Maps the interface names to their Famix model
-    private fmxModuleMap = new Map<string, Famix.Module>(); // Maps the namespace names to their Famix model
+    private fmxModuleMap = new Map<ModuleDeclaration, Famix.Module>(); // Maps the namespace names to their Famix model
     private fmxFileMap = new Map<string, Famix.ScriptEntity | Famix.Module>(); // Maps the source file names to their Famix model
     private fmxTypeMap = new Map<TSMorphTypeDeclaration, Famix.Type | Famix.ParameterType>(); // Maps the types declarations to their Famix model
     private fmxPrimitiveTypeMap = new Map<string, Famix.PrimitiveType>(); // Maps the primitive type names to their Famix model
@@ -45,6 +45,8 @@ export class EntityDictionary {
     private fmxParameterMap = new Map<ParameterDeclaration, Famix.Parameter>(); // Maps the parameters to their Famix model
     private fmxVariableMap = new Map<VariableDeclaration, Famix.Variable>(); // Maps the variables to their Famix model
     private fmxImportClauseMap = new Map<ImportDeclaration | ImportEqualsDeclaration, Famix.ImportClause>(); // Maps the import clauses to their Famix model
+    private fmxEnumMap = new Map<EnumDeclaration, Famix.Enum>(); // Maps the enum names to their Famix model
+    private fmxInheritanceMap = new Map<string, Famix.Inheritance>(); // Maps the inheritance names to their Famix model
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
     public fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
     public tsMorphElementObjectMap = new Map<TSMorphObjectType,Famix.Entity>();
@@ -252,32 +254,34 @@ export class EntityDictionary {
 
     /**
      * Creates or gets a Famix Module
-     * @param m A module
+     * @param moduleDeclaration A module
      * @returns The Famix model of the module
      */
-    public createOrGetFamixModule(m: ModuleDeclaration): Famix.Module {
-        let fmxModule: Famix.Module;
-        const moduleName = m.getName();
-        const foundModuleName = this.fmxModuleMap.get(moduleName);
-        if (!foundModuleName) {
-            fmxModule = new Famix.Module();
-            fmxModule.name = moduleName;
-            fmxModule.isAmbient = isAmbient(m);
-            fmxModule.isNamespace = isNamespace(m);
-            fmxModule.isModule = !fmxModule.isNamespace && !fmxModule.isAmbient;
-
-            initFQN(m, fmxModule);
-            this.makeFamixIndexFileAnchor(m, fmxModule);
-
-            this.fmxModuleMap.set(moduleName, fmxModule);
-
-            this.famixRep.addElement(fmxModule);
-        }
-        else {
-            fmxModule = foundModuleName;
+    public createOrGetFamixModule(moduleDeclaration: ModuleDeclaration): Famix.Module {
+        if (this.fmxModuleMap.has(moduleDeclaration)) {
+            const rModule = this.fmxModuleMap.get(moduleDeclaration);
+            if (rModule) { 
+               return rModule;
+            } else {
+                throw new Error(`Famix module ${moduleDeclaration.getName()} is not found in the module map.`);
+            }
         }
 
-        this.fmxElementObjectMap.set(fmxModule,m);
+        const fmxModule = new Famix.Module();
+        const moduleName = moduleDeclaration.getName();
+        fmxModule.name = moduleName;
+        fmxModule.isAmbient = isAmbient(moduleDeclaration);
+        fmxModule.isNamespace = isNamespace(moduleDeclaration);
+        fmxModule.isModule = !fmxModule.isNamespace && !fmxModule.isAmbient;
+
+        initFQN(moduleDeclaration, fmxModule);
+        this.makeFamixIndexFileAnchor(moduleDeclaration, fmxModule);
+
+        this.fmxModuleMap.set(moduleDeclaration, fmxModule);
+
+        this.famixRep.addElement(fmxModule);
+
+        this.fmxElementObjectMap.set(fmxModule,moduleDeclaration);
         return fmxModule;
     }
 
@@ -634,7 +638,7 @@ export class EntityDictionary {
      */
     public createOrGetFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: { [key: string]: number }): Famix.Function | Famix.ParametricFunction {
         let fmxFunction: Famix.Function | Famix.ParametricFunction;
-        const isGeneric = func.getTypeParameters().length > 0;        
+        const isGeneric = func.getTypeParameters().length > 0;
         const functionFullyQualifiedName = FQNFunctions.getFQN(func);
         if (!this.fmxFunctionAndMethodMap.has(functionFullyQualifiedName)) {
             if (isGeneric) {
@@ -654,7 +658,8 @@ export class EntityDictionary {
 
             fmxFunction.signature = Helpers.computeSignature(func.getText());
             fmxFunction.cyclomaticComplexity = currentCC[fmxFunction.name];
-            fmxFunction.fullyQualifiedName = functionFullyQualifiedName;
+            initFQN(func, fmxFunction);
+            // fmxFunction.fullyQualifiedName = functionFullyQualifiedName;
     
             let functionTypeName = this.UNKNOWN_VALUE;
             try {
@@ -866,7 +871,15 @@ export class EntityDictionary {
      * @param enumEntity An enum
      * @returns The Famix model of the enum
      */
-    public createFamixEnum(enumEntity: EnumDeclaration): Famix.Enum {
+    public createOrGetFamixEnum(enumEntity: EnumDeclaration): Famix.Enum {
+        if (this.fmxEnumMap.has(enumEntity)) {
+            const rEnum = this.fmxEnumMap.get(enumEntity);
+            if (rEnum) { 
+               return rEnum;
+            } else {
+                throw new Error(`Famix enum ${enumEntity.getName()} is not found in the enum map.`);
+            }
+        }
         const fmxEnum = new Famix.Enum();
         fmxEnum.name = enumEntity.getName();
         initFQN(enumEntity, fmxEnum);
@@ -875,6 +888,7 @@ export class EntityDictionary {
         this.famixRep.addElement(fmxEnum);
 
         this.fmxElementObjectMap.set(fmxEnum,enumEntity);
+        this.fmxEnumMap.set(enumEntity, fmxEnum);
 
         return fmxEnum;
     }
@@ -1231,73 +1245,111 @@ export class EntityDictionary {
      * @param cls A class or an interface (subclass)
      * @param inhClass The inherited class or interface (superclass)
      */
-    public createFamixInheritance(cls: ClassDeclaration | InterfaceDeclaration, inhClass: ClassDeclaration | InterfaceDeclaration | ExpressionWithTypeArguments): void {
+    public createOrGetFamixInheritance(cls: ClassDeclaration | InterfaceDeclaration, inhClass: ClassDeclaration | InterfaceDeclaration | ExpressionWithTypeArguments): void {
+        // // need a key to see if the inheritance already exists
+        // const classFullyQualifiedName = FQNFunctions.getFQN(cls);
+        // let inKeyword: string;
+        // let inhClassFullyQualifiedName: string;
+        // let inhClassName: string | undefined;
+        // // if inhClass is an ExpressionWithTypeArguments, it is an interface
+        // if (inhClass instanceof ExpressionWithTypeArguments) {
+        //     inhClassName = inhClass.getExpression().getText();
+        //     // what is inhClassFullyQualifiedName? TODO
+        //     inhClassFullyQualifiedName = 'Undefined_Scope_from_importer.' + inhClassName;
+        // } else {
+        //     inhClassName = inhClass.getName();
+        //     if (!inhClassName) {
+        //         throw new Error(`Inherited class or interface name not found for ${inhClass.getText()}.`);
+        //     }
+        //     inhClassFullyQualifiedName = FQNFunctions.getFQN(inhClass);
+        // }
+        // // build the unique key of the inheritance
+        // if ((cls instanceof ClassDeclaration && inhClass instanceof ClassDeclaration) 
+        //     || (cls instanceof InterfaceDeclaration && inhClass instanceof InterfaceDeclaration)) {
+        //     inKeyword = " extends ";
+        // } else if (cls instanceof ClassDeclaration && (inhClass instanceof InterfaceDeclaration || inhClass instanceof ExpressionWithTypeArguments)) {
+        //     inKeyword = " implements ";
+        // } else {
+        //     throw new Error(`Inheritance ${cls.getText()} and ${inhClass.getText()} is not valid.`);
+        // }
+
+        // const inheritanceFullyQualifiedName = FQNFunctions.getFQN(cls) + inKeyword + inhClassFullyQualifiedName;
+        // if (this.fmxInheritanceMap.has(inheritanceFullyQualifiedName)) {
+        //     const rInheritance = this.fmxInheritanceMap.get(inheritanceFullyQualifiedName);
+        //     if (rInheritance) { 
+        //        return; // don't do anything
+        //     } else {
+        //         throw new Error(`Inheritance ${cls.getText()} is not found in the inheritance map.`);
+        //     }
+        // }
+
         const fmxInheritance = new Famix.Inheritance();
-        // const clsName = cls.getName();
-        const classFullyQualifiedName = FQNFunctions.getFQN(cls);
-        logger.debug(`createFamixInheritance: classFullyQualifiedName: class fqn = ${classFullyQualifiedName}`);
+
+        // logger.debug(`createFamixInheritance: classFullyQualifiedName: class fqn = ${classFullyQualifiedName}`);
+
         let subClass: Famix.Class | Famix.Interface | undefined;
         if (cls instanceof ClassDeclaration) {
-            subClass = this.fmxClassMap.get(classFullyQualifiedName);
+            subClass = this.createOrGetFamixClass(cls);
         }
         else {
-            subClass = this.fmxInterfaceMap.get(classFullyQualifiedName);
+            subClass = this.createOrGetFamixInterface(cls);
         }
+
         if (!subClass) {
-            throw new Error(`Subclass ${classFullyQualifiedName} not found in Class or Interface maps.`);
+            throw new Error(`Subclass ${cls} not found in Class or Interface maps.`);
         }
-        
-        let inhClassName: string | undefined;
-        let inhClassFullyQualifiedName: string;
+
         let superClass: Famix.Class | Famix.Interface | undefined;
-        if (inhClass instanceof ClassDeclaration || inhClass instanceof InterfaceDeclaration) {
-            inhClassName = inhClass.getName();
-            if (!inhClassName) {
-                throw new Error(`Inherited class or interface name not found for ${inhClass.getText()}.`);
-            }
-            inhClassFullyQualifiedName = FQNFunctions.getFQN(inhClass);
-            if (inhClass instanceof ClassDeclaration) {
-                superClass = this.fmxClassMap.get(inhClassFullyQualifiedName);
-            }
-            else {
-                superClass = this.fmxInterfaceMap.get(inhClassFullyQualifiedName);
-            }
-            if (!superClass) {
-                throw new Error(`Superclass ${classFullyQualifiedName} not found in Class or Interface maps.`);
+        // if (inhClass instanceof ClassDeclaration || inhClass instanceof InterfaceDeclaration) {
+        //     inhClassName = inhClass.getName();
+        //     if (!inhClassName) {
+        //         throw new Error(`Inherited class or interface name not found for ${inhClass.getText()}.`);
+        //     }
+        //     inhClassFullyQualifiedName = FQNFunctions.getFQN(inhClass);
+        //     if (inhClass instanceof ClassDeclaration) {
+        //         superClass = this.fmxClassMap.get(inhClassFullyQualifiedName);
+        //     }
+        //     else {
+        //         superClass = this.fmxInterfaceMap.get(inhClassFullyQualifiedName);
+        //     }
+        //     if (!superClass) {
+        //         throw new Error(`Superclass ${classFullyQualifiedName} not found in Class or Interface maps.`);
+        //     }
+        // }
+
+        // // it shouldn't add the class/interface again to the Map, it should use createOrGet (?)
+        // if (superClass === undefined) {
+
+        if (inhClass instanceof ClassDeclaration) {
+            // superClass = new Famix.Class();
+            superClass = this.createOrGetFamixClass(inhClass);
+            // this.fmxClassMap.set(inhClassFullyQualifiedName, superClass);
+        }
+        else if (inhClass instanceof InterfaceDeclaration) {
+            // superClass = new Famix.Interface();
+            superClass = this.createOrGetFamixInterface(inhClass);
+            // this.fmxInterfaceMap.set(inhClassFullyQualifiedName, superClass);
+        } else {
+            // inhClass instanceof ExpressionWithTypeArguments
+            const interfaceDeclaration = getInterfaceDeclarationFromExpression(inhClass);
+            if (interfaceDeclaration !== undefined) {
+                superClass = this.createOrGetFamixInterface(interfaceDeclaration);
+            } else {
+                throw new Error(`Interface declaration not found for ${inhClass.getText()}.`);
             }
         }
-        else {
-            // inhClass is an ExpressionWithTypeArguments
-            inhClassName = inhClass.getExpression().getText();
-            // what is inhClassFullyQualifiedName? TODO
-            inhClassFullyQualifiedName = 'Undefined_Scope_from_importer.' + inhClassName;
-        }
 
-        if (superClass === undefined) {
-            if (inhClass instanceof ClassDeclaration) {
-                superClass = new Famix.Class();
-                this.fmxClassMap.set(inhClassFullyQualifiedName, superClass);
-            }
-            else {
-                superClass = new Famix.Interface();
-                this.fmxInterfaceMap.set(inhClassFullyQualifiedName, superClass);
-            }
+        this.fmxElementObjectMap.set(superClass, inhClass);
 
-            this.fmxElementObjectMap.set(superClass,inhClass);
+        this.makeFamixIndexFileAnchor(inhClass, superClass);
 
-            superClass.name = inhClassName;
-            superClass.fullyQualifiedName = inhClassFullyQualifiedName;
-            superClass.isStub = true;
-
-            this.makeFamixIndexFileAnchor(inhClass, superClass);
-        
-            this.famixRep.addElement(superClass);
-        }
+        this.famixRep.addElement(superClass);
 
         fmxInheritance.subclass = subClass;
         fmxInheritance.superclass = superClass;
 
         this.famixRep.addElement(fmxInheritance);
+        // no FQN for inheritance
 
         // We don't map inheritance to the source code element because there are two elements (super, sub)
         // this.fmxElementObjectMap.set(fmxInheritance, null);
@@ -1333,7 +1385,7 @@ export class EntityDictionary {
             }
         }
 
-        logger.debug(`createFamixImportClause: Creating import clause:`);
+        logger.info(`creating a new FamixImportClause for ${importDeclaration?.getText()} in ${importer.getBaseName()}.`);
         const fmxImportClause = new Famix.ImportClause();
 
         let importedEntity: Famix.NamedEntity | Famix.StructuralEntity | undefined = undefined;
@@ -1385,7 +1437,7 @@ export class EntityDictionary {
             importedEntity.name = importedEntityName;
             initFQN(importDeclaration, importedEntity);
             this.makeFamixIndexFileAnchor(importElement, importedEntity);
-            importedEntity.fullyQualifiedName = pathName;
+            // importedEntity.fullyQualifiedName = pathName;
             const anyType = this.createOrGetFamixType('any', importDeclaration);
             (importedEntity as Famix.StructuralEntity).declaredType = anyType;
         } else {  // default imports, e.g. import ClassW from "./complexExportModule";  
@@ -1393,7 +1445,8 @@ export class EntityDictionary {
             pathName = pathName + (isDefaultExport ? "defaultExport" : "namespaceExport");
             importedEntity = new Famix.NamedEntity();
             importedEntity.name = importedEntityName;
-            importedEntity.fullyQualifiedName = pathName;
+            // importedEntity.fullyQualifiedName = pathName;
+            initFQN(importElement, importedEntity);
             this.makeFamixIndexFileAnchor(importElement, importedEntity);
         }
         // I don't think it should be added to the repository if it exists already
@@ -1829,14 +1882,14 @@ function initFQN(sourceElement: TSMorphObjectType, famixElement: Famix.SourcedEn
         let fqn = FQNFunctions.getFQN(sourceElement);
         // using regex, replace [blah] with [blahType]
         fqn = fqn.replace(/\[([^\]]+)\]/g, "[$1Type]");
-        logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+        logger.info("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
         famixElement.fullyQualifiedName = fqn;
         return;
     }
     // catch all (except comments)
     if (!(sourceElement instanceof CommentRange)) {
         const fqn = FQNFunctions.getFQN(sourceElement);
-        logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+        logger.info("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
         (famixElement as Famix.NamedEntity).fullyQualifiedName = fqn;
     } 
 }
@@ -1861,7 +1914,103 @@ function isTypeContext(sourceElement: ImportDeclaration | ImportEqualsDeclaratio
         sourceElement instanceof ImportSpecifier ||
         sourceElement instanceof EnumDeclaration ||
         sourceElement instanceof EnumMember ||
-        sourceElement instanceof TypeAliasDeclaration ||
-        sourceElement instanceof ExpressionWithTypeArguments;
+        sourceElement instanceof TypeAliasDeclaration
+        || sourceElement instanceof ImportDeclaration
+        || sourceElement instanceof ExpressionWithTypeArguments;
 }
 
+
+function getInterfaceDeclarationFromExpression(expression: ExpressionWithTypeArguments): InterfaceDeclaration | undefined {
+    // Step 1: Get the type of the expression
+    const type = expression.getType();
+
+    // Step 2: Get the symbol associated with the type
+    let symbol = type.getSymbol();
+
+    if (!symbol) {
+        // If symbol is not found, try to get the symbol from the identifier
+        const identifier = expression.getFirstDescendantByKind(SyntaxKind.Identifier);
+        if (!identifier) {
+            throw new Error(`Identifier not found for ${expression.getText()}.`);
+        }
+        symbol = identifier.getSymbol();
+        if (!symbol) {
+            throw new Error(`Symbol not found for ${identifier.getText()}.`);
+        }
+    }
+
+    // Step 3: Resolve the symbol to find the actual declaration
+    const interfaceDeclaration = resolveSymbolToInterfaceDeclaration(symbol);
+
+    if (!interfaceDeclaration) {
+        throw new Error(`Interface declaration not found for ${expression.getText()}.`);
+    }
+
+    return interfaceDeclaration;
+}
+
+import { Symbol as TSMorphSymbol } from "ts-morph";
+
+function resolveSymbolToInterfaceDeclaration(symbol: TSMorphSymbol): InterfaceDeclaration | undefined {
+    // Get the declarations associated with the symbol
+    const declarations = symbol.getDeclarations();
+
+    // Filter for InterfaceDeclaration
+    const interfaceDeclaration = declarations.find(declaration => declaration instanceof InterfaceDeclaration) as InterfaceDeclaration | undefined;
+
+    if (interfaceDeclaration) {
+        return interfaceDeclaration;
+    }
+
+    // Handle imports: If the symbol is imported, resolve the import to find the actual declaration
+    for (const declaration of declarations) {
+        if (declaration.getKind() === SyntaxKind.ImportSpecifier) {
+            const importSpecifier = declaration as ImportSpecifier;
+            const importDeclaration = importSpecifier.getImportDeclaration();
+            const moduleSpecifier = importDeclaration.getModuleSpecifierSourceFile();
+
+            if (moduleSpecifier) {
+                const exportedSymbols = moduleSpecifier.getExportSymbols();
+                const exportedSymbol = exportedSymbols.find(symbol => symbol.getName() === importSpecifier.getName());
+                if (exportedSymbol) {
+                    return resolveSymbolToInterfaceDeclaration(exportedSymbol);
+                }
+            }
+        }
+    }
+
+    return undefined;
+}
+
+// function oldGetInterfaceDeclarationFromExpression(expression: ExpressionWithTypeArguments): InterfaceDeclaration | undefined {
+//     // Two cases:
+//     // class A implements ImportedInterface, DeclaredInterface {}
+//     const type = expression.getType();
+
+//     // ImportedInterface: type will a symbol 
+//     let symbol = type.getAliasSymbol();  // will be defined for imported interfaces
+
+//     if (!symbol) {
+//         // DeclaredInterface: type will be an InterfaceDeclaration on Identifier node that is the child of the ExpressionWithTypeArguments
+//         const identifier = expression.getFirstDescendantByKind(SyntaxKind.Identifier);
+//         if (!identifier) {
+//             throw new Error(`Identifier not found for ${expression.getText()}.`);
+//         }
+//         symbol = identifier.getSymbol();
+//         if (!symbol) {
+//             throw new Error(`Symbol not found for ${identifier.getText()}.`);
+//         }
+//     }
+
+//     // Step 3: Get the declarations associated with the symbol
+//     const declarations = symbol.getDeclarations();
+
+//     // Step 4: Filter for InterfaceDeclaration
+//     const interfaceDeclaration = declarations.find(declaration => declaration instanceof InterfaceDeclaration) as InterfaceDeclaration | undefined;
+
+//     if (!interfaceDeclaration) {
+//         throw new Error(`Interface declaration not found for ${expression.getText()}.`);
+//     }
+
+//     return interfaceDeclaration;
+// }
