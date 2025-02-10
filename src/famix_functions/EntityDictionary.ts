@@ -1943,7 +1943,7 @@ function getInterfaceDeclarationFromExpression(expression: ExpressionWithTypeArg
     const interfaceDeclaration = resolveSymbolToInterfaceDeclaration(symbol);
 
     if (!interfaceDeclaration) {
-        throw new Error(`Interface declaration not found for ${expression.getText()}.`);
+        logger.error(`Interface declaration not found for ${expression.getText()}.`);
     }
 
     return interfaceDeclaration;

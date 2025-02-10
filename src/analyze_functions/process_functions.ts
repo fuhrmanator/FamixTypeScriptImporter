@@ -2,7 +2,7 @@ import { ClassDeclaration, MethodDeclaration, VariableStatement, FunctionDeclara
 import * as Famix from "../lib/famix/model/famix";
 import { calculate } from "../lib/ts-complex/cyclomatic-service";
 import * as fs from 'fs';
-import { logger , entityDictionary } from "../analyze";
+import { logger, entityDictionary } from "../analyze";
 import { getFQN } from "../fqn";
 import { InvocableType } from "src/famix_functions/EntityDictionary";
 
@@ -163,7 +163,7 @@ function processModule(m: ModuleDeclaration): Famix.Module {
     processVariables(m, fmxModule);
 
     processEnums(m, fmxModule);
-    
+
     processFunctions(m, fmxModule);
 
     processModules(m, fmxModule);
@@ -193,7 +193,7 @@ function processAliases(m: ContainerTypes, fmxScope: ScopedTypes): void {
  * @param m A container (a source file or a namespace)
  * @param fmxScope The Famix model of the container
  */
-function processClasses(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module ): void {
+function processClasses(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module): void {
     logger.debug(`processClasses: ---------- Finding Classes:`);
     const classesInArrowFunctions = getClassesDeclaredInArrowFunctions(m);
     const classes = m.getClasses().concat(classesInArrowFunctions);
@@ -233,7 +233,7 @@ function getClassesDeclaredInArrowFunctions(s: SourceFile | ModuleDeclaration): 
  * @param m A container (a source file or a namespace)
  * @param fmxScope The Famix model of the container
  */
-function processInterfaces(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module ): void {
+function processInterfaces(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module): void {
     logger.debug(`processInterfaces: ---------- Finding Interfaces:`);
     m.getInterfaces().forEach(i => {
         const fmxInterface = processInterface(i);
@@ -295,7 +295,7 @@ function processFunctions(m: ContainerTypes, fmxScope: ScopedTypes): void {
  * @param m A container (a source file or a namespace)
  * @param fmxScope The Famix model of the container
  */
-function processModules(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module ): void {
+function processModules(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module): void {
     logger.debug(`Finding Modules:`);
     m.getModules().forEach(md => {
         const fmxModule = processModule(md);
@@ -345,7 +345,7 @@ function processClass(c: ClassDeclaration): Famix.Class | Famix.ParametricClass 
         const fmxAcc = processMethod(acc);
         fmxClass.addMethod(fmxAcc);
     });
-    
+
     c.getSetAccessors().forEach(acc => {
         const fmxAcc = processMethod(acc);
         fmxClass.addMethod(fmxAcc);
@@ -470,7 +470,7 @@ function processFunction(f: FunctionDeclaration | FunctionExpression | ArrowFunc
     logger.debug(`Function: ${(f instanceof ArrowFunction ? "anonymous" : f.getName() ? f.getName() : "anonymous")}, (${f.getType().getText()}), fqn = ${getFQN(f)}`);
 
     let fmxFunction;
-    if( f instanceof ArrowFunction) {
+    if (f instanceof ArrowFunction) {
         fmxFunction = entityDictionary.createOrGetFamixArrowFunction(f, currentCC);
     } else {
         fmxFunction = entityDictionary.createOrGetFamixFunction(f, currentCC);
@@ -555,7 +555,7 @@ function processParameterAsProperty(param: ParameterDeclaration, classDecl: Clas
     if (classDecl instanceof ClassDeclaration) {
         const fmxClass = entityDictionary.createOrGetFamixClass(classDecl);
         fmxClass.addProperty(fmxProperty);
-    } else { 
+    } else {
         throw new Error("Unexpected type ClassExpression.");
     }
 
@@ -630,7 +630,7 @@ function processParameter(paramDecl: ParameterDeclaration): Famix.Parameter {
  * @param e A class, an interface, a method or a function
  * @param fmxScope The Famix model of the class, the interface, the method or the function
  */
-function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression |ArrowFunction, fmxScope: Famix.ParametricClass | Famix.ParametricInterface | Famix.Method | Famix.Accessor | Famix.Function | Famix.ArrowFunction): void {
+function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction, fmxScope: Famix.ParametricClass | Famix.ParametricInterface | Famix.Method | Famix.Accessor | Famix.Function | Famix.ArrowFunction): void {
     logger.debug(`Finding Type Parameters:`);
     e.getTypeParameters().forEach(tp => {
         const fmxParam = processTypeParameter(tp);
@@ -667,7 +667,7 @@ function processVariableStatement(v: VariableStatement): Array<Famix.Variable> {
         const fmxVar = processVariable(variable);
         processComments(v, fmxVar);
         fmxVariables.push(fmxVar);
-    }); 
+    });
 
     return fmxVariables;
 }
@@ -799,8 +799,8 @@ export function processAccesses(accessMap: Map<FamixID, AccessibleTSMorphElement
     accessMap.forEach((v, id) => {
         logger.debug(`Accesses to ${v.getName()}`);
         // try {
-            const temp_nodes = v.findReferencesAsNodes() as Array<Identifier>;
-            temp_nodes.forEach(node => processNodeForAccesses(node, id));
+        const temp_nodes = v.findReferencesAsNodes() as Array<Identifier>;
+        temp_nodes.forEach(node => processNodeForAccesses(node, id));
         // } catch (error) {
         //     logger.error(`> WARNING: got exception "${error}".\nContinuing...`);
         // }
@@ -814,16 +814,16 @@ export function processAccesses(accessMap: Map<FamixID, AccessibleTSMorphElement
  */
 function processNodeForAccesses(n: Identifier, id: number): void {
     // try {
-        // sometimes node's first ancestor is a PropertyDeclaration, which is not an access
-        // see https://github.com/fuhrmanator/FamixTypeScriptImporter/issues/9
-        // check for a node whose first ancestor is a property declaration and bail?
-        // This may be a bug in ts-morph?
-        if (n.getFirstAncestorOrThrow().getKindName() === "PropertyDeclaration") {
-            logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})'s first ancestor is a PropertyDeclaration. Skipping...`);
-            return;
-        }
-        entityDictionary.createFamixAccess(n, id);
-        logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})`);
+    // sometimes node's first ancestor is a PropertyDeclaration, which is not an access
+    // see https://github.com/fuhrmanator/FamixTypeScriptImporter/issues/9
+    // check for a node whose first ancestor is a property declaration and bail?
+    // This may be a bug in ts-morph?
+    if (n.getFirstAncestorOrThrow().getKindName() === "PropertyDeclaration") {
+        logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})'s first ancestor is a PropertyDeclaration. Skipping...`);
+        return;
+    }
+    entityDictionary.createFamixAccess(n, id);
+    logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})`);
     // } catch (error) {
     //     logger.error(`> Got exception "${error}".\nScopeDeclaration invalid for "${n.getSymbol().fullyQualifiedName}".\nContinuing...`);
     // }
@@ -845,12 +845,14 @@ export function processImportClausesForImportEqualsDeclarations(sourceFiles: Arr
                 // const importedEntity = node.getName();
                 // create a famix import clause
                 const namedImport = node.getNameNode();
-                entityDictionary.oldCreateOrGetFamixImportClause({importDeclaration: node,
-                    importerSourceFile: sourceFile, 
-                    moduleSpecifierFilePath: node.getModuleReference().getText(), 
-                    importElement: namedImport, 
-                    isInExports: exports.find(e => e.has(namedImport.getText())) !== undefined, 
-                    isDefaultExport: false});
+                entityDictionary.oldCreateOrGetFamixImportClause({
+                    importDeclaration: node,
+                    importerSourceFile: sourceFile,
+                    moduleSpecifierFilePath: node.getModuleReference().getText(),
+                    importElement: namedImport,
+                    isInExports: exports.find(e => e.has(namedImport.getText())) !== undefined,
+                    isDefaultExport: false
+                });
                 // entityDictionary.createFamixImportClause(importedEntity, importingEntity);
             }
         });
@@ -875,38 +877,44 @@ export function processImportClausesForModules(modules: Array<SourceFile>, expor
                 logger.info(`Importing (named) ${namedImport.getName()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
                 const importedEntityName = namedImport.getName();
                 const importFoundInExports = isInExports(exports, importedEntityName);
-                entityDictionary.oldCreateOrGetFamixImportClause({importDeclaration: impDecl,
-                    importerSourceFile: module, 
-                    moduleSpecifierFilePath: path, 
-                    importElement: namedImport, 
-                    isInExports: importFoundInExports, 
-                    isDefaultExport: false});
+                entityDictionary.oldCreateOrGetFamixImportClause({
+                    importDeclaration: impDecl,
+                    importerSourceFile: module,
+                    moduleSpecifierFilePath: path,
+                    importElement: namedImport,
+                    isInExports: importFoundInExports,
+                    isDefaultExport: false
+                });
             });
 
             const defaultImport = impDecl.getDefaultImport();
             if (defaultImport !== undefined) {
                 logger.info(`Importing (default) ${defaultImport.getText()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
                 // call with module, impDecl.getModuleSpecifierValue(), path, defaultImport, false, true
-                entityDictionary.oldCreateOrGetFamixImportClause({importDeclaration: impDecl,
+                entityDictionary.oldCreateOrGetFamixImportClause({
+                    importDeclaration: impDecl,
                     importerSourceFile: module,
                     moduleSpecifierFilePath: path,
                     importElement: defaultImport,
                     isInExports: false,
-                    isDefaultExport: true});
+                    isDefaultExport: true
+                });
             }
 
             const namespaceImport = impDecl.getNamespaceImport();
             if (namespaceImport !== undefined) {
                 logger.info(`Importing (namespace) ${namespaceImport.getText()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
-                entityDictionary.oldCreateOrGetFamixImportClause({importDeclaration: impDecl,
-                    importerSourceFile: module, 
-                    moduleSpecifierFilePath: path, 
-                    importElement: namespaceImport, 
-                    isInExports: false, 
-                    isDefaultExport: false});
+                entityDictionary.oldCreateOrGetFamixImportClause({
+                    importDeclaration: impDecl,
+                    importerSourceFile: module,
+                    moduleSpecifierFilePath: path,
+                    importElement: namespaceImport,
+                    isInExports: false,
+                    isDefaultExport: false
+                });
                 // entityDictionary.createFamixImportClause(module, impDecl.getModuleSpecifierValue(), path, namespaceImport, false, false);
             }
-        }); 
+        });
     });
 }
 
@@ -929,30 +937,40 @@ export function processInheritances(classes: ClassDeclaration[], interfaces: Int
     logger.info(`processInheritances: Creating inheritances:`);
     classes.forEach(cls => {
         logger.debug(`processInheritances: Checking class inheritance for ${cls.getName()}`);
-        const extClass = cls.getBaseClass();
-        if (extClass !== undefined) {
-            entityDictionary.createOrGetFamixInheritance(cls, extClass);
-            
-            logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), extClass: ${extClass.getName()}, (${extClass.getType().getText()})`);
+        try {
+            const extClass = cls.getBaseClass();
+            if (extClass !== undefined) {
+                entityDictionary.createOrGetFamixInheritance(cls, extClass);
+
+                logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), extClass: ${extClass.getName()}, (${extClass.getType().getText()})`);
+            }
+
+            logger.debug(`processInheritances: Checking interface inheritance for ${cls.getName()}`);
+            const implementedInterfaces = getImplementedOrExtendedInterfaces(interfaces, cls);
+            implementedInterfaces.forEach(impInter => {
+                entityDictionary.createOrGetFamixInheritance(cls, impInter);
+
+                logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), impInter: ${(impInter instanceof InterfaceDeclaration) ? impInter.getName() : impInter.getExpression().getText()}, (${(impInter instanceof InterfaceDeclaration) ? impInter.getType().getText() : impInter.getExpression().getText()})`);
+            });
         }
-
-        logger.debug(`processInheritances: Checking interface inheritance for ${cls.getName()}`);
-        const implementedInterfaces = getImplementedOrExtendedInterfaces(interfaces, cls);
-        implementedInterfaces.forEach(impInter => {
-            entityDictionary.createOrGetFamixInheritance(cls, impInter);
-
-            logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), impInter: ${(impInter instanceof InterfaceDeclaration) ? impInter.getName() : impInter.getExpression().getText()}, (${(impInter instanceof InterfaceDeclaration) ? impInter.getType().getText() : impInter.getExpression().getText()})`);
-        });
+        catch (error) {
+            logger.error(`> WARNING: got exception ${error}. Continuing...`);
+        }
     });
 
     interfaces.forEach(inter => {
-        logger.debug(`processInheritances: Checking interface inheritance for ${inter.getName()}`);
-        const extendedInterfaces = getImplementedOrExtendedInterfaces(interfaces, inter);
-        extendedInterfaces.forEach(extInter => {
-            entityDictionary.createOrGetFamixInheritance(inter, extInter);
+        try {
+            logger.debug(`processInheritances: Checking interface inheritance for ${inter.getName()}`);
+            const extendedInterfaces = getImplementedOrExtendedInterfaces(interfaces, inter);
+            extendedInterfaces.forEach(extInter => {
+                entityDictionary.createOrGetFamixInheritance(inter, extInter);
 
-            logger.debug(`processInheritances: inter: ${inter.getName()}, (${inter.getType().getText()}), extInter: ${(extInter instanceof InterfaceDeclaration) ? extInter.getName() : extInter.getExpression().getText()}, (${(extInter instanceof InterfaceDeclaration) ? extInter.getType().getText() : extInter.getExpression().getText()})`);
-        });
+                logger.debug(`processInheritances: inter: ${inter.getName()}, (${inter.getType().getText()}), extInter: ${(extInter instanceof InterfaceDeclaration) ? extInter.getName() : extInter.getExpression().getText()}, (${(extInter instanceof InterfaceDeclaration) ? extInter.getType().getText() : extInter.getExpression().getText()})`);
+            });
+        }
+        catch (error) {
+            logger.error(`> WARNING: got exception ${error}. Continuing...`);
+        }
     });
 }
 
@@ -1005,12 +1023,12 @@ function processNodeForInvocations(nodeReferencingInvocable: Identifier, invocab
 //         entityDictionary.createFamixConcretisationClassOrInterfaceSpecialisation(cls);
 //         entityDictionary.createFamixConcretisationGenericInstantiation(cls);
 //         entityDictionary.createFamixConcretisationInterfaceClass(cls);
-//         entityDictionary.createFamixConcretisationTypeInstanciation(cls); 
+//         entityDictionary.createFamixConcretisationTypeInstanciation(cls);
 
 //     });
 //     interfaces.forEach(inter => {
 //         logger.debug(`processConcretisations: Checking interface concretisation for ${inter.getName()}`);
-//         entityDictionary.createFamixConcretisationTypeInstanciation(inter); 
+//         entityDictionary.createFamixConcretisationTypeInstanciation(inter);
 //         entityDictionary.createFamixConcretisationClassOrInterfaceSpecialisation(inter);
 //     });
 //     functions.forEach(func => {
