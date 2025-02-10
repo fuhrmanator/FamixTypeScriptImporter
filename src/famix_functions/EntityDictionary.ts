@@ -1882,14 +1882,14 @@ function initFQN(sourceElement: TSMorphObjectType, famixElement: Famix.SourcedEn
         let fqn = FQNFunctions.getFQN(sourceElement);
         // using regex, replace [blah] with [blahType]
         fqn = fqn.replace(/\[([^\]]+)\]/g, "[$1Type]");
-        logger.info("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+        logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
         famixElement.fullyQualifiedName = fqn;
         return;
     }
     // catch all (except comments)
     if (!(sourceElement instanceof CommentRange)) {
         const fqn = FQNFunctions.getFQN(sourceElement);
-        logger.info("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
+        logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
         (famixElement as Famix.NamedEntity).fullyQualifiedName = fqn;
     } 
 }
