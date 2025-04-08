@@ -10,16 +10,126 @@ function isFQNNode(node: Node): node is FQNNode {
     return Node.isVariableDeclaration(node) || Node.isArrowFunction(node) || Node.isIdentifier(node) || Node.isMethodDeclaration(node) || Node.isClassDeclaration(node) || Node.isClassExpression(node) || Node.isDecorator(node) || Node.isModuleDeclaration(node) || Node.isCallExpression(node);
 }
 
-export function getFQN(node: FQNNode | Node): string {
-    const absolutePathProject = entityDictionary.famixRep.getAbsolutePath();
+/**
+ * Builds a map of method positions to their property keys in object literals.
+ * Scans all variable declarations in a source file, targeting object literals with any keys
+ * (e.g., `3: { method() {} }` or `add: { compute() {} }`), and maps each method's start position to its key.
+ * Logs each step for debugging.
+ * 
+ * @param sourceFile The TypeScript source file to analyze
+ * @returns A Map where keys are method start positions and values are their property keys (e.g., "3", "add")
+ */
+function buildStageMethodMap(sourceFile: SourceFile): Map<number, string> {
+    const stageMap = new Map<number, string>();
 
+    sourceFile.getVariableDeclarations().forEach(varDecl => {
+        const varName = varDecl.getName();
+        const initializer = varDecl.getInitializer();
+
+        if (!initializer || !Node.isObjectLiteralExpression(initializer)) {
+            console.log(`  Debug: ${varName} initializer not an object literal`);
+            return;
+        }
+
+        initializer.getProperties().forEach(prop => {
+            let key: string | undefined;
+
+            if (Node.isPropertyAssignment(prop)) {
+                const nameNode = prop.getNameNode();
+
+                if (Node.isIdentifier(nameNode)) {
+                    key = nameNode.getText();
+                    console.log(`  Debug: Found identifier key=${key}`);
+                } else if (Node.isStringLiteral(nameNode)) {
+                    key = nameNode.getText().replace(/^"(.+)"$/, '$1').replace(/^'(.+)'$/, '$1');
+                    console.log(`  Debug: Found string literal key=${key}`);
+                } else if (Node.isNumericLiteral(nameNode)) {
+                    key = nameNode.getText();
+                    console.log(`  Debug: Found numeric literal key=${key}`);
+                } else if (Node.isComputedPropertyName(nameNode)) {
+                    const expression = nameNode.getExpression();
+
+                    if (Node.isIdentifier(expression)) {
+                        // Resolve variable value if possible
+                        const symbol = expression.getSymbol();
+                        if (symbol) {
+                            const decl = symbol.getDeclarations()[0];
+                            if (Node.isVariableDeclaration(decl) && decl.getInitializer()) {
+                                const init = decl.getInitializer()!;
+                                if (Node.isStringLiteral(init) || Node.isNumericLiteral(init)) {
+                                    key = init.getText().replace(/^"(.+)"$/, '$1').replace(/^'(.+)'$/, '$1');
+                                    console.log(`  Debug: Resolved computed identifier key=${key}`);
+                                }
+                            }
+                        }
+                        if (!key) {
+                            key = expression.getText();
+                            console.log(`  Debug: Fallback computed identifier key=${key}`);
+                        }
+                    } else if (Node.isBinaryExpression(expression) && expression.getOperatorToken().getText() === '+') {
+                        // Handle simple string concatenation (e.g., "A" + "B")
+                        const left = expression.getLeft();
+                        const right = expression.getRight();
+                        if (Node.isStringLiteral(left) && Node.isStringLiteral(right)) {
+                            key = left.getLiteralText() + right.getLiteralText();
+                            console.log(`  Debug: Evaluated concat key=${key}`);
+                        }
+                    } else if (Node.isTemplateExpression(expression)) {
+                        // Handle template literals (e.g., `key-${1}`)
+                        const head = expression.getHead().getLiteralText();
+                        const spans = expression.getTemplateSpans();
+                        if (spans.length === 1 && Node.isNumericLiteral(spans[0].getExpression())) {
+                            const num = spans[0].getExpression().getText();
+                            key = `${head}${num}`;
+                            console.log(`  Debug: Evaluated template key=${key}`);
+                        }
+                    }
+                    if (!key) {
+                        key = expression.getText(); // Fallback
+                        console.log(`  Debug: Fallback computed key=${key}`);
+                    }
+                } else {
+                    return;
+                }
+
+                const propInitializer = prop.getInitializer();
+                if (propInitializer && Node.isObjectLiteralExpression(propInitializer)) {
+                    propInitializer.getDescendantsOfKind(SyntaxKind.MethodDeclaration).forEach(method => {
+                        const methodName = method.getName();
+                        const pos = method.getStart();
+                        if (key) {
+                            stageMap.set(pos, key);
+                            console.log(`  Debug: Mapped key=${key} to ${methodName} @ pos=${pos}`);
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    return stageMap;
+}
+
+/**
+ * Generates a fully qualified name (FQN) for a given AST node.
+ * Constructs an FQN by traversing the node's ancestry, adding names and keys
+ * (numeric or string from object literals ...) as needed, prefixed with the file's relative path.
+ * 
+ * @param node The AST node to generate an FQN for
+ * @returns A string representing the node's FQN (e.g., "{path}.operations.add.compute[MethodDeclaration]")
+ */
+export function getFQN(node: FQNNode | Node): string {
     const sourceFile = node.getSourceFile();
+    const absolutePathProject = entityDictionary.famixRep.getAbsolutePath();
     const parts: string[] = [];
     let currentNode: Node | undefined = node;
+
+    const stageMap = buildStageMethodMap(sourceFile);
 
     while (currentNode && !Node.isSourceFile(currentNode)) {
         const { line, column } = sourceFile.getLineAndColumnAtPos(currentNode.getStart());
         const lc = `${line}:${column}`;
+
         if (Node.isClassDeclaration(currentNode) || 
             Node.isClassExpression(currentNode) || 
             Node.isInterfaceDeclaration(currentNode) ||
@@ -41,44 +151,78 @@ export function getFQN(node: FQNNode | Node): string {
             Node.isArrayLiteralExpression(currentNode) ||
             Node.isImportSpecifier(currentNode) ||
             Node.isIdentifier(currentNode)) {
-            const name = Node.isIdentifier(currentNode) ? currentNode.getText() 
-                : getNameOfNode(currentNode) /* currentNode.getName() */ || 'Unnamed_' + currentNode.getKindName() + `(${lc})`;
+            let name: string;
+            if (Node.isImportSpecifier(currentNode)) {
+                const alias = currentNode.getAliasNode()?.getText();
+                if (alias) {
+                    let importDecl: Node | undefined = currentNode;
+                    while (importDecl && !Node.isImportDeclaration(importDecl)) {
+                        importDecl = importDecl.getParent();
+                    }
+                    const moduleSpecifier = importDecl && Node.isImportDeclaration(importDecl) 
+                        ? importDecl.getModuleSpecifier().getLiteralText() 
+                        : "unknown";
+                    name = currentNode.getName(); 
+                    name = `${name} as ${alias}[ImportSpecifier<${moduleSpecifier}>]`;
+                } else {
+                    name = currentNode.getName(); 
+                }
+            } else {
+                name = Node.isIdentifier(currentNode) ? currentNode.getText() 
+                    : (currentNode as any).getName?.() || `Unnamed_${currentNode.getKindName()}(${lc})`;
+            }
             parts.unshift(name);
-        }
-        // unnamed nodes
+            console.log(`  Step: text=${currentNode.getText().slice(0, 50)}..., kind=${currentNode.getKindName()}, pos=${currentNode.getStart()}, name=${name}, parts=${JSON.stringify(parts)}`);
+
+            if (Node.isMethodDeclaration(currentNode)) {
+                const key = stageMap.get(currentNode.getStart());
+                if (key) {
+                    console.log(`  Found key=${key} for ${name} @ pos=${currentNode.getStart()} from map`);
+                    parts.unshift(key);
+                    console.log(`  Added key=${key}, parts=${JSON.stringify(parts)}`);
+                    const parentFQN = parts.slice(0, -1).join(".");
+                    console.log(`  Debug: Method FQN=${parentFQN}.${name}[${node.getKindName()}], Parent FQN=${parentFQN}`);
+                } else {
+                    console.log(`  No key mapped for ${name} @ pos=${currentNode.getStart()}`);
+                }
+            }
+        } 
         else if (Node.isArrowFunction(currentNode) || 
-                   Node.isBlock(currentNode) || 
-                   Node.isForInStatement(currentNode) || 
-                   Node.isForOfStatement(currentNode) || 
-                   Node.isForStatement(currentNode) || 
-                   Node.isCatchClause(currentNode)) {
-            parts.unshift(`${currentNode.getKindName()}(${lc})`);
-        } else if (Node.isConstructorDeclaration(currentNode)) {
-            parts.unshift(`constructor`);
+                 Node.isBlock(currentNode) || 
+                 Node.isForInStatement(currentNode) || 
+                 Node.isForOfStatement(currentNode) || 
+                 Node.isForStatement(currentNode) || 
+                 Node.isCatchClause(currentNode)) {
+            const name = `${currentNode.getKindName()}(${lc})`;
+            parts.unshift(name);
+            console.log(`  Step: text=${currentNode.getText().slice(0, 50)}..., kind=${currentNode.getKindName()}, pos=${currentNode.getStart()}, name=${name}, parts=${JSON.stringify(parts)}`);
+        } 
+        else if (Node.isConstructorDeclaration(currentNode)) {
+            const name = "constructor";
+            parts.unshift(name);
+            console.log(`  Step: text=${currentNode.getText().slice(0, 50)}..., kind=${currentNode.getKindName()}, pos=${currentNode.getStart()}, name=${name}, parts=${JSON.stringify(parts)}`);
         } else {
-            // For other kinds, you might want to handle them specifically or ignore
-            logger.debug(`Ignoring node kind: ${currentNode.getKindName()}`);
+            console.log(`Ignoring node kind: ${currentNode.getKindName()}`);
         }
+
         currentNode = currentNode.getParent();
     }
 
-
-
-    // Prepend the relative path of the source file
     let relativePath = entityDictionary.convertToRelativePath(
         path.normalize(sourceFile.getFilePath()), 
-                       absolutePathProject).replace(/\\/sg, "/");
-                       
+        absolutePathProject
+    ).replace(/\\/g, "/");
+
     if (relativePath.includes("..")) {
-        logger.error(`Relative path contains ../: ${relativePath}`);
+        console.log(`Relative path contains ../: ${relativePath}`);
     }
     if (relativePath.startsWith("/")) {
-        relativePath = relativePath.substring(1);
+        relativePath = relativePath.slice(1);
     }
     parts.unshift(`{${relativePath}}`);
-    const fqn = parts.join(".") + `[${node.getKindName()}]`;  // disambiguate
 
-    logger.debug(`Generated FQN: ${fqn} for node: ${node.getKindName()}`);
+    const fqn = parts.join(".") + `[${node.getKindName()}]`;
+    console.log(`getFQN End: fqn=${fqn}, parts=${JSON.stringify(parts)}, node=${node.getText().slice(0, 50)}..., kind=${node.getKindName()}`);
     return fqn;
 }
 

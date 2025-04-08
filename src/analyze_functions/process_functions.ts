@@ -78,19 +78,15 @@ export function getImplementedOrExtendedInterfaces(interfaces: Array<InterfaceDe
     return implementedOrExtendedInterfaces;
 }
 
-/**
- * Builds a Famix model for an array of source files
- * @param sourceFiles An array of source files
- */
 export function processFiles(sourceFiles: Array<SourceFile>): void {
     sourceFiles.forEach(file => {
         logger.info(`File: >>>>>>>>>> ${file.getFilePath()}`);
 
-        // Computes the cyclomatic complexity metrics for the current source file if it exists (i.e. if it is not from a jest test)
-        if (fs.existsSync(file.getFilePath()))
+        if (fs.existsSync(file.getFilePath())) {
             currentCC = calculate(file.getFilePath());
-        else
+        } else {
             currentCC = {};
+        }
 
         processFile(file);
     });
@@ -115,21 +111,17 @@ function processFile(f: SourceFile): void {
     logger.debug(`processFile: file: ${f.getBaseName()}, fqn = ${fmxFile.fullyQualifiedName}`);
 
     processComments(f, fmxFile);
-
     processAliases(f, fmxFile);
-
     processClasses(f, fmxFile);
-
-    processInterfaces(f, fmxFile);
-
-    processVariables(f, fmxFile);
-
-    processEnums(f, fmxFile);
-
-    processFunctions(f, fmxFile);
-
+    processInterfaces(f, fmxFile); 
     processModules(f, fmxFile);
+    processVariables(f, fmxFile); // This will handle our object literal methods
+    processEnums(f, fmxFile);
+    processFunctions(f, fmxFile);
+   
+
 }
+
 
 export function isAmbient(node: ModuleDeclaration): boolean {
     // An ambient module has the DeclareKeyword modifier.
@@ -252,6 +244,26 @@ function processVariables(m: ContainerTypes, fmxScope: Famix.ScriptEntity | Fami
         const fmxVariables = processVariableStatement(v);
         fmxVariables.forEach(fmxVariable => {
             fmxScope.addVariable(fmxVariable);
+        });
+
+        // Check each VariableDeclaration for object literal methods
+        v.getDeclarations().forEach(varDecl => {
+            const varName = varDecl.getName();
+            console.log(`Checking variable: ${varName} at pos=${varDecl.getStart()}`);
+            const initializer = varDecl.getInitializer();
+            if (initializer && Node.isObjectLiteralExpression(initializer)) {
+                initializer.getProperties().forEach(prop => {
+                    if (Node.isPropertyAssignment(prop)) {
+                        const nested = prop.getInitializer();
+                        if (nested && Node.isObjectLiteralExpression(nested)) {
+                            nested.getDescendantsOfKind(SyntaxKind.MethodDeclaration).forEach(method => {
+                                console.log(`Found object literal method: ${method.getName()} at pos=${method.getStart()}`);
+                                entityDictionary.createOrGetFamixMethod(method, currentCC);
+                            });
+                        }
+                    }
+                });
+            }
         });
     });
 }
@@ -868,7 +880,7 @@ export function processImportClausesForImportEqualsDeclarations(sourceFiles: Arr
 export function processImportClausesForModules(modules: Array<SourceFile>, exports: Array<ReadonlyMap<string, ExportedDeclarations[]>>): void {
     logger.info(`Creating import clauses from ${modules.length} modules:`);
     modules.forEach(module => {
-        const modulePath = module.getFilePath(); // + module.getBaseName();
+        const modulePath = module.getFilePath();
         module.getImportDeclarations().forEach(impDecl => {
             logger.info(`Importing ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
             const path = getModulePath(impDecl);
@@ -877,6 +889,7 @@ export function processImportClausesForModules(modules: Array<SourceFile>, expor
                 logger.info(`Importing (named) ${namedImport.getName()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
                 const importedEntityName = namedImport.getName();
                 const importFoundInExports = isInExports(exports, importedEntityName);
+                logger.debug(`Processing ImportSpecifier: ${namedImport.getText()}, pos=${namedImport.getStart()}`);
                 entityDictionary.oldCreateOrGetFamixImportClause({
                     importDeclaration: impDecl,
                     importerSourceFile: module,
@@ -890,7 +903,7 @@ export function processImportClausesForModules(modules: Array<SourceFile>, expor
             const defaultImport = impDecl.getDefaultImport();
             if (defaultImport !== undefined) {
                 logger.info(`Importing (default) ${defaultImport.getText()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
-                // call with module, impDecl.getModuleSpecifierValue(), path, defaultImport, false, true
+                logger.debug(`Processing Default Import: ${defaultImport.getText()}, pos=${defaultImport.getStart()}`);
                 entityDictionary.oldCreateOrGetFamixImportClause({
                     importDeclaration: impDecl,
                     importerSourceFile: module,
@@ -912,7 +925,6 @@ export function processImportClausesForModules(modules: Array<SourceFile>, expor
                     isInExports: false,
                     isDefaultExport: false
                 });
-                // entityDictionary.createFamixImportClause(module, impDecl.getModuleSpecifierValue(), path, namespaceImport, false, false);
             }
         });
     });
