@@ -27,7 +27,6 @@ function buildStageMethodMap(sourceFile: SourceFile): Map<number, string> {
         const initializer = varDecl.getInitializer();
 
         if (!initializer || !Node.isObjectLiteralExpression(initializer)) {
-            console.log(`  Debug: ${varName} initializer not an object literal`);
             return;
         }
 
@@ -39,13 +38,10 @@ function buildStageMethodMap(sourceFile: SourceFile): Map<number, string> {
 
                 if (Node.isIdentifier(nameNode)) {
                     key = nameNode.getText();
-                    console.log(`  Debug: Found identifier key=${key}`);
                 } else if (Node.isStringLiteral(nameNode)) {
                     key = nameNode.getText().replace(/^"(.+)"$/, '$1').replace(/^'(.+)'$/, '$1');
-                    console.log(`  Debug: Found string literal key=${key}`);
                 } else if (Node.isNumericLiteral(nameNode)) {
                     key = nameNode.getText();
-                    console.log(`  Debug: Found numeric literal key=${key}`);
                 } else if (Node.isComputedPropertyName(nameNode)) {
                     const expression = nameNode.getExpression();
 
@@ -58,13 +54,11 @@ function buildStageMethodMap(sourceFile: SourceFile): Map<number, string> {
                                 const init = decl.getInitializer()!;
                                 if (Node.isStringLiteral(init) || Node.isNumericLiteral(init)) {
                                     key = init.getText().replace(/^"(.+)"$/, '$1').replace(/^'(.+)'$/, '$1');
-                                    console.log(`  Debug: Resolved computed identifier key=${key}`);
                                 }
                             }
                         }
                         if (!key) {
                             key = expression.getText();
-                            console.log(`  Debug: Fallback computed identifier key=${key}`);
                         }
                     } else if (Node.isBinaryExpression(expression) && expression.getOperatorToken().getText() === '+') {
                         // Handle simple string concatenation (e.g., "A" + "B")
@@ -72,7 +66,6 @@ function buildStageMethodMap(sourceFile: SourceFile): Map<number, string> {
                         const right = expression.getRight();
                         if (Node.isStringLiteral(left) && Node.isStringLiteral(right)) {
                             key = left.getLiteralText() + right.getLiteralText();
-                            console.log(`  Debug: Evaluated concat key=${key}`);
                         }
                     } else if (Node.isTemplateExpression(expression)) {
                         // Handle template literals (e.g., `key-${1}`)
@@ -81,12 +74,10 @@ function buildStageMethodMap(sourceFile: SourceFile): Map<number, string> {
                         if (spans.length === 1 && Node.isNumericLiteral(spans[0].getExpression())) {
                             const num = spans[0].getExpression().getText();
                             key = `${head}${num}`;
-                            console.log(`  Debug: Evaluated template key=${key}`);
                         }
                     }
                     if (!key) {
                         key = expression.getText(); // Fallback
-                        console.log(`  Debug: Fallback computed key=${key}`);
                     }
                 } else {
                     return;
@@ -99,7 +90,6 @@ function buildStageMethodMap(sourceFile: SourceFile): Map<number, string> {
                         const pos = method.getStart();
                         if (key) {
                             stageMap.set(pos, key);
-                            console.log(`  Debug: Mapped key=${key} to ${methodName} @ pos=${pos}`);
                         }
                     });
                 }
@@ -108,6 +98,45 @@ function buildStageMethodMap(sourceFile: SourceFile): Map<number, string> {
     });
 
     return stageMap;
+}
+
+/**
+ * Builds a map of method positions to their index in class/interface declarations
+ * @param sourceFile The TypeScript source file to analyze
+ * @returns A Map where keys are method start positions and values are their positional index (1-based)
+ */
+function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
+    const positionMap = new Map<number, number>();
+    
+    // Handle classes
+    sourceFile.getClasses().forEach(classNode => {
+        const methods = classNode.getMethods();
+        const methodCounts = new Map<string, number>();
+        
+        methods.forEach(method => {
+            const methodName = method.getName();
+            const count = (methodCounts.get(methodName) || 0) + 1;
+            methodCounts.set(methodName, count);
+            
+            positionMap.set(method.getStart(), count);
+        });
+    });
+    
+    // Handle interfaces
+    sourceFile.getInterfaces().forEach(interfaceNode => {
+        const methods = interfaceNode.getMethods();
+        const methodCounts = new Map<string, number>();
+        
+        methods.forEach(method => {
+            const methodName = method.getName();
+            const count = (methodCounts.get(methodName) || 0) + 1;
+            methodCounts.set(methodName, count);
+            
+            positionMap.set(method.getStart(), count);
+        });
+    });
+    
+    return positionMap;
 }
 
 /**
@@ -125,6 +154,7 @@ export function getFQN(node: FQNNode | Node): string {
     let currentNode: Node | undefined = node;
 
     const stageMap = buildStageMethodMap(sourceFile);
+    const methodPositionMap = buildMethodPositionMap(sourceFile);
 
     while (currentNode && !Node.isSourceFile(currentNode)) {
         const { line, column } = sourceFile.getLineAndColumnAtPos(currentNode.getStart());
@@ -171,19 +201,30 @@ export function getFQN(node: FQNNode | Node): string {
                 name = Node.isIdentifier(currentNode) ? currentNode.getText() 
                     : (currentNode as any).getName?.() || `Unnamed_${currentNode.getKindName()}(${lc})`;
             }
-            parts.unshift(name);
-            console.log(`  Step: text=${currentNode.getText().slice(0, 50)}..., kind=${currentNode.getKindName()}, pos=${currentNode.getStart()}, name=${name}, parts=${JSON.stringify(parts)}`);
 
-            if (Node.isMethodDeclaration(currentNode)) {
+            if (Node.isMethodSignature(currentNode)) {
+                const method = currentNode as MethodSignature;
+                const params = method.getParameters().map(p => {
+                    const typeText = p.getType().getText().replace(/\s+/g, "");
+                    return typeText || "any"; // Fallback for untyped parameters
+                });
+                const returnType = method.getReturnType().getText().replace(/\s+/g, "") || "void";
+                name = `${name}(${params.join(",")}):${returnType}`;
+            }
+
+            parts.unshift(name);
+
+            if (Node.isMethodDeclaration(currentNode) || Node.isMethodSignature(currentNode)) {
                 const key = stageMap.get(currentNode.getStart());
                 if (key) {
-                    console.log(`  Found key=${key} for ${name} @ pos=${currentNode.getStart()} from map`);
                     parts.unshift(key);
-                    console.log(`  Added key=${key}, parts=${JSON.stringify(parts)}`);
-                    const parentFQN = parts.slice(0, -1).join(".");
-                    console.log(`  Debug: Method FQN=${parentFQN}.${name}[${node.getKindName()}], Parent FQN=${parentFQN}`);
                 } else {
-                    console.log(`  No key mapped for ${name} @ pos=${currentNode.getStart()}`);
+                    // Check if this is a method that needs positional index
+                    const positionIndex = methodPositionMap.get(currentNode.getStart());
+                    if (positionIndex && positionIndex > 1) {
+                        // Only add position if it's not the first occurrence (backward compatibility)
+                        parts.unshift(positionIndex.toString());
+                    }
                 }
             }
         } 
@@ -195,12 +236,10 @@ export function getFQN(node: FQNNode | Node): string {
                  Node.isCatchClause(currentNode)) {
             const name = `${currentNode.getKindName()}(${lc})`;
             parts.unshift(name);
-            console.log(`  Step: text=${currentNode.getText().slice(0, 50)}..., kind=${currentNode.getKindName()}, pos=${currentNode.getStart()}, name=${name}, parts=${JSON.stringify(parts)}`);
         } 
         else if (Node.isConstructorDeclaration(currentNode)) {
             const name = "constructor";
             parts.unshift(name);
-            console.log(`  Step: text=${currentNode.getText().slice(0, 50)}..., kind=${currentNode.getKindName()}, pos=${currentNode.getStart()}, name=${name}, parts=${JSON.stringify(parts)}`);
         } else {
             console.log(`Ignoring node kind: ${currentNode.getKindName()}`);
         }
@@ -222,7 +261,6 @@ export function getFQN(node: FQNNode | Node): string {
     parts.unshift(`{${relativePath}}`);
 
     const fqn = parts.join(".") + `[${node.getKindName()}]`;
-    console.log(`getFQN End: fqn=${fqn}, parts=${JSON.stringify(parts)}, node=${node.getText().slice(0, 50)}..., kind=${node.getKindName()}`);
     return fqn;
 }
 

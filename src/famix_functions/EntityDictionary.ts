@@ -530,9 +530,11 @@ export class EntityDictionary {
     public createOrGetFamixMethod(
         method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration,
         currentCC: { [key: string]: number }
-    ): Famix.Method | Famix.Accessor | Famix.ParametricMethod {
+    ): Famix.Method | Famix.Accessor | Famix.ParametricMethod { 
+
         const fqn = FQNFunctions.getFQN(method);
         logger.debug(`Processing method ${fqn}`);
+       
     
         let fmxMethod = this.fmxFunctionAndMethodMap.get(fqn) as Famix.Method | Famix.Accessor | Famix.ParametricMethod;
         if (!fmxMethod) {
@@ -948,6 +950,36 @@ export class EntityDictionary {
      */
 public createOrGetFamixType(typeName: string, element: TSMorphTypeDeclaration): Famix.Type {
         logger.debug(`Creating (or getting) type: '${typeName}' of element: '${element?.getText().slice(0, 50)}...' of kind: ${element?.getKindName()}`);
+        if (element.isKind(SyntaxKind.MethodSignature) || element.isKind(SyntaxKind.MethodDeclaration)) {
+            const methodFQN = FQNFunctions.getFQN(element);
+            const returnTypeFQN = `${methodFQN.replace(/\[Method(Signature|Declaration)\]$/, '')}[ReturnType]`;
+            
+            // Check if we already have this return type in the repository
+            const existingType = this.famixRep.getFamixEntityByFullyQualifiedName(returnTypeFQN);
+            if (existingType) {
+                return existingType as Famix.Type;
+            }
+    
+            const fmxType = new Famix.Type();
+            fmxType.name = typeName;
+            fmxType.fullyQualifiedName = returnTypeFQN;
+            
+            // Set container (same as method's container)
+            const methodAncestor = Helpers.findTypeAncestor(element);
+            if (methodAncestor) {
+                const ancestorFQN = FQNFunctions.getFQN(methodAncestor);
+                const ancestor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFQN) as Famix.ContainerEntity;
+                if (ancestor) {
+                    fmxType.container = ancestor;
+                }
+            }
+    
+            this.famixRep.addElement(fmxType);
+            this.fmxTypeMap.set(element, fmxType);
+            this.fmxElementObjectMap.set(fmxType, element);
+            return fmxType;
+        }
+
         const isPrimitive = isPrimitiveType(typeName);
         const isParametricType =
             (element instanceof ClassDeclaration && element.getTypeParameters().length > 0) ||
@@ -980,7 +1012,7 @@ public createOrGetFamixType(typeName: string, element: TSMorphTypeDeclaration): 
             }
     
             const fmxType = new Famix.Type();
-            fmxType.name = typeName;    
+            fmxType.name = typeName;
             if (ancestor) {
                 fmxType.container = ancestor;
             } else {
