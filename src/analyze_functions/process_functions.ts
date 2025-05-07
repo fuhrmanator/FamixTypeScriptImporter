@@ -17,6 +17,7 @@ export const interfaces = new Array<InterfaceDeclaration>(); // Array of all the
 export const modules = new Array<SourceFile>(); // Array of all the source files which are modules
 export const listOfExportMaps = new Array<ReadonlyMap<string, ExportedDeclarations[]>>(); // Array of all the export maps
 export let currentCC: { [key: string]: number }; // Stores the cyclomatic complexity metrics for the current source file
+const processedNodesWithTypeParams = new Set<number>(); // Set of nodes that have been processed and have type parameters
 
 /**
  * Checks if the file has any imports or exports to be considered a module
@@ -637,17 +638,34 @@ function processParameter(paramDecl: ParameterDeclaration): Famix.Parameter {
     return fmxParam;
 }
 
-/**
- * Builds a Famix model for the type parameters of a class, an interface, a method or a function
- * @param e A class, an interface, a method or a function
- * @param fmxScope The Famix model of the class, the interface, the method or the function
- */
-function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction, fmxScope: Famix.ParametricClass | Famix.ParametricInterface | Famix.Method | Famix.Accessor | Famix.Function | Famix.ArrowFunction): void {
+function processTypeParameters(
+    e: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction,
+    fmxScope: Famix.ParametricClass | Famix.ParametricInterface | Famix.Method | Famix.Accessor | Famix.Function | Famix.ArrowFunction
+): void {
     logger.debug(`Finding Type Parameters:`);
-    e.getTypeParameters().forEach(tp => {
+    const nodeStart = e.getStart();
+
+    // Check if this node has already been processed
+    if (processedNodesWithTypeParams.has(nodeStart)) {
+        return;
+    }
+
+    // Get type parameters
+    const typeParams = e.getTypeParameters();
+
+    // Process each type parameter
+    typeParams.forEach((tp, index) => {
         const fmxParam = processTypeParameter(tp);
         fmxScope.addGenericParameter(fmxParam);
     });
+
+    // Log if no type parameters were found
+    if (typeParams.length === 0) {
+        logger.debug(`[processTypeParameters] No type parameters found for this node`);
+    }
+
+    // Mark this node as processed
+    processedNodesWithTypeParams.add(nodeStart);
 }
 
 /**
@@ -657,11 +675,8 @@ function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | Meth
  */
 function processTypeParameter(tp: TypeParameterDeclaration): Famix.ParameterType {
     const fmxTypeParameter = entityDictionary.createFamixParameterType(tp);
-
     logger.debug(`type parameter: ${tp.getName()}, (${tp.getType().getText()}), fqn = ${fmxTypeParameter.fullyQualifiedName}`);
-
     processComments(tp, fmxTypeParameter);
-
     return fmxTypeParameter;
 }
 

@@ -531,13 +531,17 @@ export class EntityDictionary {
         method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration,
         currentCC: { [key: string]: number }
     ): Famix.Method | Famix.Accessor | Famix.ParametricMethod { 
-
+        // console.log(`\n=== Creating/Getting Method ===`);
+        // console.log(`Method kind: ${method.getKindName()}`);
+        // console.log(`Method text: ${method.getText().slice(0, 50)}...`);
         const fqn = FQNFunctions.getFQN(method);
+        // console.log(`Method FQN: ${fqn}`);
         logger.debug(`Processing method ${fqn}`);
        
     
         let fmxMethod = this.fmxFunctionAndMethodMap.get(fqn) as Famix.Method | Famix.Accessor | Famix.ParametricMethod;
         if (!fmxMethod) {
+            // console.log('Method not found in map, creating new');
             const isGeneric = method.getTypeParameters().length > 0;
             if (method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) {
                 fmxMethod = new Famix.Accessor();
@@ -579,11 +583,13 @@ export class EntityDictionary {
             let methodTypeName = this.UNKNOWN_VALUE;
             try {
                 methodTypeName = method.getReturnType().getText().trim();
+                // console.log(`Method return type: ${methodTypeName}`);
             } catch (error) {
                 logger.error(`Failed to get return type for ${fqn}: ${error}`);
             }
     
             const fmxType = this.createOrGetFamixType(methodTypeName, method);
+            // console.log(`Created/retrieved return type with FQN: ${fmxType.fullyQualifiedName}`);
             fmxMethod.declaredType = fmxType;
             fmxMethod.numberOfLinesOfCode = method.getEndLineNumber() - method.getStartLineNumber();
             fmxMethod.numberOfParameters = method.getParameters().length;
@@ -948,8 +954,12 @@ export class EntityDictionary {
      * @param element A ts-morph element
      * @returns The Famix model of the type
      */
-public createOrGetFamixType(typeName: string, element: TSMorphTypeDeclaration): Famix.Type {
+    public createOrGetFamixType(typeName: string, element: TSMorphTypeDeclaration): Famix.Type {
         logger.debug(`Creating (or getting) type: '${typeName}' of element: '${element?.getText().slice(0, 50)}...' of kind: ${element?.getKindName()}`);
+        // console.log(`\n=== Creating/Getting Type: ${typeName} ===`);
+        // console.log(`Element kind: ${element?.getKindName()}`);
+        // console.log(`Element text: ${element?.getText().slice(0, 50)}...`);
+
         if (element.isKind(SyntaxKind.MethodSignature) || element.isKind(SyntaxKind.MethodDeclaration)) {
             const methodFQN = FQNFunctions.getFQN(element);
             const returnTypeFQN = `${methodFQN.replace(/\[Method(Signature|Declaration)\]$/, '')}[ReturnType]`;
@@ -957,9 +967,11 @@ public createOrGetFamixType(typeName: string, element: TSMorphTypeDeclaration): 
             // Check if we already have this return type in the repository
             const existingType = this.famixRep.getFamixEntityByFullyQualifiedName(returnTypeFQN);
             if (existingType) {
+                // console.log(`Found existing return type with FQN: ${returnTypeFQN}`);
                 return existingType as Famix.Type;
             }
     
+            // console.log(`Creating return type with distinct FQN: ${returnTypeFQN}`);
             const fmxType = new Famix.Type();
             fmxType.name = typeName;
             fmxType.fullyQualifiedName = returnTypeFQN;
@@ -994,15 +1006,19 @@ public createOrGetFamixType(typeName: string, element: TSMorphTypeDeclaration): 
         }
     
         if (!this.fmxTypeMap.has(element)) {
+            // console.log('Type not found in map, creating new'); 
             let ancestor: Famix.ContainerEntity | undefined;    
             if (element) {
                 const typeAncestor = Helpers.findTypeAncestor(element);
+                // console.log(`Type ancestor found: ${typeAncestor?.getKindName()}`);
     
                 if (typeAncestor) {
                     const ancestorFullyQualifiedName = FQNFunctions.getFQN(typeAncestor);
+                    // console.log(`Ancestor FQN: ${ancestorFullyQualifiedName}`);
                     ancestor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
                     if (!ancestor) {
                         ancestor = this.createOrGetFamixType(typeAncestor.getText(), typeAncestor as TSMorphTypeDeclaration);
+                        // console.log('Ancestor not found in repo, creating it');
                     } else {
                         console.log(`Found ancestor in famixRep: ${ancestor.fullyQualifiedName}`);
                     }
@@ -1013,6 +1029,7 @@ public createOrGetFamixType(typeName: string, element: TSMorphTypeDeclaration): 
     
             const fmxType = new Famix.Type();
             fmxType.name = typeName;
+            // console.log(`Created new type with name: ${typeName}`);    
             if (ancestor) {
                 fmxType.container = ancestor;
             } else {
@@ -1020,8 +1037,10 @@ public createOrGetFamixType(typeName: string, element: TSMorphTypeDeclaration): 
             }
     
             initFQN(element, fmxType);
+            // console.log(`Type FQN after init: ${fmxType.fullyQualifiedName}`);
             this.makeFamixIndexFileAnchor(element, fmxType);
             this.famixRep.addElement(fmxType);
+            // console.log('Added type to repository');
             this.fmxTypeMap.set(element, fmxType);
         } else {
             const fmxType = this.fmxTypeMap.get(element);
