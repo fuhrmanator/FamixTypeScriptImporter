@@ -112,6 +112,25 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
     function processModule(moduleNode: ModuleDeclaration, modulePath: string) {
         // console.log(`[buildMethodPositionMap] Processing module: ${modulePath}`);
 
+        // Track nested modules
+        const nestedModuleCounts = new Map<string, number>(); // Track only nested modules
+        const nestedModules = moduleNode.getModules();
+        nestedModules.forEach(nestedModule => {
+            if (Node.isModuleDeclaration(nestedModule)) {
+                const nestedModuleName = nestedModule.getName();
+                const count = (nestedModuleCounts.get(nestedModuleName) || 0) + 1;
+                nestedModuleCounts.set(nestedModuleName, count);
+                if (count > 1) { // Only set index for second and subsequent nested modules
+                    positionMap.set(nestedModule.getStart(), count);
+                    // console.log(`[buildMethodPositionMap] Nested module: ${nestedModuleName}, position: ${nestedModule.getStart()}, index: ${count}`);
+                } else {
+                    // console.log(`[buildMethodPositionMap] Nested module: ${nestedModuleName}, position: ${nestedModule.getStart()}, no index assigned (first occurrence)`);
+                }
+                const newModulePath = `${modulePath}.${nestedModuleName}`;
+                processModule(nestedModule, newModulePath);
+            }
+        });
+
         // Handle functions directly in the module
         const functions = moduleNode.getFunctions();
         const functionCounts = new Map<string, number>();
@@ -155,17 +174,6 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
                 // console.log(`[buildMethodPositionMap] Module interface method: ${methodName}, position: ${method.getStart()}, index: ${count}`);
             });
         });
-
-        // Recursively process nested modules
-        const nestedModules = moduleNode.getModules();
-        nestedModules.forEach(nestedModule => {
-            if (Node.isModuleDeclaration(nestedModule)) {
-                const nestedModuleName = nestedModule.getName();
-                const newModulePath = `${modulePath}.${nestedModuleName}`;
-                processModule(nestedModule, newModulePath);
-            }
-        });
-
     }
 
     function trackArrowFunctions(container: Node) {
@@ -211,17 +219,24 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
             // console.log(`[buildMethodPositionMap] Interface method: ${methodName}, position: ${method.getStart()}, index: ${count}`);
         });
         methods.forEach(method => trackArrowFunctions(method));
-
     });
 
     // Handle top-level namespaces/modules
+    const topLevelModuleCounts = new Map<string, number>(); // Track top-level modules
     sourceFile.getModules().forEach(moduleNode => {
         if (Node.isModuleDeclaration(moduleNode)) {
             const moduleName = moduleNode.getName();
+            const count = (topLevelModuleCounts.get(moduleName) || 0) + 1;
+            topLevelModuleCounts.set(moduleName, count);
+            if (count > 1) { // Only set index for second and subsequent top-level modules
+                positionMap.set(moduleNode.getStart(), count);
+                // console.log(`[buildMethodPositionMap] Top-level module: ${moduleName}, position: ${moduleNode.getStart()}, index: ${count}`);
+            } else {
+                // console.log(`[buildMethodPositionMap] Top-level module: ${moduleName}, position: ${moduleNode.getStart()}, no index assigned (first occurrence)`);
+            }
             processModule(moduleNode, moduleName);
         }
     });
-
 
     // console.log(`[buildMethodPositionMap] Final positionMap:`, Array.from(positionMap.entries()));
     return positionMap;
@@ -316,19 +331,20 @@ export function getFQN(node: FQNNode | Node): string {
 
             parts.unshift(name);
 
-            // Apply positional index for MethodDeclaration, MethodSignature, and FunctionDeclaration
-            if (Node.isMethodDeclaration(currentNode) ||
-                Node.isMethodSignature(currentNode) ||
-                Node.isFunctionDeclaration(currentNode)) {
+            // Apply positional index for MethodDeclaration, MethodSignature, FunctionDeclaration, and ModuleDeclaration
+            if (Node.isMethodDeclaration(currentNode) || 
+                Node.isMethodSignature(currentNode) || 
+                Node.isFunctionDeclaration(currentNode) || 
+                Node.isModuleDeclaration(currentNode)) {
                 const key = stageMap.get(currentNode.getStart());
                 if (key) {
                     parts.unshift(key);
-                    // console.log(`[getFQN] Applied stageMap key: ${key} for ${currentNode.getKindName()} at position ${currentNode.getStart()}`);
+                    console.log(`[getFQN] Applied stageMap key: ${key} for ${currentNode.getKindName()} at position ${currentNode.getStart()}`);
                 } else {
                     const positionIndex = methodPositionMap.get(currentNode.getStart());
                     if (positionIndex && positionIndex > 1) {
                         parts.unshift(positionIndex.toString());
-                        // console.log(`[getFQN] Applied positionIndex: ${positionIndex} for ${currentNode.getKindName()} at position ${currentNode.getStart()}`);
+                        console.log(`[getFQN] Applied positionIndex: ${positionIndex} for ${currentNode.getKindName()} at position ${currentNode.getStart()}`);
                     } else {
                         console.log(`[getFQN] No positionIndex applied for ${currentNode.getKindName()} at position ${currentNode.getStart()}, positionIndex: ${positionIndex || 'none'}`);
                     }
@@ -378,7 +394,7 @@ export function getFQN(node: FQNNode | Node): string {
     parts.unshift(`{${relativePath}}`);
 
     const fqn = parts.join(".") + `[${node.getKindName()}]`;
-    // console.log(`[getFQN] Final FQN: ${fqn}`);
+    console.log(`[getFQN] Final FQN: ${fqn}`);
     return fqn;
 }
 
