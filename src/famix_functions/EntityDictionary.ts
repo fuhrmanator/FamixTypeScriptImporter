@@ -527,106 +527,85 @@ export class EntityDictionary {
      * @param currentCC The cyclomatic complexity metrics of the current source file
      * @returns The Famix model of the method or the accessor
      */
-    public createOrGetFamixMethod(method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration, currentCC: { [key: string]: number }): Famix.Method | Famix.Accessor | Famix.ParametricMethod {
-        let fmxMethod: Famix.Method | Famix.Accessor | Famix.ParametricMethod;
-        const isGeneric = method.getTypeParameters().length > 0;
-        const functionFullyQualifiedName = FQNFunctions.getFQN(method);
-        if (!this.fmxFunctionAndMethodMap.has(functionFullyQualifiedName)) {
-
+    public createOrGetFamixMethod(
+        method: MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration,
+        currentCC: { [key: string]: number }
+    ): Famix.Method | Famix.Accessor | Famix.ParametricMethod { 
+        // console.log(`\n=== Creating/Getting Method ===`);
+        // console.log(`Method kind: ${method.getKindName()}`);
+        // console.log(`Method text: ${method.getText().slice(0, 50)}...`);
+        const fqn = FQNFunctions.getFQN(method);
+        // console.log(`Method FQN: ${fqn}`);
+        logger.debug(`Processing method ${fqn}`);
+       
+    
+        let fmxMethod = this.fmxFunctionAndMethodMap.get(fqn) as Famix.Method | Famix.Accessor | Famix.ParametricMethod;
+        if (!fmxMethod) {
+            // console.log('Method not found in map, creating new');
+            const isGeneric = method.getTypeParameters().length > 0;
             if (method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) {
                 fmxMethod = new Famix.Accessor();
                 const isGetter = method instanceof GetAccessorDeclaration;
                 const isSetter = method instanceof SetAccessorDeclaration;
-                if (isGetter) {(fmxMethod as Famix.Accessor).kind = "getter";}
-                if (isSetter) {(fmxMethod as Famix.Accessor).kind = "setter";}
-                this.famixRep.addElement(fmxMethod);
+                if (isGetter) { (fmxMethod as Famix.Accessor).kind = "getter"; }
+                if (isSetter) { (fmxMethod as Famix.Accessor).kind = "setter"; }
+            } else {
+                fmxMethod = isGeneric ? new Famix.ParametricMethod() : new Famix.Method();
             }
-            else {
-                if (isGeneric) {
-                    fmxMethod = new Famix.ParametricMethod();
-                }
-                else {
-                    fmxMethod = new Famix.Method();
-                }
-            }
+    
             const isConstructor = method instanceof ConstructorDeclaration;
             const isSignature = method instanceof MethodSignature;
-
             let isAbstract = false;
             let isStatic = false;
             if (method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) {
                 isAbstract = method.isAbstract();
                 isStatic = method.isStatic();
             }
-
-            if (isConstructor) {(fmxMethod as Famix.Accessor).kind = "constructor";}
+    
+            if (isConstructor) { (fmxMethod as Famix.Accessor).kind = "constructor"; }
             fmxMethod.isAbstract = isAbstract;
             fmxMethod.isClassSide = isStatic;
-            fmxMethod.isPrivate = (method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) ? (method.getModifiers().find(x => x.getText() === 'private')) !== undefined : false;
-            fmxMethod.isProtected = (method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration) ? (method.getModifiers().find(x => x.getText() === 'protected')) !== undefined : false;
+            fmxMethod.isPrivate = (method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration)
+                ? !!method.getModifiers().find(x => x.getText() === 'private') : false;
+            fmxMethod.isProtected = (method instanceof MethodDeclaration || method instanceof GetAccessorDeclaration || method instanceof SetAccessorDeclaration)
+                ? !!method.getModifiers().find(x => x.getText() === 'protected') : false;
             fmxMethod.signature = Helpers.computeSignature(method.getText());
-
-            let methodName: string;
-            if (isConstructor) {
-                methodName = "constructor";
-            }
-            else {
-                methodName = (method as MethodDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration).getName();
-            }
+    
+            const methodName = isConstructor ? "constructor" : method.getName();
             fmxMethod.name = methodName;
-
-            if (!isConstructor) {
-                if (method.getName().substring(0, 1) === "#") {
-                    fmxMethod.isPrivate = true;
-                }
+    
+            if (!isConstructor && methodName.startsWith("#")) {
+                fmxMethod.isPrivate = true;
             }
-
-            if (!fmxMethod.isPrivate && !fmxMethod.isProtected) {
-                fmxMethod.isPublic = true;
-            }
-            else {
-                fmxMethod.isPublic = false;
-            }
-
-            if (!isSignature) {
-                fmxMethod.cyclomaticComplexity = currentCC[fmxMethod.name];
-            }
-            else {
-                fmxMethod.cyclomaticComplexity = 0;
-            }
-
-            let methodTypeName = this.UNKNOWN_VALUE; 
+            fmxMethod.isPublic = !fmxMethod.isPrivate && !fmxMethod.isProtected;
+    
+            fmxMethod.cyclomaticComplexity = isSignature ? 0 : (currentCC[methodName] || 0);
+            let methodTypeName = this.UNKNOWN_VALUE;
             try {
-                methodTypeName = method.getReturnType().getText().trim();            
+                methodTypeName = method.getReturnType().getText().trim();
+                // console.log(`Method return type: ${methodTypeName}`);
             } catch (error) {
-                logger.error(`> WARNING: got exception ${error}. Failed to get usable name for return type of method: ${fmxMethod.name}. Continuing...`);
+                logger.error(`Failed to get return type for ${fqn}: ${error}`);
             }
-
+    
             const fmxType = this.createOrGetFamixType(methodTypeName, method);
+            // console.log(`Created/retrieved return type with FQN: ${fmxType.fullyQualifiedName}`);
             fmxMethod.declaredType = fmxType;
             fmxMethod.numberOfLinesOfCode = method.getEndLineNumber() - method.getStartLineNumber();
-            const parameters = method.getParameters();
-            fmxMethod.numberOfParameters = parameters.length;
-
-            if (!isSignature) {
-                fmxMethod.numberOfStatements = method.getStatements().length;
-            }
-            else {
-                fmxMethod.numberOfStatements = 0;
-            }
-            
+            fmxMethod.numberOfParameters = method.getParameters().length;
+            fmxMethod.numberOfStatements = isSignature ? 0 : method.getStatements().length;
+    
+            // Add to famixRep
             initFQN(method, fmxMethod);
             this.famixRep.addElement(fmxMethod);
             this.makeFamixIndexFileAnchor(method, fmxMethod);
-
-            this.fmxFunctionAndMethodMap.set(functionFullyQualifiedName, fmxMethod);
+            this.fmxFunctionAndMethodMap.set(fqn, fmxMethod);
+            logger.debug(`Added method ${fqn} to famixRep`);
+        } else {
+            logger.debug(`Method ${fqn} already exists`);
         }
-        else {
-            fmxMethod = this.fmxFunctionAndMethodMap.get(functionFullyQualifiedName) as (Famix.Method | Famix.Accessor | Famix.ParametricMethod);
-        }
-
-        this.fmxElementObjectMap.set(fmxMethod,method);
-        
+    
+        this.fmxElementObjectMap.set(fmxMethod, method);
         return fmxMethod;
     }
 
@@ -976,71 +955,103 @@ export class EntityDictionary {
      * @returns The Famix model of the type
      */
     public createOrGetFamixType(typeName: string, element: TSMorphTypeDeclaration): Famix.Type {
-        let fmxType: Famix.Type;
+        logger.debug(`Creating (or getting) type: '${typeName}' of element: '${element?.getText().slice(0, 50)}...' of kind: ${element?.getKindName()}`);
+        // console.log(`\n=== Creating/Getting Type: ${typeName} ===`);
+        // console.log(`Element kind: ${element?.getKindName()}`);
+        // console.log(`Element text: ${element?.getText().slice(0, 50)}...`);
+
+        if (element.isKind(SyntaxKind.MethodSignature) || element.isKind(SyntaxKind.MethodDeclaration)) {
+            const methodFQN = FQNFunctions.getFQN(element);
+            const returnTypeFQN = `${methodFQN.replace(/\[Method(Signature|Declaration)\]$/, '')}[ReturnType]`;
+            
+            // Check if we already have this return type in the repository
+            const existingType = this.famixRep.getFamixEntityByFullyQualifiedName(returnTypeFQN);
+            if (existingType) {
+                // console.log(`Found existing return type with FQN: ${returnTypeFQN}`);
+                return existingType as Famix.Type;
+            }
+    
+            // console.log(`Creating return type with distinct FQN: ${returnTypeFQN}`);
+            const fmxType = new Famix.Type();
+            fmxType.name = typeName;
+            fmxType.fullyQualifiedName = returnTypeFQN;
+            
+            // Set container (same as method's container)
+            const methodAncestor = Helpers.findTypeAncestor(element);
+            if (methodAncestor) {
+                const ancestorFQN = FQNFunctions.getFQN(methodAncestor);
+                const ancestor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFQN) as Famix.ContainerEntity;
+                if (ancestor) {
+                    fmxType.container = ancestor;
+                }
+            }
+    
+            this.famixRep.addElement(fmxType);
+            this.fmxTypeMap.set(element, fmxType);
+            this.fmxElementObjectMap.set(fmxType, element);
+            return fmxType;
+        }
+
         const isPrimitive = isPrimitiveType(typeName);
         const isParametricType =
-            element instanceof ClassDeclaration && element.getTypeParameters().length > 0 ||
-            element instanceof InterfaceDeclaration && element.getTypeParameters().length > 0; 
-
-            // Functions and methods aren't types!
-            // ||
-            // element instanceof FunctionDeclaration && element.getTypeParameters().length > 0 ||
-            // element instanceof MethodDeclaration && element.getTypeParameters().length > 0 ||
-            // element instanceof ArrowFunction && element.getTypeParameters().length > 0;
-
-        logger.debug("Creating (or getting) type: '" + typeName + "' of element: " + element?.getText() + " of kind: " + element?.getKindName());
-
+            (element instanceof ClassDeclaration && element.getTypeParameters().length > 0) ||
+            (element instanceof InterfaceDeclaration && element.getTypeParameters().length > 0);
+        
         if (isPrimitive) {
             return this.createOrGetFamixPrimitiveType(typeName);
         }
-
+    
         if (isParametricType) {
-            // narrow the type
-            const parametricElement = element as TSMorphParametricType;
-            return this.createOrGetFamixParametricType(typeName, parametricElement);
+            return this.createOrGetFamixParametricType(typeName, element as TSMorphParametricType);
         }
-
+    
         if (!this.fmxTypeMap.has(element)) {
-            let ancestor: Famix.ContainerEntity | undefined = undefined;
- 
-            if (element !== undefined) {
+            // console.log('Type not found in map, creating new'); 
+            let ancestor: Famix.ContainerEntity | undefined;    
+            if (element) {
                 const typeAncestor = Helpers.findTypeAncestor(element);
-                if (!typeAncestor) {
-                    throw new Error(`Ancestor not found for element ${element.getText()}.`);
-                }
-                const ancestorFullyQualifiedName = FQNFunctions.getFQN(typeAncestor);
-                ancestor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
-                if (!ancestor) {
-                    logger.debug(`Ancestor ${FQNFunctions.getFQN(typeAncestor)} not found. Adding the new type.`);
-                    ancestor = this.createOrGetFamixType(typeAncestor.getText(), typeAncestor as TSMorphTypeDeclaration);
+                // console.log(`Type ancestor found: ${typeAncestor?.getKindName()}`);
+    
+                if (typeAncestor) {
+                    const ancestorFullyQualifiedName = FQNFunctions.getFQN(typeAncestor);
+                    // console.log(`Ancestor FQN: ${ancestorFullyQualifiedName}`);
+                    ancestor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
+                    if (!ancestor) {
+                        ancestor = this.createOrGetFamixType(typeAncestor.getText(), typeAncestor as TSMorphTypeDeclaration);
+                        // console.log('Ancestor not found in repo, creating it');
+                    } else {
+                        console.log(`Found ancestor in famixRep: ${ancestor.fullyQualifiedName}`);
+                    }
+                } else {
+                    console.log(`No type ancestor found for ${typeName} - proceeding without container`);
                 }
             }
-
-            fmxType = new Famix.Type();
+    
+            const fmxType = new Famix.Type();
             fmxType.name = typeName;
-
-            if (!ancestor) {
+            // console.log(`Created new type with name: ${typeName}`);    
+            if (ancestor) {
+                fmxType.container = ancestor;
+            } else {
                 throw new Error(`Ancestor not found for type ${typeName}.`);
             }
-            fmxType.container = ancestor;
+    
             initFQN(element, fmxType);
+            // console.log(`Type FQN after init: ${fmxType.fullyQualifiedName}`);
             this.makeFamixIndexFileAnchor(element, fmxType);
-
             this.famixRep.addElement(fmxType);
-
+            // console.log('Added type to repository');
             this.fmxTypeMap.set(element, fmxType);
-        }
-        else {
-            const result = this.fmxTypeMap.get(element);
-            if (result) {
-                fmxType = result;
-            } else {
+        } else {
+            const fmxType = this.fmxTypeMap.get(element);
+            if (!fmxType) {
                 throw new Error(`Famix type ${typeName} is not found in the Type map.`);
             }
+            return fmxType;
         }
-
-        this.fmxElementObjectMap.set(fmxType,element);
-
+    
+        const fmxType = this.fmxTypeMap.get(element)!;
+        this.fmxElementObjectMap.set(fmxType, element);
         return fmxType;
     }
 
@@ -1167,40 +1178,43 @@ export class EntityDictionary {
         if (!fmxVar) {
             throw new Error(`Famix entity with id ${id} not found, for node ${node.getText()} in ${node.getSourceFile().getBaseName()} at line ${node.getStartLineNumber()}.`);
         }
-
+    
         logger.debug(`Creating FamixAccess. Node: [${node.getKindName()}] '${node.getText()}' at line ${node.getStartLineNumber()} in ${node.getSourceFile().getBaseName()}, id: ${id} refers to fmxVar '${fmxVar.fullyQualifiedName}'.`);
-
+    
         const nodeReferenceAncestor = Helpers.findAncestor(node);
+        if (!nodeReferenceAncestor) {
+            logger.error(`No ancestor found for node '${node.getText()}'`);
+            return;
+        }
+    
         const ancestorFullyQualifiedName = FQNFunctions.getFQN(nodeReferenceAncestor);
         const accessor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
         if (!accessor) {
             logger.error(`Ancestor ${ancestorFullyQualifiedName} of kind ${nodeReferenceAncestor.getKindName()} not found.`);
-            // accessor = this.createOrGetFamixType(ancestorFullyQualifiedName, nodeReferenceAncestor as TypeDeclaration);
-            return; // bail out TODO: this is probably wrong
+            return; // Bail out for now
         } else {
             logger.debug(`Found accessor to be ${accessor.fullyQualifiedName}.`);
         }
-
-
-        // make sure accessor is a method, function, script or module
+    
+        // Ensure accessor is a method, function, script, or module
         if (!(accessor instanceof Famix.Method) && !(accessor instanceof Famix.ArrowFunction) && !(accessor instanceof Famix.Function) && !(accessor instanceof Famix.ScriptEntity) && !(accessor instanceof Famix.Module)) {
             logger.error(`Accessor ${accessor.fullyQualifiedName} is not a method, function, etc.`);
             return;
         }
-
-        // don't create any duplicates (e.g. if the same variable is accessed multiple times by same accessor)
+    
+        // Avoid duplicates
         const foundAccess = this.famixRep.getFamixAccessByAccessorAndVariable(accessor, fmxVar);
         if (foundAccess) {
             logger.debug(`FamixAccess already exists for accessor ${accessor.fullyQualifiedName} and variable ${fmxVar.fullyQualifiedName}.`);
             return;
         }
+    
         const fmxAccess = new Famix.Access();
         fmxAccess.accessor = accessor;
         fmxAccess.variable = fmxVar;
-
         this.famixRep.addElement(fmxAccess);
-
-        this.fmxElementObjectMap.set(fmxAccess,node);
+        this.fmxElementObjectMap.set(fmxAccess, node);
+        logger.debug(`Created access: ${accessor.fullyQualifiedName} -> ${fmxVar.fullyQualifiedName}`);
     }
 
     /**
@@ -1379,39 +1393,36 @@ export class EntityDictionary {
         if (importDeclaration && this.fmxImportClauseMap.has(importDeclaration)) {
             const rImportClause = this.fmxImportClauseMap.get(importDeclaration);
             if (rImportClause) { 
-               return; // don't do anything
+                logger.debug(`Import clause ${importElement.getText()} already exists in map, skipping.`);
+                return;
             } else {
                 throw new Error(`Import clause ${importElement.getText()} is not found in the import clause map.`);
             }
         }
-
+    
         logger.info(`creating a new FamixImportClause for ${importDeclaration?.getText()} in ${importer.getBaseName()}.`);
         const fmxImportClause = new Famix.ImportClause();
-
+    
         let importedEntity: Famix.NamedEntity | Famix.StructuralEntity | undefined = undefined;
         let importedEntityName: string;
-
+    
         const absolutePathProject = this.famixRep.getAbsolutePath();
         
         const absolutePath = path.normalize(moduleSpecifierFilePath);
-        // convert the path and remove any windows backslashes introduced by path.normalize
         logger.debug(`createFamixImportClause: absolutePath: ${absolutePath}`);
         logger.debug(`createFamixImportClause: convertToRelativePath: ${this.convertToRelativePath(absolutePath, absolutePathProject)}`);
         const pathInProject: string = this.convertToRelativePath(absolutePath, absolutePathProject).replace(/\\/g, "/");
         logger.debug(`createFamixImportClause: pathInProject: ${pathInProject}`);
         let pathName = "{" + pathInProject + "}.";
         logger.debug(`createFamixImportClause: pathName: ${pathName}`);
-
-        // Named imports, e.g. import { ClassW } from "./complexExportModule";
-
-        // Start with simple import clause (without referring to the actual variable)
-
+    
         if (importDeclaration instanceof ImportDeclaration 
             && importElement instanceof ImportSpecifier) { 
                 importedEntityName = importElement.getName();
             pathName = pathName + importedEntityName;
             if (isInExports) {
                 importedEntity = this.famixRep.getFamixEntityByFullyQualifiedName(pathName) as Famix.NamedEntity;
+                logger.debug(`Found exported entity: ${pathName}`);
             }
             if (importedEntity === undefined) {
                 importedEntity = new Famix.NamedEntity();
@@ -1419,38 +1430,37 @@ export class EntityDictionary {
                 if (!isInExports) {
                     importedEntity.isStub = true;
                 }
-                // logger.debug(`createFamixImportClause: Creating named entity ${importedEntityName} with FQN ${pathName}`);
-                // importedEntity.fullyQualifiedName = pathName;
+                logger.debug(`Creating named entity ${importedEntityName} for ImportSpecifier ${importElement.getText()}`);
                 initFQN(importElement, importedEntity);
-
+                logger.debug(`Assigned FQN to entity: ${importedEntity.fullyQualifiedName}`);
                 this.makeFamixIndexFileAnchor(importElement, importedEntity);
-                // must add entity to repository
                 this.famixRep.addElement(importedEntity);
+                logger.debug(`Added entity to repository: ${importedEntity.fullyQualifiedName}`);
             }
         }
-        // handle import equals declarations, e.g. import myModule = require("./complexExportModule");
-        // TypeScript can't determine the type of the imported module, so we create a Module entity
         else if (importDeclaration instanceof ImportEqualsDeclaration) {
             importedEntityName = importDeclaration?.getName();
             pathName = pathName + importedEntityName;
             importedEntity = new Famix.StructuralEntity();
             importedEntity.name = importedEntityName;
             initFQN(importDeclaration, importedEntity);
+            logger.debug(`Assigned FQN to ImportEquals entity: ${importedEntity.fullyQualifiedName}`);
             this.makeFamixIndexFileAnchor(importElement, importedEntity);
-            // importedEntity.fullyQualifiedName = pathName;
             const anyType = this.createOrGetFamixType('any', importDeclaration);
             (importedEntity as Famix.StructuralEntity).declaredType = anyType;
-        } else {  // default imports, e.g. import ClassW from "./complexExportModule";  
+        } else {  
             importedEntityName = importElement.getText();
             pathName = pathName + (isDefaultExport ? "defaultExport" : "namespaceExport");
             importedEntity = new Famix.NamedEntity();
             importedEntity.name = importedEntityName;
-            // importedEntity.fullyQualifiedName = pathName;
             initFQN(importElement, importedEntity);
+            logger.debug(`Assigned FQN to default/namespace entity: ${importedEntity.fullyQualifiedName}`);
             this.makeFamixIndexFileAnchor(importElement, importedEntity);
         }
-        // I don't think it should be added to the repository if it exists already
-        if (!isInExports) this.famixRep.addElement(importedEntity);
+        if (!isInExports) {
+            this.famixRep.addElement(importedEntity);
+            logger.debug(`Added non-exported entity to repository: ${importedEntity.fullyQualifiedName}`);
+        }
         const importerFullyQualifiedName = FQNFunctions.getFQN(importer);
         const fmxImporter = this.famixRep.getFamixEntityByFullyQualifiedName(importerFullyQualifiedName) as Famix.Module;
         fmxImportClause.importingEntity = fmxImporter;
@@ -1461,13 +1471,11 @@ export class EntityDictionary {
             fmxImportClause.moduleSpecifier = importDeclaration?.getModuleSpecifierValue() as string;
         }
     
-        logger.debug(`createFamixImportClause: ${fmxImportClause.importedEntity?.name} (of type ${
-            Helpers.getSubTypeName(fmxImportClause.importedEntity)}) is imported by ${fmxImportClause.importingEntity?.name}`);
-
+        logger.debug(`ImportClause: ${fmxImportClause.importedEntity?.name} (type=${Helpers.getSubTypeName(fmxImportClause.importedEntity)}) imported by ${fmxImportClause.importingEntity?.name}`);
+    
         fmxImporter.addOutgoingImport(fmxImportClause);
-
         this.famixRep.addElement(fmxImportClause);
-
+    
         if (importDeclaration) {
             this.fmxElementObjectMap.set(fmxImportClause, importDeclaration);
             this.fmxImportClauseMap.set(importDeclaration, fmxImportClause);

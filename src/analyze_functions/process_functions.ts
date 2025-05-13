@@ -17,6 +17,7 @@ export const interfaces = new Array<InterfaceDeclaration>(); // Array of all the
 export const modules = new Array<SourceFile>(); // Array of all the source files which are modules
 export const listOfExportMaps = new Array<ReadonlyMap<string, ExportedDeclarations[]>>(); // Array of all the export maps
 export let currentCC: { [key: string]: number }; // Stores the cyclomatic complexity metrics for the current source file
+const processedNodesWithTypeParams = new Set<number>(); // Set of nodes that have been processed and have type parameters
 
 /**
  * Checks if the file has any imports or exports to be considered a module
@@ -78,19 +79,15 @@ export function getImplementedOrExtendedInterfaces(interfaces: Array<InterfaceDe
     return implementedOrExtendedInterfaces;
 }
 
-/**
- * Builds a Famix model for an array of source files
- * @param sourceFiles An array of source files
- */
 export function processFiles(sourceFiles: Array<SourceFile>): void {
     sourceFiles.forEach(file => {
         logger.info(`File: >>>>>>>>>> ${file.getFilePath()}`);
 
-        // Computes the cyclomatic complexity metrics for the current source file if it exists (i.e. if it is not from a jest test)
-        if (fs.existsSync(file.getFilePath()))
+        if (fs.existsSync(file.getFilePath())) {
             currentCC = calculate(file.getFilePath());
-        else
+        } else {
             currentCC = {};
+        }
 
         processFile(file);
     });
@@ -115,21 +112,17 @@ function processFile(f: SourceFile): void {
     logger.debug(`processFile: file: ${f.getBaseName()}, fqn = ${fmxFile.fullyQualifiedName}`);
 
     processComments(f, fmxFile);
-
     processAliases(f, fmxFile);
-
     processClasses(f, fmxFile);
-
-    processInterfaces(f, fmxFile);
-
-    processVariables(f, fmxFile);
-
-    processEnums(f, fmxFile);
-
-    processFunctions(f, fmxFile);
-
+    processInterfaces(f, fmxFile); 
     processModules(f, fmxFile);
+    processVariables(f, fmxFile); // This will handle our object literal methods
+    processEnums(f, fmxFile);
+    processFunctions(f, fmxFile);
+   
+
 }
+
 
 export function isAmbient(node: ModuleDeclaration): boolean {
     // An ambient module has the DeclareKeyword modifier.
@@ -252,6 +245,26 @@ function processVariables(m: ContainerTypes, fmxScope: Famix.ScriptEntity | Fami
         const fmxVariables = processVariableStatement(v);
         fmxVariables.forEach(fmxVariable => {
             fmxScope.addVariable(fmxVariable);
+        });
+
+        // Check each VariableDeclaration for object literal methods
+        v.getDeclarations().forEach(varDecl => {
+            const varName = varDecl.getName();
+            console.log(`Checking variable: ${varName} at pos=${varDecl.getStart()}`);
+            const initializer = varDecl.getInitializer();
+            if (initializer && Node.isObjectLiteralExpression(initializer)) {
+                initializer.getProperties().forEach(prop => {
+                    if (Node.isPropertyAssignment(prop)) {
+                        const nested = prop.getInitializer();
+                        if (nested && Node.isObjectLiteralExpression(nested)) {
+                            nested.getDescendantsOfKind(SyntaxKind.MethodDeclaration).forEach(method => {
+                                console.log(`Found object literal method: ${method.getName()} at pos=${method.getStart()}`);
+                                entityDictionary.createOrGetFamixMethod(method, currentCC);
+                            });
+                        }
+                    }
+                });
+            }
         });
     });
 }
@@ -625,17 +638,34 @@ function processParameter(paramDecl: ParameterDeclaration): Famix.Parameter {
     return fmxParam;
 }
 
-/**
- * Builds a Famix model for the type parameters of a class, an interface, a method or a function
- * @param e A class, an interface, a method or a function
- * @param fmxScope The Famix model of the class, the interface, the method or the function
- */
-function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction, fmxScope: Famix.ParametricClass | Famix.ParametricInterface | Famix.Method | Famix.Accessor | Famix.Function | Famix.ArrowFunction): void {
+function processTypeParameters(
+    e: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction,
+    fmxScope: Famix.ParametricClass | Famix.ParametricInterface | Famix.Method | Famix.Accessor | Famix.Function | Famix.ArrowFunction
+): void {
     logger.debug(`Finding Type Parameters:`);
-    e.getTypeParameters().forEach(tp => {
+    const nodeStart = e.getStart();
+
+    // Check if this node has already been processed
+    if (processedNodesWithTypeParams.has(nodeStart)) {
+        return;
+    }
+
+    // Get type parameters
+    const typeParams = e.getTypeParameters();
+
+    // Process each type parameter
+    typeParams.forEach((tp, index) => {
         const fmxParam = processTypeParameter(tp);
         fmxScope.addGenericParameter(fmxParam);
     });
+
+    // Log if no type parameters were found
+    if (typeParams.length === 0) {
+        logger.debug(`[processTypeParameters] No type parameters found for this node`);
+    }
+
+    // Mark this node as processed
+    processedNodesWithTypeParams.add(nodeStart);
 }
 
 /**
@@ -645,11 +675,8 @@ function processTypeParameters(e: ClassDeclaration | InterfaceDeclaration | Meth
  */
 function processTypeParameter(tp: TypeParameterDeclaration): Famix.ParameterType {
     const fmxTypeParameter = entityDictionary.createFamixParameterType(tp);
-
     logger.debug(`type parameter: ${tp.getName()}, (${tp.getType().getText()}), fqn = ${fmxTypeParameter.fullyQualifiedName}`);
-
     processComments(tp, fmxTypeParameter);
-
     return fmxTypeParameter;
 }
 
@@ -868,7 +895,7 @@ export function processImportClausesForImportEqualsDeclarations(sourceFiles: Arr
 export function processImportClausesForModules(modules: Array<SourceFile>, exports: Array<ReadonlyMap<string, ExportedDeclarations[]>>): void {
     logger.info(`Creating import clauses from ${modules.length} modules:`);
     modules.forEach(module => {
-        const modulePath = module.getFilePath(); // + module.getBaseName();
+        const modulePath = module.getFilePath();
         module.getImportDeclarations().forEach(impDecl => {
             logger.info(`Importing ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
             const path = getModulePath(impDecl);
@@ -877,6 +904,7 @@ export function processImportClausesForModules(modules: Array<SourceFile>, expor
                 logger.info(`Importing (named) ${namedImport.getName()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
                 const importedEntityName = namedImport.getName();
                 const importFoundInExports = isInExports(exports, importedEntityName);
+                logger.debug(`Processing ImportSpecifier: ${namedImport.getText()}, pos=${namedImport.getStart()}`);
                 entityDictionary.oldCreateOrGetFamixImportClause({
                     importDeclaration: impDecl,
                     importerSourceFile: module,
@@ -890,7 +918,7 @@ export function processImportClausesForModules(modules: Array<SourceFile>, expor
             const defaultImport = impDecl.getDefaultImport();
             if (defaultImport !== undefined) {
                 logger.info(`Importing (default) ${defaultImport.getText()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
-                // call with module, impDecl.getModuleSpecifierValue(), path, defaultImport, false, true
+                logger.debug(`Processing Default Import: ${defaultImport.getText()}, pos=${defaultImport.getStart()}`);
                 entityDictionary.oldCreateOrGetFamixImportClause({
                     importDeclaration: impDecl,
                     importerSourceFile: module,
@@ -912,7 +940,6 @@ export function processImportClausesForModules(modules: Array<SourceFile>, expor
                     isInExports: false,
                     isDefaultExport: false
                 });
-                // entityDictionary.createFamixImportClause(module, impDecl.getModuleSpecifierValue(), path, namespaceImport, false, false);
             }
         });
     });

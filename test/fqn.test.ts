@@ -68,18 +68,16 @@ describe('getFQN functionality', () => {
     });
 
     test('should generate unique FQNs for two creations of a class named A within the same source file', () => {
-        // Find the class declarations via nodes in the AST
         const classExpressions = sourceFile.getDescendantsOfKind(SyntaxKind.ClassExpression);
         expect(classExpressions.length).toBe(2);
-        // find the two classes named A
         const classA1 = classExpressions.find(c => c.getName() === 'A');
         expect(classA1).toBeDefined();
         const classA2 = classExpressions.find(c => c.getName() === 'A' && c !== classA1)!;
         expect(classA2).toBeDefined();
         const a1fqn = getFQN(classA1!);
-        expect(a1fqn).toBe('{sampleFile.ts}.createClassA1.Unnamed_ArrowFunction(7:29).Block(7:35).Unnamed_ClassExpression(8:16)[ClassExpression]');
+        expect(a1fqn).toBe('{sampleFile.ts}.createClassA1.createClassA1_Fn.createClassA1_Block.A[ClassExpression]');
         const a2fqn = getFQN(classA2!);
-        expect(a2fqn).toBe('{sampleFile.ts}.createClassA2.Unnamed_ArrowFunction(12:29).Block(12:35).Unnamed_ClassExpression(13:16)[ClassExpression]');
+        expect(a2fqn).toBe('{sampleFile.ts}.createClassA2.createClassA2_Fn.createClassA2_Block.A[ClassExpression]');
         expect(a1fqn).not.toBe(a2fqn);
     });
 

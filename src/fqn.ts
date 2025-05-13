@@ -10,16 +10,244 @@ function isFQNNode(node: Node): node is FQNNode {
     return Node.isVariableDeclaration(node) || Node.isArrowFunction(node) || Node.isIdentifier(node) || Node.isMethodDeclaration(node) || Node.isClassDeclaration(node) || Node.isClassExpression(node) || Node.isDecorator(node) || Node.isModuleDeclaration(node) || Node.isCallExpression(node);
 }
 
-export function getFQN(node: FQNNode | Node): string {
-    const absolutePathProject = entityDictionary.famixRep.getAbsolutePath();
+/**
+ * Builds a map of method positions to their property keys in object literals.
+ * Scans all variable declarations in a source file, targeting object literals with any keys
+ * (e.g., `3: { method() {} }` or `add: { compute() {} }`), and maps each method's start position to its key.
+ * Logs each step for debugging.
+ * 
+ * @param sourceFile The TypeScript source file to analyze
+ * @returns A Map where keys are method start positions and values are their property keys (e.g., "3", "add")
+ */
+function buildStageMethodMap(sourceFile: SourceFile): Map<number, string> {
+    const stageMap = new Map<number, string>();
 
+    sourceFile.getVariableDeclarations().forEach(varDecl => {
+        const varName = varDecl.getName();
+        const initializer = varDecl.getInitializer();
+
+        if (!initializer || !Node.isObjectLiteralExpression(initializer)) {
+            return;
+        }
+
+        initializer.getProperties().forEach(prop => {
+            let key: string | undefined;
+
+            if (Node.isPropertyAssignment(prop)) {
+                const nameNode = prop.getNameNode();
+
+                if (Node.isIdentifier(nameNode)) {
+                    key = nameNode.getText();
+                } else if (Node.isStringLiteral(nameNode)) {
+                    key = nameNode.getText().replace(/^"(.+)"$/, '$1').replace(/^'(.+)'$/, '$1');
+                } else if (Node.isNumericLiteral(nameNode)) {
+                    key = nameNode.getText();
+                } else if (Node.isComputedPropertyName(nameNode)) {
+                    const expression = nameNode.getExpression();
+                    if (Node.isIdentifier(expression)) {
+                        // Resolve variable value if possible
+                        const symbol = expression.getSymbol();
+                        if (symbol) {
+                            const decl = symbol.getDeclarations()[0];
+                            if (Node.isVariableDeclaration(decl) && decl.getInitializer()) {
+                                const init = decl.getInitializer()!;
+                                if (Node.isStringLiteral(init) || Node.isNumericLiteral(init)) {
+                                    key = init.getText().replace(/^"(.+)"$/, '$1').replace(/^'(.+)'$/, '$1');
+                                }
+                            }
+                        }
+                        if (!key) {
+                            key = expression.getText();
+                        }
+                    } else if (Node.isBinaryExpression(expression) && expression.getOperatorToken().getText() === '+') {
+                        // Handle simple string concatenation (e.g., "A" + "B")
+                        const left = expression.getLeft();
+                        const right = expression.getRight();
+                        if (Node.isStringLiteral(left) && Node.isStringLiteral(right)) {
+                            key = left.getLiteralText() + right.getLiteralText();
+                        }
+                    } else if (Node.isTemplateExpression(expression)) {
+                        // Handle template literals (e.g., `key-${1}`)
+                        const head = expression.getHead().getLiteralText();
+                        const spans = expression.getTemplateSpans();
+                        if (spans.length === 1 && Node.isNumericLiteral(spans[0].getExpression())) {
+                            const num = spans[0].getExpression().getText();
+                            key = `${head}${num}`;
+                        }
+                    }
+                    if (!key) {
+                        key = expression.getText(); // Fallback
+                    }
+                } else {
+                    return;
+                }
+
+                const propInitializer = prop.getInitializer();
+                if (propInitializer && Node.isObjectLiteralExpression(propInitializer)) {
+                    propInitializer.getDescendantsOfKind(SyntaxKind.MethodDeclaration).forEach(method => {
+                        const methodName = method.getName();
+                        const pos = method.getStart();
+                        if (key) {
+                            stageMap.set(pos, key);
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    return stageMap;
+}
+
+/**
+ * Builds a map of method positions to their index in class/interface/namespace declarations
+ * @param sourceFile The TypeScript source file to analyze
+ * @returns A Map where keys are method start positions and values are their positional index (1-based)
+ */
+function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
+    const positionMap = new Map<number, number>();
+    // console.log(`[buildMethodPositionMap] Starting analysis for file: ${sourceFile.getFilePath()}`);
+
+    // Helper function to process modules recursively
+    function processModule(moduleNode: ModuleDeclaration, modulePath: string) {
+        // console.log(`[buildMethodPositionMap] Processing module: ${modulePath}`);
+
+        // Handle functions directly in the module
+        const functions = moduleNode.getFunctions();
+        const functionCounts = new Map<string, number>();
+        
+        functions.forEach(func => {
+            const funcName = func.getName() || `Unnamed_Function(${func.getStart()})`;
+            const count = (functionCounts.get(funcName) || 0) + 1;
+            functionCounts.set(funcName, count);
+            positionMap.set(func.getStart(), count);
+            // console.log(`[buildMethodPositionMap] Module function: ${funcName}, position: ${func.getStart()}, index: ${count}`);
+        });
+
+        // Handle classes within the module
+        const classes = moduleNode.getClasses();
+        classes.forEach(classNode => {
+            // console.log(`[buildMethodPositionMap] Processing class in module: ${classNode.getName() || 'Unnamed'}`);
+            const methods = classNode.getMethods();
+            const methodCounts = new Map<string, number>();
+            
+            methods.forEach(method => {
+                const methodName = method.getName();
+                const count = (methodCounts.get(methodName) || 0) + 1;
+                methodCounts.set(methodName, count);
+                positionMap.set(method.getStart(), count);
+                // console.log(`[buildMethodPositionMap] Module class method: ${methodName}, position: ${method.getStart()}, index: ${count}`);
+            });
+        });
+
+        // Handle interfaces within the module
+        const interfaces = moduleNode.getInterfaces();
+        interfaces.forEach(interfaceNode => {
+            // console.log(`[buildMethodPositionMap] Processing interface in module: ${interfaceNode.getName() || 'Unnamed'}`);
+            const methods = interfaceNode.getMethods();
+            const methodCounts = new Map<string, number>();
+            
+            methods.forEach(method => {
+                const methodName = method.getName();
+                const count = (methodCounts.get(methodName) || 0) + 1;
+                methodCounts.set(methodName, count);
+                positionMap.set(method.getStart(), count);
+                // console.log(`[buildMethodPositionMap] Module interface method: ${methodName}, position: ${method.getStart()}, index: ${count}`);
+            });
+        });
+
+        // Recursively process nested modules
+        const nestedModules = moduleNode.getModules();
+        nestedModules.forEach(nestedModule => {
+            if (Node.isModuleDeclaration(nestedModule)) {
+                const nestedModuleName = nestedModule.getName();
+                const newModulePath = `${modulePath}.${nestedModuleName}`;
+                processModule(nestedModule, newModulePath);
+            }
+        });
+
+    }
+
+    function trackArrowFunctions(container: Node) {
+        const arrows = container.getDescendantsOfKind(SyntaxKind.ArrowFunction);
+        arrows.forEach(arrow => {
+            const parent = arrow.getParent();
+            if (Node.isBlock(parent) || Node.isSourceFile(parent)) {
+                // Use negative numbers for arrow functions to distinguish from methods
+                positionMap.set(arrow.getStart(), -1 * (positionMap.size + 1));
+                // console.log(`[buildMethodPositionMap] Arrow function at ${arrow.getStart()}`);
+            }
+        });
+    }
+
+    // Handle top-level classes
+    sourceFile.getClasses().forEach(classNode => {
+        // console.log(`[buildMethodPositionMap] Processing class: ${classNode.getName() || 'Unnamed'}`);
+        const methods = classNode.getMethods();
+        const methodCounts = new Map<string, number>();
+        
+        methods.forEach(method => {
+            const methodName = method.getName();
+            const count = (methodCounts.get(methodName) || 0) + 1;
+            methodCounts.set(methodName, count);
+            positionMap.set(method.getStart(), count);
+            // console.log(`[buildMethodPositionMap] Class method: ${methodName}, position: ${method.getStart()}, index: ${count}`);
+        });
+
+        methods.forEach(method => trackArrowFunctions(method));
+    });
+    
+    // Handle top-level interfaces
+    sourceFile.getInterfaces().forEach(interfaceNode => {
+        // console.log(`[buildMethodPositionMap] Processing interface: ${interfaceNode.getName() || 'Unnamed'}`);
+        const methods = interfaceNode.getMethods();
+        const methodCounts = new Map<string, number>();
+        
+        methods.forEach(method => {
+            const methodName = method.getName();
+            const count = (methodCounts.get(methodName) || 0) + 1;
+            methodCounts.set(methodName, count);
+            positionMap.set(method.getStart(), count);
+            // console.log(`[buildMethodPositionMap] Interface method: ${methodName}, position: ${method.getStart()}, index: ${count}`);
+        });
+        methods.forEach(method => trackArrowFunctions(method));
+
+    });
+
+    // Handle top-level namespaces/modules
+    sourceFile.getModules().forEach(moduleNode => {
+        if (Node.isModuleDeclaration(moduleNode)) {
+            const moduleName = moduleNode.getName();
+            processModule(moduleNode, moduleName);
+        }
+    });
+
+
+    // console.log(`[buildMethodPositionMap] Final positionMap:`, Array.from(positionMap.entries()));
+    return positionMap;
+}
+
+/**
+ * Generates a fully qualified name (FQN) for a given AST node.
+ * Constructs an FQN by traversing the node's ancestry, adding names and keys
+ * (numeric or string from object literals ...) as needed, prefixed with the file's relative path.
+ * 
+ * @param node The AST node to generate an FQN for
+ * @returns A string representing the node's FQN (e.g., "{path}.operations.add.compute[MethodDeclaration]")
+ */
+export function getFQN(node: FQNNode | Node): string {
     const sourceFile = node.getSourceFile();
+    const absolutePathProject = entityDictionary.famixRep.getAbsolutePath();
     const parts: string[] = [];
     let currentNode: Node | undefined = node;
+
+    const stageMap = buildStageMethodMap(sourceFile);
+    const methodPositionMap = buildMethodPositionMap(sourceFile);
 
     while (currentNode && !Node.isSourceFile(currentNode)) {
         const { line, column } = sourceFile.getLineAndColumnAtPos(currentNode.getStart());
         const lc = `${line}:${column}`;
+
         if (Node.isClassDeclaration(currentNode) || 
             Node.isClassExpression(currentNode) || 
             Node.isInterfaceDeclaration(currentNode) ||
@@ -29,7 +257,6 @@ export function getFQN(node: FQNNode | Node): string {
             Node.isVariableDeclaration(currentNode) || 
             Node.isGetAccessorDeclaration(currentNode) ||
             Node.isSetAccessorDeclaration(currentNode) ||
-            Node.isTypeParameterDeclaration(currentNode) ||
             Node.isPropertyDeclaration(currentNode) ||
             Node.isParameterDeclaration(currentNode) ||
             Node.isDecorator(currentNode) ||
@@ -41,44 +268,102 @@ export function getFQN(node: FQNNode | Node): string {
             Node.isArrayLiteralExpression(currentNode) ||
             Node.isImportSpecifier(currentNode) ||
             Node.isIdentifier(currentNode)) {
-            const name = Node.isIdentifier(currentNode) ? currentNode.getText() 
-                : getNameOfNode(currentNode) /* currentNode.getName() */ || 'Unnamed_' + currentNode.getKindName() + `(${lc})`;
+            let name: string;
+            if (Node.isImportSpecifier(currentNode)) {
+                const alias = currentNode.getAliasNode()?.getText();
+                if (alias) {
+                    let importDecl: Node | undefined = currentNode;
+                    while (importDecl && !Node.isImportDeclaration(importDecl)) {
+                        importDecl = importDecl.getParent();
+                    }
+                    const moduleSpecifier = importDecl && Node.isImportDeclaration(importDecl) 
+                        ? importDecl.getModuleSpecifier().getLiteralText() 
+                        : "unknown";
+                    name = currentNode.getName(); 
+                    name = `${name} as ${alias}[ImportSpecifier<${moduleSpecifier}>]`;
+                } else {
+                    name = currentNode.getName(); 
+                }
+            } else {
+                name = Node.isIdentifier(currentNode) ? currentNode.getText() 
+                    : (currentNode as any).getName?.() || `Unnamed_${currentNode.getKindName()}(${lc})`;
+            }
+
+            if (Node.isMethodSignature(currentNode)) {
+                const method = currentNode as MethodSignature;
+                const params = method.getParameters().map(p => {
+                    const typeText = p.getType().getText().replace(/\s+/g, "");
+                    return typeText || "any"; // Fallback for untyped parameters
+                });
+                const returnType = method.getReturnType().getText().replace(/\s+/g, "") || "void";
+                name = `${name}(${params.join(",")}):${returnType}`;
+            }
+
             parts.unshift(name);
-        }
-        // unnamed nodes
+
+            // Apply positional index for MethodDeclaration, MethodSignature, and FunctionDeclaration
+            if (Node.isMethodDeclaration(currentNode) || 
+                Node.isMethodSignature(currentNode) || 
+                Node.isFunctionDeclaration(currentNode)) {
+                const key = stageMap.get(currentNode.getStart());
+                if (key) {
+                    parts.unshift(key);
+                    // console.log(`[getFQN] Applied stageMap key: ${key} for ${currentNode.getKindName()} at position ${currentNode.getStart()}`);
+                } else {
+                    const positionIndex = methodPositionMap.get(currentNode.getStart());
+                    if (positionIndex && positionIndex > 1) {
+                        parts.unshift(positionIndex.toString());
+                        // console.log(`[getFQN] Applied positionIndex: ${positionIndex} for ${currentNode.getKindName()} at position ${currentNode.getStart()}`);
+                    } else {
+                        console.log(`[getFQN] No positionIndex applied for ${currentNode.getKindName()} at position ${currentNode.getStart()}, positionIndex: ${positionIndex || 'none'}`);
+                    }
+                }
+            }
+        } 
         else if (Node.isArrowFunction(currentNode) || 
-                   Node.isBlock(currentNode) || 
-                   Node.isForInStatement(currentNode) || 
-                   Node.isForOfStatement(currentNode) || 
-                   Node.isForStatement(currentNode) || 
-                   Node.isCatchClause(currentNode)) {
-            parts.unshift(`${currentNode.getKindName()}(${lc})`);
-        } else if (Node.isConstructorDeclaration(currentNode)) {
-            parts.unshift(`constructor`);
-        } else {
-            // For other kinds, you might want to handle them specifically or ignore
-            logger.debug(`Ignoring node kind: ${currentNode.getKindName()}`);
+                 Node.isBlock(currentNode) || 
+                 Node.isForInStatement(currentNode) || 
+                 Node.isForOfStatement(currentNode) || 
+                 Node.isForStatement(currentNode) || 
+                 Node.isCatchClause(currentNode)) {
+            const name = `${currentNode.getKindName()}(${lc})`;
+            parts.unshift(name);
+        } 
+        else if (Node.isTypeParameterDeclaration(currentNode)) {
+            const arrowParent = currentNode.getFirstAncestorByKind(SyntaxKind.ArrowFunction);
+            if (arrowParent) {
+                const arrowIndex = Math.abs(methodPositionMap.get(arrowParent.getStart()) || 0);
+                if (arrowIndex > 0) {
+                    parts.unshift(arrowIndex.toString());
+                }
+            }
+            parts.unshift(currentNode.getName());
+            // Removed continue to allow ancestor processing
         }
+        else if (Node.isConstructorDeclaration(currentNode)) {
+            const name = "constructor";
+            parts.unshift(name);
+        } else {
+            console.log(`[getFQN] Ignoring node kind: ${currentNode.getKindName()}`);
+        }
+
         currentNode = currentNode.getParent();
     }
 
-
-
-    // Prepend the relative path of the source file
     let relativePath = entityDictionary.convertToRelativePath(
         path.normalize(sourceFile.getFilePath()), 
-                       absolutePathProject).replace(/\\/sg, "/");
-                       
+        absolutePathProject
+    ).replace(/\\/g, "/");
+
     if (relativePath.includes("..")) {
-        logger.error(`Relative path contains ../: ${relativePath}`);
     }
     if (relativePath.startsWith("/")) {
-        relativePath = relativePath.substring(1);
+        relativePath = relativePath.slice(1);
     }
     parts.unshift(`{${relativePath}}`);
-    const fqn = parts.join(".") + `[${node.getKindName()}]`;  // disambiguate
 
-    logger.debug(`Generated FQN: ${fqn} for node: ${node.getKindName()}`);
+    const fqn = parts.join(".") + `[${node.getKindName()}]`;
+    // console.log(`[getFQN] Final FQN: ${fqn}`);
     return fqn;
 }
 
