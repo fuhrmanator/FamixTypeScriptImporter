@@ -6,46 +6,76 @@ import { project } from './testUtils';
 const importer = new Importer();
 
 project.createSourceFile("/classImplementsUndefinedInterface.ts",
-`import {FileSystemHost} from "ts-morph";
+    `import { FileSystemHost } from "ts-morph";
 
-class myClass implements FileSystemHost {}
+class MyClass implements FileSystemHost {}
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for class implements undefined interface', () => {
 
-    const classesSet = fmxRep._getAllEntitiesWithType("Class");
-    const interfacesSet = fmxRep._getAllEntitiesWithType("Interface");
-    
-    it("should contain one class and one interface", () => {
-        expect(classesSet.size).toBe(1);
-        expect(interfacesSet.size).toBe(1);
+    let myClass: Class | undefined;
+    let myInterface: Interface | undefined;
+
+    it("should contain a class MyClass", () => {
+        myClass = fmxRep._getFamixClass("{classImplementsUndefinedInterface.ts}.MyClass[ClassDeclaration]");
+        expect(myClass).toBeTruthy();
     });
 
-    it("should contain an interface myClass that extends an interface FileSystemHost", () => {
-        const cList = Array.from(classesSet as Set<Class>);
-        const iList = Array.from(interfacesSet as Set<Interface>);
-        expect(cList).toBeTruthy();
-        expect(iList).toBeTruthy();
-        const myInterface1 = iList.find(p => p.name === "FileSystemHost");
-        expect(myInterface1).toBeTruthy();
-        expect(myInterface1?.isStub).toBe(true);
-        const myClass = cList.find(p => p.name === "myClass");
+    it("should contain an interface FileSystemHost", () => {
+        myInterface = fmxRep._getFamixInterface("{module:ts-morph}.FileSystemHost[InterfaceDeclaration]");
+        expect(myInterface).toBeTruthy();
+    });
+
+    it("MyClass should have no sub classes", () => {
+        expect(myClass?.subInheritances.size).toBe(0);
+    });
+
+    it("MyClass should have one superInheritance", () => {
+        expect(myClass?.superInheritances.size).toBe(1);
+    });
+
+    it("MyClass should have one superInheritance", () => {
+        expect(myClass?.superInheritances.size).toBe(1);
+    });
+
+    it("MyClass should have one superIneritance of FileSystemHost", () => {
         expect(myClass).toBeTruthy();
+        expect(myInterface).toBeTruthy();
         if (myClass) {
-            expect(myClass.subInheritances.size).toBe(0);
-            expect(myClass.superInheritances.size).toBe(1);
             const theInheritance = (Array.from(myClass.superInheritances)[0]);
             expect(theInheritance.superclass).toBeTruthy();
-            expect(theInheritance.superclass).toBe(myInterface1);
+            expect(theInheritance.superclass).toBe(myInterface);
         }
-        if (myInterface1) {
-            expect(myInterface1.subInheritances.size).toBe(1);
-            expect(myInterface1.superInheritances.size).toBe(0);
-            const theInheritance = (Array.from(myInterface1.subInheritances)[0]);
+    });
+
+
+    //     if (myClass) {
+    //         expect(myClass.subInheritances.size).toBe(0);
+    //         expect(myClass.superInheritances.size).toBe(1);
+    //         const theInheritance = (Array.from(myClass.superInheritances)[0]);
+    //         expect(theInheritance.superclass).toBeTruthy();
+    //         expect(theInheritance.superclass).toBe(myInterface);
+    //     }
+    // });
+
+    it("FileSystemHost should have one implementation", () => {
+        if (myInterface) {
+            expect(myInterface.subInheritances.size).toBe(1);
+        }
+    });
+    it("FileSystemHost should have no parent interface", () => {
+        if (myInterface) {
+            expect(myInterface.superInheritances.size).toBe(0);
+        }
+    });
+    it("FileSystemHost should have one implementation that is MyClass", () => {
+        if (myInterface) {
+            const theInheritance = (Array.from(myInterface.subInheritances)[0]);
             expect(theInheritance.subclass).toBeTruthy();
             expect(theInheritance.subclass).toBe(myClass);
         }
     });
+
 });

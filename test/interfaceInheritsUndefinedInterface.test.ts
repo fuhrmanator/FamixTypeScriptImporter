@@ -14,8 +14,12 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for interface inherits undefined interface', () => {
 
-    it("should contain two interfaces", () => {
-        expect(fmxRep._getAllEntitiesWithType("Interface").size).toBe(2);
+    it("should contain an imported interface FileSystemHost", () => {
+        const cList = Array.from(fmxRep._getAllEntitiesWithType("Interface") as Set<Interface>);
+        expect(cList).toBeTruthy();
+        const myInterface = cList.find(p => p.name === "FileSystemHost");
+        expect(myInterface).toBeTruthy();
+        expect(myInterface?.isStub).toBe(true);
     });
 
     it("should contain an interface MyInterface that extends an interface FileSystemHost", () => {
@@ -41,4 +45,9 @@ describe('Tests for interface inherits undefined interface', () => {
             expect(theInheritance.subclass).toBe(myInterface2);
         }
     });
+
+    it("should contain two interfaces", () => {
+        expect(fmxRep._getAllEntitiesWithType("Interface").size).toBe(2);
+    });
+
 });

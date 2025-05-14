@@ -1,4 +1,4 @@
-import { ArrowFunction, CallExpression, ClassDeclaration, ConstructorDeclaration, Decorator, EnumDeclaration, FunctionDeclaration, FunctionExpression, GetAccessorDeclaration, Identifier, ImportDeclaration, ImportEqualsDeclaration, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, Node, PropertyDeclaration, SetAccessorDeclaration, SourceFile, SyntaxKind, TypeParameterDeclaration, VariableDeclaration } from "ts-morph";
+import { ArrowFunction, CallExpression, ClassDeclaration, ConstructorDeclaration, Decorator, EnumDeclaration, ExpressionWithTypeArguments, FunctionDeclaration, FunctionExpression, GetAccessorDeclaration, Identifier, ImportDeclaration, ImportEqualsDeclaration, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, Node, PropertyDeclaration, SetAccessorDeclaration, SourceFile, SyntaxKind, TypeParameterDeclaration, VariableDeclaration } from "ts-morph";
 import { entityDictionary, logger } from "./analyze";
 import path from "path";
 import { TSMorphTypeDeclaration } from "./famix_functions/EntityDictionary";
@@ -23,7 +23,7 @@ function buildStageMethodMap(sourceFile: SourceFile): Map<number, string> {
     const stageMap = new Map<number, string>();
 
     sourceFile.getVariableDeclarations().forEach(varDecl => {
-        const varName = varDecl.getName();
+        // const varName = varDecl.getName();
         const initializer = varDecl.getInitializer();
 
         if (!initializer || !Node.isObjectLiteralExpression(initializer)) {
@@ -85,7 +85,7 @@ function buildStageMethodMap(sourceFile: SourceFile): Map<number, string> {
                 const propInitializer = prop.getInitializer();
                 if (propInitializer && Node.isObjectLiteralExpression(propInitializer)) {
                     propInitializer.getDescendantsOfKind(SyntaxKind.MethodDeclaration).forEach(method => {
-                        const methodName = method.getName();
+                        // const methodName = method.getName();
                         const pos = method.getStart();
                         if (key) {
                             stageMap.set(pos, key);
@@ -285,8 +285,14 @@ export function getFQN(node: FQNNode | Node): string {
                     name = currentNode.getName(); 
                 }
             } else {
-                name = Node.isIdentifier(currentNode) ? currentNode.getText() 
-                    : (currentNode as any).getName?.() || `Unnamed_${currentNode.getKindName()}(${lc})`;
+                // if constructor, use "constructor" as name
+                if (Node.isConstructorDeclaration(currentNode)) {
+                    name = "constructor";
+                } else {
+                    name = Node.isIdentifier(currentNode) ? currentNode.getText() 
+                        : 'getName' in currentNode && typeof currentNode['getName'] === 'function' 
+                            ? (currentNode as { getName(): string }).getName() : `Unnamed_${currentNode.getKindName()}(${lc})`;
+                }
             }
 
             if (Node.isMethodSignature(currentNode)) {
@@ -355,8 +361,8 @@ export function getFQN(node: FQNNode | Node): string {
         absolutePathProject
     ).replace(/\\/g, "/");
 
-    if (relativePath.includes("..")) {
-    }
+    // if (relativePath.includes("..")) {
+    // }
     if (relativePath.startsWith("/")) {
         relativePath = relativePath.slice(1);
     }
@@ -526,3 +532,47 @@ export function getParameters(a: Node): string {
     }
     return paramString;
 }
+
+/**
+ * Gets the FQN of an unresolved interface whos 
+ * @param inhClass The inheritance class
+ * @returns The FQN of the unresolved interface
+ */
+export function getFQNUnresolvedInterface(inhClass: ExpressionWithTypeArguments): string {
+    // make sure it's an implements context
+    const ancestor = inhClass.getFirstAncestorByKind(SyntaxKind.ClassDeclaration);
+    if (!ancestor) {
+        throw new Error("getFQNUnresolvedInterface called on a node that is not an implements context");
+    }
+    // check if it's an implements context
+    const implementsClause = ancestor.getImplements();
+    if (!implementsClause) {
+        throw new Error("getFQNUnresolvedInterface called on a node that is not an implements context");
+    }
+
+    // get the name of the interface
+    const name = inhClass.getExpression().getText();
+    // Find where it's imported - search the entire source file
+    const sourceFile = inhClass.getSourceFile();
+    const importDecls = sourceFile.getImportDeclarations();
+    
+    for (const importDecl of importDecls) {
+        const moduleSpecifier = importDecl.getModuleSpecifierValue();
+        const importClause = importDecl.getImportClause();
+        
+        if (importClause) {
+            const namedImports = importClause.getNamedImports();
+            
+            for (const namedImport of namedImports) {
+                if (namedImport.getName() === name) {
+                    logger.debug(`Found import for ${name} in ${moduleSpecifier}`);
+                    return `{module:${moduleSpecifier}}.${name}[InterfaceDeclaration]`;
+                }
+            }
+        }
+    }
+    
+    // If not found, return a default FQN format
+    return `{unknown-module}.${name}[InterfaceDeclaration]`;
+}
+

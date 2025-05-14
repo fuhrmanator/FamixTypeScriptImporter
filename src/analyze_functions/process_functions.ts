@@ -654,7 +654,7 @@ function processTypeParameters(
     const typeParams = e.getTypeParameters();
 
     // Process each type parameter
-    typeParams.forEach((tp, index) => {
+    typeParams.forEach((tp) => {
         const fmxParam = processTypeParameter(tp);
         fmxScope.addGenericParameter(fmxParam);
     });
@@ -964,7 +964,6 @@ export function processInheritances(classes: ClassDeclaration[], interfaces: Int
     logger.info(`processInheritances: Creating inheritances:`);
     classes.forEach(cls => {
         logger.debug(`processInheritances: Checking class inheritance for ${cls.getName()}`);
-        try {
             const extClass = cls.getBaseClass();
             if (extClass !== undefined) {
                 entityDictionary.createOrGetFamixInheritance(cls, extClass);
@@ -979,10 +978,6 @@ export function processInheritances(classes: ClassDeclaration[], interfaces: Int
 
                 logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), impInter: ${(impInter instanceof InterfaceDeclaration) ? impInter.getName() : impInter.getExpression().getText()}, (${(impInter instanceof InterfaceDeclaration) ? impInter.getType().getText() : impInter.getExpression().getText()})`);
             });
-        }
-        catch (error) {
-            logger.error(`> WARNING: got exception ${error}. Continuing...`);
-        }
     });
 
     interfaces.forEach(inter => {
