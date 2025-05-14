@@ -534,24 +534,40 @@ export function getParameters(a: Node): string {
 }
 
 /**
- * Gets the FQN of an unresolved interface whos 
- * @param inhClass The inheritance class
+ * Gets the FQN of an unresolved interface that is being implemented or extended
+ * @param inhClass The expression with type arguments representing the interface
  * @returns The FQN of the unresolved interface
  */
 export function getFQNUnresolvedInterface(inhClass: ExpressionWithTypeArguments): string {
-    // make sure it's an implements context
-    const ancestor = inhClass.getFirstAncestorByKind(SyntaxKind.ClassDeclaration);
-    if (!ancestor) {
-        throw new Error("getFQNUnresolvedInterface called on a node that is not an implements context");
+    // Check for either ClassDeclaration or InterfaceDeclaration ancestor
+    const classAncestor = inhClass.getFirstAncestorByKind(SyntaxKind.ClassDeclaration);
+    const interfaceAncestor = inhClass.getFirstAncestorByKind(SyntaxKind.InterfaceDeclaration);
+    
+    // Validate the context
+    if (!classAncestor && !interfaceAncestor) {
+        throw new Error("getFQNUnresolvedInterface called on a node that is not in an implements or extends context");
     }
-    // check if it's an implements context
-    const implementsClause = ancestor.getImplements();
-    if (!implementsClause) {
-        throw new Error("getFQNUnresolvedInterface called on a node that is not an implements context");
+    
+    // Check if it's a valid implements/extends context
+    let isValidContext = false;
+    
+    if (classAncestor) {
+        // Check implements clause for classes
+        const implementsClause = classAncestor.getImplements();
+        isValidContext = implementsClause && implementsClause.length > 0;
+    } else if (interfaceAncestor) {
+        // Check extends clause for interfaces
+        const extendsClause = interfaceAncestor.getExtends();
+        isValidContext = extendsClause && extendsClause.length > 0;
+    }
+    
+    if (!isValidContext) {
+        throw new Error("getFQNUnresolvedInterface called on a node that is not in a valid implements or extends context");
     }
 
     // get the name of the interface
     const name = inhClass.getExpression().getText();
+    
     // Find where it's imported - search the entire source file
     const sourceFile = inhClass.getSourceFile();
     const importDecls = sourceFile.getImportDeclarations();
