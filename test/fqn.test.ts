@@ -75,9 +75,9 @@ describe('getFQN functionality', () => {
         const classA2 = classExpressions.find(c => c.getName() === 'A' && c !== classA1)!;
         expect(classA2).toBeDefined();
         const a1fqn = getFQN(classA1!);
-        expect(a1fqn).toBe('{sampleFile.ts}.createClassA1.createClassA1_Fn.createClassA1_Block.A[ClassExpression]');
+        expect(a1fqn).toBe('{sampleFile.ts}.createClassA1.Unnamed_ArrowFunction(7:29).Block(7:35).A[ClassExpression]');
         const a2fqn = getFQN(classA2!);
-        expect(a2fqn).toBe('{sampleFile.ts}.createClassA2.createClassA2_Fn.createClassA2_Block.A[ClassExpression]');
+        expect(a2fqn).toBe('{sampleFile.ts}.createClassA2.Unnamed_ArrowFunction(12:29).Block(12:35).A[ClassExpression]');
         expect(a1fqn).not.toBe(a2fqn);
     });
 
