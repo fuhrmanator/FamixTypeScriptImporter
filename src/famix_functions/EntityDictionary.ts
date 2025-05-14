@@ -583,7 +583,7 @@ export class EntityDictionary {
             let methodTypeName = this.UNKNOWN_VALUE;
             try {
                 methodTypeName = method.getReturnType().getText().trim();
-                // console.log(`Method return type: ${methodTypeName}`);
+                logger.debug(`Method return type: ${methodTypeName}`);
             } catch (error) {
                 logger.error(`Failed to get return type for ${fqn}: ${error}`);
             }
@@ -956,9 +956,10 @@ export class EntityDictionary {
      */
     public createOrGetFamixType(typeName: string, element: TSMorphTypeDeclaration): Famix.Type {
         logger.debug(`Creating (or getting) type: '${typeName}' of element: '${element?.getText().slice(0, 50)}...' of kind: ${element?.getKindName()}`);
-        // console.log(`\n=== Creating/Getting Type: ${typeName} ===`);
-        // console.log(`Element kind: ${element?.getKindName()}`);
-        // console.log(`Element text: ${element?.getText().slice(0, 50)}...`);
+
+        if (isPrimitiveType(typeName)) {
+            return this.createOrGetFamixPrimitiveType(typeName);
+        }
 
         if (element.isKind(SyntaxKind.MethodSignature) || element.isKind(SyntaxKind.MethodDeclaration)) {
             const methodFQN = FQNFunctions.getFQN(element);
@@ -992,15 +993,10 @@ export class EntityDictionary {
             return fmxType;
         }
 
-        const isPrimitive = isPrimitiveType(typeName);
         const isParametricType =
             (element instanceof ClassDeclaration && element.getTypeParameters().length > 0) ||
             (element instanceof InterfaceDeclaration && element.getTypeParameters().length > 0);
-        
-        if (isPrimitive) {
-            return this.createOrGetFamixPrimitiveType(typeName);
-        }
-    
+            
         if (isParametricType) {
             return this.createOrGetFamixParametricType(typeName, element as TSMorphParametricType);
         }
