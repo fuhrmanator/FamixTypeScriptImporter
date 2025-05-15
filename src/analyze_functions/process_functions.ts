@@ -251,7 +251,7 @@ function processVariables(m: ContainerTypes, fmxScope: Famix.ScriptEntity | Fami
         // Check each VariableDeclaration for object literal methods
         v.getDeclarations().forEach(varDecl => {
             const varName = varDecl.getName();
-            console.log(`Checking variable: ${varName} at pos=${varDecl.getStart()}`);
+            // console.log(`Checking variable: ${varName} at pos=${varDecl.getStart()}`);
             const initializer = varDecl.getInitializer();
             if (initializer && Node.isObjectLiteralExpression(initializer)) {
                 initializer.getProperties().forEach(prop => {
@@ -259,7 +259,7 @@ function processVariables(m: ContainerTypes, fmxScope: Famix.ScriptEntity | Fami
                         const nested = prop.getInitializer();
                         if (nested && Node.isObjectLiteralExpression(nested)) {
                             nested.getDescendantsOfKind(SyntaxKind.MethodDeclaration).forEach(method => {
-                                console.log(`Found object literal method: ${method.getName()} at pos=${method.getStart()}`);
+                                // console.log(`Found object literal method: ${method.getName()} at pos=${method.getStart()}`);
                                 entityDictionary.createOrGetFamixMethod(method, currentCC);
                             });
                         }
@@ -590,7 +590,7 @@ function convertParameterToPropertyRepresentation(param: ParameterDeclaration) {
     const paramType = param.getType().getText(param);
 
     // Determine visibility
-    let scope: Scope;
+    let scope: Scope = Scope.Public;
     if (param.hasModifier(SyntaxKind.PrivateKeyword)) {
         scope = Scope.Private;
     } else if (param.hasModifier(SyntaxKind.ProtectedKeyword)) {
@@ -598,7 +598,7 @@ function convertParameterToPropertyRepresentation(param: ParameterDeclaration) {
     } else if (param.hasModifier(SyntaxKind.PublicKeyword)) {
         scope = Scope.Public;
     } else {
-        throw new Error(`Parameter property ${paramName} in constructor does not have a visibility modifier.`);
+        console.log(`[convertParameterToPropertyRepresentation] Parameter ${paramName} has no visibility modifier, defaulting to public.`);
     }
 
     // Determine if readonly
