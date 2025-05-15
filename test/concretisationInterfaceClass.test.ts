@@ -15,7 +15,7 @@ class ClassG implements InterfaceD<number> {
 
 const fmxRep = importer.famixRepFromProject(project);
 
-describe.skip('Tests for concretisation', () => {
+describe('Tests for concretisation', () => {
 
     it("should parse generics", () => {
         expect(fmxRep).toBeTruthy();

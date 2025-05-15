@@ -10,7 +10,7 @@ const project = new Project(
     }
 );
 
-describe.skip('fullyQualifiedName functionality', () => {
+describe('fullyQualifiedName functionality', () => {
     let sourceFile: ReturnType<Project['createSourceFile']>;
 
     beforeAll(() => {
