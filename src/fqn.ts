@@ -282,6 +282,7 @@ export function getFQN(node: FQNNode | Node): string {
             Node.isPropertySignature(currentNode) ||
             Node.isArrayLiteralExpression(currentNode) ||
             Node.isImportSpecifier(currentNode) ||
+            Node.isImportEqualsDeclaration(currentNode) || // Added for ImportEqualsDeclaration
             Node.isIdentifier(currentNode)) {
             let name: string;
             if (Node.isImportSpecifier(currentNode)) {
@@ -339,14 +340,14 @@ export function getFQN(node: FQNNode | Node): string {
                 const key = stageMap.get(currentNode.getStart());
                 if (key) {
                     parts.unshift(key);
-                    console.log(`[getFQN] Applied stageMap key: ${key} for ${currentNode.getKindName()} at position ${currentNode.getStart()}`);
+                    // console.log(`[getFQN] Applied stageMap key: ${key} for ${currentNode.getKindName()} at position ${currentNode.getStart()}`);
                 } else {
                     const positionIndex = methodPositionMap.get(currentNode.getStart());
                     if (positionIndex && positionIndex > 1) {
                         parts.unshift(positionIndex.toString());
-                        console.log(`[getFQN] Applied positionIndex: ${positionIndex} for ${currentNode.getKindName()} at position ${currentNode.getStart()}`);
+                        // console.log(`[getFQN] Applied positionIndex: ${positionIndex} for ${currentNode.getKindName()} at position ${currentNode.getStart()}`);
                     } else {
-                        console.log(`[getFQN] No positionIndex applied for ${currentNode.getKindName()} at position ${currentNode.getStart()}, positionIndex: ${positionIndex || 'none'}`);
+                        // console.log(`[getFQN] No positionIndex applied for ${currentNode.getKindName()} at position ${currentNode.getStart()}, positionIndex: ${positionIndex || 'none'}`);
                     }
                 }
             }
@@ -369,13 +370,12 @@ export function getFQN(node: FQNNode | Node): string {
                 }
             }
             parts.unshift(currentNode.getName());
-            // Removed continue to allow ancestor processing
         }
         else if (Node.isConstructorDeclaration(currentNode)) {
             const name = "constructor";
             parts.unshift(name);
         } else {
-            console.log(`[getFQN] Ignoring node kind: ${currentNode.getKindName()}`);
+            // console.log(`[getFQN] Ignoring node kind: ${currentNode.getKindName()}`);
         }
 
         currentNode = currentNode.getParent();
@@ -394,7 +394,7 @@ export function getFQN(node: FQNNode | Node): string {
     parts.unshift(`{${relativePath}}`);
 
     const fqn = parts.join(".") + `[${node.getKindName()}]`;
-    console.log(`[getFQN] Final FQN: ${fqn}`);
+    // console.log(`[getFQN] Final FQN: ${fqn}`);
     return fqn;
 }
 
