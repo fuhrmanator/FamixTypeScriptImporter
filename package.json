@@ -18,6 +18,14 @@
   "bin": {
     "ts2famix": "dist/ts2famix-cli-wrapper.js"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "keywords": [
     "TypeScript",
     "famix",
