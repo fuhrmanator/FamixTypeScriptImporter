@@ -50,9 +50,9 @@ describe('Tests for types', () => {
     const theVoidType = primitiveTypes.find(t => t.name === "void");
     const theSymbolType = primitiveTypes.find(t => t.name === "symbol");
 
-    it("should contain all the primitive types: string, boolean, void, number, null, undefined, unknown, never, symbol, (not unique symbol), bigint, any", () => {
+    it("should contain all the primitive types: string, boolean, void, number, null, undefined, unknown, never, symbol, unique symbol, bigint, any", () => {
         primitiveTypes.forEach(t => {console.info(t.name);});
-        expect(primitiveTypes.length).toBe(11); // not 12, because unique symbol is not found
+        expect(primitiveTypes.length).toBe(12); // not 12, because unique symbol is not found
         expect(theStringType).toBeTruthy();
         expect(theBooleanType).toBeTruthy();
         expect(theVoidType).toBeTruthy();
@@ -62,7 +62,7 @@ describe('Tests for types', () => {
         expect(theUnknownType).toBeTruthy();
         expect(theNeverType).toBeTruthy();
         // below fails in ts-morph 19.0.0, see https://github.com/dsherret/ts-morph/issues/1453
-        expect(theUniqueType).toBeFalsy(); // this should be true, but it's not found
+        expect(theUniqueType).toBeTruthy(); // this should be true, but it's not found
         expect(theBigintType).toBeTruthy();
         expect(theAnyType).toBeTruthy();
         expect(theSymbolType).toBeTruthy();
