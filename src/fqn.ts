@@ -115,7 +115,7 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
         // Handle functions directly in the module
         const functions = moduleNode.getFunctions();
         const functionCounts = new Map<string, number>();
-        
+
         functions.forEach(func => {
             const funcName = func.getName() || `Unnamed_Function(${func.getStart()})`;
             const count = (functionCounts.get(funcName) || 0) + 1;
@@ -130,7 +130,7 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
             // console.log(`[buildMethodPositionMap] Processing class in module: ${classNode.getName() || 'Unnamed'}`);
             const methods = classNode.getMethods();
             const methodCounts = new Map<string, number>();
-            
+
             methods.forEach(method => {
                 const methodName = method.getName();
                 const count = (methodCounts.get(methodName) || 0) + 1;
@@ -146,7 +146,7 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
             // console.log(`[buildMethodPositionMap] Processing interface in module: ${interfaceNode.getName() || 'Unnamed'}`);
             const methods = interfaceNode.getMethods();
             const methodCounts = new Map<string, number>();
-            
+
             methods.forEach(method => {
                 const methodName = method.getName();
                 const count = (methodCounts.get(methodName) || 0) + 1;
@@ -185,7 +185,7 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
         // console.log(`[buildMethodPositionMap] Processing class: ${classNode.getName() || 'Unnamed'}`);
         const methods = classNode.getMethods();
         const methodCounts = new Map<string, number>();
-        
+
         methods.forEach(method => {
             const methodName = method.getName();
             const count = (methodCounts.get(methodName) || 0) + 1;
@@ -196,13 +196,13 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
 
         methods.forEach(method => trackArrowFunctions(method));
     });
-    
+
     // Handle top-level interfaces
     sourceFile.getInterfaces().forEach(interfaceNode => {
         // console.log(`[buildMethodPositionMap] Processing interface: ${interfaceNode.getName() || 'Unnamed'}`);
         const methods = interfaceNode.getMethods();
         const methodCounts = new Map<string, number>();
-        
+
         methods.forEach(method => {
             const methodName = method.getName();
             const count = (methodCounts.get(methodName) || 0) + 1;
@@ -248,13 +248,13 @@ export function getFQN(node: FQNNode | Node): string {
         const { line, column } = sourceFile.getLineAndColumnAtPos(currentNode.getStart());
         const lc = `${line}:${column}`;
 
-        if (Node.isClassDeclaration(currentNode) || 
-            Node.isClassExpression(currentNode) || 
+        if (Node.isClassDeclaration(currentNode) ||
+            Node.isClassExpression(currentNode) ||
             Node.isInterfaceDeclaration(currentNode) ||
-            Node.isFunctionDeclaration(currentNode) || 
-            Node.isMethodDeclaration(currentNode) || 
-            Node.isModuleDeclaration(currentNode) || 
-            Node.isVariableDeclaration(currentNode) || 
+            Node.isFunctionDeclaration(currentNode) ||
+            Node.isMethodDeclaration(currentNode) ||
+            Node.isModuleDeclaration(currentNode) ||
+            Node.isVariableDeclaration(currentNode) ||
             Node.isGetAccessorDeclaration(currentNode) ||
             Node.isSetAccessorDeclaration(currentNode) ||
             Node.isPropertyDeclaration(currentNode) ||
@@ -276,22 +276,31 @@ export function getFQN(node: FQNNode | Node): string {
                     while (importDecl && !Node.isImportDeclaration(importDecl)) {
                         importDecl = importDecl.getParent();
                     }
-                    const moduleSpecifier = importDecl && Node.isImportDeclaration(importDecl) 
-                        ? importDecl.getModuleSpecifier().getLiteralText() 
+                    const moduleSpecifier = importDecl && Node.isImportDeclaration(importDecl)
+                        ? importDecl.getModuleSpecifier().getLiteralText()
                         : "unknown";
-                    name = currentNode.getName(); 
+                    name = currentNode.getName();
                     name = `${name} as ${alias}[ImportSpecifier<${moduleSpecifier}>]`;
                 } else {
-                    name = currentNode.getName(); 
+                    name = currentNode.getName();
                 }
             } else {
                 // if constructor, use "constructor" as name
                 if (Node.isConstructorDeclaration(currentNode)) {
                     name = "constructor";
                 } else {
-                    name = Node.isIdentifier(currentNode) ? currentNode.getText() 
-                        : 'getName' in currentNode && typeof currentNode['getName'] === 'function' 
-                            ? (currentNode as { getName(): string }).getName() : `Unnamed_${currentNode.getKindName()}(${lc})`;
+                    name = Node.isIdentifier(currentNode) ? currentNode.getText()
+                        : 'getName' in currentNode && typeof currentNode['getName'] === 'function'
+                            ? ((currentNode as { getName(): string }).getName() +
+                                ((Node.isClassDeclaration(currentNode) ||
+                                    Node.isInterfaceDeclaration(currentNode) ||
+                                    Node.isMethodDeclaration(currentNode) ||
+                                    Node.isFunctionDeclaration(currentNode)) &&
+                                    'getTypeParameters' in currentNode &&
+                                    currentNode.getTypeParameters().length > 0
+                                    ? getParameters(currentNode)
+                                    : ''))
+                            : `Unnamed_${currentNode.getKindName()}(${lc})`;
                 }
             }
 
@@ -308,8 +317,8 @@ export function getFQN(node: FQNNode | Node): string {
             parts.unshift(name);
 
             // Apply positional index for MethodDeclaration, MethodSignature, and FunctionDeclaration
-            if (Node.isMethodDeclaration(currentNode) || 
-                Node.isMethodSignature(currentNode) || 
+            if (Node.isMethodDeclaration(currentNode) ||
+                Node.isMethodSignature(currentNode) ||
                 Node.isFunctionDeclaration(currentNode)) {
                 const key = stageMap.get(currentNode.getStart());
                 if (key) {
@@ -325,16 +334,16 @@ export function getFQN(node: FQNNode | Node): string {
                     }
                 }
             }
-        } 
-        else if (Node.isArrowFunction(currentNode) || 
-                 Node.isBlock(currentNode) || 
-                 Node.isForInStatement(currentNode) || 
-                 Node.isForOfStatement(currentNode) || 
-                 Node.isForStatement(currentNode) || 
-                 Node.isCatchClause(currentNode)) {
+        }
+        else if (Node.isArrowFunction(currentNode) ||
+            Node.isBlock(currentNode) ||
+            Node.isForInStatement(currentNode) ||
+            Node.isForOfStatement(currentNode) ||
+            Node.isForStatement(currentNode) ||
+            Node.isCatchClause(currentNode)) {
             const name = `${currentNode.getKindName()}(${lc})`;
             parts.unshift(name);
-        } 
+        }
         else if (Node.isTypeParameterDeclaration(currentNode)) {
             const arrowParent = currentNode.getFirstAncestorByKind(SyntaxKind.ArrowFunction);
             if (arrowParent) {
@@ -357,7 +366,7 @@ export function getFQN(node: FQNNode | Node): string {
     }
 
     let relativePath = entityDictionary.convertToRelativePath(
-        path.normalize(sourceFile.getFilePath()), 
+        path.normalize(sourceFile.getFilePath()),
         absolutePathProject
     ).replace(/\\/g, "/");
 
@@ -412,14 +421,14 @@ export function getNameOfNode(a: Node): string {
     let cKind: ClassDeclaration | undefined;
     let iKind: InterfaceDeclaration | undefined;
     let mKind: MethodDeclaration | undefined;
-    let fKind: FunctionDeclaration | undefined; 
+    let fKind: FunctionDeclaration | undefined;
     let alias: TSMorphTypeDeclaration | undefined;
     switch (a.getKind()) {
         case SyntaxKind.SourceFile:
             return a.asKind(SyntaxKind.SourceFile)!.getBaseName();
 
         case SyntaxKind.ModuleDeclaration:
-            return a.asKind(SyntaxKind.ModuleDeclaration)!.getName(); 
+            return a.asKind(SyntaxKind.ModuleDeclaration)!.getName();
 
         case SyntaxKind.ClassDeclaration:
             cKind = a.asKind(SyntaxKind.ClassDeclaration);
@@ -436,13 +445,13 @@ export function getNameOfNode(a: Node): string {
             } else {
                 return iKind?.getName() || "";
             }
-                
+
         case SyntaxKind.PropertyDeclaration:
-            return a.asKind(SyntaxKind.PropertyDeclaration)!.getName();    
+            return a.asKind(SyntaxKind.PropertyDeclaration)!.getName();
 
         case SyntaxKind.PropertySignature:
-            return a.asKind(SyntaxKind.PropertySignature)!.getName();    
-    
+            return a.asKind(SyntaxKind.PropertySignature)!.getName();
+
         case SyntaxKind.MethodDeclaration:
             mKind = a.asKind(SyntaxKind.MethodDeclaration);
             if (mKind && mKind.getTypeParameters().length > 0) {
@@ -452,14 +461,14 @@ export function getNameOfNode(a: Node): string {
             }
 
         case SyntaxKind.MethodSignature:
-            return a.asKind(SyntaxKind.MethodSignature)!.getName();   
+            return a.asKind(SyntaxKind.MethodSignature)!.getName();
 
         case SyntaxKind.GetAccessor:
             return a.asKind(SyntaxKind.GetAccessor)!.getName();
 
         case SyntaxKind.SetAccessor:
             return a.asKind(SyntaxKind.SetAccessor)!.getName();
-    
+
         case SyntaxKind.FunctionDeclaration:
             fKind = a.asKind(SyntaxKind.FunctionDeclaration);
             if (fKind && fKind.getTypeParameters().length > 0) {
@@ -470,15 +479,15 @@ export function getNameOfNode(a: Node): string {
 
         case SyntaxKind.FunctionExpression:
             return a.asKind(SyntaxKind.FunctionExpression)?.getName() || "anonymous";
-            
+
         case SyntaxKind.Parameter:
             return a.asKind(SyntaxKind.Parameter)!.getName();
-                
+
         case SyntaxKind.VariableDeclaration:
             return a.asKind(SyntaxKind.VariableDeclaration)!.getName();
 
         case SyntaxKind.Decorator:
-            return "@" + a.asKind(SyntaxKind.Decorator)!.getName();    
+            return "@" + a.asKind(SyntaxKind.Decorator)!.getName();
 
         case SyntaxKind.TypeParameter:
             return a.asKind(SyntaxKind.TypeParameter)!.getName();
@@ -498,13 +507,13 @@ export function getNameOfNode(a: Node): string {
             return a.asKind(SyntaxKind.TypeAliasDeclaration)!.getName();
 
         case SyntaxKind.Constructor:
-            return "constructor";   
-        
+            return "constructor";
+
         default:
             // throw new Error(`getNameOfNode called on a node that doesn't have a name: ${a.getKindName()}`);
             // ancestor hasn't got a useful name
             return "";
-        }
+    }
 }
 
 /**
@@ -542,17 +551,17 @@ export function getFQNUnresolvedInheritedClassOrInterface(unresolvedInheritedCla
     // Check for either ClassDeclaration or InterfaceDeclaration ancestor
     const classAncestor = unresolvedInheritedClassOrInterface.getFirstAncestorByKind(SyntaxKind.ClassDeclaration);
     const interfaceAncestor = unresolvedInheritedClassOrInterface.getFirstAncestorByKind(SyntaxKind.InterfaceDeclaration);
-    
+
     // Validate the context
     if (!classAncestor && !interfaceAncestor) {
         throw new Error("getFQNUnresolvedClassOrInterface called on a node that is not in an implements or extends context");
     }
-    
+
     // Check if it's a valid implements/extends context
     let isValidContext = false;
 
     let classExtendsClass = false;
-    
+
     if (classAncestor) {
         // check if the class is extending or implementing an interface
         const extendsClause = classAncestor.getExtends();
@@ -564,27 +573,27 @@ export function getFQNUnresolvedInheritedClassOrInterface(unresolvedInheritedCla
         const extendsClause = interfaceAncestor.getExtends();
         isValidContext = extendsClause && extendsClause.length > 0;
     }
-    
+
     if (!isValidContext) {
         throw new Error("getFQNUnresolvedInterface called on a node that is not in a valid implements or extends context");
     }
 
     // get the name of the interface
     const name = unresolvedInheritedClassOrInterface.getExpression().getText();
-    
+
     // Find where it's imported - search the entire source file
     const sourceFile = unresolvedInheritedClassOrInterface.getSourceFile();
     const importDecls = sourceFile.getImportDeclarations();
-    
+
     for (const importDecl of importDecls) {
         const moduleSpecifier = importDecl.getModuleSpecifierValue();
         const importClause = importDecl.getImportClause();
-        
+
         if (importClause) {
             const namedImports = importClause.getNamedImports();
             // declarationName is ClassDeclaration if "class extends class"
             const declarationName = classExtendsClass ? "ClassDeclaration" : "InterfaceDeclaration";
-            
+
             for (const namedImport of namedImports) {
                 if (namedImport.getName() === name) {
                     logger.debug(`Found import for ${name} in ${moduleSpecifier}`);
@@ -593,7 +602,7 @@ export function getFQNUnresolvedInheritedClassOrInterface(unresolvedInheritedCla
             }
         }
     }
-    
+
     // If not found, return a default FQN format
     return `{unknown-module}.${name}[InterfaceDeclaration]`;
 }
