@@ -5,7 +5,7 @@
  */
 
 
-import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ImportDeclaration, ImportEqualsDeclaration, SyntaxKind, Expression, TypeNode, Scope, ArrowFunction, ExpressionWithTypeArguments } from "ts-morph";
+import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ImportDeclaration, ImportEqualsDeclaration, SyntaxKind, Expression, TypeNode, Scope, ArrowFunction, ExpressionWithTypeArguments, HeritageClause } from "ts-morph";
 import { isAmbient, isNamespace } from "../analyze_functions/process_functions";
 import * as Famix from "../lib/famix/model/famix";
 import { FamixRepository } from "../lib/famix/famix_repository";
@@ -1252,105 +1252,73 @@ export class EntityDictionary {
 
     /**
      * Creates a Famix inheritance
-     * @param cls A class or an interface (subclass)
-     * @param inhClass The inherited class or interface (superclass)
+     * @param baseClassOrInterface A class or an interface (subclass)
+     * @param inheritedClassOrInterface The inherited class or interface (superclass)
      */
-    public createOrGetFamixInheritance(cls: ClassDeclaration | InterfaceDeclaration, inhClass: ClassDeclaration | InterfaceDeclaration | ExpressionWithTypeArguments): void {
-        logger.debug(`Creating FamixInheritance for ${cls.getText()} and ${inhClass.getText()} [${inhClass.constructor.name}].`);
-        // // need a key to see if the inheritance already exists
-        // const classFullyQualifiedName = FQNFunctions.getFQN(cls);
-        // let inKeyword: string;
-        // let inhClassFullyQualifiedName: string;
-        // let inhClassName: string | undefined;
-        // // if inhClass is an ExpressionWithTypeArguments, it is an interface
-        // if (inhClass instanceof ExpressionWithTypeArguments) {
-        //     inhClassName = inhClass.getExpression().getText();
-        //     // what is inhClassFullyQualifiedName? TODO
-        //     inhClassFullyQualifiedName = 'Undefined_Scope_from_importer.' + inhClassName;
-        // } else {
-        //     inhClassName = inhClass.getName();
-        //     if (!inhClassName) {
-        //         throw new Error(`Inherited class or interface name not found for ${inhClass.getText()}.`);
-        //     }
-        //     inhClassFullyQualifiedName = FQNFunctions.getFQN(inhClass);
-        // }
-        // // build the unique key of the inheritance
-        // if ((cls instanceof ClassDeclaration && inhClass instanceof ClassDeclaration) 
-        //     || (cls instanceof InterfaceDeclaration && inhClass instanceof InterfaceDeclaration)) {
-        //     inKeyword = " extends ";
-        // } else if (cls instanceof ClassDeclaration && (inhClass instanceof InterfaceDeclaration || inhClass instanceof ExpressionWithTypeArguments)) {
-        //     inKeyword = " implements ";
-        // } else {
-        //     throw new Error(`Inheritance ${cls.getText()} and ${inhClass.getText()} is not valid.`);
-        // }
-
-        // const inheritanceFullyQualifiedName = FQNFunctions.getFQN(cls) + inKeyword + inhClassFullyQualifiedName;
-        // if (this.fmxInheritanceMap.has(inheritanceFullyQualifiedName)) {
-        //     const rInheritance = this.fmxInheritanceMap.get(inheritanceFullyQualifiedName);
-        //     if (rInheritance) { 
-        //        return; // don't do anything
-        //     } else {
-        //         throw new Error(`Inheritance ${cls.getText()} is not found in the inheritance map.`);
-        //     }
-        // }
-
+    public createOrGetFamixInheritance(baseClassOrInterface: ClassDeclaration | InterfaceDeclaration, inheritedClassOrInterface: ClassDeclaration | InterfaceDeclaration | ExpressionWithTypeArguments): void {
+        logger.debug(`Creating FamixInheritance for ${baseClassOrInterface.getText()} and ${inheritedClassOrInterface.getText()} [${inheritedClassOrInterface.constructor.name}].`);
         const fmxInheritance = new Famix.Inheritance();
 
-        // logger.debug(`createFamixInheritance: classFullyQualifiedName: class fqn = ${classFullyQualifiedName}`);
-
         let subClass: Famix.Class | Famix.Interface | undefined;
-        if (cls instanceof ClassDeclaration) {
-            subClass = this.createOrGetFamixClass(cls);
-        }
-        else {
-            subClass = this.createOrGetFamixInterface(cls);
+        if (baseClassOrInterface instanceof ClassDeclaration) {
+            subClass = this.createOrGetFamixClass(baseClassOrInterface);
+        } else {
+            subClass = this.createOrGetFamixInterface(baseClassOrInterface);
         }
 
         if (!subClass) {
-            throw new Error(`Subclass ${cls} not found in Class or Interface maps.`);
+            throw new Error(`Subclass ${baseClassOrInterface} not found in Class or Interface maps.`);
         }
 
         let superClass: Famix.Class | Famix.Interface | undefined;
-        // if (inhClass instanceof ClassDeclaration || inhClass instanceof InterfaceDeclaration) {
-        //     inhClassName = inhClass.getName();
-        //     if (!inhClassName) {
-        //         throw new Error(`Inherited class or interface name not found for ${inhClass.getText()}.`);
-        //     }
-        //     inhClassFullyQualifiedName = FQNFunctions.getFQN(inhClass);
-        //     if (inhClass instanceof ClassDeclaration) {
-        //         superClass = this.fmxClassMap.get(inhClassFullyQualifiedName);
-        //     }
-        //     else {
-        //         superClass = this.fmxInterfaceMap.get(inhClassFullyQualifiedName);
-        //     }
-        //     if (!superClass) {
-        //         throw new Error(`Superclass ${classFullyQualifiedName} not found in Class or Interface maps.`);
-        //     }
-        // }
 
-        // // it shouldn't add the class/interface again to the Map, it should use createOrGet (?)
-        // if (superClass === undefined) {
-
-        if (inhClass instanceof ClassDeclaration) {
-            superClass = this.createOrGetFamixClass(inhClass);
-        }
-        else if (inhClass instanceof InterfaceDeclaration) {
-            superClass = this.createOrGetFamixInterface(inhClass);
+        if (inheritedClassOrInterface instanceof ClassDeclaration) {
+            superClass = this.createOrGetFamixClass(inheritedClassOrInterface);
+        } else if (inheritedClassOrInterface instanceof InterfaceDeclaration) {
+            superClass = this.createOrGetFamixInterface(inheritedClassOrInterface);
         } else  {
-            // inhClass instanceof ExpressionWithTypeArguments
-            const interfaceDeclaration = getInterfaceDeclarationFromExpression(inhClass);
-            if (interfaceDeclaration !== undefined) {
-                superClass = this.createOrGetFamixInterface(interfaceDeclaration);
+            // inheritedClassOrInterface instanceof ExpressionWithTypeArguments
+            // must determine if inheritedClassOrInterface is a class or an interface
+            // then find the declaration, else it's a stub
+
+            const heritageClause = inheritedClassOrInterface.getParent();
+            if (heritageClause instanceof HeritageClause) {
+                // cases: 1) class extends class, 2) class implements interface, 3) interface extends interface
+
+                // class extends class
+                if (heritageClause.getText().startsWith("extends") && baseClassOrInterface instanceof ClassDeclaration) {
+                    const classDeclaration = getInterfaceOrClassDeclarationFromExpression(inheritedClassOrInterface);
+                    if (classDeclaration !== undefined && classDeclaration instanceof ClassDeclaration) {
+                        superClass = this.createOrGetFamixClass(classDeclaration);
+                    } else {
+                        logger.error(`Class declaration not found for ${inheritedClassOrInterface.getText()}.`);
+                        superClass = this.createOrGetFamixClassStub(inheritedClassOrInterface);
+                    }
+                } 
+                else if (heritageClause.getText().startsWith("implements") && baseClassOrInterface instanceof ClassDeclaration // class implements interface
+                    || (heritageClause.getText().startsWith("extends") && baseClassOrInterface instanceof InterfaceDeclaration)) { // interface extends interface
+
+                    const interfaceOrClassDeclaration = getInterfaceOrClassDeclarationFromExpression(inheritedClassOrInterface);
+                    if (interfaceOrClassDeclaration !== undefined && interfaceOrClassDeclaration instanceof InterfaceDeclaration) {
+                        superClass = this.createOrGetFamixInterface(interfaceOrClassDeclaration);
+                    } else {
+                        logger.error(`Interface declaration not found for ${inheritedClassOrInterface.getText()}.`);
+                        superClass = this.createOrGetFamixInterfaceStub(inheritedClassOrInterface);
+                    }
+                } else {
+                    // throw new Error(`Parent of ${inheritedClassOrInterface.getText()} is not a class or an interface.`);
+                    logger.error(`Parent of ${inheritedClassOrInterface.getText()} is not a class or an interface.`);
+                    superClass = this.createOrGetFamixInterfaceStub(inheritedClassOrInterface);
+                }
             } else {
-                // throw new Error(`Interface declaration not found for ${inhClass.getText()}.`);
-                logger.error(`Interface declaration not found for ${inhClass.getText()}.`);
-                superClass = this.createOrGetFamixInterfaceStub(inhClass);
+                throw new Error(`Heritage clause not found for ${inheritedClassOrInterface.getText()}.`);
             }
+
         }
 
-        this.fmxElementObjectMap.set(superClass, inhClass);
+        this.fmxElementObjectMap.set(superClass, inheritedClassOrInterface);
 
-        this.makeFamixIndexFileAnchor(inhClass, superClass);
+        this.makeFamixIndexFileAnchor(inheritedClassOrInterface, superClass);
 
         this.famixRep.addElement(superClass);
 
@@ -1364,22 +1332,38 @@ export class EntityDictionary {
         // this.fmxElementObjectMap.set(fmxInheritance, null);
 
     }
-
-    createOrGetFamixInterfaceStub(inhClass: ExpressionWithTypeArguments): Famix.Class | Famix.Interface {
+    createOrGetFamixClassStub(unresolvedInheritedClass: ExpressionWithTypeArguments): Famix.Class {
         // make a FQN for the stub
-        const fqn = FQNFunctions.getFQNUnresolvedInterface(inhClass);
+        const fqn = FQNFunctions.getFQNUnresolvedInheritedClassOrInterface(unresolvedInheritedClass);
+        logger.debug(`createOrGetFamixClassStub: fqn: ${fqn}`);
+        const fmxClass = this.famixRep.getFamixEntityByFullyQualifiedName(fqn) as Famix.Class;
+        if (fmxClass) {
+            return fmxClass;
+        } else {
+            const stub = new Famix.Class();
+            stub.name = unresolvedInheritedClass.getText();
+            stub.isStub = true;
+            stub.fullyQualifiedName = fqn;
+            this.famixRep.addElement(stub);
+            this.fmxElementObjectMap.set(stub, unresolvedInheritedClass);
+            return stub;
+        }
+    }
+
+    createOrGetFamixInterfaceStub(unresolvedInheritedInterface: ExpressionWithTypeArguments): Famix.Interface {
+        // make a FQN for the stub
+        const fqn = FQNFunctions.getFQNUnresolvedInheritedClassOrInterface(unresolvedInheritedInterface);
         logger.debug(`createOrGetFamixInterfaceStub: fqn: ${fqn}`);
         const fmxInterface = this.famixRep.getFamixEntityByFullyQualifiedName(fqn) as Famix.Interface;
         if (fmxInterface) {
             return fmxInterface;
         } else {
             const stub = new Famix.Interface();
-            stub.name = inhClass.getText();
+            stub.name = unresolvedInheritedInterface.getText();
             stub.isStub = true;
-            // initFQN(inhClass, stub);
             stub.fullyQualifiedName = fqn;
             this.famixRep.addElement(stub);
-            this.fmxElementObjectMap.set(stub, inhClass);
+            this.fmxElementObjectMap.set(stub, unresolvedInheritedInterface);
             return stub;
         }
     }
@@ -1942,7 +1926,7 @@ function isTypeContext(sourceElement: ImportDeclaration | ImportEqualsDeclaratio
 }
 
 
-function getInterfaceDeclarationFromExpression(expression: ExpressionWithTypeArguments): InterfaceDeclaration | undefined {
+function getInterfaceOrClassDeclarationFromExpression(expression: ExpressionWithTypeArguments): InterfaceDeclaration | ClassDeclaration | undefined {
     // Step 1: Get the type of the expression
     const type = expression.getType();
 
@@ -1962,7 +1946,7 @@ function getInterfaceDeclarationFromExpression(expression: ExpressionWithTypeArg
     }
 
     // Step 3: Resolve the symbol to find the actual declaration
-    const interfaceDeclaration = resolveSymbolToInterfaceDeclaration(symbol);
+    const interfaceDeclaration = resolveSymbolToInterfaceOrClassDeclaration(symbol);
 
     if (!interfaceDeclaration) {
         logger.error(`Interface declaration not found for ${expression.getText()}.`);
@@ -1973,15 +1957,18 @@ function getInterfaceDeclarationFromExpression(expression: ExpressionWithTypeArg
 
 import { Symbol as TSMorphSymbol } from "ts-morph";
 
-function resolveSymbolToInterfaceDeclaration(symbol: TSMorphSymbol): InterfaceDeclaration | undefined {
+function resolveSymbolToInterfaceOrClassDeclaration(symbol: TSMorphSymbol): InterfaceDeclaration | ClassDeclaration | undefined {
     // Get the declarations associated with the symbol
     const declarations = symbol.getDeclarations();
 
-    // Filter for InterfaceDeclaration
-    const interfaceDeclaration = declarations.find(declaration => declaration instanceof InterfaceDeclaration) as InterfaceDeclaration | undefined;
+    // Filter for InterfaceDeclaration or ClassDeclaration
+    const interfaceOrClassDeclaration = declarations.find(
+        declaration => 
+            declaration instanceof InterfaceDeclaration || 
+            declaration instanceof ClassDeclaration) as InterfaceDeclaration | ClassDeclaration | undefined;
 
-    if (interfaceDeclaration) {
-        return interfaceDeclaration;
+    if (interfaceOrClassDeclaration) {
+        return interfaceOrClassDeclaration;
     }
 
     // Handle imports: If the symbol is imported, resolve the import to find the actual declaration
@@ -1995,7 +1982,7 @@ function resolveSymbolToInterfaceDeclaration(symbol: TSMorphSymbol): InterfaceDe
                 const exportedSymbols = moduleSpecifier.getExportSymbols();
                 const exportedSymbol = exportedSymbols.find(symbol => symbol.getName() === importSpecifier.getName());
                 if (exportedSymbol) {
-                    return resolveSymbolToInterfaceDeclaration(exportedSymbol);
+                    return resolveSymbolToInterfaceOrClassDeclaration(exportedSymbol);
                 }
             }
         }

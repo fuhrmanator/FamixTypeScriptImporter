@@ -535,26 +535,30 @@ export function getParameters(a: Node): string {
 
 /**
  * Gets the FQN of an unresolved interface that is being implemented or extended
- * @param inhClass The expression with type arguments representing the interface
+ * @param unresolvedInheritedClassOrInterface The expression with type arguments representing the interface
  * @returns The FQN of the unresolved interface
  */
-export function getFQNUnresolvedInterface(inhClass: ExpressionWithTypeArguments): string {
+export function getFQNUnresolvedInheritedClassOrInterface(unresolvedInheritedClassOrInterface: ExpressionWithTypeArguments): string {
     // Check for either ClassDeclaration or InterfaceDeclaration ancestor
-    const classAncestor = inhClass.getFirstAncestorByKind(SyntaxKind.ClassDeclaration);
-    const interfaceAncestor = inhClass.getFirstAncestorByKind(SyntaxKind.InterfaceDeclaration);
+    const classAncestor = unresolvedInheritedClassOrInterface.getFirstAncestorByKind(SyntaxKind.ClassDeclaration);
+    const interfaceAncestor = unresolvedInheritedClassOrInterface.getFirstAncestorByKind(SyntaxKind.InterfaceDeclaration);
     
     // Validate the context
     if (!classAncestor && !interfaceAncestor) {
-        throw new Error("getFQNUnresolvedInterface called on a node that is not in an implements or extends context");
+        throw new Error("getFQNUnresolvedClassOrInterface called on a node that is not in an implements or extends context");
     }
     
     // Check if it's a valid implements/extends context
     let isValidContext = false;
+
+    let classExtendsClass = false;
     
     if (classAncestor) {
-        // Check implements clause for classes
+        // check if the class is extending or implementing an interface
+        const extendsClause = classAncestor.getExtends();
         const implementsClause = classAncestor.getImplements();
-        isValidContext = implementsClause && implementsClause.length > 0;
+        isValidContext = (extendsClause !== undefined) || (implementsClause && implementsClause.length > 0);
+        classExtendsClass = extendsClause !== undefined;
     } else if (interfaceAncestor) {
         // Check extends clause for interfaces
         const extendsClause = interfaceAncestor.getExtends();
@@ -566,10 +570,10 @@ export function getFQNUnresolvedInterface(inhClass: ExpressionWithTypeArguments)
     }
 
     // get the name of the interface
-    const name = inhClass.getExpression().getText();
+    const name = unresolvedInheritedClassOrInterface.getExpression().getText();
     
     // Find where it's imported - search the entire source file
-    const sourceFile = inhClass.getSourceFile();
+    const sourceFile = unresolvedInheritedClassOrInterface.getSourceFile();
     const importDecls = sourceFile.getImportDeclarations();
     
     for (const importDecl of importDecls) {
@@ -578,11 +582,13 @@ export function getFQNUnresolvedInterface(inhClass: ExpressionWithTypeArguments)
         
         if (importClause) {
             const namedImports = importClause.getNamedImports();
+            // declarationName is ClassDeclaration if "class extends class"
+            const declarationName = classExtendsClass ? "ClassDeclaration" : "InterfaceDeclaration";
             
             for (const namedImport of namedImports) {
                 if (namedImport.getName() === name) {
                     logger.debug(`Found import for ${name} in ${moduleSpecifier}`);
-                    return `{module:${moduleSpecifier}}.${name}[InterfaceDeclaration]`;
+                    return `{module:${moduleSpecifier}}.${name}[${declarationName}]`;
                 }
             }
         }

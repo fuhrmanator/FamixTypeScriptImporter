@@ -1,44 +1,77 @@
 import { Importer } from '../src/analyze';
-import { Interface } from '../src/lib/famix/model/famix';
+import { Class } from '../src/lib/famix/model/famix';
 import { project } from './testUtils';
 
 const importer = new Importer();
 
 project.createSourceFile("/classExtendsUndefinedClass.ts",
-`import {ClassDeclaration} from "ts-morph";
+`import {BaseClass} from "ts-morph";
 
-class MyClass extends ClassDeclaration {}
+class MyClass extends BaseClass {}
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
 
-describe.skip('Tests for class extends undefined class', () => {
+describe('Tests for class extends unresolved (stub) class', () => {
 
-    it("should contain two classes", () => {
-        expect(fmxRep._getAllEntitiesWithType("Class").size).toBe(2);
+    let baseClass: Class | undefined;
+    let myClass: Class | undefined;
+    
+    it("should contain BaseClass", () => {
+        baseClass = fmxRep._getFamixClass("{module:ts-morph}.BaseClass[ClassDeclaration]");
+        expect(baseClass).toBeTruthy();
     });
 
-    it("should contain a class MyClass that extends a class ClassDeclaration", () => {
-        const cList = Array.from(fmxRep._getAllEntitiesWithType("Class") as Set<Interface>);
-        expect(cList).toBeTruthy();
-        const myClass1 = cList.find(p => p.name === "ClassDeclaration");
-        expect(myClass1).toBeTruthy();
-        expect(myClass1?.isStub).toBe(true);
-        const myClass2 = cList.find(p => p.name === "MyClass");
-        expect(myClass2).toBeTruthy();
-        if (myClass2) {
-            expect(myClass2.subInheritances.size).toBe(0);
-            expect(myClass2.superInheritances.size).toBe(1);
-            const theInheritance = (Array.from(myClass2.superInheritances)[0]);
+    it("should contain MyClass", () => {
+        myClass = fmxRep._getFamixClass("{classExtendsUndefinedClass.ts}.MyClass[ClassDeclaration]");
+        expect(myClass).toBeTruthy();
+    });
+
+    it("MyClass should have no sub classes", () => {
+        expect(myClass?.subInheritances.size).toBe(0);
+    });
+
+    it("MyClass should have one superInheritance", () => {
+        expect(myClass?.superInheritances.size).toBe(1);
+    });
+
+    it("MyClass should have one superInheritance", () => {
+        expect(myClass?.superInheritances.size).toBe(1);
+    });
+
+    it("MyClass should have one superInheritance of ClassDeclaration", () => {
+        expect(myClass).toBeTruthy();
+        expect(baseClass).toBeTruthy();
+        if (myClass) {
+            const theInheritance = (Array.from(myClass.superInheritances)[0]);
             expect(theInheritance.superclass).toBeTruthy();
-            expect(theInheritance.superclass).toBe(myClass1);
-        }
-        if (myClass1) {
-            expect(myClass1.subInheritances.size).toBe(1);
-            expect(myClass1.superInheritances.size).toBe(0);
-            const theInheritance = (Array.from(myClass1.subInheritances)[0]);
-            expect(theInheritance.subclass).toBeTruthy();
-            expect(theInheritance.subclass).toBe(myClass2);
+            expect(theInheritance.superclass).toBe(baseClass);
+        } else {
+            throw new Error("MyClass is undefined");
         }
     });
+
+    it("BaseClass should have one subclass", () => {
+        if (baseClass) {
+            expect(baseClass.subInheritances.size).toBe(1);
+        } else {
+            throw new Error("BaseClass is undefined");
+        }
+    });
+
+    it("BaseClass should have no super class", () => {
+        if (baseClass) {
+            expect(baseClass.superInheritances.size).toBe(0);
+        }
+    });
+    it("BaseClass should have one implementation that is MyClass", () => {
+        if (baseClass) {
+            const theInheritance = (Array.from(baseClass.subInheritances)[0]);
+            expect(theInheritance.subclass).toBeTruthy();
+            expect(theInheritance.subclass).toBe(myClass);
+        } else {
+            throw new Error("BaseClass is undefined");
+        }
+    });
+
 });

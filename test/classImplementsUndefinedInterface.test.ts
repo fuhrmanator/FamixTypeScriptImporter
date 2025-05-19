@@ -40,7 +40,7 @@ describe('Tests for class implements undefined interface', () => {
         expect(myClass?.superInheritances.size).toBe(1);
     });
 
-    it("MyClass should have one superIneritance of FileSystemHost", () => {
+    it("MyClass should have one superInheritance of FileSystemHost", () => {
         expect(myClass).toBeTruthy();
         expect(myInterface).toBeTruthy();
         if (myClass) {
@@ -49,16 +49,6 @@ describe('Tests for class implements undefined interface', () => {
             expect(theInheritance.superclass).toBe(myInterface);
         }
     });
-
-
-    //     if (myClass) {
-    //         expect(myClass.subInheritances.size).toBe(0);
-    //         expect(myClass.superInheritances.size).toBe(1);
-    //         const theInheritance = (Array.from(myClass.superInheritances)[0]);
-    //         expect(theInheritance.superclass).toBeTruthy();
-    //         expect(theInheritance.superclass).toBe(myInterface);
-    //     }
-    // });
 
     it("FileSystemHost should have one implementation", () => {
         if (myInterface) {

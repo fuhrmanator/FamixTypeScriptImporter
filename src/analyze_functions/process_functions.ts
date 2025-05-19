@@ -49,6 +49,7 @@ export function getModulePath(importDecl: ImportDeclaration): string {
     return path;
 }
 
+
 /**
  * Gets the interfaces implemented or extended by a class or an interface
  * @param interfaces An array of interfaces
@@ -961,33 +962,39 @@ function isInExports(exports: ReadonlyMap<string, ExportedDeclarations[]>[], imp
  * @param interfaces An array of interfaces
  */
 export function processInheritances(classes: ClassDeclaration[], interfaces: InterfaceDeclaration[]): void {
-    logger.info(`processInheritances: Creating inheritances:`);
+    logger.info(`Creating inheritances:`);
     classes.forEach(cls => {
-        logger.debug(`processInheritances: Checking class inheritance for ${cls.getName()}`);
-            const extClass = cls.getBaseClass();
-            if (extClass !== undefined) {
-                entityDictionary.createOrGetFamixInheritance(cls, extClass);
-
-                logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), extClass: ${extClass.getName()}, (${extClass.getType().getText()})`);
+        logger.debug(`Checking class inheritance for ${cls.getName()}`);
+            const baseClass = cls.getBaseClass();
+            if (baseClass !== undefined) {
+                entityDictionary.createOrGetFamixInheritance(cls, baseClass);
+                logger.debug(`class: ${cls.getName()}, (${cls.getType().getText()}), extClass: ${baseClass.getName()}, (${baseClass.getType().getText()})`);
+            } // this is false when the class extends an undefined class
+            else {
+                // check for "extends" of unresolved class
+                const undefinedExtendedClass = cls.getExtends();
+                if (undefinedExtendedClass) {
+                    entityDictionary.createOrGetFamixInheritance(cls, undefinedExtendedClass);
+                    logger.debug(`class: ${cls.getName()}, (${cls.getType().getText()}), undefinedExtendedClass: ${undefinedExtendedClass.getText()}`);
+                }
             }
 
-            logger.debug(`processInheritances: Checking interface inheritance for ${cls.getName()}`);
+            logger.debug(`Checking interface inheritance for ${cls.getName()}`);
             const implementedInterfaces = getImplementedOrExtendedInterfaces(interfaces, cls);
-            implementedInterfaces.forEach(impInter => {
-                entityDictionary.createOrGetFamixInheritance(cls, impInter);
-
-                logger.debug(`processInheritances: class: ${cls.getName()}, (${cls.getType().getText()}), impInter: ${(impInter instanceof InterfaceDeclaration) ? impInter.getName() : impInter.getExpression().getText()}, (${(impInter instanceof InterfaceDeclaration) ? impInter.getType().getText() : impInter.getExpression().getText()})`);
+            implementedInterfaces.forEach(implementedIF => {
+                entityDictionary.createOrGetFamixInheritance(cls, implementedIF);
+                logger.debug(`class: ${cls.getName()}, (${cls.getType().getText()}), impInter: ${(implementedIF instanceof InterfaceDeclaration) ? implementedIF.getName() : implementedIF.getExpression().getText()}, (${(implementedIF instanceof InterfaceDeclaration) ? implementedIF.getType().getText() : implementedIF.getExpression().getText()})`);
             });
     });
 
-    interfaces.forEach(inter => {
+    interfaces.forEach(interFace => {
         try {
-            logger.debug(`processInheritances: Checking interface inheritance for ${inter.getName()}`);
-            const extendedInterfaces = getImplementedOrExtendedInterfaces(interfaces, inter);
-            extendedInterfaces.forEach(extInter => {
-                entityDictionary.createOrGetFamixInheritance(inter, extInter);
+            logger.debug(`Checking interface inheritance for ${interFace.getName()}`);
+            const extendedInterfaces = getImplementedOrExtendedInterfaces(interfaces, interFace);
+            extendedInterfaces.forEach(extendedInterface => {
+                entityDictionary.createOrGetFamixInheritance(interFace, extendedInterface);
 
-                logger.debug(`processInheritances: inter: ${inter.getName()}, (${inter.getType().getText()}), extInter: ${(extInter instanceof InterfaceDeclaration) ? extInter.getName() : extInter.getExpression().getText()}, (${(extInter instanceof InterfaceDeclaration) ? extInter.getType().getText() : extInter.getExpression().getText()})`);
+                logger.debug(`interFace: ${interFace.getName()}, (${interFace.getType().getText()}), extendedInterface: ${(extendedInterface instanceof InterfaceDeclaration) ? extendedInterface.getName() : extendedInterface.getExpression().getText()}, (${(extendedInterface instanceof InterfaceDeclaration) ? extendedInterface.getType().getText() : extendedInterface.getExpression().getText()})`);
             });
         }
         catch (error) {
