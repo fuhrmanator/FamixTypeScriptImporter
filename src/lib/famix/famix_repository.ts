@@ -2,6 +2,8 @@ import { FamixBaseElement } from "./famix_base_element";
 import { Class, Interface, Variable, Method, ArrowFunction, Function as FamixFunctionEntity, Type, NamedEntity, ScriptEntity, Module, SourceLanguage } from "./model/famix";
 import * as Famix from "./model/famix";
 import { TSMorphObjectType } from "../../famix_functions/EntityDictionary";
+import { logger } from "../../analyze";
+
 /**
  * This class is used to store all Famix elements
  */
@@ -226,6 +228,7 @@ export class FamixRepository {
      * @param element A Famix element
      */
     public addElement(element: FamixBaseElement): void {
+        logger.debug(`Adding Famix element ${element.constructor.name} with id ${element.id}`);
         if (element instanceof Class) {
             this.famixClasses.add(element);
         } else if (element instanceof Interface) {
@@ -254,11 +257,18 @@ export class FamixRepository {
         // make sure all elements have unique fully qualified names
         const fqns = new Set<string>();
         for (const element of Array.from(this.elements.values())) {
-            if (element instanceof NamedEntity && element.fullyQualifiedName && fqns.has(element.fullyQualifiedName)) {
-                const theExistingElement = Array.from(this.elements.values()).find(e => (e as NamedEntity).fullyQualifiedName === element.fullyQualifiedName);
-                throw new Error(`The fully qualified name ${element.fullyQualifiedName} is not unique.\nIt exists for ${theExistingElement?.getJSON()}`);
+            // ignore everything that is not a NamedEntity
+            if (element instanceof NamedEntity) {
+                if (element.fullyQualifiedName && fqns.has(element.fullyQualifiedName)) {
+                    const theExistingElement = Array.from(this.elements.values()).find(e => (e as NamedEntity).fullyQualifiedName === element.fullyQualifiedName);
+                    throw new Error(`The fully qualified name ${element.fullyQualifiedName} is not unique.\nIt exists for ${theExistingElement?.getJSON()}`);
+                }
+                const theName = (element as NamedEntity).fullyQualifiedName;
+                if (theName === undefined || theName === "") {
+                    throw new Error(`The element ${element.constructor.name} with id ${element.id} has no valid fully qualified name`);
+                }
+                fqns.add(theName);
             }
-            fqns.add((element as NamedEntity).fullyQualifiedName);
         }
     }
 
