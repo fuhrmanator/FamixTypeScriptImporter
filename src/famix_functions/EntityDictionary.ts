@@ -18,7 +18,7 @@ import path from "path";
 
 export type TSMorphObjectType = ImportDeclaration | ImportEqualsDeclaration | SourceFile | ModuleDeclaration | ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | PropertyDeclaration | PropertySignature | TypeParameterDeclaration | Identifier | Decorator | GetAccessorDeclaration | SetAccessorDeclaration | ImportSpecifier | CommentRange | EnumDeclaration | EnumMember | TypeAliasDeclaration | ExpressionWithTypeArguments | TSMorphParametricType;
 
-export type TSMorphTypeDeclaration = TypeAliasDeclaration | PropertyDeclaration | PropertySignature | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | EnumMember | ImportEqualsDeclaration | TSMorphParametricType | TypeParameterDeclaration;
+export type TSMorphTypeDeclaration = TypeAliasDeclaration | PropertyDeclaration | PropertySignature | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionExpression | ParameterDeclaration | VariableDeclaration | EnumMember | ImportEqualsDeclaration | TSMorphParametricType | TypeParameterDeclaration ;
 
 export type TSMorphParametricType = ClassDeclaration | InterfaceDeclaration | FunctionDeclaration | MethodDeclaration | ArrowFunction;
 
@@ -425,9 +425,13 @@ export class EntityDictionary {
             concElement.fullyQualifiedName = fullyQualifiedFilename;
             concElement.clearGenericParameters();
             concreteArguments.map((param) => {
-                const parameter = this.createOrGetFamixConcreteType(param);
-                concElement.addConcreteParameter(parameter);
-            })
+                if (param instanceof TypeParameterDeclaration) {
+                    const parameter = this.createOrGetFamixType(param.getText(),param.getType(), param);
+                    concElement.addConcreteParameter(parameter);
+                } else {
+                    logger.warn(`> WARNING: concrete argument ${param.getText()} is not a TypeParameterDeclaration. It is a ${param.getKindName()}.`);
+                }
+            });
             
             if (concreteElement instanceof Famix.ParametricClass) {
                 this.fmxClassMap.set(fullyQualifiedFilename, concElement as Famix.ParametricClass);
@@ -726,86 +730,94 @@ export class EntityDictionary {
     }
 
 
-    /**
-     * Creates a Famix type in the context of concretizations
-     * @param typeName A type name
-     * @param element An element
-     * @returns The Famix model of the type
-     */
-    public createOrGetFamixConcreteType(element: TypeNode): 
-        Famix.ParameterType | Famix.PrimitiveType | Famix.Class | Famix.Interface {
-        // TODO - refactor to stop using names as a key in the maps, use ts-morph element instead
-        const typeParameterDeclaration = element.getSymbol()?.getDeclarations()[0] as TypeParameterDeclaration;
-        // const parameterTypeName : string = element.getText();
-        const parameterTypeName = getPrimitiveTypeName(element.getType()) || element.getText();
-        let fmxParameterType: Famix.Type | Famix.Class | Famix.Interface | undefined = undefined;
+    // /**
+    //  * Creates a Famix type in the context of concretizations
+    //  * @param typeName A type name
+    //  * @param element An element
+    //  * @returns The Famix model of the type
+    //  */
+    // public createOrGetFamixConcreteType(element: TypeNode): 
+    //     Famix.ParameterType | Famix.PrimitiveType | Famix.Class | Famix.Interface {
+    //         if (this.fmxTypeMap.has(element)) {
+    //             const rType = this.fmxTypeMap.get(element);
+    //             if (rType) { 
+    //                return rType;
+    //             } else {
+    //                 throw new Error(`Famix type ${element.getText()} is not found in the type map.`);
+    //             }
+    //         }
 
-        // get a TypeReference from a TypeNode
-        const typeReference = element.getType();
-        // get a TypeDeclaration from a TypeReference
-        const typeDeclaration = typeReference.getSymbol()?.getDeclarations()[0] as TSMorphTypeDeclaration;
+    //     const typeParameterDeclaration = element.getSymbol()?.getDeclarations()[0] as TypeParameterDeclaration;
+    //     // const parameterTypeName : string = element.getText();
+    //     const parameterTypeName = getPrimitiveTypeName(element.getType()) || element.getText();
+    //     let fmxParameterType: Famix.Type | Famix.Class | Famix.Interface | undefined = undefined;
 
-        let isClassOrInterface = false;
-        if (this.fmxClassMap.has(parameterTypeName)){
-            this.fmxClassMap.forEach((obj, name) => {
-                if(obj instanceof Famix.ParametricClass){
-                    if (name === element.getText() && obj.genericParameters.size>0) {
-                        fmxParameterType = obj;
-                        isClassOrInterface = true;
-                    } 
-                } else {
-                    if (name === element.getText()) {
-                        fmxParameterType = obj;
-                        isClassOrInterface = true;
-                    } 
-                }   
-            });
-        }
+    //     // get a TypeReference from a TypeNode
+    //     const typeReference = element.getType();
+    //     // get a TypeDeclaration from a TypeReference
+    //     const typeDeclaration = typeReference.getSymbol()?.getDeclarations()[0] as TSMorphTypeDeclaration;
 
-        if (this.fmxInterfaceMap.has(parameterTypeName)){
-            this.fmxInterfaceMap.forEach((obj, name) => {
-                if(obj instanceof Famix.ParametricInterface){
-                    if (name === element.getText() && obj.genericParameters.size>0) {
-                        fmxParameterType = obj;
-                        isClassOrInterface = true;
-                    } 
-                } else {
-                    if (name === element.getText()) {
-                        fmxParameterType = obj;
-                        isClassOrInterface = true;
-                    } 
-                }   
-            });
-        }
+    //     let isClassOrInterface = false;
+    //     if (this.fmxClassMap.has(parameterTypeName)){
+    //         this.fmxClassMap.forEach((obj, name) => {
+    //             if(obj instanceof Famix.ParametricClass){
+    //                 if (name === element.getText() && obj.genericParameters.size>0) {
+    //                     fmxParameterType = obj;
+    //                     isClassOrInterface = true;
+    //                 } 
+    //             } else {
+    //                 if (name === element.getText()) {
+    //                     fmxParameterType = obj;
+    //                     isClassOrInterface = true;
+    //                 } 
+    //             }   
+    //         });
+    //     }
 
-        if(!isClassOrInterface){
-            if (!this.fmxTypeMap.has(typeDeclaration)) {    
-                // TODO refactor 
-                if (isPrimitiveType(parameterTypeName)) {
-                    fmxParameterType = this.createOrGetFamixPrimitiveType(parameterTypeName);
-                } else {
-                    fmxParameterType = new Famix.ParameterType();
-                } 
+    //     if (this.fmxInterfaceMap.has(parameterTypeName)){
+    //         this.fmxInterfaceMap.forEach((obj, name) => {
+    //             if(obj instanceof Famix.ParametricInterface){
+    //                 if (name === element.getText() && obj.genericParameters.size>0) {
+    //                     fmxParameterType = obj;
+    //                     isClassOrInterface = true;
+    //                 } 
+    //             } else {
+    //                 if (name === element.getText()) {
+    //                     fmxParameterType = obj;
+    //                     isClassOrInterface = true;
+    //                 } 
+    //             }   
+    //         });
+    //     }
+
+    //     if(!isClassOrInterface){
+    //         if (!this.fmxTypeMap.has(typeDeclaration)) {    
+    //             // TODO refactor 
+    //             if (isPrimitiveType(parameterTypeName)) {
+    //                 fmxParameterType = this.createOrGetFamixPrimitiveType(parameterTypeName);
+    //             } else {
+    //                 fmxParameterType = new Famix.ParameterType();
+    //             } 
     
-                fmxParameterType.name = parameterTypeName;
-                this.famixRep.addElement(fmxParameterType);
-                this.fmxTypeMap.set(typeDeclaration, fmxParameterType);
-                this.fmxElementObjectMap.set(fmxParameterType,typeParameterDeclaration);
-            }
-            else {
-                const result = this.fmxTypeMap.get(typeDeclaration);
-                if (result) {
-                    fmxParameterType = result;
-                } else {
-                    throw new Error(`Famix type ${typeDeclaration} is not found in the Type map.`);
-                }
-            }
-        }
-        if (!fmxParameterType) {
-            throw new Error(`fmxParameterType was undefined for parameterTypeName ${parameterTypeName}`);
-        }
-        return fmxParameterType;
-    }
+    //             fmxParameterType.name = parameterTypeName;
+    //             this.famixRep.addElement(fmxParameterType);
+    //             this.fmxTypeMap.set(typeDeclaration, fmxParameterType);
+    //             this.fmxElementObjectMap.set(fmxParameterType,typeParameterDeclaration);
+    //         }
+    //         else {
+    //             const result = this.fmxTypeMap.get(typeDeclaration);
+    //             if (result) {
+    //                 fmxParameterType = result;
+    //             } else {
+    //                 throw new Error(`Famix type ${typeDeclaration} is not found in the Type map.`);
+    //             }
+    //         }
+    //     }
+    //     if (!fmxParameterType) {
+    //         throw new Error(`fmxParameterType was undefined for parameterTypeName ${parameterTypeName}`);
+    //     }
+    //     return fmxParameterType;
+    // }
 
     /**
      * Creates a Famix variable
@@ -954,10 +966,11 @@ export class EntityDictionary {
      * @returns The Famix model of the type
      */
     public createOrGetFamixType(typeNameArg: string, tsMorphType: Type | undefined, element: TSMorphTypeDeclaration): Famix.Type {
-        logger.debug(`Creating (or getting) type: '${tsMorphType!.getText() || "undefined"}' of element: '${element?.getText().slice(0, 50)}...' of kind: ${element?.getKindName()}`);
+        logger.debug(`Creating (or getting) type: '${tsMorphType?.getText() || "undefined"}' of element: '${element?.getText().slice(0, 50)}...' of kind: ${element?.getKindName()}`);
 
-        // convert type to name (workaround for unique symbole primitive type)
-        const typeName = tsMorphType && getPrimitiveTypeName(tsMorphType) || typeNameArg;
+        // convert type to correct primitive name (workaround for unique symbole primitive type)
+        // don't convert to primitive if it's a generic type
+        const typeName = !typeNameArg.includes("<") && tsMorphType && getPrimitiveTypeName(tsMorphType) || typeNameArg;
 
         if (isPrimitiveType(typeName)) {
             return this.createOrGetFamixPrimitiveType(typeName);
@@ -1656,7 +1669,7 @@ export class EntityDictionary {
                         genEntity = this.createOrGetFamixInterface(EntityDeclaration) as Famix.ParametricInterface;
                     }
                     const genParams = EntityDeclaration.getTypeParameters().map((param) => param.getText());
-                    const args = element.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments()
+                    const args = element.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments();
                     const conParams = element.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments().map((param) => param.getText());
                     if (!Helpers.arraysAreEqual(conParams,genParams)) {
                         const conEntity = this.createOrGetFamixConcreteElement(genEntity,EntityDeclaration,args);
@@ -1714,7 +1727,7 @@ export class EntityDictionary {
                         }
                     }
                 }
-            })
+            });
         }
         // TODO: This function seems unfinished
     }
@@ -1998,10 +2011,10 @@ function resolveSymbolToInterfaceOrClassDeclaration(symbol: TSMorphSymbol): Inte
 export function getPrimitiveTypeName(type: Type): string | undefined {
   const flags = type.compilerType.flags;
 
-  if (flags & ts.TypeFlags.StringLike) return "string";
-  if (flags & ts.TypeFlags.NumberLike) return "number";
-  if (flags & ts.TypeFlags.BooleanLike) return "boolean";
-  if (flags & ts.TypeFlags.BigIntLike) return "bigint";
+  if (flags & ts.TypeFlags.String) return "string";
+  if (flags & ts.TypeFlags.Number) return "number";
+  if (flags & ts.TypeFlags.Boolean) return "boolean";
+  if (flags & ts.TypeFlags.BigInt) return "bigint";
   if (flags & ts.TypeFlags.UniqueESSymbol) return "unique symbol";
   if (flags & ts.TypeFlags.ESSymbol) return "symbol";
   if (flags & ts.TypeFlags.Undefined) return "undefined";

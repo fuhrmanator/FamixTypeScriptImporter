@@ -72,6 +72,7 @@ describe('Tests for concretisation', () => {
         const theConcretisations = fmxRep._getAllEntitiesWithType("ParameterConcretisation") as Set<ParameterConcretisation>;
         const iterator = theConcretisations.values();
         const firstElement = iterator.next().value as ParameterConcretisation;
+        expect(firstElement).toBeTruthy();
         const genericParameter = firstElement.genericParameter;
         const concParameter = firstElement.concreteParameter;
         expect(genericParameter.name).toBe("T");
