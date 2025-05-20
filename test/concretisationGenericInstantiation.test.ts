@@ -63,6 +63,7 @@ describe('Tests for concretisation', () => {
         const firstElement = iterator.next().value as Concretisation;
         expect(firstElement.concreteEntity.name).toBe("ClassA");
         const concParameter = firstElement.concreteEntity.concreteParameters.values().next().value as ParametricClass;
+        expect(concParameter).toBeTruthy();
         expect(concParameter.name).toBe("number");
     });
 

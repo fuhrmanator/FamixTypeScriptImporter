@@ -81,8 +81,10 @@ describe('Tests for concretisation', () => {
         const theConcretisations = fmxRep._getAllEntitiesWithType("Concretisation") as Set<Concretisation>;
         const iterator = theConcretisations.values();
         const firstElement = iterator.next().value as Concretisation;
+        expect(firstElement).toBeTruthy();
         expect(firstElement.concreteEntity.name).toBe("process");
         const concParameter = firstElement.concreteEntity.concreteParameters.values().next().value as ParametricMethod;
+        expect(concParameter).toBeTruthy();
         expect(concParameter.name).toBe("string");
     });
 

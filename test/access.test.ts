@@ -25,23 +25,24 @@ describe('Accesses', () => {
 
     const jsonOutput = fmxRep.getJSON();
     const parsedModel = JSON.parse(jsonOutput);
-    let testAccessCls;
-    let accessClsMethods;
-    let accessClsAttributes;
+    let testAccessClsFromJSON;
+    let accessClsMethodsFromJSON : Array<Method>;
+    let accessClsAttributesFromJSON : Array<Property>;
 
     it("should have a class with two methods and two attributes", () => {
         const expectedAttributeNames: Array<string> = ['privateAttribute', 'publicAttribute'];
         const expectedMethodNames: Array<string> = ['privateMethod', 'returnAccessName'];
-        testAccessCls = parsedModel.filter(el => (el.FM3 === "FamixTypeScript.Class" && el.name === "AccessClassForTesting"))[0];
-        expect(testAccessCls.attributes.length).toBe(expectedAttributeNames.length);
-        expect(testAccessCls.methods.length).toBe(expectedMethodNames.length);
-        accessClsMethods = parsedModel.filter(e => testAccessCls.methods.some(m => m.ref === e.id));
-        expect(accessClsMethods.length).toBeGreaterThan(0);
-        const checkMethodName = accessClsMethods.every(m => expectedMethodNames.includes(m.name));
+        testAccessClsFromJSON = parsedModel.filter(el => (el.FM3 === "FamixTypeScript.Class" && el.name === "AccessClassForTesting"))[0];
+        // Note: the JSON (moose) info uses "attributes" (Java style name) rather than "properties" (TypeScript)
+        expect(testAccessClsFromJSON.attributes.length).toBe(expectedAttributeNames.length);
+        expect(testAccessClsFromJSON.methods.length).toBe(expectedMethodNames.length);
+        accessClsMethodsFromJSON = parsedModel.filter(e => testAccessClsFromJSON.methods.some(m => m.ref === e.id));
+        expect(accessClsMethodsFromJSON.length).toBeGreaterThan(0);
+        const checkMethodName = accessClsMethodsFromJSON.every(m => expectedMethodNames.includes(m.name));
         expect(checkMethodName).toBe(true);
-        accessClsAttributes = parsedModel.filter(e => testAccessCls.attributes.some(a => a.ref === e.id));
-        expect(accessClsAttributes.length).toBeGreaterThan(0);
-        const checkAttributeName = accessClsAttributes.every(a => expectedAttributeNames.includes(a.name));
+        accessClsAttributesFromJSON = parsedModel.filter(e => testAccessClsFromJSON.attributes.some(a => a.ref === e.id));
+        expect(accessClsAttributesFromJSON.length).toBeGreaterThan(0);
+        const checkAttributeName = accessClsAttributesFromJSON.every(a => expectedAttributeNames.includes(a.name));
         expect(checkAttributeName).toBe(true);
     });
 

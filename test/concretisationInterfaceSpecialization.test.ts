@@ -66,6 +66,7 @@ describe('Tests for concretisation', () => {
         const firstElement = iterator.next().value as Concretisation;
         expect(firstElement.genericEntity).toBe(theInterface);
         const T = firstElement.genericEntity.genericParameters.values().next().value as ParametricInterface;
+        expect(T).toBeTruthy();
         expect(T.name).toBe("T");
     });
 
@@ -75,6 +76,7 @@ describe('Tests for concretisation', () => {
         const firstElement = iterator.next().value as Concretisation;
         expect(firstElement.concreteEntity.name).toBe("InterfaceA");
         const concParameter = firstElement.concreteEntity.concreteParameters.values().next().value as ParametricInterface;
+        expect(concParameter).toBeTruthy();
         expect(concParameter.name).toBe("string");
     });
 
@@ -86,8 +88,12 @@ describe('Tests for concretisation', () => {
         const theConcretisation = fmxRep._getAllEntitiesWithType("ParameterConcretisation") as Set<ParameterConcretisation>;
         const iterator = theConcretisation.values();
         const firstElement = iterator.next().value as ParameterConcretisation;
+        expect(firstElement).toBeTruthy();
         const genericParameter = firstElement.genericParameter;
+        expect(genericParameter).toBeTruthy();
         const concParameter = firstElement.concreteParameter;
+        expect(concParameter).toBeTruthy();
+
         expect(genericParameter.name).toBe("T");
         expect(concParameter.name).toBe("string");
         expect(firstElement.concretisations.size).toBe(2);
