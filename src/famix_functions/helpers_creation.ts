@@ -90,7 +90,7 @@ export function findAncestor(node: Identifier): Node {
 export function findTypeAncestor(element: Node): Node | undefined {
     let ancestor: Node | undefined;
     const ancestors = element.getAncestors();
-    console.log(`Ancestors count: ${ancestors.length}`);
+    // console.log(`Ancestors count: ${ancestors.length}`);
 
     ancestor = ancestors.find(a => {
         const kind = a.getKind();
