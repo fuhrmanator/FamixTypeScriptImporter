@@ -2,6 +2,8 @@ import { FamixBaseElement } from "./famix_base_element";
 import { Class, Interface, Variable, Method, ArrowFunction, Function as FamixFunctionEntity, Type, NamedEntity, ScriptEntity, Module, SourceLanguage } from "./model/famix";
 import * as Famix from "./model/famix";
 import { TSMorphObjectType } from "../../famix_functions/EntityDictionary";
+import { logger } from "../../analyze";
+
 /**
  * This class is used to store all Famix elements
  */
@@ -56,9 +58,27 @@ export class FamixRepository {
      */
     public getFamixEntityByFullyQualifiedName(fullyQualifiedName: string): FamixBaseElement | undefined {
         const allEntities = Array.from(this.elements.values()).filter(e => e instanceof NamedEntity) as Array<NamedEntity>;
-        const entity = allEntities.find(e => e.fullyQualifiedName === fullyQualifiedName);
+        const entity = allEntities.find(e => 
+            // {console.log(`namedEntity: ${e.fullyQualifiedName}`); 
+            // return 
+            e.fullyQualifiedName === fullyQualifiedName
+        // }
+        );
         return entity;
     }
+
+    // Method to get Famix access by accessor and variable
+    public getFamixAccessByAccessorAndVariable(accessor: Famix.ContainerEntity, variable: Famix.StructuralEntity): Famix.Access | undefined {
+        // Iterate through the list of Famix accesses to find the matching one
+        for (const access of Array.from(this.elements.values()).filter(e => e instanceof Famix.Access) as Array<Famix.Access>) {
+            if (access.accessor === accessor && access.variable === variable) {
+                return access;
+            }
+        }
+        // Return undefined if no matching access is found
+        return undefined;
+    }
+
 
     export(arg0: { format: string; }) {
         if (arg0.format === "json") {
@@ -208,6 +228,7 @@ export class FamixRepository {
      * @param element A Famix element
      */
     public addElement(element: FamixBaseElement): void {
+        logger.debug(`Adding Famix element ${element.constructor.name} with id ${element.id}`);
         if (element instanceof Class) {
             this.famixClasses.add(element);
         } else if (element instanceof Interface) {
@@ -226,7 +247,31 @@ export class FamixRepository {
         this.elements.add(element);
         element.id = this.idCounter;
         this.idCounter++;
+        this.validateFQNs();
     }
+
+    /**
+     * Validates the fully qualified names of all Famix elements
+     */
+    private validateFQNs(): void {
+        // make sure all elements have unique fully qualified names
+        const fqns = new Set<string>();
+        for (const element of Array.from(this.elements.values())) {
+            // ignore everything that is not a NamedEntity
+            if (element instanceof NamedEntity) {
+                if (element.fullyQualifiedName && fqns.has(element.fullyQualifiedName)) {
+                    const theExistingElement = Array.from(this.elements.values()).find(e => (e as NamedEntity).fullyQualifiedName === element.fullyQualifiedName);
+                    throw new Error(`The fully qualified name ${element.fullyQualifiedName} is not unique.\nIt exists for ${theExistingElement?.getJSON()}`);
+                }
+                const theName = (element as NamedEntity).fullyQualifiedName;
+                if (theName === undefined || theName === "") {
+                    throw new Error(`The element ${element.constructor.name} with id ${element.id} has no valid fully qualified name`);
+                }
+                fqns.add(theName);
+            }
+        }
+    }
+
 
     /**
      * Gets a JSON representation of the repository

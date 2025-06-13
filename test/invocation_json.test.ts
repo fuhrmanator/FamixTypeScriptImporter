@@ -48,6 +48,7 @@ describe('Invocations json', () => {
     });
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function verifyInvocation(parsedModel: any, theClass: string, theMethod: string) {
     const invocationCls = parsedModel.filter(el => (el.FM3 === "FamixTypeScript.Class" && el.name === theClass))[0];
     const invocationClsMethods = parsedModel.filter(e => invocationCls.methods.some(m => m.ref === e.id));

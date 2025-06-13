@@ -1,5 +1,5 @@
 import { Importer } from "../src/analyze";
-import { Variable, StructuralEntity, ImportClause } from "../src/lib/famix/model/famix";
+import { Variable, ImportClause } from "../src/lib/famix/model/famix";
 import { project } from './testUtils';
 
 const importer = new Importer();

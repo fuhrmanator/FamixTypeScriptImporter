@@ -24,7 +24,7 @@ describe('ArrowFunctions', () => {
     it("should contain arrow function arrayLength", () => {
         expect(theFunction).toBeTruthy();
         expect(theFunction?.declaredType.name).toBe("number");
-        expect(theFunction?.fullyQualifiedName).toBe("{parametricArrowFunctions.ts}.arrayLength.ArrowFunction(2:25)[ArrowFunction]");
+        expect(theFunction?.fullyQualifiedName).toBe("{parametricArrowFunctions.ts}.arrayLength.Unnamed_ArrowFunction(2:25)[ArrowFunction]");
     });
 
     it("should contain a parametric arrow function arrayLength", () => {
@@ -41,7 +41,7 @@ describe('ArrowFunctions', () => {
 
     it("should contain a type parameter T", () => {
         const parameter = theFunction?.genericParameters.values().next().value as Parameter;
-        expect(parameter.name).toBe('T')
+        expect(parameter.name).toBe('T');
     });
 
 });

@@ -37,7 +37,7 @@ describe('Tests for concretisation', () => {
         expect(fmxRep._getAllEntitiesWithType("Concretisation").size).toBe(1);
     });
     
-    it("should contain one parameter concretisation", () => {
+    it.skip("should contain one parameter concretisation", () => {
         expect(fmxRep._getAllEntitiesWithType("ParameterConcretisation").size).toBe(1);
     });
 

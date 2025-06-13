@@ -10,7 +10,7 @@ const project = new Project(
     }
 );
 
-describe.skip('fullyQualifiedName functionality', () => {
+describe('fullyQualifiedName functionality', () => {
     let sourceFile: ReturnType<Project['createSourceFile']>;
 
     beforeAll(() => {
@@ -40,7 +40,7 @@ describe.skip('fullyQualifiedName functionality', () => {
         const result = getFQN(variableDeclaration!);
 
         // Use Jest's expect function to assert the expected fully qualified name
-        expect(result).toBe('{sampleFile.ts}.createClassA1');
+        expect(result).toBe('{sampleFile.ts}.createClassA1[VariableDeclaration]');
     });
 
     test('should generate fully qualified name for method1', () => {
@@ -77,7 +77,7 @@ describe.skip('fullyQualifiedName functionality', () => {
             const result = getFQN(methodDeclaration);
     
             // Use Jest's expect function to assert the expected fully qualified name
-            expect(result).toBe('{sampleFile.ts}.createClassA1.ArrowFunction(4:21).Block(4:21).A.method1');
+            expect(result).toBe('{sampleFile.ts}.createClassA1.Unnamed_ArrowFunction(2:35).Block(2:41).A.method1[MethodDeclaration]');
         } else {
             throw new Error('Variable declaration is undefined');
         }
@@ -92,6 +92,6 @@ describe.skip('fullyQualifiedName functionality', () => {
         const result = getFQN(variableDeclaration!);
 
         // Use Jest's expect function to assert the expected fully qualified name
-        expect(result).toBe('{sampleFile.ts}.instance1');
+        expect(result).toBe('{sampleFile.ts}.instance1[VariableDeclaration]');
     });
 });

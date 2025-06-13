@@ -4,7 +4,7 @@
   "coverageProvider": "babel",
   "maxWorkers": "50%",
   "transform": {
-    "^.+\\.tsx?$": ["ts-jest", { "isolatedModules": true }]
+    "^.+\\.tsx?$": ["ts-jest", { }]
   },
   "testEnvironment": "jest-environment-node",
   "verbose": true

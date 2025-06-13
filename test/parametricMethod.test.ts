@@ -10,10 +10,10 @@ project.createSourceFile("/parametricMethod.ts",
 class ClassParametric<T> {
 
     methodNotParametric(t: T): void {
-    }
+    };
 
     methodParametric<V>(v: V): void {
-    }
+    };
 }
 `);
 
@@ -32,6 +32,14 @@ describe('Tests for generics', () => {
     it("should contain a ParametricClass ClassParametric", () => {
         const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass")).map(e => (e as ParametricClass).name);
         expect(listOfNames).toContain("ClassParametric");
+    });
+
+    it("should contain a ParametricClass ClassParametric with type parameter T", () => {
+        const pcList = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass") as Set<ParametricClass>);
+        expect(pcList).toBeTruthy();
+        const parametricClass = pcList.find(c => c.name === "ClassParametric");
+        const parameterTypes = parametricClass?.genericParameters;
+        expect(parameterTypes?.values().next().value.name).toBe('T');
     });
 
     const theClass = fmxRep._getFamixClass("{parametricMethod.ts}.ClassParametric<T>[ClassDeclaration]");
@@ -60,11 +68,11 @@ describe('Tests for generics', () => {
     });
 
     it("should contain a ParametricMethod methodParametric with type parameter V", () => {
-        const pmList = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod") as Set<ParametricMethod>)
+        const pmList = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod") as Set<ParametricMethod>);
         expect(pmList).toBeTruthy();
         const parametricMethod = pmList.find(m => m.name === "methodParametric");
         const parameterTypes = parametricMethod?.genericParameters;
-        expect(parameterTypes?.values().next().value.name).toBe('V')
+        expect(parameterTypes?.values().next().value.name).toBe('V');
     });
 
 });
