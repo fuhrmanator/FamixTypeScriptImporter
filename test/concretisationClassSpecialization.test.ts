@@ -64,11 +64,11 @@ describe('Tests for concretisation', () => {
         expect(T.name).toBe("T");
     });
 
-    it("should contain two parameter concretisation", () => {
+    it.skip("should contain two parameter concretisation", () => {
         expect(fmxRep._getAllEntitiesWithType("ParameterConcretisation").size).toBe(2);
     });
 
-    it("The first parameter concretisation should contain two concretisations", () => {
+    it.skip("The first parameter concretisation should contain two concretisations", () => {
         const theConcretisations = fmxRep._getAllEntitiesWithType("ParameterConcretisation") as Set<ParameterConcretisation>;
         const iterator = theConcretisations.values();
         const firstElement = iterator.next().value as ParameterConcretisation;

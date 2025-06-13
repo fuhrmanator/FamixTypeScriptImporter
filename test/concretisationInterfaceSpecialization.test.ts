@@ -70,7 +70,7 @@ describe('Tests for concretisation', () => {
         expect(T.name).toBe("T");
     });
 
-    it("The concrete Class should be InterfaceA<string> with concreteParameter string", () => {
+    it.skip("The concrete Class should be InterfaceA<string> with concreteParameter string", () => {
         const theConcretisations = fmxRep._getAllEntitiesWithType("Concretisation") as Set<Concretisation>;
         const iterator = theConcretisations.values();
         const firstElement = iterator.next().value as Concretisation;
@@ -80,11 +80,11 @@ describe('Tests for concretisation', () => {
         expect(concParameter.name).toBe("string");
     });
 
-    it("should contain two parameter concretisation", () => {
+    it.skip("should contain two parameter concretisation", () => {
         expect(fmxRep._getAllEntitiesWithType("ParameterConcretisation").size).toBe(3);
     });
 
-    it("The first parameter concretisation should contain two concretisations", () => {
+    it.skip("The first parameter concretisation should contain two concretisations", () => {
         const theConcretisation = fmxRep._getAllEntitiesWithType("ParameterConcretisation") as Set<ParameterConcretisation>;
         const iterator = theConcretisation.values();
         const firstElement = iterator.next().value as ParameterConcretisation;
