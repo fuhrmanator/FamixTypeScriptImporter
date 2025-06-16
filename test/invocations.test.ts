@@ -26,6 +26,11 @@ class Class3 {
 }
 
 function a() {}
+
+((i:number) => {
+  console.log(\`invoked with \${i}\`);
+})(1);
+
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -127,5 +132,18 @@ describe('Invocations', () => {
         expect(invocations.length).toBeTruthy();
         expect((invocations[0] as Invocation).signature).toBeTruthy();
         expect((invocations[0] as Invocation).signature).toBe('public returnHi(): string');
+    });
+
+    // to find the unnamed IIFE, we need a better approach (AST traverse for call expressions)
+    // current ts2famix relies on findReferencesAsNodes() which doesn't work on unnamed IIFEs or arrow functions
+    it.skip("should contain an invocation for the unnamed IIFE", () => {
+        const invocations = Array.from(fmxRep._getAllEntitiesWithType("Invocation"));
+        expect(invocations.length).toBe(5);
+        expect(invocations).toBeTruthy();
+        const iifeInvocation = invocations.find(i => {
+            const invocation = i as Invocation;
+            return invocation.signature === '(i:number) => { console.log(`invoked with ${i}`); }';
+        });
+        expect(iifeInvocation).toBeTruthy();
     });
 });

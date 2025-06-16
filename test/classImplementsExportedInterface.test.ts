@@ -5,10 +5,13 @@ import { project } from './testUtils';
 
 const importer = new Importer();
 
-project.createSourceFile("/classImplementsUndefinedInterface.ts",
-    `import { FileSystemHost } from "ts-morph";
+project.createSourceFile("/outsideInterface.ts",
+    `export interface MyInterface {}`);
 
-class MyClass implements FileSystemHost {}
+project.createSourceFile("/classImplementsUndefinedInterface.ts",
+    `import { MyInterface } from "outsideInterface";
+
+class MyClass implements MyInterface {}
 `);
 
 const fmxRep = importer.famixRepFromProject(project);
@@ -23,8 +26,8 @@ describe('Tests for class implements undefined interface', () => {
         expect(myClass).toBeTruthy();
     });
 
-    it("should contain an interface FileSystemHost", () => {
-        myInterface = fmxRep._getFamixInterface("{module:ts-morph}.FileSystemHost[InterfaceDeclaration]");
+    it("should contain an interface MyInterface", () => {
+        myInterface = fmxRep._getFamixInterface("{outsideInterface.ts}.MyInterface[InterfaceDeclaration]");
         expect(myInterface).toBeTruthy();
     });
 
@@ -40,7 +43,7 @@ describe('Tests for class implements undefined interface', () => {
         expect(myClass?.superInheritances.size).toBe(1);
     });
 
-    it("MyClass should have one superInheritance of FileSystemHost", () => {
+    it("MyClass should have one superIneritance of MyInterface", () => {
         expect(myClass).toBeTruthy();
         expect(myInterface).toBeTruthy();
         if (myClass) {
@@ -50,17 +53,27 @@ describe('Tests for class implements undefined interface', () => {
         }
     });
 
-    it("FileSystemHost should have one implementation", () => {
+
+    //     if (myClass) {
+    //         expect(myClass.subInheritances.size).toBe(0);
+    //         expect(myClass.superInheritances.size).toBe(1);
+    //         const theInheritance = (Array.from(myClass.superInheritances)[0]);
+    //         expect(theInheritance.superclass).toBeTruthy();
+    //         expect(theInheritance.superclass).toBe(myInterface);
+    //     }
+    // });
+
+    it("MyInterface should have one implementation", () => {
         if (myInterface) {
             expect(myInterface.subInheritances.size).toBe(1);
         }
     });
-    it("FileSystemHost should have no parent interface", () => {
+    it("MyInterface should have no parent interface", () => {
         if (myInterface) {
             expect(myInterface.superInheritances.size).toBe(0);
         }
     });
-    it("FileSystemHost should have one implementation that is MyClass", () => {
+    it("MyInterface should have one implementation that is MyClass", () => {
         if (myInterface) {
             const theInheritance = (Array.from(myInterface.subInheritances)[0]);
             expect(theInheritance.subclass).toBeTruthy();

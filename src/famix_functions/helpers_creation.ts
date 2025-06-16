@@ -1,7 +1,7 @@
 import * as Famix from "../lib/famix/model/famix";
 import { logger } from "../analyze";
 import { ConstructorDeclaration, Identifier, FunctionDeclaration, MethodDeclaration, MethodSignature, PropertyDeclaration, PropertySignature, VariableDeclaration, ParameterDeclaration, GetAccessorDeclaration, SetAccessorDeclaration, EnumMember, TypeAliasDeclaration, Node, SyntaxKind, FunctionExpression } from "ts-morph";
-import { TypeDeclaration } from "./EntityDictionary";
+import { TSMorphTypeDeclaration } from "./EntityDictionary";
 
 interface SearchParameters {
     searchArray: string[];
@@ -87,23 +87,31 @@ export function findAncestor(node: Identifier): Node {
  * @param element A ts-morph element
  * @returns The ancestor of the ts-morph element
  */
-export function findTypeAncestor(element: TypeDeclaration): Node {
+export function findTypeAncestor(element: Node): Node | undefined {
     let ancestor: Node | undefined;
-    ancestor = element.getAncestors().find(a => 
-        a.getKind() === SyntaxKind.MethodDeclaration || 
-        a.getKind() === SyntaxKind.Constructor || 
-        a.getKind() === SyntaxKind.MethodSignature || 
-        a.getKind() === SyntaxKind.FunctionDeclaration || 
-        a.getKind() === SyntaxKind.FunctionExpression || 
-        a.getKind() === SyntaxKind.ModuleDeclaration || 
-        a.getKind() === SyntaxKind.SourceFile || 
-        a.getKindName() === "GetAccessor" || 
-        a.getKindName() === "SetAccessor" || 
-        a.getKind() === SyntaxKind.ClassDeclaration || 
-        a.getKind() === SyntaxKind.InterfaceDeclaration);
+    const ancestors = element.getAncestors();
+    console.log(`Ancestors count: ${ancestors.length}`);
+
+    ancestor = ancestors.find(a => {
+        const kind = a.getKind();
+        const kindName = a.getKindName();
+        return kind === SyntaxKind.MethodDeclaration ||
+               kind === SyntaxKind.Constructor ||
+               kind === SyntaxKind.MethodSignature ||
+               kind === SyntaxKind.FunctionDeclaration ||
+               kind === SyntaxKind.FunctionExpression ||
+               kind === SyntaxKind.ModuleDeclaration ||
+               kind === SyntaxKind.SourceFile ||
+               kindName === "GetAccessor" ||
+               kindName === "SetAccessor" ||
+               kind === SyntaxKind.ClassDeclaration ||
+               kind === SyntaxKind.InterfaceDeclaration;
+    });
+
     if (!ancestor) {
         throw new Error(`Type ancestor not found for ${element.getKindName()}`);
-    }
+    } 
+
     return ancestor;
 }
 

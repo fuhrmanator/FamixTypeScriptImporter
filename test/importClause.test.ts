@@ -1,5 +1,5 @@
-import { Importer, logger } from "../src/analyze";
-import { Class, ImportClause, IndexedFileAnchor, Module, NamedEntity, StructuralEntity } from "../src/lib/famix/model/famix";
+import { Importer } from "../src/analyze";
+import { Class, ImportClause, Module, NamedEntity, StructuralEntity } from "../src/lib/famix/model/famix";
 import { project } from './testUtils';
 
 const importer = new Importer();

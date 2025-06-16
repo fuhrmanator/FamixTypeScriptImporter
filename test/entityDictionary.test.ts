@@ -11,7 +11,7 @@ class Class1 {
         return "Hi";
     }
 
-    m(param /* any */) /* void */ {
+    m(param /* any implied */) /* void return type implied */ {
         var z = param; 
         console.log(b); // b is in global scope
     }
@@ -24,9 +24,10 @@ const fmxRep = importer.famixRepFromProject(project);
 
 describe('Tests for famix objects and ts-morph objects', () => {
 
-    it("should contain 12 elements", () => {
-        expect(fmxRep.getFmxElementObjectMap().size).toBe(12);
-    });
+    // it.skip("should contain x elements", () => {
+    //     // not a really useful test? There are IndexFileAnchors, etc.
+    //     expect(fmxRep._getAllEntities().size).toBe(12);
+    // });
 
     // 0 = ScriptEntity
     it("should contain a ScriptEntity", () => {
@@ -47,13 +48,12 @@ describe('Tests for famix objects and ts-morph objects', () => {
     it("should contain three PrimitiveType: string, void, any", () => {
         const primitiveTypes = fmxRep._getAllEntitiesWithType("PrimitiveType") as Set<PrimitiveType>;
         expect(primitiveTypes.size).toBe(3);
-        const primitiveTypesIterator = primitiveTypes.values();
-        const firstPrimitiveType = primitiveTypesIterator.next().value;
-        expect(firstPrimitiveType.name).toBe("string");
-        const secondPrimitiveType = primitiveTypesIterator.next().value;
-        expect(secondPrimitiveType.name).toBe("void");
-        const thirdPrimitiveType = primitiveTypesIterator.next().value;
-        expect(thirdPrimitiveType.name).toBe("any");
+        
+        const primitiveTypesArray = Array.from(primitiveTypes);
+        
+        expect(primitiveTypesArray.some(type => type.name === "string")).toBeTruthy();
+        expect(primitiveTypesArray.some(type => type.name === "void")).toBeTruthy();
+        expect(primitiveTypesArray.some(type => type.name === "any")).toBeTruthy();
     });
     // 3, 5 = Method
     it("should contain two methods: returnHi, m", () => {

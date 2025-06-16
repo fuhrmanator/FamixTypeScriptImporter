@@ -3,7 +3,6 @@ import { Decorator } from '../src/lib/famix/model/famix/decorator';
 import { Parameter } from '../src/lib/famix/model/famix/parameter';
 import { project } from './testUtils';
 
-const path = require('path');
 const importer = new Importer();
 
 project.createSourceFile("/parameterWithDecorators.ts",

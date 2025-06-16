@@ -6,7 +6,7 @@ import * as processFunctions from "./analyze_functions/process_functions";
 import { EntityDictionary } from "./famix_functions/EntityDictionary";
 import path from "path";
 
-export const logger = new Logger({ name: "ts2famix", minLevel: 3 });
+export const logger = new Logger({ name: "ts2famix", minLevel: 2 });
 export const config = { "expectGraphemes": false };
 export const entityDictionary = new EntityDictionary();
 

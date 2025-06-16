@@ -1,4 +1,4 @@
-import { Importer, logger } from '../src/analyze';
+import { Importer } from '../src/analyze';
 import { Access } from '../src/lib/famix/model/famix/access';
 import { Enum } from '../src/lib/famix/model/famix/enum';
 import { ScriptEntity } from '../src/lib/famix/model/famix/script_entity';
