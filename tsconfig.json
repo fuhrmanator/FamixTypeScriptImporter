@@ -61,7 +61,7 @@
     "exclude": [
         "node_modules",
         "**/*.spec.ts",
-        "famix-typescript-analyzer/**"  // Exclude the child extension project
+        "vscode-extension/**", // Exclude the VS Code extension project
     ],
     "typedocOptions": {
         "entryPoints": [

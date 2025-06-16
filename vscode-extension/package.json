@@ -1,0 +1,38 @@
+{
+	"name": "ts2famix-vscode-extension",
+	"description": "Real-time TypeScript model generation for FAMIX/Moose analysis. This extension automatically creates and updates FAMIX models of your TypeScript code as you make changes, eliminating manual model generation steps. The models can be imported into the Moose platform for advanced code analysis and visualization.",
+  	"author": "Christopher Fuhrman <christopher.fuhrman@etsmtl.ca>",
+	"license": "MIT",
+	"version": "0.0.1",
+	"categories": [],
+	"keywords": [
+		
+	],
+	"engines": {
+		"vscode": "^1.99.0"
+	},
+	"activationEvents": [
+		"onLanguage:typescript"
+	],
+	"main": "./client/dist/extension",
+	"contributes": {
+		"configuration": {
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -b",
+		"watch": "tsc -b -w",
+		"lint": "eslint",
+		"postinstall": "cd client && npm install && cd ../server && npm install && cd .."
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.13.0",
+		"@stylistic/eslint-plugin": "^2.9.0",
+		"@types/node": "^20",
+		"eslint": "^9.13.0",
+    	"npm-run-all": "^4.1.5",
+		"typescript": "^5.8.2",
+		"typescript-eslint": "^8.26.0"
+	}
+}
