@@ -32,7 +32,7 @@ ts2famix
   - Press Ctrl+Shift+P (Windows/Linux) or Cmd+Shift+P (macOS) - this should open the **Command Palette**.
   - Start writing and select the `Preferences: Open Settings (UI)` option. This will open User settings.
   - Toggle the `Extension` section. Scroll down, search and select `Ts2Famix`.
-  - For the `Output File Path` add the output file location where you want your JSON model to be stored. For example, '*C:\Users\User\JSONModels\app.json*'
+  - For the `Famix model output file path` add the output file location where you want your JSON model to be stored. For example, '*C:\Users\User\JSONModels\app.json*'
 - Open any file from this folder that has the `.ts` file extension
 - Press Ctrl+Shift+P (Windows/Linux) or Cmd+Shift+P (macOS) - this should open the **Command Palette**.
 - Start writing `ts2famix` and select the `ts2famix: Generate Famix Model` option. This will trigger the command

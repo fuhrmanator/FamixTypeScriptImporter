@@ -27,7 +27,7 @@
 		"title": "Ts2Famix",
 		"type": "object",
 			"properties": {
-				"ts2famix.outputFilePath": {
+				"ts2famix.FamixModelOutputFilePath": {
 				"type": "string",
 				"default": "",
 				"description": "The output file location where the FAMIX JSON model will be saved."
