@@ -1,17 +1,17 @@
 {
-	"name": "ts2famix-vscode-extension-client",
-	"description": "Server part of an extension.",
-	"version": "0.0.1",
-  	"author": "Christopher Fuhrman <christopher.fuhrman@etsmtl.ca>",
-	"license": "MIT",
-	"engines": {
-		"node": "*"
-	},
-	"dependencies": {
-		"fs": "^0.0.1-security",
-		"ts2famix": "file:../..",
-		"vscode-languageserver": "^9.0.1",
-		"vscode-languageserver-textdocument": "^1.0.11"
-	},
-	"scripts": {}
+  "name": "ts2famix-vscode-extension-client",
+  "description": "Server part of an extension.",
+  "version": "0.0.1",
+  "author": "Christopher Fuhrman <christopher.fuhrman@etsmtl.ca>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.20.4"
+  },
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "ts2famix": "file:../../",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.11"
+  },
+  "scripts": {}
 }

@@ -5,11 +5,14 @@
 		"module": "node18",
 		"moduleResolution": "nodenext",
 		"sourceMap": true,
+		"inlineSources": true,
 		"strict": true,
 		"outDir": "./dist",
 		"rootDir": "./src",
 		"baseUrl": "./",
 		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"tsBuildInfoFile": "./dist/.tsbuildinfo",
 		"typeRoots": [	/* https://www.typescriptlang.org/tsconfig/#typeRoots */
 			"./node_modules/@types"
 		],

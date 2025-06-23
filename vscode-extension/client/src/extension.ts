@@ -7,16 +7,18 @@ import {
 	ServerOptions,
 	TransportKind
 } from 'vscode-languageclient/node';
+import { registerCommands } from './commands';
 
 let client: LanguageClient;
+
+const extensionName = 'ts2famixExtension';
+const extensionDisplayName = 'ts2famix Extension';
 
 export function activate(context: ExtensionContext) {
 	const serverModule = context.asAbsolutePath(
 		path.join('server', 'dist', 'server.js')
 	);
 
-	// If the extension is launched in debug mode then the debug server options are used
-	// Otherwise the run options are used
 	const serverOptions: ServerOptions = {
 		run: { module: serverModule, transport: TransportKind.ipc },
 		debug: {
@@ -25,19 +27,18 @@ export function activate(context: ExtensionContext) {
 		}
 	};
 
-	// Options to control the language client
 	const clientOptions: LanguageClientOptions = {
-		// Register the server for plain text documents
 		documentSelector: [{ scheme: 'file', language: 'typescript' }],
 	};
 
-	// Create the language client and start the client.
 	client = new LanguageClient(
-		'ts2famixExtension',
-		'ts2famix Extension',
+		extensionName,
+		extensionDisplayName,
 		serverOptions,
 		clientOptions
 	);
+
+	registerCommands(context, client);
 
 	// Start the client. This will also launch the server
 	client.start();

@@ -3,21 +3,29 @@
 {
 	"version": "0.2.0",
 	"configurations": [
-		{
-			"type": "extensionHost",
-			"request": "launch",
-			"name": "Launch Client",
-			"runtimeExecutable": "${execPath}",
-			"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
-			"outFiles": [
-				"${workspaceRoot}/client/dist/**/*.js",
-				"${workspaceRoot}/server/dist/**/*.js"
-			],
-			"autoAttachChildProcesses": true,
-			"preLaunchTask": {
-				"type": "npm",
-				"script": "watch"
-			}
+    {
+      "type": "extensionHost",
+      "request": "launch",
+      "name": "Launch Client",
+      "runtimeExecutable": "${execPath}",
+      "args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+      "outFiles": [
+        "${workspaceRoot}/client/dist/**/*.js",
+        "${workspaceRoot}/server/dist/**/*.js",
+        "${workspaceRoot}/../dist/**/*.js" // for ts2famix
+      ],
+      "sourceMaps": true,
+      "sourceMapRenames": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "${workspaceFolder}/../dist/**", // for ts2famix
+        "!**/node_modules/**"
+      ],
+      "autoAttachChildProcesses": true,
+      "preLaunchTask": {
+        "type": "npm",
+        "script": "watch"
+      }
 		},
 	]
 }
