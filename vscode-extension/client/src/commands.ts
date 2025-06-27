@@ -24,7 +24,9 @@ export const registerCommands = (context: vscode.ExtensionContext, client: Langu
 		}
 		
 		if (client) {
-			await client.start(); // Ensure client is started
+			if (!client.isRunning()) {
+				await client.start();
+			}
 			client.sendRequest(serverMethodName, { filePath });
 			vscode.window.showInformationMessage('Model generation command sent for current file.');
 		}

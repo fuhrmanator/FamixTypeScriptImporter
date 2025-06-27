@@ -37,3 +37,12 @@ ts2famix
 - Press Ctrl+Shift+P (Windows/Linux) or Cmd+Shift+P (macOS) - this should open the **Command Palette**.
 - Start writing `ts2famix` and select the `ts2famix: Generate Famix Model` option. This will trigger the command
 - Verify that a file in the specified location was generated
+
+## Testing the Extension
+### Run Tests
+To test the extension run the `npm run test` inside the `vscode-extension` folder. This will run all the tests for the client and server.
+
+### Debug Tests
+- Switch to the Run and Debug View in the Sidebar (Ctrl+Shift+D).
+- Select `Integration Tests` or `Smoke Tests` from the drop down (if it is not already).
+- Press ▷ to run the launch config (F5).

@@ -14,7 +14,7 @@ let client: LanguageClient;
 const extensionName = 'ts2famixExtension';
 const extensionDisplayName = 'ts2famix Extension';
 
-export function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
 	const serverModule = context.asAbsolutePath(
 		path.join('server', 'dist', 'server.js')
 	);
@@ -41,7 +41,11 @@ export function activate(context: ExtensionContext) {
 	registerCommands(context, client);
 
 	// Start the client. This will also launch the server
-	client.start();
+	await client.start();
+
+	return {
+		client: client
+	};
 }
 
 export function deactivate(): Thenable<void> | undefined {

@@ -12,6 +12,14 @@
     "ts2famix": "file:../../",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.11"
+  },  
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
-  "scripts": {}
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.2",
+    "ts-jest": "^29.4.0"
+  }
 }
