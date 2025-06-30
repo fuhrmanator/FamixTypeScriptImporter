@@ -47,6 +47,7 @@ export class EntityDictionary {
     private fmxInheritanceMap = new Map<string, Famix.Inheritance>(); // Maps the inheritance names to their Famix model
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
     public fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
+    // TODO: not used, can be removed?
     public tsMorphElementObjectMap = new Map<TSMorphObjectType,Famix.Entity>();
             
     constructor() {
@@ -1868,6 +1869,7 @@ export class EntityDictionary {
         }
     }
 
+    // TODO: move to a helper
     public convertToRelativePath(absolutePath: string, absolutePathProject: string) {
         logger.debug(`convertToRelativePath: absolutePath: '${absolutePath}', absolutePathProject: '${absolutePathProject}'`);
         if (absolutePath.startsWith(absolutePathProject)) {

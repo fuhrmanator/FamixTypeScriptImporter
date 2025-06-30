@@ -17,7 +17,9 @@ export class FamixRepository {
     private famixFunctions = new Set<FamixFunctionEntity>(); // All Famix functions
     private famixFiles = new Set<ScriptEntity | Module>(); // All Famix files
     private idCounter = 1; // Id counter
+    // TODO: move to EntityDictionary
     private absolutePath: string = "";
+    // TODO: delete, fmxElementObjectMap is already inside the entity_Dictionary 
     private fmxElementObjectMap = new Map<Famix.Entity, TSMorphObjectType>();
     private tsMorphObjectMap = new Map<TSMorphObjectType, Famix.Entity>(); // TODO: add this map to have two-way mapping between Famix and TS Morph objects
     
