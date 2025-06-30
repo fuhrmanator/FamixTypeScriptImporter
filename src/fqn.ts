@@ -378,12 +378,13 @@ export function getFQN(node: FQNNode | Node): string {
 
             parts.unshift(name);
 
-            // Apply positional index for MethodDeclaration, MethodSignature, FunctionDeclaration, FunctionExpression, and PropertyDeclaration
+            // Apply positional index for MethodDeclaration, MethodSignature, FunctionDeclaration, FunctionExpression, and PropertyDeclaration , and ModuleDeclaration
             if (Node.isMethodDeclaration(currentNode) || 
                 Node.isMethodSignature(currentNode) || 
                 Node.isFunctionDeclaration(currentNode) ||
                 Node.isFunctionExpression(currentNode) ||
-                Node.isPropertyDeclaration(currentNode)) {
+                Node.isPropertyDeclaration(currentNode) ||
+                Node.isModuleDeclaration(currentNode)) {
                 const key = stageMap.get(currentNode.getStart());
                 if (key) {
                     parts.unshift(key);
