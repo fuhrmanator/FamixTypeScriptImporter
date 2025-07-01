@@ -35,6 +35,7 @@ export type EntityDictionaryConfig = {
 
 export class EntityDictionary {
     private config: EntityDictionaryConfig;
+    private absolutePath: string = "";
     public famixRep = new FamixRepository();
     private fmxAliasMap = new Map<string, Famix.Alias>(); // Maps the alias names to their Famix model
     private fmxClassMap = new Map<string, Famix.Class | Famix.ParametricClass>(); // Maps the fully qualified class names to their Famix model
@@ -58,6 +59,14 @@ export class EntityDictionary {
     constructor(config: EntityDictionaryConfig) {
         this.famixRep.setFmxElementObjectMap(this.fmxElementObjectMap);
         this.config = config;
+    }
+
+    public getAbsolutePath(): string {
+        return this.absolutePath;
+    }
+
+    public setAbsolutePath(path: string) {
+        this.absolutePath = path;
     }
 
     public addSourceAnchor(fmx: Famix.SourcedEntity, node: TSMorphObjectType): Famix.IndexedFileAnchor {
@@ -139,7 +148,7 @@ export class EntityDictionary {
         this.fmxElementObjectMap.set(famixElement, sourceElement);
 
         if (sourceElement !== null) {
-            const absolutePathProject = this.famixRep.getAbsolutePath();
+            const absolutePathProject = this.getAbsolutePath();
         
             const absolutePath = path.normalize(sourceElement.getSourceFile().getFilePath());
 
@@ -299,7 +308,7 @@ export class EntityDictionary {
         let fmxAlias: Famix.Alias;
         const aliasName = typeAliasDeclaration.getName();
         //const aliasFullyQualifiedName = a.getType().getText(); // FQNFunctions.getFQN(a);
-        const aliasFullyQualifiedName = FQNFunctions.getFQN(typeAliasDeclaration, this.famixRep.getAbsolutePath());
+        const aliasFullyQualifiedName = FQNFunctions.getFQN(typeAliasDeclaration, this.getAbsolutePath());
         const foundAlias = this.fmxAliasMap.get(aliasFullyQualifiedName);
         if (!foundAlias) {
             fmxAlias = new Famix.Alias();
@@ -332,7 +341,7 @@ export class EntityDictionary {
     public createOrGetFamixClass(cls: ClassDeclaration): Famix.Class | Famix.ParametricClass {
         let fmxClass: Famix.Class | Famix.ParametricClass;
         const isAbstract = cls.isAbstract();
-        const classFullyQualifiedName = FQNFunctions.getFQN(cls, this.famixRep.getAbsolutePath());
+        const classFullyQualifiedName = FQNFunctions.getFQN(cls, this.getAbsolutePath());
         const clsName = cls.getName() || this.UNKNOWN_VALUE;
         const isGeneric = cls.getTypeParameters().length;
         const foundClass = this.fmxClassMap.get(classFullyQualifiedName);
@@ -373,7 +382,7 @@ export class EntityDictionary {
 
         let fmxInterface: Famix.Interface | Famix.ParametricInterface;
         const interName = inter.getName();
-        const interFullyQualifiedName = FQNFunctions.getFQN(inter, this.famixRep.getAbsolutePath());
+        const interFullyQualifiedName = FQNFunctions.getFQN(inter, this.getAbsolutePath());
         const foundInterface = this.fmxInterfaceMap.get(interFullyQualifiedName);
         if (!foundInterface) {
             const isGeneric = inter.getTypeParameters().length;
@@ -543,7 +552,7 @@ export class EntityDictionary {
         // console.log(`\n=== Creating/Getting Method ===`);
         // console.log(`Method kind: ${method.getKindName()}`);
         // console.log(`Method text: ${method.getText().slice(0, 50)}...`);
-        const fqn = FQNFunctions.getFQN(method, this.famixRep.getAbsolutePath());
+        const fqn = FQNFunctions.getFQN(method, this.getAbsolutePath());
         // console.log(`Method FQN: ${fqn}`);
         logger.debug(`Processing method ${fqn}`);
        
@@ -627,7 +636,7 @@ export class EntityDictionary {
     public createOrGetFamixFunction(func: FunctionDeclaration | FunctionExpression, currentCC: { [key: string]: number }): Famix.Function | Famix.ParametricFunction {
         let fmxFunction: Famix.Function | Famix.ParametricFunction;
         const isGeneric = func.getTypeParameters().length > 0;
-        const functionFullyQualifiedName = FQNFunctions.getFQN(func, this.famixRep.getAbsolutePath());
+        const functionFullyQualifiedName = FQNFunctions.getFQN(func, this.getAbsolutePath());
         if (!this.fmxFunctionAndMethodMap.has(functionFullyQualifiedName)) {
             if (isGeneric) {
                 fmxFunction = new Famix.ParametricFunction();
@@ -931,7 +940,7 @@ export class EntityDictionary {
 
         fmxDecorator.name = decoratorName;
         fmxDecorator.decoratorExpression = decoratorExpression;
-        const decoratedEntityFullyQualifiedName = FQNFunctions.getFQN(decoratedEntity, this.famixRep.getAbsolutePath());
+        const decoratedEntityFullyQualifiedName = FQNFunctions.getFQN(decoratedEntity, this.getAbsolutePath());
         const fmxDecoratedEntity = this.famixRep.getFamixEntityByFullyQualifiedName(decoratedEntityFullyQualifiedName) as Famix.NamedEntity;
         fmxDecorator.decoratedEntity = fmxDecoratedEntity;
         this.initFQN(decorator, fmxDecorator);
@@ -984,7 +993,7 @@ export class EntityDictionary {
         }
 
         if (element.isKind(SyntaxKind.MethodSignature) || element.isKind(SyntaxKind.MethodDeclaration)) {
-            const methodFQN = FQNFunctions.getFQN(element, this.famixRep.getAbsolutePath());
+            const methodFQN = FQNFunctions.getFQN(element, this.getAbsolutePath());
             const returnTypeFQN = `${methodFQN.replace(/\[Method(Signature|Declaration)\]$/, '')}[ReturnType]`;
             
             // Check if we already have this return type in the repository
@@ -1002,7 +1011,7 @@ export class EntityDictionary {
             // Set container (same as method's container)
             const methodAncestor = Helpers.findTypeAncestor(element);
             if (methodAncestor) {
-                const ancestorFQN = FQNFunctions.getFQN(methodAncestor, this.famixRep.getAbsolutePath());
+                const ancestorFQN = FQNFunctions.getFQN(methodAncestor, this.getAbsolutePath());
                 const ancestor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFQN) as Famix.ContainerEntity;
                 if (ancestor) {
                     fmxType.container = ancestor;
@@ -1031,7 +1040,7 @@ export class EntityDictionary {
                 // console.log(`Type ancestor found: ${typeAncestor?.getKindName()}`);
     
                 if (typeAncestor) {
-                    const ancestorFullyQualifiedName = FQNFunctions.getFQN(typeAncestor, this.famixRep.getAbsolutePath());
+                    const ancestorFullyQualifiedName = FQNFunctions.getFQN(typeAncestor, this.getAbsolutePath());
                     // console.log(`Ancestor FQN: ${ancestorFullyQualifiedName}`);
                     ancestor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
                     if (!ancestor) {
@@ -1206,7 +1215,7 @@ export class EntityDictionary {
             return;
         }
     
-        const ancestorFullyQualifiedName = FQNFunctions.getFQN(nodeReferenceAncestor, this.famixRep.getAbsolutePath());
+        const ancestorFullyQualifiedName = FQNFunctions.getFQN(nodeReferenceAncestor, this.getAbsolutePath());
         const accessor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
         if (!accessor) {
             logger.error(`Ancestor ${ancestorFullyQualifiedName} of kind ${nodeReferenceAncestor.getKindName()} not found.`);
@@ -1247,7 +1256,7 @@ export class EntityDictionary {
         // since the node is in the AST, we need to find the ancestor that is in the Famix model
         const containerOfNode = Helpers.findAncestor(nodeReferringToInvocable);
         logger.debug(`Found container (ancestor) ${containerOfNode.getKindName()} for AST node ${nodeReferringToInvocable.getText()}.`);
-        const containerFQN = FQNFunctions.getFQN(containerOfNode, this.famixRep.getAbsolutePath());
+        const containerFQN = FQNFunctions.getFQN(containerOfNode, this.getAbsolutePath());
         logger.debug(`Found containerFQN ${containerFQN}.`);
         let sender = this.famixRep.getFamixEntityByFullyQualifiedName(containerFQN) as Famix.ContainerEntity;
         logger.debug(`Found a sender that matches ${sender.fullyQualifiedName}.`);
@@ -1259,7 +1268,7 @@ export class EntityDictionary {
                 sender = senderContainer;
             }
         }
-        const receiverFullyQualifiedName = FQNFunctions.getFQN(invocable.getParent(), this.famixRep.getAbsolutePath());
+        const receiverFullyQualifiedName = FQNFunctions.getFQN(invocable.getParent(), this.getAbsolutePath());
         const receiver = this.famixRep.getFamixEntityByFullyQualifiedName(receiverFullyQualifiedName) as Famix.NamedEntity;
 
         const fmxInvocation = new Famix.Invocation();
@@ -1427,7 +1436,7 @@ export class EntityDictionary {
         let importedEntity: Famix.NamedEntity | Famix.StructuralEntity | undefined = undefined;
         let importedEntityName: string;
     
-        const absolutePathProject = this.famixRep.getAbsolutePath();
+        const absolutePathProject = this.getAbsolutePath();
         
         const absolutePath = path.normalize(moduleSpecifierFilePath);
         logger.debug(`createFamixImportClause: absolutePath: ${absolutePath}`);
@@ -1482,7 +1491,7 @@ export class EntityDictionary {
             this.famixRep.addElement(importedEntity);
             logger.debug(`Added non-exported entity to repository: ${importedEntity.fullyQualifiedName}`);
         }
-        const importerFullyQualifiedName = FQNFunctions.getFQN(importer, this.famixRep.getAbsolutePath());
+        const importerFullyQualifiedName = FQNFunctions.getFQN(importer, this.getAbsolutePath());
         const fmxImporter = this.famixRep.getFamixEntityByFullyQualifiedName(importerFullyQualifiedName) as Famix.Module;
         fmxImportClause.importingEntity = fmxImporter;
         fmxImportClause.importedEntity = importedEntity;
@@ -1511,7 +1520,7 @@ export class EntityDictionary {
     public createOrGetFamixArrowFunction(arrowExpression: Expression, currentCC: { [key: string]: number } ): Famix.ArrowFunction | Famix.ParametricArrowFunction {
         
         let fmxArrowFunction: Famix.ArrowFunction | Famix.ParametricArrowFunction;
-        const functionFullyQualifiedName = FQNFunctions.getFQN(arrowExpression, this.famixRep.getAbsolutePath());
+        const functionFullyQualifiedName = FQNFunctions.getFQN(arrowExpression, this.getAbsolutePath());
 
         if (!this.fmxFunctionAndMethodMap.has(functionFullyQualifiedName)) {
 
@@ -1878,7 +1887,7 @@ export class EntityDictionary {
     private initFQN(sourceElement: TSMorphObjectType, famixElement: Famix.SourcedEntity) {
         // handle special cases where an element is a Type -- need to change its name
         if (famixElement instanceof Famix.Type && !(sourceElement instanceof CommentRange) && isTypeContext(sourceElement)) {
-            let fqn = FQNFunctions.getFQN(sourceElement, this.famixRep.getAbsolutePath());
+            let fqn = FQNFunctions.getFQN(sourceElement, this.getAbsolutePath());
             // using regex, replace [blah] with [blahType]
             fqn = fqn.replace(/\[([^\]]+)\]/g, "[$1Type]");
             logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
@@ -1887,7 +1896,7 @@ export class EntityDictionary {
         }
         // catch all (except comments)
         if (!(sourceElement instanceof CommentRange)) {
-            const fqn = FQNFunctions.getFQN(sourceElement, this.famixRep.getAbsolutePath());
+            const fqn = FQNFunctions.getFQN(sourceElement, this.getAbsolutePath());
             logger.debug("Setting fully qualified name for " + famixElement.getJSON() + " to " + fqn);
             (famixElement as Famix.NamedEntity).fullyQualifiedName = fqn;
         } 

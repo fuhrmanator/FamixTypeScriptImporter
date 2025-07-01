@@ -119,6 +119,6 @@ export class Importer {
     
         const absoluteBaseUrl = path.resolve(baseUrl);
     
-        this.entityDictionary.famixRep.setAbsolutePath(path.normalize(absoluteBaseUrl));
+        this.entityDictionary.setAbsolutePath(path.normalize(absoluteBaseUrl));
     }
 }

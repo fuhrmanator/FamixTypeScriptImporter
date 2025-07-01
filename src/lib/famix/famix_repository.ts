@@ -8,6 +8,9 @@ import { logger } from "../../analyze";
  * This class is used to store all Famix elements
  */
 export class FamixRepository {
+    setAbsolutePath(arg0: string) {
+        throw new Error("Method not implemented.");
+    }
     private elements = new Set<FamixBaseElement>(); // All Famix elements
     private famixClasses = new Set<Class>(); // All Famix classes
     private famixInterfaces = new Set<Interface>(); // All Famix interfaces
@@ -17,8 +20,6 @@ export class FamixRepository {
     private famixFunctions = new Set<FamixFunctionEntity>(); // All Famix functions
     private famixFiles = new Set<ScriptEntity | Module>(); // All Famix files
     private idCounter = 1; // Id counter
-    // TODO: move to EntityDictionary
-    private absolutePath: string = "";
     // TODO: delete, fmxElementObjectMap is already inside the entity_Dictionary 
     private fmxElementObjectMap = new Map<Famix.Entity, TSMorphObjectType>();
     private tsMorphObjectMap = new Map<TSMorphObjectType, Famix.Entity>(); // TODO: add this map to have two-way mapping between Famix and TS Morph objects
@@ -33,14 +34,6 @@ export class FamixRepository {
 
     public getFmxElementObjectMap() {
         return this.fmxElementObjectMap;
-    }
-
-    public getAbsolutePath(): string {
-        return this.absolutePath;
-    }
-
-    public setAbsolutePath(path: string) {
-        this.absolutePath = path;
     }
 
     /**

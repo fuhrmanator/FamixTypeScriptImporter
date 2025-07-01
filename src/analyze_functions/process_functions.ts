@@ -476,7 +476,7 @@ export class Process {
      */
     private processFunction(f: FunctionDeclaration | FunctionExpression | ArrowFunction): Famix.Function {
     
-        logger.debug(`Function: ${(f instanceof ArrowFunction ? "anonymous" : f.getName() ? f.getName() : "anonymous")}, (${f.getType().getText()}), fqn = ${getFQN(f, this.entityDictionary.famixRep.getAbsolutePath())}`);
+        logger.debug(`Function: ${(f instanceof ArrowFunction ? "anonymous" : f.getName() ? f.getName() : "anonymous")}, (${f.getType().getText()}), fqn = ${getFQN(f, this.entityDictionary.getAbsolutePath())}`);
     
         let fmxFunction;
         if (f instanceof ArrowFunction) {
