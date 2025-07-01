@@ -1,4 +1,4 @@
-import { entityDictionary } from "../src/analyze";
+import { EntityDictionary } from "../src/famix_functions/EntityDictionary";
 import * as Famix from "../src/lib/famix/model/famix";
 import { project } from './testUtils';
 
@@ -27,6 +27,8 @@ namespace MyNamespace {
 describe('EntityDictionary', () => {
 
   const modules = sourceFile.getModules();
+  const config = { expectGraphemes: false };
+  const entityDictionary = new EntityDictionary(config);
 
   test('should get a module/namespace and add it to the map', () => {
     
