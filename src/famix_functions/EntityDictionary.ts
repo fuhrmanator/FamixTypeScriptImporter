@@ -53,11 +53,9 @@ export class EntityDictionary {
     private fmxInheritanceMap = new Map<string, Famix.Inheritance>(); // Maps the inheritance names to their Famix model
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
     public fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
-    // TODO: not used, can be removed?
     public tsMorphElementObjectMap = new Map<TSMorphObjectType,Famix.Entity>();
             
     constructor(config: EntityDictionaryConfig) {
-        this.famixRep.setFmxElementObjectMap(this.fmxElementObjectMap);
         this.config = config;
     }
 
