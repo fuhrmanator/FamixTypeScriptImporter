@@ -8,9 +8,6 @@ import { logger } from "../../analyze";
  * This class is used to store all Famix elements
  */
 export class FamixRepository {
-    setAbsolutePath(arg0: string) {
-        throw new Error("Method not implemented.");
-    }
     private elements = new Set<FamixBaseElement>(); // All Famix elements
     private famixClasses = new Set<Class>(); // All Famix classes
     private famixInterfaces = new Set<Interface>(); // All Famix interfaces
