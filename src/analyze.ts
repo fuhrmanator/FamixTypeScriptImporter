@@ -4,7 +4,7 @@ import { FamixRepository } from "./lib/famix/famix_repository";
 import { Logger } from "tslog";
 import { EntityDictionary, EntityDictionaryConfig } from "./famix_functions/EntityDictionary";
 import path from "path";
-import { Process } from "./analyze_functions/process_functions";
+import { TypeScriptToFamixProcessor  } from "./analyze_functions/process_functions";
 
 export const logger = new Logger({ name: "ts2famix", minLevel: 2 });
 
@@ -13,7 +13,7 @@ export const logger = new Logger({ name: "ts2famix", minLevel: 2 });
  */
 export class Importer {
     private entityDictionary: EntityDictionary;
-    private processFunctions: Process;
+    private processFunctions: TypeScriptToFamixProcessor ;
 
     private project = new Project(
         {
@@ -25,7 +25,7 @@ export class Importer {
 
     constructor(config: EntityDictionaryConfig = { expectGraphemes: false }) {
         this.entityDictionary = new EntityDictionary(config);
-        this.processFunctions = new Process(this.entityDictionary);
+        this.processFunctions = new TypeScriptToFamixProcessor (this.entityDictionary);
     }
 
     /**

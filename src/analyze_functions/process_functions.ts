@@ -22,7 +22,7 @@ function isSourceFileAModule(sourceFile: SourceFile): boolean {
     return sourceFile.getImportDeclarations().length > 0 || sourceFile.getExportedDeclarations().size > 0;
 }
 
-export class Process {
+export class TypeScriptToFamixProcessor  {
     private entityDictionary: EntityDictionary;
 
     public methodsAndFunctionsWithId = new Map<number, InvocableType>(); // Maps the Famix method, constructor, getter, setter and function ids to their ts-morph method, constructor, getter, setter or function object
