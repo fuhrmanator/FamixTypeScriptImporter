@@ -2,5 +2,5 @@
 // You can add any global setup logic here
 
 beforeEach(() => {
-  jest.resetAllMocks();
+    jest.resetAllMocks();
 });
