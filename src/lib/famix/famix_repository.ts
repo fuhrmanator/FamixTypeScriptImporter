@@ -17,28 +17,10 @@ export class FamixRepository {
     private famixFunctions = new Set<FamixFunctionEntity>(); // All Famix functions
     private famixFiles = new Set<ScriptEntity | Module>(); // All Famix files
     private idCounter = 1; // Id counter
-    private absolutePath: string = "";
-    private fmxElementObjectMap = new Map<Famix.Entity, TSMorphObjectType>();
     private tsMorphObjectMap = new Map<TSMorphObjectType, Famix.Entity>(); // TODO: add this map to have two-way mapping between Famix and TS Morph objects
     
     constructor() {
         this.addElement(new SourceLanguage());  // add the source language entity (TypeScript)
-    }
-
-    public setFmxElementObjectMap(fmxElementObjectMap: Map<Famix.Entity, TSMorphObjectType>) {
-        this.fmxElementObjectMap = fmxElementObjectMap;
-    }
-
-    public getFmxElementObjectMap() {
-        return this.fmxElementObjectMap;
-    }
-
-    public getAbsolutePath(): string {
-        return this.absolutePath;
-    }
-
-    public setAbsolutePath(path: string) {
-        this.absolutePath = path;
     }
 
     /**

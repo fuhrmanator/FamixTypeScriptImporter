@@ -4,7 +4,6 @@ import yargs from "yargs";
 import { Importer } from './analyze';
 import { FamixRepository } from "./lib/famix/famix_repository";
 import { Project } from "ts-morph";
-import { config } from "./analyze";
 
 const argv = yargs
     .example(`ts2famix -i "path/to/project/**/*.ts" -o JSONModels/projectName.json`, 'Creates a JSON-format Famix model of typescript files.')
@@ -26,9 +25,9 @@ const argv = yargs
 
 import { logger } from './analyze';
 logger.settings.minLevel = Number(argv.loglevel) as number;
-config.expectGraphemes = argv.graphemes as boolean;
+const config = { expectGraphemes: argv.graphemes as boolean };
 
-const importer = new Importer();
+const importer = new Importer(config);
 let famixRep: FamixRepository;
 
 if ((argv.input as string).endsWith('tsconfig.json')) {
