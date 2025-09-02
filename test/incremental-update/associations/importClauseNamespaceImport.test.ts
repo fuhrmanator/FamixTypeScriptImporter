@@ -2,6 +2,8 @@ import { expectRepositoriesToHaveSameStructure } from "../incrementalUpdateExpec
 import { IncrementalUpdateProjectBuilder } from "../incrementalUpdateProjectBuilder";
 import { createExpectedFamixModelForSeveralFiles, getUpdateFileChangesMap } from "../incrementalUpdateTestHelper";
 
+// TODO: 🛠️ Fix code to pass the tests and remove .skip
+
 const exportSourceFileName = 'exportSourceCode.ts';
 const importSourceFileName = 'importSourceCode.ts';
 const existingClassName = 'ExistingClass';
@@ -164,6 +166,38 @@ describe('Incremental update should work for namespace imports', () => {
     const expectedFamixRepo = createExpectedFamixModelForSeveralFiles([
         [exportSourceFileName, sourceCodeWithExport],
         [importSourceFileName, sourceCodeWithImport]
+    ]);
+
+    expectRepositoriesToHaveSameStructure(famixRep, expectedFamixRepo);
+  });
+
+  it.skip('should retain an import clause association and a stub', () => {
+    // arrange
+    const anotherExportSourceCode = ``;
+    const anotherExportSourceFileName = 'anotherExportSourceCode.ts';
+    const sourceCodeWithAnotherImport = `
+      import * from './${exportSourceFileName}';
+      import * from './${anotherExportSourceFileName}';
+    `;
+
+    const testProjectBuilder = new IncrementalUpdateProjectBuilder();
+    testProjectBuilder
+        .addSourceFile(exportSourceFileName, sourceCodeWithExport)
+        .addSourceFile(anotherExportSourceFileName, anotherExportSourceCode)
+        .addSourceFile(importSourceFileName, sourceCodeWithAnotherImport);
+
+    const { importer, famixRep } = testProjectBuilder.build();
+    const sourceFile = testProjectBuilder.changeSourceFile(exportSourceFileName, '');
+
+    // act
+    const fileChangesMap = getUpdateFileChangesMap(sourceFile);
+    importer.updateFamixModelIncrementally(fileChangesMap);
+
+    // assert
+    const expectedFamixRepo = createExpectedFamixModelForSeveralFiles([
+        [exportSourceFileName, ''],
+        [anotherExportSourceFileName, anotherExportSourceCode],
+        [importSourceFileName, sourceCodeWithAnotherImport]
     ]);
 
     expectRepositoriesToHaveSameStructure(famixRep, expectedFamixRepo);
