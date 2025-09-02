@@ -44,7 +44,7 @@ export async function activate(context: ExtensionContext) {
     await client.start();
 
     return {
-        client: client
+        client: client,
     };
 }
 

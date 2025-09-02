@@ -2,6 +2,8 @@ import { Importer } from '../src/analyze';
 import * as fs from 'fs';
 import { Project } from 'ts-morph';
 
+// TODO: ⏳ Review if the test is still in a sync with a current solution.
+
 const importer = new Importer();
 const project = new Project(
     {

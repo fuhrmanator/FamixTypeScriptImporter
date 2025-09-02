@@ -1,10 +1,12 @@
-import { ClassDeclaration, MethodDeclaration, VariableStatement, FunctionDeclaration, VariableDeclaration, InterfaceDeclaration, ParameterDeclaration, ConstructorDeclaration, MethodSignature, SourceFile, ModuleDeclaration, PropertyDeclaration, PropertySignature, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ExportedDeclarations, CommentRange, EnumDeclaration, EnumMember, TypeParameterDeclaration, TypeAliasDeclaration, SyntaxKind, FunctionExpression, Block, Identifier, ExpressionWithTypeArguments, ImportDeclaration, Node, ArrowFunction, Scope, ClassExpression } from "ts-morph";
+import { ClassDeclaration, MethodDeclaration, VariableStatement, FunctionDeclaration, VariableDeclaration, InterfaceDeclaration, ParameterDeclaration, ConstructorDeclaration, MethodSignature, SourceFile, ModuleDeclaration, PropertyDeclaration, PropertySignature, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, CommentRange, EnumDeclaration, EnumMember, TypeParameterDeclaration, TypeAliasDeclaration, SyntaxKind, FunctionExpression, Block, Identifier, ImportDeclaration, Node, ArrowFunction, Scope, ClassExpression } from "ts-morph";
 import * as Famix from "../lib/famix/model/famix";
 import { calculate } from "../lib/ts-complex/cyclomatic-service";
 import * as fs from 'fs';
 import { logger } from "../analyze";
 import { getFQN } from "../fqn";
-import { EntityDictionary, InvocableType } from "src/famix_functions/EntityDictionary";
+import { EntityDictionary, InvocableType } from "../famix_functions/EntityDictionary";
+import { getClassesDeclaredInArrowFunctions } from "../famix_functions/helpersTsMorphElementsProcessing";
+import { ImportClauseCreator } from "../famix_functions/ImportClauseCreator";
 
 export type AccessibleTSMorphElement = ParameterDeclaration | VariableDeclaration | PropertyDeclaration | EnumMember;
 export type FamixID = number;
@@ -13,31 +15,20 @@ type ContainerTypes = SourceFile | ModuleDeclaration | FunctionDeclaration | Fun
 
 type ScopedTypes = Famix.ScriptEntity | Famix.Module | Famix.Function | Famix.Method | Famix.Accessor;
 
-/**
- * Checks if the file has any imports or exports to be considered a module
- * @param sourceFile A source file
- * @returns A boolean indicating if the file is a module
- */
-function isSourceFileAModule(sourceFile: SourceFile): boolean {
-    return sourceFile.getImportDeclarations().length > 0 || sourceFile.getExportedDeclarations().size > 0;
-}
-
 export class TypeScriptToFamixProcessor  {
     private entityDictionary: EntityDictionary;
+    private importClauseCreator: ImportClauseCreator;
 
+    // TODO: get rid of these maps and set
     public methodsAndFunctionsWithId = new Map<number, InvocableType>(); // Maps the Famix method, constructor, getter, setter and function ids to their ts-morph method, constructor, getter, setter or function object
-    
     public accessMap = new Map<FamixID, AccessibleTSMorphElement>(); // Maps the Famix parameter, variable, property and enum value ids to their ts-morph parameter, variable, property or enum member object
-    public classes = new Array<ClassDeclaration>(); // Array of all the classes of the source files
-    public interfaces = new Array<InterfaceDeclaration>(); // Array of all the interfaces of the source files
-    public modules = new Array<SourceFile>(); // Array of all the source files which are modules
-    public listOfExportMaps = new Array<ReadonlyMap<string, ExportedDeclarations[]>>(); // Array of all the export maps
     private processedNodesWithTypeParams = new Set<number>(); // Set of nodes that have been processed and have type parameters
 
     private currentCC: { [key: string]: number }; // Stores the cyclomatic complexity metrics for the current source file
 
     constructor(entityDictionary: EntityDictionary) {
         this.entityDictionary = entityDictionary;
+        this.importClauseCreator = new ImportClauseCreator(entityDictionary);
         this.currentCC = {};
     }
 
@@ -62,37 +53,6 @@ export class TypeScriptToFamixProcessor  {
         return path;
     }
     
-    
-    /**
-     * Gets the interfaces implemented or extended by a class or an interface
-     * @param interfaces An array of interfaces
-     * @param subClass A class or an interface
-     * @returns An array of InterfaceDeclaration and ExpressionWithTypeArguments containing the interfaces implemented or extended by the subClass
-     */
-    public getImplementedOrExtendedInterfaces(interfaces: Array<InterfaceDeclaration>, subClass: ClassDeclaration | InterfaceDeclaration): Array<InterfaceDeclaration | ExpressionWithTypeArguments> {
-        let impOrExtInterfaces: Array<ExpressionWithTypeArguments>;
-        if (subClass instanceof ClassDeclaration) {
-            impOrExtInterfaces = subClass.getImplements();
-        }
-        else {
-            impOrExtInterfaces = subClass.getExtends();
-        }
-    
-        const interfacesNames = interfaces.map(i => i.getName());
-        const implementedOrExtendedInterfaces = new Array<InterfaceDeclaration | ExpressionWithTypeArguments>();
-    
-        impOrExtInterfaces.forEach(i => {
-            if (interfacesNames.includes(i.getExpression().getText())) {
-                implementedOrExtendedInterfaces.push(interfaces[interfacesNames.indexOf(i.getExpression().getText())]);
-            }
-            else {
-                implementedOrExtendedInterfaces.push(i);
-            }
-        });
-    
-        return implementedOrExtendedInterfaces;
-    }
-    
     public processFiles(sourceFiles: Array<SourceFile>): void {
         sourceFiles.forEach(file => {
             logger.info(`File: >>>>>>>>>> ${file.getFilePath()}`);
@@ -102,7 +62,7 @@ export class TypeScriptToFamixProcessor  {
             } else {
                 this.currentCC = {};
             }
-    
+
             this.processFile(file);
         });
     }
@@ -111,18 +71,8 @@ export class TypeScriptToFamixProcessor  {
      * Builds a Famix model for a source file
      * @param f A source file
      */
-    private processFile(f: SourceFile): void {
-        const isModule = isSourceFileAModule(f);
-    
-        if (isModule) {
-            this.modules.push(f);
-        }
-    
-        const exportMap = f.getExportedDeclarations();
-        if (exportMap) this.listOfExportMaps.push(exportMap);
-    
-        const fmxFile = this.entityDictionary.createOrGetFamixFile(f, isModule);
-    
+    private processFile(f: SourceFile): void {        
+        const fmxFile = this.entityDictionary.ensureFamixFile(f);
         logger.debug(`processFile: file: ${f.getBaseName()}, fqn = ${fmxFile.fullyQualifiedName}`);
     
         this.processComments(f, fmxFile);
@@ -141,7 +91,7 @@ export class TypeScriptToFamixProcessor  {
      * @returns A Famix.Module representing the module
      */
     private processModule(m: ModuleDeclaration): Famix.Module {
-        const fmxModule = this.entityDictionary.createOrGetFamixModule(m);
+        const fmxModule = this.entityDictionary.ensureFamixModule(m);
     
         logger.debug(`module: ${m.getName()}, (${m.getType().getText()}), ${fmxModule.fullyQualifiedName}`);
     
@@ -184,38 +134,13 @@ export class TypeScriptToFamixProcessor  {
      */
     private processClasses(m: SourceFile | ModuleDeclaration, fmxScope: Famix.ScriptEntity | Famix.Module): void {
         logger.debug(`processClasses: ---------- Finding Classes:`);
-        const classesInArrowFunctions = this.getClassesDeclaredInArrowFunctions(m);
+        const classesInArrowFunctions = getClassesDeclaredInArrowFunctions(m);
         const classes = m.getClasses().concat(classesInArrowFunctions);
         classes.forEach(c => {
             const fmxClass = this.processClass(c);
             fmxScope.addType(fmxClass);
         });
-    }
-    
-    private getArrowFunctionClasses(f: ArrowFunction): ClassDeclaration[] {
-        const classes: ClassDeclaration[] = [];
-    
-        function findClasses(node: Node) {
-            if (node.getKind() === SyntaxKind.ClassDeclaration) {
-                classes.push(node as ClassDeclaration);
-            }
-            node.getChildren().forEach(findClasses);
-        }
-    
-        findClasses(f);
-        return classes;
-    }
-    
-    /**
-     * ts-morph doesn't find classes in arrow functions, so we need to find them manually
-     * @param s A source file 
-     * @returns the ClassDeclaration objects found in arrow functions of the source file
-     */
-    private getClassesDeclaredInArrowFunctions(s: SourceFile | ModuleDeclaration): ClassDeclaration[] {
-        const arrowFunctions = s.getDescendantsOfKind(SyntaxKind.ArrowFunction);
-        const classesInArrowFunctions = arrowFunctions.map(f => this.getArrowFunctionClasses(f)).flat();
-        return classesInArrowFunctions;
-    }
+    }  
     
     /**
      * Builds a Famix model for the interfaces of a container
@@ -308,6 +233,7 @@ export class TypeScriptToFamixProcessor  {
         logger.debug(`Finding Modules:`);
         m.getModules().forEach(md => {
             const fmxModule = this.processModule(md);
+            // TODO: need to ensure that there are no duplicates
             fmxScope.addModule(fmxModule);
         });
     }
@@ -333,18 +259,20 @@ export class TypeScriptToFamixProcessor  {
      * @returns A Famix.Class or a Famix.ParametricClass representing the class
      */
     private processClass(c: ClassDeclaration): Famix.Class | Famix.ParametricClass {
-        this.classes.push(c);
+        // this.classes.push(c);
     
-        const fmxClass = this.entityDictionary.createOrGetFamixClass(c);
+        const fmxClass = this.entityDictionary.ensureFamixClass(c);
     
         logger.debug(`Class: ${c.getName()}, (${c.getType().getText()}), fqn = ${fmxClass.fullyQualifiedName}`);
     
+            // TODO: need to ensure that there are no duplicates
         this.processComments(c, fmxClass);
     
         this.processDecorators(c, fmxClass);
     
         this.processStructuredType(c, fmxClass);
     
+            // TODO: need to ensure that there are no duplicates
         c.getConstructors().forEach(con => {
             const fmxCon = this.processMethod(con);
             fmxClass.addMethod(fmxCon);
@@ -359,7 +287,9 @@ export class TypeScriptToFamixProcessor  {
             const fmxAcc = this.processMethod(acc);
             fmxClass.addMethod(fmxAcc);
         });
-    
+
+        this.processInheritanceForClass(c);
+
         return fmxClass;
     }
     
@@ -369,16 +299,18 @@ export class TypeScriptToFamixProcessor  {
      * @returns A Famix.Interface or a Famix.ParametricInterface representing the interface
      */
     private processInterface(i: InterfaceDeclaration): Famix.Interface | Famix.ParametricInterface {
-        this.interfaces.push(i);
+        // this.interfaces.push(i);
     
-        const fmxInterface = this.entityDictionary.createOrGetFamixInterface(i);
+        const fmxInterface = this.entityDictionary.ensureFamixInterface(i);
     
         logger.debug(`Interface: ${i.getName()}, (${i.getType().getText()}), fqn = ${fmxInterface.fullyQualifiedName}`);
     
         this.processComments(i, fmxInterface);
     
         this.processStructuredType(i, fmxInterface);
-    
+
+        this.processInheritanceForInterface(i);
+
         return fmxInterface;
     }
     
@@ -410,7 +342,7 @@ export class TypeScriptToFamixProcessor  {
      * @returns A Famix.Property representing the property
      */
     private processProperty(p: PropertyDeclaration | PropertySignature): Famix.Property {
-        const fmxProperty = this.entityDictionary.createFamixProperty(p);
+        const fmxProperty = this.entityDictionary.ensureFamixProperty(p);
     
         logger.debug(`property: ${p.getName()}, (${p.getType().getText()}), fqn = ${fmxProperty.fullyQualifiedName}`);
         logger.debug(` ---> It's a Property${(p instanceof PropertySignature) ? "Signature" : "Declaration"}!`);
@@ -423,7 +355,7 @@ export class TypeScriptToFamixProcessor  {
             // only add access if the p's first ancestor is not a PropertyDeclaration
             if (ancestor.getKindName() !== "PropertyDeclaration") {
                 logger.debug(`adding access to map: ${p.getName()}, (${p.getType().getText()}) Famix ${fmxProperty.name} id: ${fmxProperty.id}`);
-                this.accessMap.set(fmxProperty.id, p);
+                // this.accessMap.set(fmxProperty.id, p);
             }
         }
     
@@ -560,9 +492,9 @@ export class TypeScriptToFamixProcessor  {
         if (!property) {
             throw new Error(`Property ${propertyRepresentation.name} not found in class ${classDecl.getName()}`);
         }
-        const fmxProperty = this.entityDictionary.createFamixProperty(property);
+        const fmxProperty = this.entityDictionary.ensureFamixProperty(property);
         if (classDecl instanceof ClassDeclaration) {
-            const fmxClass = this.entityDictionary.createOrGetFamixClass(classDecl);
+            const fmxClass = this.entityDictionary.ensureFamixClass(classDecl);
             fmxClass.addProperty(fmxProperty);
         } else {
             throw new Error("Unexpected type ClassExpression.");
@@ -856,146 +788,103 @@ export class TypeScriptToFamixProcessor  {
     // exports has name -> Declaration -- the declaration can be used to find the FamixElement
     
     // handle `import path = require("path")` for example
-    public processImportClausesForImportEqualsDeclarations(sourceFiles: Array<SourceFile>, exports: Array<ReadonlyMap<string, ExportedDeclarations[]>>): void {
+    public processImportClausesForImportEqualsDeclarations(sourceFiles: Array<SourceFile>): void {
         logger.info(`Creating import clauses from ImportEqualsDeclarations in source files:`);
         sourceFiles.forEach(sourceFile => {
             sourceFile.forEachDescendant(node => {
                 if (Node.isImportEqualsDeclaration(node)) {
-                    // You've found an ImportEqualsDeclaration
-                    logger.info("Declaration Name:", node.getName());
-                    logger.info("Module Reference Text:", node.getModuleReference().getText());
-                    // what's the name of the imported entity?
-                    // const importedEntity = node.getName();
-                    // create a famix import clause
-                    const namedImport = node.getNameNode();
-                    this.entityDictionary.oldCreateOrGetFamixImportClause({
-                        importDeclaration: node,
-                        importerSourceFile: sourceFile,
-                        moduleSpecifierFilePath: node.getModuleReference().getText(),
-                        importElement: namedImport,
-                        isInExports: exports.find(e => e.has(namedImport.getText())) !== undefined,
-                        isDefaultExport: false
-                    });
-                    // this.entityDictionary.createFamixImportClause(importedEntity, importingEntity);
+                    // TODO: implement getting all the imports with require (look up to tests for all the cases)
+                    this.importClauseCreator.ensureFamixImportClauseForImportEqualsDeclaration(node);
                 }
             });
-        }
-        );
+        });
     }
     
     /**
      * Builds a Famix model for the import clauses of the source files which are modules
      * @param modules An array of modules
-     * @param exports An array of maps of exported declarations
      */
-    public processImportClausesForModules(modules: Array<SourceFile>, exports: Array<ReadonlyMap<string, ExportedDeclarations[]>>): void {
+    public processImportClausesForModules(modules: Array<SourceFile>): void {
         logger.info(`Creating import clauses from ${modules.length} modules:`);
         modules.forEach(module => {
-            const modulePath = module.getFilePath();
-            module.getImportDeclarations().forEach(impDecl => {
-                logger.info(`Importing ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
-                const path = this.getModulePath(impDecl);
-    
-                impDecl.getNamedImports().forEach(namedImport => {
-                    logger.info(`Importing (named) ${namedImport.getName()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
-                    const importedEntityName = namedImport.getName();
-                    const importFoundInExports = this.isInExports(exports, importedEntityName);
-                    logger.debug(`Processing ImportSpecifier: ${namedImport.getText()}, pos=${namedImport.getStart()}`);
-                    this.entityDictionary.oldCreateOrGetFamixImportClause({
-                        importDeclaration: impDecl,
-                        importerSourceFile: module,
-                        moduleSpecifierFilePath: path,
-                        importElement: namedImport,
-                        isInExports: importFoundInExports,
-                        isDefaultExport: false
-                    });
+            const exportDeclarations = module.getExportDeclarations();
+            const reExports = Array.from(exportDeclarations.entries())
+                .flatMap(([, declarations]) => declarations)
+                .filter(declaration => declaration.hasModuleSpecifier());
+
+            reExports.forEach(reExport => {                
+                const namedExports = reExport.getNamedExports();
+                namedExports.forEach(namedExport => {
+                    this.importClauseCreator.ensureFamixImportClauseForNamedImport(
+                        reExport, namedExport, module,
+                    );
                 });
-    
+
+                if (reExport.isNamespaceExport()) {
+                    this.importClauseCreator.ensureFamixImportClauseForNamespaceExports(reExport, module);
+                }
+            });
+
+            module.getImportDeclarations().forEach(impDecl => {
+                impDecl.getNamedImports().forEach(namedImport => {
+                    this.importClauseCreator.ensureFamixImportClauseForNamedImport(
+                        impDecl, namedImport, module,
+                    );
+                });
+
                 const defaultImport = impDecl.getDefaultImport();
                 if (defaultImport !== undefined) {
-                    logger.info(`Importing (default) ${defaultImport.getText()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
-                    logger.debug(`Processing Default Import: ${defaultImport.getText()}, pos=${defaultImport.getStart()}`);
-                    this.entityDictionary.oldCreateOrGetFamixImportClause({
-                        importDeclaration: impDecl,
-                        importerSourceFile: module,
-                        moduleSpecifierFilePath: path,
-                        importElement: defaultImport,
-                        isInExports: false,
-                        isDefaultExport: true
-                    });
+                    this.importClauseCreator.ensureFamixImportClauseForDefaultImport(
+                        impDecl, defaultImport, module
+                    );
                 }
     
                 const namespaceImport = impDecl.getNamespaceImport();
                 if (namespaceImport !== undefined) {
-                    logger.info(`Importing (namespace) ${namespaceImport.getText()} from ${impDecl.getModuleSpecifierValue()} in ${modulePath}`);
-                    this.entityDictionary.oldCreateOrGetFamixImportClause({
-                        importDeclaration: impDecl,
-                        importerSourceFile: module,
-                        moduleSpecifierFilePath: path,
-                        importElement: namespaceImport,
-                        isInExports: false,
-                        isDefaultExport: false
-                    });
+                    this.importClauseCreator.ensureFamixImportClauseForNamespaceImport(
+                        impDecl, namespaceImport, module
+                    );
                 }
             });
         });
     }
-    
-    private isInExports(exports: ReadonlyMap<string, ExportedDeclarations[]>[], importedEntityName: string) {
-        let importFoundInExports = false;
-        exports.forEach(e => {
-            if (e.has(importedEntityName)) {
-                importFoundInExports = true;
+
+    private processInheritanceForClass(cls: ClassDeclaration) {
+        logger.debug(`Checking class inheritance for ${cls.getName()}`);
+        const baseClass = cls.getBaseClass();
+        if (baseClass !== undefined) {
+            this.entityDictionary.createFamixClassToClassInheritance(cls, baseClass);
+            logger.debug(`class: ${cls.getName()}, (${cls.getType().getText()}), extClass: ${baseClass.getName()}, (${baseClass.getType().getText()})`);
+        } // this is false when the class extends an undefined class
+        else {
+            // check for "extends" of unresolved class
+            const undefinedExtendedClass = cls.getExtends();
+            if (undefinedExtendedClass) {
+                this.entityDictionary.createFamixClassToClassInheritance(cls, undefinedExtendedClass);
+                logger.debug(`class: ${cls.getName()}, (${cls.getType().getText()}), undefinedExtendedClass: ${undefinedExtendedClass.getText()}`);
             }
+        }
+
+        logger.debug(`Checking interface inheritance for ${cls.getName()}`);
+
+        cls.getImplements().forEach(implementedIF => {
+            this.entityDictionary.createFamixInterfaceInheritance(cls, implementedIF);
+            logger.debug(`class: ${cls.getName()}, (${cls.getType().getText()}), impInter: ${(implementedIF instanceof InterfaceDeclaration) ? implementedIF.getName() : implementedIF.getExpression().getText()}, (${(implementedIF instanceof InterfaceDeclaration) ? implementedIF.getType().getText() : implementedIF.getExpression().getText()})`);
         });
-        return importFoundInExports;
     }
-    
-    /**
-     * Builds a Famix model for the inheritances of the classes and interfaces of the source files
-     * @param classes An array of classes
-     * @param interfaces An array of interfaces
-     */
-    public processInheritances(classes: ClassDeclaration[], interfaces: InterfaceDeclaration[]): void {
-        logger.info(`Creating inheritances:`);
-        classes.forEach(cls => {
-            logger.debug(`Checking class inheritance for ${cls.getName()}`);
-                const baseClass = cls.getBaseClass();
-                if (baseClass !== undefined) {
-                    this.entityDictionary.createOrGetFamixInheritance(cls, baseClass);
-                    logger.debug(`class: ${cls.getName()}, (${cls.getType().getText()}), extClass: ${baseClass.getName()}, (${baseClass.getType().getText()})`);
-                } // this is false when the class extends an undefined class
-                else {
-                    // check for "extends" of unresolved class
-                    const undefinedExtendedClass = cls.getExtends();
-                    if (undefinedExtendedClass) {
-                        this.entityDictionary.createOrGetFamixInheritance(cls, undefinedExtendedClass);
-                        logger.debug(`class: ${cls.getName()}, (${cls.getType().getText()}), undefinedExtendedClass: ${undefinedExtendedClass.getText()}`);
-                    }
-                }
-    
-                logger.debug(`Checking interface inheritance for ${cls.getName()}`);
-                const implementedInterfaces = this.getImplementedOrExtendedInterfaces(interfaces, cls);
-                implementedInterfaces.forEach(implementedIF => {
-                    this.entityDictionary.createOrGetFamixInheritance(cls, implementedIF);
-                    logger.debug(`class: ${cls.getName()}, (${cls.getType().getText()}), impInter: ${(implementedIF instanceof InterfaceDeclaration) ? implementedIF.getName() : implementedIF.getExpression().getText()}, (${(implementedIF instanceof InterfaceDeclaration) ? implementedIF.getType().getText() : implementedIF.getExpression().getText()})`);
-                });
-        });
-    
-        interfaces.forEach(interFace => {
-            try {
-                logger.debug(`Checking interface inheritance for ${interFace.getName()}`);
-                const extendedInterfaces = this.getImplementedOrExtendedInterfaces(interfaces, interFace);
-                extendedInterfaces.forEach(extendedInterface => {
-                    this.entityDictionary.createOrGetFamixInheritance(interFace, extendedInterface);
-    
-                    logger.debug(`interFace: ${interFace.getName()}, (${interFace.getType().getText()}), extendedInterface: ${(extendedInterface instanceof InterfaceDeclaration) ? extendedInterface.getName() : extendedInterface.getExpression().getText()}, (${(extendedInterface instanceof InterfaceDeclaration) ? extendedInterface.getType().getText() : extendedInterface.getExpression().getText()})`);
-                });
-            }
-            catch (error) {
-                logger.error(`> WARNING: got exception ${error}. Continuing...`);
-            }
-        });
+
+    private processInheritanceForInterface(interFace: InterfaceDeclaration) {
+        try {
+            logger.debug(`Checking interface inheritance for ${interFace.getName()}`);
+
+            interFace.getExtends().forEach(extendedInterface => {
+                this.entityDictionary.createFamixInterfaceInheritance(interFace, extendedInterface);
+                logger.debug(`interFace: ${interFace.getName()}, (${interFace.getType().getText()}), extendedInterface: ${(extendedInterface instanceof InterfaceDeclaration) ? extendedInterface.getName() : extendedInterface.getExpression().getText()}, (${(extendedInterface instanceof InterfaceDeclaration) ? extendedInterface.getType().getText() : extendedInterface.getExpression().getText()})`);
+            });
+        }
+        catch (error) {
+            logger.error(`> WARNING: got exception ${error}. Continuing...`);
+        }
     }
     
     /**

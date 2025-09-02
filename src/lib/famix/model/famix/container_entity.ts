@@ -49,6 +49,12 @@ export class ContainerEntity extends NamedEntity {
         }
     }
 
+    public removeAccess(access: Access): void {
+        if (this._accesses.has(access)) {
+            this._accesses.delete(access);
+        }
+    }
+
     private childrenTypes: Set<Type> = new Set();
 
     public addType(childType: Type): void {

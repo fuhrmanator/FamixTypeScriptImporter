@@ -20,8 +20,12 @@ ts2famix
 - Run `npm install` in the `ts2famix` folder
 - Run `npm run build` in the `ts2famix` folder to build the project
 ### Building the vscode-extension
-- Run `npm install` in the `vscode-extension` folder. This installs all necessary npm modules in both the client and server folder
-- Open VS Code on the `vscode-extension` folder. It should be open as a workspace (root directory).
+- Run `npm install` in the `vscode-extension` folder. This installs all necessary npm modules in both the client and server folder, then open VS Code on the `vscode-extension` folder. It should be open as a workspace (root directory):
+```
+cd vscode-extension
+npm install
+code .
+```
 - Press Ctrl+Shift+B to start compiling the client and server in [watch mode](https://code.visualstudio.com/docs/editor/tasks#:~:text=The%20first%20entry%20executes,the%20HelloWorld.js%20file.).
 - Switch to the Run and Debug View in the Sidebar (Ctrl+Shift+D).
 - Select `Launch Client` from the drop down (if it is not already).
@@ -40,9 +44,12 @@ ts2famix
 
 ## Testing the Extension
 ### Run Tests
-To test the extension run the `npm run test` inside the `vscode-extension` folder. This will run all the tests for the client and server.
+To test the extension run the `npm run test` inside the `vscode-extension` folder. This will run all the tests for the client and server. For the client it will run the integration and smoke tests, for which it will download (the location of the downloaded files will be `/.vscode-tests`) and launch a separate instance of VSCode. While downloading the files it may take some time, so it may be a reason of a timeout. If that happens, just run the command again. If there is an error with downloading the file - try to delete the `/.vscode-tests` folder and run the command again.
 
 ### Debug Tests
 - Switch to the Run and Debug View in the Sidebar (Ctrl+Shift+D).
 - Select `Integration Tests` or `Smoke Tests` from the drop down (if it is not already).
 - Press ▷ to run the launch config (F5).
+
+### Manual testing
+Some manual test cases are described in the [`test-cases.md`](./test-cases.md) file.

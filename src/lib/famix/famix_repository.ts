@@ -3,14 +3,17 @@ import { Class, Interface, Variable, Method, ArrowFunction, Function as FamixFun
 import * as Famix from "./model/famix";
 import { TSMorphObjectType } from "../../famix_functions/EntityDictionary";
 import { logger } from "../../analyze";
+import { EntityWithSourceAnchor } from "./model/famix/sourced_entity";
+import { FullyQualifiedNameEntity } from "./model/interfaces/fully_qualified_name_entity";
 
 /**
  * This class is used to store all Famix elements
  */
 export class FamixRepository {
     private elements = new Set<FamixBaseElement>(); // All Famix elements
-    private famixClasses = new Set<Class>(); // All Famix classes
-    private famixInterfaces = new Set<Interface>(); // All Famix interfaces
+    // DO WE NEED THESE SETS? THEY ARE ONLY USED IN METHODS THAT ARE USED IN TESTS
+    // private famixClasses = new Set<Class>(); // All Famix classes
+    // private famixInterfaces = new Set<Interface>(); // All Famix interfaces
     private famixModules = new Set<Module>(); // All Famix namespaces
     private famixMethods = new Set<Method>(); // All Famix methods
     private famixVariables = new Set<Variable>(); // All Famix variables
@@ -18,7 +21,7 @@ export class FamixRepository {
     private famixFiles = new Set<ScriptEntity | Module>(); // All Famix files
     private idCounter = 1; // Id counter
     private tsMorphObjectMap = new Map<TSMorphObjectType, Famix.Entity>(); // TODO: add this map to have two-way mapping between Famix and TS Morph objects
-    
+
     constructor() {
         this.addElement(new SourceLanguage());  // add the source language entity (TypeScript)
     }
@@ -38,15 +41,15 @@ export class FamixRepository {
      * @param fullyQualifiedName A fully qualified name
      * @returns The Famix entity corresponding to the fully qualified name or undefined if it doesn't exist
      */
-    public getFamixEntityByFullyQualifiedName(fullyQualifiedName: string): FamixBaseElement | undefined {
-        const allEntities = Array.from(this.elements.values()).filter(e => e instanceof NamedEntity) as Array<NamedEntity>;
+    public getFamixEntityByFullyQualifiedName<T extends FamixBaseElement>(fullyQualifiedName: string): T | undefined {
+        const allEntities = Array.from(this.elements.values()).filter(e => (e as NamedEntity).fullyQualifiedName) as Array<NamedEntity>;
         const entity = allEntities.find(e => 
             // {console.log(`namedEntity: ${e.fullyQualifiedName}`); 
             // return 
             e.fullyQualifiedName === fullyQualifiedName
         // }
         );
-        return entity;
+        return entity as T | undefined;
     }
 
     // Method to get Famix access by accessor and variable
@@ -70,6 +73,53 @@ export class FamixRepository {
         }
     }
 
+    private getElementsBySourceFile(sourceFile: string): FamixBaseElement[] {
+        return Array.from(this.elements.values()).filter(e => {
+            if (e instanceof EntityWithSourceAnchor && e.sourceAnchor && e.sourceAnchor instanceof Famix.IndexedFileAnchor) {
+                return e.sourceAnchor.fileName === sourceFile;
+            } else if (e instanceof Famix.IndexedFileAnchor) {
+                return e.fileName === sourceFile;
+            }
+            // TODO: check for the SourceAnchor type, maybe make the SourceAnchor abstract cause there is no instance of this class
+        });
+    }
+
+    public removeEntitiesBySourceFile(sourceFile: string): FamixBaseElement[] {
+        const entitiesToRemove = this.getElementsBySourceFile(sourceFile);
+
+        this.removeElements(entitiesToRemove);
+        this.removeRelatedAssociations(entitiesToRemove);
+
+        return entitiesToRemove;
+    }
+
+    public removeElements(entities: FamixBaseElement[]): void {
+        for (const entity of entities) {
+            this.elements.delete(entity);
+        }
+    }
+
+    public removeRelatedAssociations(entities: FamixBaseElement[]): void {
+        for (const entity of entities) {
+            if (entity instanceof Famix.Inheritance) {
+                entity.subclass.removeSuperInheritance(entity);
+                entity.superclass.removeSubInheritance(entity);
+            } else if (entity instanceof Famix.ImportClause) {
+                entity.importingEntity.removeOutgoingImport(entity);
+                entity.importedEntity.removeIncomingImport(entity);
+            }
+            // TODO: Add more conditions here for other types of associations
+        }
+    }
+
+    // NOTE: consider storing all the associations (ImportClause, Inheritance, ...) if we need a better performance
+    public getImportClauses(): Famix.ImportClause[] {
+        return Array.from(this.elements.values()).filter(e => e instanceof Famix.ImportClause) as Famix.ImportClause[];
+    }
+
+    public getInheritances(): Famix.Inheritance[] {
+        return Array.from(this.elements.values()).filter(e => e instanceof Famix.Inheritance) as Famix.Inheritance[];
+    }
 
     // Only for tests
 
@@ -96,7 +146,9 @@ export class FamixRepository {
      * @returns The Famix class corresponding to the name or undefined if it doesn't exist
      */
     public _getFamixClass(fullyQualifiedName: string): Class | undefined {
-        return Array.from(this.famixClasses.values()).find(ns => ns.fullyQualifiedName === fullyQualifiedName);
+        return Array.from(this.elements.values())
+            .filter(e => e instanceof Class)
+            .find(ns => ns.fullyQualifiedName === fullyQualifiedName);
     }
 
     /**
@@ -105,7 +157,9 @@ export class FamixRepository {
      * @returns The Famix interface corresponding to the name or undefined if it doesn't exist
      */
     public _getFamixInterface(fullyQualifiedName: string): Interface | undefined {
-        return Array.from(this.famixInterfaces.values()).find(ns => ns.fullyQualifiedName === fullyQualifiedName);
+        return Array.from(this.elements.values())
+            .filter(e => e instanceof Interface)
+            .find(ns => ns.fullyQualifiedName === fullyQualifiedName);
     }
 
     /**
@@ -210,12 +264,12 @@ export class FamixRepository {
      * @param element A Famix element
      */
     public addElement(element: FamixBaseElement): void {
-        logger.debug(`Adding Famix element ${element.constructor.name} with id ${element.id}`);
-        if (element instanceof Class) {
-            this.famixClasses.add(element);
-        } else if (element instanceof Interface) {
-            this.famixInterfaces.add(element);
-        } else if (element instanceof Module) {
+        // if (element instanceof Class) {
+        //     this.famixClasses.add(element);
+        // } else if (element instanceof Interface) {
+        //     this.famixInterfaces.add(element);
+        // } else 
+        if (element instanceof Module) {
             this.famixModules.add(element);
         } else if (element instanceof Variable) {
             this.famixVariables.add(element);
@@ -229,6 +283,7 @@ export class FamixRepository {
         this.elements.add(element);
         element.id = this.idCounter;
         this.idCounter++;
+        logger.debug(`Adding Famix element ${element.constructor.name} with id ${element.id}`);
         this.validateFQNs();
     }
 

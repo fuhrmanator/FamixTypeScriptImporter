@@ -57,6 +57,11 @@ export class TestHelper {
         throw new Error(`Language Client not available within ${timeout}ms`);
     }
 
+    static async waitForServerToInitialize(): Promise<void> {
+        // TODO: add a more robust way to check if the server is initialized
+        await this.sleep(1000);
+    }
+
     private static sleep(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
     }

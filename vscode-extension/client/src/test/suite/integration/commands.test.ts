@@ -26,23 +26,4 @@ test('generateModelForProject command is registered', async function() {
     assert.ok(isRegistered, 
         'ts2famix.generateModelForProject command should be registered');
 });
-
-test('Command shows warning when no active editor', async () => {
-    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
-    let warningShown = false;
-    const originalShowWarning = vscode.window.showWarningMessage;
-    
-    vscode.window.showWarningMessage = (async (message: string, ...items: string[]) => {
-        if (message === 'No active editor found.') {
-            warningShown = true;
-        }
-        return originalShowWarning(message, ...items);
-    }) as typeof vscode.window.showWarningMessage;
-    
-    await vscode.commands.executeCommand('ts2famix.generateModelForProject');
-    
-    vscode.window.showWarningMessage = originalShowWarning;
-    
-    assert.ok(warningShown, 'Warning should be shown when no active editor');
-});
 });

@@ -7,7 +7,7 @@ export const project = createProject();
 export function createProject(): Project {
     return new Project({
         compilerOptions: {
-            baseUrl: "",
+            baseUrl: ".",
         },
         useInMemoryFileSystem: true,
     });

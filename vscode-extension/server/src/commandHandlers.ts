@@ -1,55 +1,44 @@
  
 import {
     createConnection,
+    ErrorCodes,
+    ResponseError,
+    ResponseMessage,
 } from 'vscode-languageserver/node';
-import { getOutputFilePath } from './utils';
-import { generateModelForProject } from 'ts2famix';
-import * as fs from "fs";
-import path from 'path';
-
-interface GenerateModelForProjectParams {
-    filePath: string;
-}
+import { findTypeScriptProject } from './utils';
+import { getTsMorphProject } from 'ts2famix';
+import { FamixProjectManager } from './model';
 
 const methodName = 'generateModelForProject';
-const tsConfigFileExtension = 'tsconfig.json';
 
-export const registerCommandHandlers = (connection: ReturnType<typeof createConnection>) => {
-    connection.onRequest(methodName, async (params: GenerateModelForProjectParams) => {
+// Note: format for response is based on LSP specification:
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#responseMessage
+export const registerCommandHandlers = (connection: ReturnType<typeof createConnection>, famixProjectManager: FamixProjectManager) => {
+    connection.onRequest(methodName, async (): Promise<ResponseMessage> => {
+        const getErrorResponse = (errorCode: number, message: string): ResponseMessage => ({
+            jsonrpc: '2.0',
+            id: null,
+            error: new ResponseError(errorCode, message, message)
+        });
         try {
-            const baseUrl = params.filePath;
-            if (!baseUrl) {
-                connection.console.error('No filePath provided for model generation.');
-                return { success: false, error: 'No filePath provided' };
+            const result = await findTypeScriptProject(connection);
+            if (result.isErr()) {
+                return getErrorResponse(ErrorCodes.InvalidRequest, result.error.message);
             }
-      
-            const tsConfigFilePath = baseUrl.endsWith(tsConfigFileExtension)
-                ? baseUrl
-                : path.join(baseUrl, tsConfigFileExtension);
-
-            const jsonOutput = generateModelForProject(tsConfigFilePath, baseUrl);
-      
-            const jsonFilePath = await getOutputFilePath(connection);
-            if (!jsonFilePath) {
-                connection.console.error('No output file path provided for model generation.');
-                return { success: false, error: 'No output file path configured' };
+            const { tsConfigPath, baseUrl } = result.value;
+            const tsMorphProject = getTsMorphProject(tsConfigPath, baseUrl);
+            const modelGenerationResult = await famixProjectManager.generateFamixModelFromScratch(tsMorphProject);
+            if (modelGenerationResult.isErr()) {
+                return getErrorResponse(ErrorCodes.InternalError, modelGenerationResult.error.message);
             }
-
-            connection.console.log(`Writing model to ${jsonFilePath}`);
-      
-            // TODO: consider adding the integration tests for this
-            const outputDir = path.dirname(jsonFilePath);
-            if (!fs.existsSync(outputDir)) {
-                fs.mkdirSync(outputDir, { recursive: true });
-            }
-
-            await fs.promises.writeFile(jsonFilePath, jsonOutput);
-      
-            return { success: true, outputPath: jsonFilePath };
+            return { 
+                jsonrpc: '2.0',
+                id: null,
+                result: null };
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
             connection.console.error(`Error generating model: ${errorMessage}`);
-            return { success: false, error: errorMessage };
+            return getErrorResponse(ErrorCodes.InternalError, errorMessage);
         }
     });
 };
