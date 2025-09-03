@@ -15,7 +15,7 @@ type ContainerTypes = SourceFile | ModuleDeclaration | FunctionDeclaration | Fun
 
 type ScopedTypes = Famix.ScriptEntity | Famix.Module | Famix.Function | Famix.Method | Famix.Accessor;
 
-export class TypeScriptToFamixProcessor  {
+export class TypeScriptToFamixProcessingContext  {
     private entityDictionary: EntityDictionary;
     private importClauseCreator: ImportClauseCreator;
 
@@ -233,7 +233,6 @@ export class TypeScriptToFamixProcessor  {
         logger.debug(`Finding Modules:`);
         m.getModules().forEach(md => {
             const fmxModule = this.processModule(md);
-            // TODO: need to ensure that there are no duplicates
             fmxScope.addModule(fmxModule);
         });
     }
@@ -265,14 +264,12 @@ export class TypeScriptToFamixProcessor  {
     
         logger.debug(`Class: ${c.getName()}, (${c.getType().getText()}), fqn = ${fmxClass.fullyQualifiedName}`);
     
-            // TODO: need to ensure that there are no duplicates
         this.processComments(c, fmxClass);
     
         this.processDecorators(c, fmxClass);
     
         this.processStructuredType(c, fmxClass);
     
-            // TODO: need to ensure that there are no duplicates
         c.getConstructors().forEach(con => {
             const fmxCon = this.processMethod(con);
             fmxClass.addMethod(fmxCon);
@@ -355,6 +352,7 @@ export class TypeScriptToFamixProcessor  {
             // only add access if the p's first ancestor is not a PropertyDeclaration
             if (ancestor.getKindName() !== "PropertyDeclaration") {
                 logger.debug(`adding access to map: ${p.getName()}, (${p.getType().getText()}) Famix ${fmxProperty.name} id: ${fmxProperty.id}`);
+                // TODO: just create the access instead of using the accessMap
                 // this.accessMap.set(fmxProperty.id, p);
             }
         }
@@ -391,6 +389,7 @@ export class TypeScriptToFamixProcessor  {
     
             this.processFunctionExpressions(m, fmxMethod);
     
+            // TODO: maybe try to create the the invocation and/or concretisation instead of using the methodsAndFunctionsWithId map
             this.methodsAndFunctionsWithId.set(fmxMethod.id, m);
         }
     
@@ -435,6 +434,7 @@ export class TypeScriptToFamixProcessor  {
             this.processFunctionExpressions(f, fmxFunction);
         }
     
+        // TODO: maybe try to create the the invocation and/or concretisation instead of using the methodsAndFunctionsWithId map
         this.methodsAndFunctionsWithId.set(fmxFunction.id, f);
     
         return fmxFunction;
@@ -560,6 +560,7 @@ export class TypeScriptToFamixProcessor  {
     
         if (!(parent instanceof MethodSignature)) {
             logger.debug(`adding access: ${paramDecl.getName()}, (${paramDecl.getType().getText()}) Famix ${fmxParam.name}`);
+            // TODO: just create the access instead of using the accessMap
             this.accessMap.set(fmxParam.id, paramDecl);
         }
     
@@ -573,6 +574,7 @@ export class TypeScriptToFamixProcessor  {
         logger.debug(`Finding Type Parameters:`);
         const nodeStart = e.getStart();
     
+        // TODO: get rid of using the processedNodesWithTypeParams, we may check the same with the ensureFamixXxx methods
         // Check if this node has already been processed
         if (this.processedNodesWithTypeParams.has(nodeStart)) {
             return;
@@ -640,6 +642,7 @@ export class TypeScriptToFamixProcessor  {
         this.processComments(v, fmxVar);
     
         logger.debug(`adding access: ${v.getName()}, (${v.getType().getText()}) Famix ${fmxVar.name}`);
+        // TODO: just create the access instead of using the accessMap
         this.accessMap.set(fmxVar.id, v);
     
         return fmxVar;
@@ -678,6 +681,7 @@ export class TypeScriptToFamixProcessor  {
         this.processComments(v, fmxEnumValue);
     
         logger.debug(`adding access: ${v.getName()}, (${v.getType().getText()}) Famix ${fmxEnumValue.name}`);
+        // TODO: just create the access instead of using the accessMap
         this.accessMap.set(fmxEnumValue.id, v);
     
         return fmxEnumValue;
@@ -745,6 +749,7 @@ export class TypeScriptToFamixProcessor  {
         return fmxComment;
     }
     
+    // TODO: get rid of this function and just create the access when processing the variable, parameter, property or enum member
     /**
      * Builds a Famix model for the accesses on the parameters, variables, properties and enum members of the source files
      * @param accessMap A map of parameters, variables, properties and enum members with their id
@@ -753,12 +758,8 @@ export class TypeScriptToFamixProcessor  {
         logger.debug(`Creating accesses:`);
         accessMap.forEach((v, id) => {
             logger.debug(`Accesses to ${v.getName()}`);
-            // try {
             const temp_nodes = v.findReferencesAsNodes() as Array<Identifier>;
             temp_nodes.forEach(node => this.processNodeForAccesses(node, id));
-            // } catch (error) {
-            //     logger.error(`> WARNING: got exception "${error}".\nContinuing...`);
-            // }
         });
     }
     
@@ -779,9 +780,6 @@ export class TypeScriptToFamixProcessor  {
         }
         this.entityDictionary.createFamixAccess(n, id);
         logger.debug(`processNodeForAccesses: node kind: ${n.getKindName()}, ${n.getText()}, (${n.getType().getText()})`);
-        // } catch (error) {
-        //     logger.error(`> Got exception "${error}".\nScopeDeclaration invalid for "${n.getSymbol().fullyQualifiedName}".\nContinuing...`);
-        // }
     }
     
     
@@ -887,6 +885,7 @@ export class TypeScriptToFamixProcessor  {
         }
     }
     
+    // TODO: maybe try to get rid of this function and just create the invocation when processing the method or the function
     /**
      * Builds a Famix model for the invocations of the methods and functions of the source files
      * @param methodsAndFunctionsWithId A map of methods and functions with their id
@@ -924,6 +923,7 @@ export class TypeScriptToFamixProcessor  {
         }
     }
     
+    // TODO: maybe try to get rid of this function and just create the concretisation when processing the class, the interface or the function
     /**
      * Builds a Famix model for the inheritances of the classes and interfaces of the source files
      * @param classes An array of classes

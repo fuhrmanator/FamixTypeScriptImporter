@@ -1807,36 +1807,3 @@ export function getPrimitiveTypeName(type: Type): string | undefined {
 
   return undefined;
 }
-
-// function oldGetInterfaceDeclarationFromExpression(expression: ExpressionWithTypeArguments): InterfaceDeclaration | undefined {
-//     // Two cases:
-//     // class A implements ImportedInterface, DeclaredInterface {}
-//     const type = expression.getType();
-
-//     // ImportedInterface: type will a symbol 
-//     let symbol = type.getAliasSymbol();  // will be defined for imported interfaces
-
-//     if (!symbol) {
-//         // DeclaredInterface: type will be an InterfaceDeclaration on Identifier node that is the child of the ExpressionWithTypeArguments
-//         const identifier = expression.getFirstDescendantByKind(SyntaxKind.Identifier);
-//         if (!identifier) {
-//             throw new Error(`Identifier not found for ${expression.getText()}.`);
-//         }
-//         symbol = identifier.getSymbol();
-//         if (!symbol) {
-//             throw new Error(`Symbol not found for ${identifier.getText()}.`);
-//         }
-//     }
-
-//     // Step 3: Get the declarations associated with the symbol
-//     const declarations = symbol.getDeclarations();
-
-//     // Step 4: Filter for InterfaceDeclaration
-//     const interfaceDeclaration = declarations.find(declaration => declaration instanceof InterfaceDeclaration) as InterfaceDeclaration | undefined;
-
-//     if (!interfaceDeclaration) {
-//         throw new Error(`Interface declaration not found for ${expression.getText()}.`);
-//     }
-
-//     return interfaceDeclaration;
-// }

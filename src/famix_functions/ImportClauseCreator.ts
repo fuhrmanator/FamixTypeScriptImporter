@@ -23,7 +23,7 @@ export class ImportClauseCreator {
         const namedEntityDeclaration = getDeclarationFromImportOrExport(namedImport);
 
         const importedEntity = this.ensureImportedEntity(namedEntityDeclaration, namedImport);
-        const importingEntity = this.ensureImportingEntity(importingSourceFile);
+        const importingEntity = this.assertImportingEntity(importingSourceFile);
         const moduleSpecifier = this.getModuleSpecifierFromDeclaration(importDeclaration);
         this.ensureFamixImportClause(importedEntity, importingEntity, moduleSpecifier, importDeclaration);
     }
@@ -48,7 +48,7 @@ export class ImportClauseCreator {
         const moduleSymbol = localSymbol.getAliasedSymbolOrThrow();
         const exportsOfModule = moduleSymbol.getExports();
 
-        const importingEntity = this.ensureImportingEntity(importingSourceFile);
+        const importingEntity = this.assertImportingEntity(importingSourceFile);
 
         this.handleNamespaceImportOrExport(exportsOfModule, importingEntity, moduleSpecifier, namespaceImport);
     }
@@ -62,7 +62,7 @@ export class ImportClauseCreator {
 
         const moduleSpecifier = this.getModuleSpecifierFromDeclaration(exportDeclaration);
 
-        const importingEntity = this.ensureImportingEntity(exportingFile);
+        const importingEntity = this.assertImportingEntity(exportingFile);
 
         if (moduleSpecifierSymbol) {
             const reexportedExports = moduleSpecifierSymbol.getExports();
@@ -115,7 +115,7 @@ export class ImportClauseCreator {
         return importedEntity;
     };
 
-    private ensureImportingEntity = (importingSourceFile: SourceFile) => {
+    private assertImportingEntity = (importingSourceFile: SourceFile) => {
         const importingFullyQualifiedName = FQNFunctions.getFQN(importingSourceFile, this.entityDictionary.getAbsolutePath());
         const importingEntity = this.famixRep.getFamixEntityByFullyQualifiedName<Famix.Module>(importingFullyQualifiedName);
         if (!importingEntity) {

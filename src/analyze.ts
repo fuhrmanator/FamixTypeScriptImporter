@@ -4,7 +4,7 @@ import { FamixRepository } from "./lib/famix/famix_repository";
 import { Logger } from "tslog";
 import { EntityDictionary, EntityDictionaryConfig } from "./famix_functions/EntityDictionary";
 import path from "path";
-import { TypeScriptToFamixProcessor  } from "./analyze_functions/process_functions";
+import { TypeScriptToFamixProcessingContext  } from "./analyze_functions/process_functions";
 import { getFamixIndexFileAnchorFileName } from "./helpers";
 import { isSourceFileAModule } from "./famix_functions/helpersTsMorphElementsProcessing";
 import { FamixBaseElement } from "./lib/famix/famix_base_element";
@@ -24,7 +24,7 @@ export enum SourceFileChangeType {
  */
 export class Importer {
     private entityDictionary: EntityDictionary;
-    private processFunctions: TypeScriptToFamixProcessor ;
+    private typeScriptToFamixProcessingContext: TypeScriptToFamixProcessingContext ;
 
     private project = new Project(
         {
@@ -36,7 +36,7 @@ export class Importer {
 
     constructor(config: EntityDictionaryConfig = { expectGraphemes: false }) {
         this.entityDictionary = new EntityDictionary(config);
-        this.processFunctions = new TypeScriptToFamixProcessor (this.entityDictionary);
+        this.typeScriptToFamixProcessingContext = new TypeScriptToFamixProcessingContext (this.entityDictionary);
     }
 
     /**
@@ -46,7 +46,6 @@ export class Importer {
      */
     public famixRepFromPaths(paths: Array<string>): FamixRepository {
 
-        //        try {
         logger.debug(`famixRepFromPaths: paths: ${paths}`);
 
         this.project.addSourceFilesAtPaths(paths);
@@ -56,30 +55,25 @@ export class Importer {
         this.processEntities(this.project);
 
         const famixRep = this.entityDictionary.famixRep;
-        //        }
-        //        catch (error) {
-        // logger.error(`> ERROR: got exception ${error}. Exiting...`);
-        // logger.error(error.message);
-        // logger.error(error.stack);
-        // process.exit(1);
-        //        }
 
         return famixRep;
     }
 
     private processEntities(project: Project): void {
         const onlyTypeScriptFiles = project.getSourceFiles().filter(f => f.getFilePath().endsWith('.ts'));
-        this.processFunctions.processFiles(onlyTypeScriptFiles);
+        this.typeScriptToFamixProcessingContext.processFiles(onlyTypeScriptFiles);
         
         this.processReferences(onlyTypeScriptFiles, onlyTypeScriptFiles);
     }
 
     private processReferences(sourceFiles: SourceFile[], allExistingSourceFiles: SourceFile[]): void {        
-        // TODO: process Access, Invocations, Concretisations
-        this.processFunctions.processImportClausesForImportEqualsDeclarations(allExistingSourceFiles);
+        // TODO: we may process Invocations, Concretisations here if they are not processed when processing methods/functions, classes/interfaces and modules
+        this.typeScriptToFamixProcessingContext.processImportClausesForImportEqualsDeclarations(allExistingSourceFiles);
         
         const modules = sourceFiles.filter(f => isSourceFileAModule(f));
-        this.processFunctions.processImportClausesForModules(modules);
+        this.typeScriptToFamixProcessingContext.processImportClausesForModules(modules);
+        // this.processFunctions.Invocations();
+        // etc.
     }
 
     /**
@@ -106,10 +100,6 @@ export class Importer {
      * @returns The Famix repository containing the Famix model
      */
     public famixRepFromProject(project: Project): FamixRepository {
-        //const sourceFileNames = project.getSourceFiles().map(f => f.getFilePath()) as Array<string>;
-
-        //const famixRep = this.famixRepFromPaths(sourceFileNames);
-
         this.project = project;
         this.initFamixRep(project);
 
@@ -142,7 +132,7 @@ export class Importer {
             associationsToRemove, sourceFileChangeMap, allSourceFiles, this.entityDictionary.getAbsolutePath()
         );
 
-        this.processFunctions.processFiles(sourceFilesToEnsure);
+        this.typeScriptToFamixProcessingContext.processFiles(sourceFilesToEnsure);
         const sourceFilesToDelete = sourceFileChangeMap.get(SourceFileChangeType.Delete) || [];
         const existingSourceFiles = allSourceFiles.filter(
             file => !sourceFilesToDelete.includes(file)

@@ -100,5 +100,5 @@ const getOtherTransientDependencies = (
         });                
     }
 
-    // TODO: find the other associations between the imported entity and the sourceFile
+    // TODO: find the other associations (access, invocation) between the imported entity and the sourceFile
 };

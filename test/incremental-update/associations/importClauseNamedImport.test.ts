@@ -234,4 +234,35 @@ describe('Change import clause between 2 files', () => {
 
     expectRepositoriesToHaveSameStructure(famixRep, expectedFamixRepo);
   });
+
+  it('should not duplicate class methids when the exporting file changed several times', () => {
+    // arrange
+    const exportingSourceCode = `export class B { }`;
+    const importingSourceCode = `
+      import { B } from './${exportSourceFileName}';
+
+      class A { 
+        constructor() {}
+      }`;
+
+    const testProjectBuilder = new IncrementalUpdateProjectBuilder();
+    testProjectBuilder.addSourceFile(exportSourceFileName, exportingSourceCode);
+    testProjectBuilder.addSourceFile(importSourceFileName, importingSourceCode);
+    const { importer, famixRep } = testProjectBuilder.build();
+    const sourceFile = testProjectBuilder.changeSourceFile(exportSourceFileName, exportingSourceCode);
+    
+    // act
+    const fileChangesMap = getUpdateFileChangesMap(sourceFile);
+    importer.updateFamixModelIncrementally(fileChangesMap);
+    importer.updateFamixModelIncrementally(fileChangesMap);
+    importer.updateFamixModelIncrementally(fileChangesMap);
+
+    // assert
+    const expectedFamixRepo = createExpectedFamixModelForSeveralFiles([
+        [exportSourceFileName, exportingSourceCode],
+        [importSourceFileName, importingSourceCode]
+    ]);
+
+    expectRepositoriesToHaveSameStructure(famixRep, expectedFamixRepo);
+  });
 });
