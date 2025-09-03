@@ -53,3 +53,10 @@ To test the extension run the `npm run test` inside the `vscode-extension` folde
 
 ### Manual testing
 Some manual test cases are described in the [`test-cases.md`](./test-cases.md) file.
+
+## Useful links and resources
+- [TypeScript AST Viewer](https://ts-ast-viewer.com/) - useful to understand the TypeScript AST structure
+- [VSCode Extension API](https://code.visualstudio.com/api)
+- [Language Server Extension Guide](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide)
+- [Language Server Protocol](https://microsoft.github.io/language-server-protocol/)
+- [TypeScript support for Moose (Pharo)](https://fuhrmanator.github.io/posts/typescript-in-moose/) - instructions on how to create a Famix model from TypeScript code and import it into Moose
