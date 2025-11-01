@@ -1,6 +1,8 @@
 import { Importer } from '../src/analyze';
 import { project } from './testUtils';
 
+// TODO: ⏳ Review if the test is still in a sync with a current solution.
+
 const importer = new Importer();
 
 project.createSourceFile("/invocation.ts",

@@ -1,0 +1,54 @@
+name: VS Code Extension CI
+
+on:
+  push:
+    branches: [ master, dev, feature/add-tests ]
+  pull_request:
+    branches: [ master, dev ]
+  workflow_dispatch:
+
+jobs:
+  test-vscode-extension:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        node-version: [20.x]
+
+    name: Test VS Code Extension on ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies for the ts2famix project
+        run: npm ci
+
+      - name: Build the ts2famix project
+        run: npm run build
+
+      - name: Install dependencies for the VS Code extension
+        working-directory: ./vscode-extension
+        run: npm install
+
+      - name: Run VS Code extension tests (Linux)
+        uses: coactions/setup-xvfb@v1
+        if: runner.os == 'Linux'
+        with:
+          run: |
+            echo "Running tests on Linux with virtual display"
+            npm test
+          working-directory: ./vscode-extension
+
+      - name: Run VS Code extension tests (Windows/macOS)
+        if: runner.os != 'Linux'
+        working-directory: ./vscode-extension
+        run: npm test
