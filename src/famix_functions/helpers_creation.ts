@@ -1,7 +1,6 @@
 import * as Famix from "../lib/famix/model/famix";
 import { logger } from "../analyze";
-import { ConstructorDeclaration, Identifier, FunctionDeclaration, MethodDeclaration, MethodSignature, PropertyDeclaration, PropertySignature, VariableDeclaration, ParameterDeclaration, GetAccessorDeclaration, SetAccessorDeclaration, EnumMember, TypeAliasDeclaration, Node, SyntaxKind, FunctionExpression } from "ts-morph";
-import { TSMorphTypeDeclaration } from "./EntityDictionary";
+import { Identifier, Node, SyntaxKind } from "ts-morph";
 
 interface SearchParameters {
     searchArray: string[];
@@ -79,7 +78,7 @@ export function findAncestor(node: Identifier): Node {
     if (!ancestor) {
         throw new Error(`Ancestor not found for ${node.getText()}`);
     }
-    return ancestor
+    return ancestor;
 }
 
 /**

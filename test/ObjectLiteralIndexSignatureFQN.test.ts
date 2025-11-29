@@ -3,6 +3,8 @@ import { getFQN } from '../src/fqn';
 import { Importer } from '../src/analyze'; 
 import * as Famix from '../src/lib/famix/model/famix'; 
 
+// TODO: ⏳ Review if the test is still in a sync with a current solution.
+
 const project = new Project({
     compilerOptions: {
         baseUrl: ""

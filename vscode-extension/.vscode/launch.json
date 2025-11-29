@@ -1,0 +1,76 @@
+
+// A launch configuration that compiles the extension and then opens it inside a new window
+{
+	"version": "0.2.0",
+	"configurations": [
+    {
+      "type": "extensionHost",
+      "request": "launch",
+      "name": "Launch Client",
+      "runtimeExecutable": "${execPath}",
+      "args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+      "outFiles": [
+        "${workspaceRoot}/client/dist/**/*.js",
+        "${workspaceRoot}/server/dist/**/*.js",
+        "${workspaceRoot}/../dist/**/*.js" // for ts2famix
+      ],
+      "sourceMaps": true,
+      "sourceMapRenames": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "${workspaceFolder}/../dist/**", // for ts2famix
+        "!**/node_modules/**"
+      ],
+      "autoAttachChildProcesses": true,
+      "preLaunchTask": {
+        "type": "npm",
+        "script": "watch"
+      }
+		},
+    {
+      "name": "Integration Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/client/dist/test/suite/index",
+        "--disable-extensions"
+      ],
+      "env": {
+        "MOCHA_GREP": "integration"
+      },
+      "outFiles": [
+        "${workspaceFolder}/client/dist/**/*.js"
+      ],
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+    },
+      {
+      "name": "Smoke Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/client/dist/test/suite/index",
+        "--disable-extensions"
+      ],
+      "env": {
+        "MOCHA_GREP": "smoke"
+      },
+      "outFiles": [
+        "${workspaceFolder}/client/dist/**/*.js",
+        "${workspaceRoot}/server/dist/**/*.js",
+      ],
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+    }
+	]
+}

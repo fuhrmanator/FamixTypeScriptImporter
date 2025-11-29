@@ -1,10 +1,10 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { Entity } from "./entity";
-import { SourcedEntity } from "./sourced_entity";
+import { EntityWithSourceAnchor } from "./sourced_entity";
 
 export class SourceAnchor extends Entity {
 
-    private _element!: SourcedEntity;
+    private _element!: EntityWithSourceAnchor;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("SourceAnchor", this);
@@ -21,7 +21,7 @@ export class SourceAnchor extends Entity {
         return this._element;
     }
 
-    set element(element: SourcedEntity) {
+    set element(element: EntityWithSourceAnchor) {
         if (this._element === undefined) {
             this._element = element;
             element.sourceAnchor = this;

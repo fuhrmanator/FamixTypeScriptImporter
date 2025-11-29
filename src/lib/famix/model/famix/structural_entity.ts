@@ -14,6 +14,12 @@ export class StructuralEntity extends NamedEntity {
         }
     }
 
+    public removeIncomingAccess(incomingAccess: Access): void {
+        if (this._incomingAccesses.has(incomingAccess)) {
+            this._incomingAccesses.delete(incomingAccess);
+        }
+    }
+
     private _declaredType!: Type;
 
     public getJSON(): string {
