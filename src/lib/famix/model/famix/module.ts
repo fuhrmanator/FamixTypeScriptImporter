@@ -53,7 +53,7 @@ export class Module extends ScriptEntity {
 
     public addPropertiesToExporter(exporter: FamixJSONExporter): void {
         super.addPropertiesToExporter(exporter);
-        exporter.addProperty("outgoingImports", this.outgoingImports);
+        exporter.addProperty("imports", this.outgoingImports);
     }
 
     get parentScope() {
