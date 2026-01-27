@@ -100,17 +100,34 @@ function buildStageMethodMap(sourceFile: SourceFile): Map<number, string> {
 }
 
 /**
- * Builds a map of method positions to their index in class/interface/namespace declarations
+ * Builds a map of method and property positions to their index in class/interface/namespace declarations
  * @param sourceFile The TypeScript source file to analyze
- * @returns A Map where keys are method start positions and values are their positional index (1-based)
+ * @returns A Map where keys are node start positions and values are their positional index (1-based)
  */
-function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
+export function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
     const positionMap = new Map<number, number>();
     // console.log(`[buildMethodPositionMap] Starting analysis for file: ${sourceFile.getFilePath()}`);
 
     // Helper function to process modules recursively
     function processModule(moduleNode: ModuleDeclaration, modulePath: string) {
         // console.log(`[buildMethodPositionMap] Processing module: ${modulePath}`);
+
+        // Track nested modules
+        const nestedModuleCounts = new Map<string, number>();
+        const nestedModules = moduleNode.getModules();
+        nestedModules.forEach(nestedModule => {
+            if (Node.isModuleDeclaration(nestedModule)) {
+                const nestedModuleName = nestedModule.getName();
+                const count = (nestedModuleCounts.get(nestedModuleName) || 0) + 1;
+                nestedModuleCounts.set(nestedModuleName, count);
+                if (count > 1) {
+                    positionMap.set(nestedModule.getStart(), count);
+                    // console.log(`[buildMethodPositionMap] Nested module: ${nestedModuleName}, position: ${nestedModule.getStart()}, index: ${count}`);
+                }
+                const newModulePath = `${modulePath}.${nestedModuleName}`;
+                processModule(nestedModule, newModulePath);
+            }
+        });
 
         // Handle functions directly in the module
         const functions = moduleNode.getFunctions();
@@ -138,6 +155,18 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
                 positionMap.set(method.getStart(), count);
                 // console.log(`[buildMethodPositionMap] Module class method: ${methodName}, position: ${method.getStart()}, index: ${count}`);
             });
+
+            // Handle properties within the class
+            const properties = classNode.getProperties();
+            const propertyCounts = new Map<string, number>();
+            
+            properties.forEach(property => {
+                const propertyName = property.getName();
+                const count = (propertyCounts.get(propertyName) || 0) + 1;
+                propertyCounts.set(propertyName, count);
+                positionMap.set(property.getStart(), count);
+                // console.log(`[buildMethodPositionMap] Module class property: ${propertyName}, position: ${property.getStart()}, index: ${count}`);
+            });
         });
 
         // Handle interfaces within the module
@@ -155,27 +184,30 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
                 // console.log(`[buildMethodPositionMap] Module interface method: ${methodName}, position: ${method.getStart()}, index: ${count}`);
             });
         });
-
-        // Recursively process nested modules
-        const nestedModules = moduleNode.getModules();
-        nestedModules.forEach(nestedModule => {
-            if (Node.isModuleDeclaration(nestedModule)) {
-                const nestedModuleName = nestedModule.getName();
-                const newModulePath = `${modulePath}.${nestedModuleName}`;
-                processModule(nestedModule, newModulePath);
-            }
-        });
-
     }
 
     function trackArrowFunctions(container: Node) {
         const arrows = container.getDescendantsOfKind(SyntaxKind.ArrowFunction);
+        const functionExpressions = container.getDescendantsOfKind(SyntaxKind.FunctionExpression);
+        let funcIndex = 0;
+        
         arrows.forEach(arrow => {
             const parent = arrow.getParent();
-            if (Node.isBlock(parent) || Node.isSourceFile(parent)) {
-                // Use negative numbers for arrow functions to distinguish from methods
-                positionMap.set(arrow.getStart(), -1 * (positionMap.size + 1));
-                // console.log(`[buildMethodPositionMap] Arrow function at ${arrow.getStart()}`);
+            if (Node.isBlock(parent) || Node.isSourceFile(parent) || Node.isCallExpression(parent)) {
+                funcIndex++;
+                positionMap.set(arrow.getStart(), funcIndex);
+                const { line, column } = sourceFile.getLineAndColumnAtPos(arrow.getStart());
+                // console.log(`[buildMethodPositionMap] Arrow function at ${arrow.getStart()} (line: ${line}, col: ${column}), parent: ${parent.getKindName()}, index: ${funcIndex}`);
+            }
+        });
+
+        functionExpressions.forEach(funcExpr => {
+            const parent = funcExpr.getParent();
+            if (Node.isBlock(parent) || Node.isSourceFile(parent) || Node.isCallExpression(parent)) {
+                funcIndex++;
+                positionMap.set(funcExpr.getStart(), funcIndex);
+                const { line, column } = sourceFile.getLineAndColumnAtPos(funcExpr.getStart());
+                // console.log(`[buildMethodPositionMap] Function expression at ${funcExpr.getStart()} (line: ${line}, col: ${column}), parent: ${parent.getKindName()}, index: ${funcIndex}`);
             }
         });
     }
@@ -194,7 +226,30 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
             // console.log(`[buildMethodPositionMap] Class method: ${methodName}, position: ${method.getStart()}, index: ${count}`);
         });
 
+        // Handle properties in top-level classes
+        const properties = classNode.getProperties();
+        const propertyCounts = new Map<string, number>();
+        
+        properties.forEach(property => {
+            const propertyName = property.getName();
+            const count = (propertyCounts.get(propertyName) || 0) + 1;
+            propertyCounts.set(propertyName, count);
+            positionMap.set(property.getStart(), count);
+            // console.log(`[buildMethodPositionMap] Class property: ${propertyName}, position: ${property.getStart()}, index: ${count}`);
+        });
+
         methods.forEach(method => trackArrowFunctions(method));
+    });
+    
+    // Handle top-level functions
+    const topLevelFunctionCounts = new Map<string, number>();
+    sourceFile.getFunctions().forEach(func => {
+        const funcName = func.getName() || `Unnamed_Function(${func.getStart()})`;
+        const count = (topLevelFunctionCounts.get(funcName) || 0) + 1;
+        topLevelFunctionCounts.set(funcName, count);
+        positionMap.set(func.getStart(), count);
+        // console.log(`[buildMethodPositionMap] Top-level function: ${funcName}, position: ${func.getStart()}, index: ${count}`);
+        trackArrowFunctions(func);
     });
 
     // Handle top-level interfaces
@@ -211,17 +266,25 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
             // console.log(`[buildMethodPositionMap] Interface method: ${methodName}, position: ${method.getStart()}, index: ${count}`);
         });
         methods.forEach(method => trackArrowFunctions(method));
-
     });
 
     // Handle top-level namespaces/modules
+    const topLevelModuleCounts = new Map<string, number>();
     sourceFile.getModules().forEach(moduleNode => {
         if (Node.isModuleDeclaration(moduleNode)) {
             const moduleName = moduleNode.getName();
+            const count = (topLevelModuleCounts.get(moduleName) || 0) + 1;
+            topLevelModuleCounts.set(moduleName, count);
+            if (count > 1) {
+                positionMap.set(moduleNode.getStart(), count);
+                // console.log(`[buildMethodPositionMap] Top-level module: ${moduleName}, position: ${moduleNode.getStart()}, index: ${count}`);
+            }
             processModule(moduleNode, moduleName);
         }
     });
 
+    // Handle top-level arrow functions and function expressions
+    trackArrowFunctions(sourceFile);
 
     // console.log(`[buildMethodPositionMap] Final positionMap:`, Array.from(positionMap.entries()));
     return positionMap;
@@ -285,7 +348,6 @@ export function getFQN(node: FQNNode | Node): string {
                     name = currentNode.getName();
                 }
             } else {
-                // if constructor, use "constructor" as name
                 if (Node.isConstructorDeclaration(currentNode)) {
                     name = "constructor";
                 } else {
@@ -308,7 +370,7 @@ export function getFQN(node: FQNNode | Node): string {
                 const method = currentNode as MethodSignature;
                 const params = method.getParameters().map(p => {
                     const typeText = p.getType().getText().replace(/\s+/g, "");
-                    return typeText || "any"; // Fallback for untyped parameters
+                    return typeText || "any";
                 });
                 const returnType = method.getReturnType().getText().replace(/\s+/g, "") || "void";
                 name = `${name}(${params.join(",")}):${returnType}`;
@@ -316,10 +378,12 @@ export function getFQN(node: FQNNode | Node): string {
 
             parts.unshift(name);
 
-            // Apply positional index for MethodDeclaration, MethodSignature, and FunctionDeclaration
-            if (Node.isMethodDeclaration(currentNode) ||
-                Node.isMethodSignature(currentNode) ||
-                Node.isFunctionDeclaration(currentNode)) {
+            // Apply positional index for MethodDeclaration, MethodSignature, FunctionDeclaration, FunctionExpression, and PropertyDeclaration
+            if (Node.isMethodDeclaration(currentNode) || 
+                Node.isMethodSignature(currentNode) || 
+                Node.isFunctionDeclaration(currentNode) ||
+                Node.isFunctionExpression(currentNode) ||
+                Node.isPropertyDeclaration(currentNode)) {
                 const key = stageMap.get(currentNode.getStart());
                 if (key) {
                     parts.unshift(key);
@@ -329,8 +393,6 @@ export function getFQN(node: FQNNode | Node): string {
                     if (positionIndex && positionIndex > 1) {
                         parts.unshift(positionIndex.toString());
                         // console.log(`[getFQN] Applied positionIndex: ${positionIndex} for ${currentNode.getKindName()} at position ${currentNode.getStart()}`);
-                    } else {
-                        console.log(`[getFQN] No positionIndex applied for ${currentNode.getKindName()} at position ${currentNode.getStart()}, positionIndex: ${positionIndex || 'none'}`);
                     }
                 }
             }
@@ -343,7 +405,14 @@ export function getFQN(node: FQNNode | Node): string {
             Node.isCatchClause(currentNode)) {
             const name = `${currentNode.getKindName()}(${lc})`;
             parts.unshift(name);
-        }
+            if (Node.isArrowFunction(currentNode)) {
+                const funcIndex = methodPositionMap.get(currentNode.getStart());
+                if (funcIndex && funcIndex > 0) {
+                    parts.unshift(funcIndex.toString());
+                    // console.log(`[getFQN] Applied funcIndex: ${funcIndex} for ArrowFunction at position ${currentNode.getStart()}`);
+                }
+            }
+        } 
         else if (Node.isTypeParameterDeclaration(currentNode)) {
             const arrowParent = currentNode.getFirstAncestorByKind(SyntaxKind.ArrowFunction);
             if (arrowParent) {
@@ -353,13 +422,10 @@ export function getFQN(node: FQNNode | Node): string {
                 }
             }
             parts.unshift(currentNode.getName());
-            // Removed continue to allow ancestor processing
         }
         else if (Node.isConstructorDeclaration(currentNode)) {
             const name = "constructor";
             parts.unshift(name);
-        } else {
-            console.log(`[getFQN] Ignoring node kind: ${currentNode.getKindName()}`);
         }
 
         currentNode = currentNode.getParent();
@@ -370,8 +436,6 @@ export function getFQN(node: FQNNode | Node): string {
         absolutePathProject
     ).replace(/\\/g, "/");
 
-    // if (relativePath.includes("..")) {
-    // }
     if (relativePath.startsWith("/")) {
         relativePath = relativePath.slice(1);
     }
