@@ -32,11 +32,11 @@ describe('Tests for source text', () => {
         const sourceAnchor = theClass?.sourceAnchor as IndexedFileAnchor;
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.startPos).toBe(19 + 1);
-        expect(sourceAnchor.endPos).toBe(402 + 1);
+        expect(sourceAnchor.endPos).toBe(402);
         expect(sourceAnchor.fileName).toBe("test_src/simple.ts");
         expect(project.getSourceFileOrThrow(
             sourceAnchor.fileName).getFullText().substring(
-                sourceAnchor.startPos - 1, sourceAnchor.endPos - 1))
+                sourceAnchor.startPos - 1, sourceAnchor.endPos))
                 .toBe(
 `export class A {
     /**
@@ -55,11 +55,11 @@ describe('Tests for source text', () => {
         const sourceAnchor = theMethod.sourceAnchor as IndexedFileAnchor;
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.startPos).toBe(266 + 1);
-        expect(sourceAnchor.endPos).toBe(400 + 1);
+        expect(sourceAnchor.endPos).toBe(400);
         expect(sourceAnchor.fileName).toBe("test_src/simple.ts");
         expect(project.getSourceFileOrThrow(
             sourceAnchor.fileName).getFullText().substring(
-                sourceAnchor.startPos - 1, sourceAnchor.endPos - 1))
+                sourceAnchor.startPos - 1, sourceAnchor.endPos))
                 .toBe(`public moveBack(numberOfSpaces: number) {
         let currentSquareIndex = this.board.indexOf(this.currentPlayer.currentSquare);
     }`
@@ -73,11 +73,11 @@ describe('Tests for source text', () => {
         const sourceAnchor = theVariable.sourceAnchor as IndexedFileAnchor;
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.startPos).toBe(4 + 1);
-        expect(sourceAnchor.endPos).toBe(17 + 1);
+        expect(sourceAnchor.endPos).toBe(17);
         expect(sourceAnchor.fileName).toBe("test_src/simple.ts");
         expect(project.getSourceFileOrThrow(
             sourceAnchor.fileName).getFullText().substring(
-                sourceAnchor.startPos - 1, sourceAnchor.endPos - 1))
+                sourceAnchor.startPos - 1, sourceAnchor.endPos))
                 .toBe("a: number = 1");
     });
 
@@ -87,11 +87,11 @@ describe('Tests for source text', () => {
         const sourceAnchor = theVariable.sourceAnchor as IndexedFileAnchor;
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.startPos).toBe(320 + 1);
-        expect(sourceAnchor.endPos).toBe(393 + 1);
+        expect(sourceAnchor.endPos).toBe(393);
         expect(sourceAnchor.fileName).toBe("test_src/simple.ts");
         expect(project.getSourceFileOrThrow(
             sourceAnchor.fileName).getFullText().substring(
-                sourceAnchor.startPos - 1, sourceAnchor.endPos - 1))
+                sourceAnchor.startPos - 1, sourceAnchor.endPos))
                 .toBe("currentSquareIndex = this.board.indexOf(this.currentPlayer.currentSquare)");
     });
 
@@ -106,10 +106,10 @@ describe('Tests for source text', () => {
         expect(testSourceWithGraphemes.length).toBe(7);
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.startPos).toBe(4 + 1);
-        expect(sourceAnchor.endPos).toBe(4 + testSourceWithGraphemes.length + 1);
+        expect(sourceAnchor.endPos).toBe(4 + testSourceWithGraphemes.length);
         expect(sourceAnchor.fileName).toBe("test_src/a-b.ts");
         const sourceFileTextWithGraphemes = splitter.splitGraphemes(project.getSourceFileOrThrow(sourceAnchor.fileName).getFullText());
-        expect(sourceFileTextWithGraphemes.slice(sourceAnchor.startPos - 1, sourceAnchor.endPos - 1)).toEqual(testSourceWithGraphemes);
+        expect(sourceFileTextWithGraphemes.slice(sourceAnchor.startPos - 1, sourceAnchor.endPos)).toEqual(testSourceWithGraphemes);
     });
 
     it("should have variable 'd' with the proper source text", () => {
@@ -117,10 +117,10 @@ describe('Tests for source text', () => {
         const sourceAnchor = theVariable.sourceAnchor as IndexedFileAnchor;
         // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
         expect(sourceAnchor.startPos).toBe(13 + 1);
-        expect(sourceAnchor.endPos).toBe(18 + 1);
+        expect(sourceAnchor.endPos).toBe(18);
         expect(sourceAnchor.fileName).toBe("test_src/a-b.ts");
         const sourceFileTextWithGraphemes = splitter.splitGraphemes(project.getSourceFileOrThrow(sourceAnchor.fileName).getFullText());
         const testSourceWithGraphemes = splitter.splitGraphemes('d = 5');
-        expect(sourceFileTextWithGraphemes.slice(sourceAnchor.startPos - 1, sourceAnchor.endPos - 1)).toEqual(testSourceWithGraphemes);    });
+        expect(sourceFileTextWithGraphemes.slice(sourceAnchor.startPos - 1, sourceAnchor.endPos)).toEqual(testSourceWithGraphemes);    });
 
 });

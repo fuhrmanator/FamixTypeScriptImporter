@@ -21,7 +21,6 @@ const arrayOfAliases = Array.from(setOfAliases);
 const arrayOfTypes = Array.from(fmxRep._getAllEntitiesWithType("Type") as Set<Type>);
 const theFirstAlias = arrayOfAliases[0];
 const theFirstType = arrayOfTypes[0];
-const theFile = fmxRep._getFamixFile("alias.ts");
 
 describe('Tests for alias', () => {
     

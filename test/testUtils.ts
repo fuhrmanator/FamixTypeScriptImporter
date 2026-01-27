@@ -16,7 +16,7 @@ function getIndexedFileAnchorFromComment(comment: Comment) {
 }
 
 function getCommentFromAnchor(anchor: IndexedFileAnchor, project: Project) {
-    return project.getSourceFileOrThrow(anchor.fileName).getFullText().substring(anchor.startPos - 1, anchor.endPos - 1);
+    return project.getSourceFileOrThrow(anchor.fileName).getFullText().substring(anchor.startPos - 1, anchor.endPos);
 }
 
 export function getCommentTextFromCommentViaAnchor(comment: Comment, project: Project) {
@@ -24,5 +24,5 @@ export function getCommentTextFromCommentViaAnchor(comment: Comment, project: Pr
 }
 
 export function getTextFromAnchor(anchor: IndexedFileAnchor, project: Project) {
-    return project.getSourceFileOrThrow(anchor.fileName).getFullText().substring(anchor.startPos - 1, anchor.endPos - 1);
+    return project.getSourceFileOrThrow(anchor.fileName).getFullText().substring(anchor.startPos - 1, anchor.endPos);
 }
