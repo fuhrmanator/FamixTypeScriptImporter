@@ -96,7 +96,7 @@ export class EntityDictionary {
 
             // The +1 is because the source anchor (Pharo) is 1-based, but ts-morph is 0-based
             sourceAnchor.startPos = sourceStart + 1;
-            sourceAnchor.endPos = sourceEnd + 1;
+            sourceAnchor.endPos = sourceEnd;
 
             let fileName = node.getSourceFile().getFilePath() as string;
             if (fileName.startsWith("/")) {
@@ -196,7 +196,7 @@ export class EntityDictionary {
             }
             // note: the +1 is because the source anchor is 1-based, but ts-morph is 0-based
             fmxIndexFileAnchor.startPos = sourceStart + 1;
-            fmxIndexFileAnchor.endPos = sourceEnd + 1;
+            fmxIndexFileAnchor.endPos = sourceEnd;
 
             // if (!(famixElement instanceof Famix.ImportClause || famixElement instanceof Famix.Access || famixElement instanceof Famix.Reference || famixElement instanceof Famix.Invocation || famixElement instanceof Famix.Inheritance) && !(famixElement instanceof Famix.Comment) && !(sourceElement instanceof CommentRange) && !(sourceElement instanceof Identifier) && !(sourceElement instanceof ImportSpecifier) && !(sourceElement instanceof ExpressionWithTypeArguments)) {
             //    initFQN(sourceElement, famixElement);

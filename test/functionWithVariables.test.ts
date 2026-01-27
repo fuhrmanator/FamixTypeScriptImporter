@@ -57,12 +57,12 @@ describe('Tests for function with variables', () => {
         let anchor = secondVariableComments[0]?.sourceAnchor as IndexedFileAnchor;
         expect(anchor?.fileName.endsWith("functionWithVariables.ts")).toBe(true);
         expect(project.getSourceFileOrThrow(anchor.fileName).getFullText().substring(
-            anchor.startPos - 1, anchor.endPos - 1)).toBe(`// comment 1`);
+            anchor.startPos - 1, anchor.endPos)).toBe(`// comment 1`);
 
         anchor = secondVariableComments[1]?.sourceAnchor as IndexedFileAnchor;
         expect(anchor?.fileName.endsWith("functionWithVariables.ts")).toBe(true);
         expect(project.getSourceFileOrThrow(anchor.fileName).getFullText().substring(
-            anchor.startPos - 1, anchor.endPos - 1)).toBe(`// comment 3`);
+            anchor.startPos - 1, anchor.endPos)).toBe(`// comment 3`);
 
         expect(secondVariableComments[0]?.container).toBe(secondVariable);
         expect(secondVariableComments[1]?.container).toBe(secondVariable);
