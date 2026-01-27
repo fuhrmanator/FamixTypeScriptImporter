@@ -9,6 +9,8 @@ import { config } from "./analyze";
 const argv = yargs
     .example(`ts2famix -i "path/to/project/**/*.ts" -o JSONModels/projectName.json`, 'Creates a JSON-format Famix model of typescript files.')
     .example(`ts2famix -i path/to/tsconfig.json -o JSONModels/projectName.json`, 'Creates a JSON-format model of a typescript project.')
+    .version()
+    .alias('v', 'version')
     .alias('i', 'input')
     .nargs('i', 1)
     .alias('o', 'output')
