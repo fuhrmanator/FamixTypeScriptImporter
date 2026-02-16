@@ -10,7 +10,7 @@ const project = new Project({
     useInMemoryFileSystem: true,
 });
 
-describe('Method and Function Overload with Parameter FQN Generation', () => {
+describe('Method, Function Overload, and Class Property FQN Generation', () => {
     let sourceFile: ReturnType<Project['createSourceFile']>;
     let importer: Importer;
     let fmxRep: any;
@@ -19,6 +19,8 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
         sourceFile = project.createSourceFile('/MethodOverloadFQN.ts', `
             declare namespace Namespace2 {
                 class Class1 {
+                    static prop1: string | number;
+                    prop2: boolean;
                     static method1(param1: string): number;
                     static method1(param1: number): number;
                     static method1(param1: any): number;
@@ -30,6 +32,7 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
             }
             declare namespace Namespace3 {
                 class Class2 {
+                    prop3: any;
                     static method3(param3: boolean): void;
                     static method3(param3: null): void;
                 }
@@ -40,6 +43,8 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
                     prop2: string;
                 }
                 class Class3 {
+                    prop4: Interface2 | null;
+                    prop5: Class3;
                     static method4(param3: Interface2 | Class3): Class3;
                     static method4(param3: Interface2 | Class3 | undefined): Class3 | undefined;
                     static method4(param3: Interface2 | Class3 | null): Class3 | null;
@@ -47,11 +52,13 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
                 }
             }
             declare namespace Namespace1 {
-                declare module Module1 {
+                module Module1 {
                     export function function1(param4: Interface3): Interface5<Interface4>;
                     export function function1(param4: Interface3, param6?: Interface6): Interface5<Interface4>;
                     export function function1(param5: Interface7, param6?: Interface6): Interface5<Interface4>;
-                }
+               
+
+ }
             }
             interface Interface3 {}
             interface Interface4 {}
@@ -62,6 +69,8 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
 
         importer = new Importer();
         fmxRep = importer.famixRepFromProject(project);
+        // Debug: Log all Property entities
+        console.log('Famix Properties:', Array.from(fmxRep._getAllEntitiesWithType('Property')).map(p => (p as Famix.Property).fullyQualifiedName));
     });
 
     it('should parse the source file and generate Famix representation', () => {
@@ -69,17 +78,72 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
         expect(sourceFile).toBeTruthy();
     });
 
+    it('should generate correct FQNs for class properties in Namespace2.Class1', () => {
+        const properties = sourceFile.getDescendantsOfKind(SyntaxKind.PropertyDeclaration);
+
+        const prop1 = properties.find(p => p.getName() === 'prop1');
+        expect(prop1).toBeDefined();
+        expect(getFQN(prop1!)).toBe('{MethodOverloadFQN.ts}.Namespace2.Class1.prop1[PropertyDeclaration]');
+
+        const prop2 = properties.find(p => p.getName() === 'prop2');
+        expect(prop2).toBeDefined();
+        expect(getFQN(prop2!)).toBe('{MethodOverloadFQN.ts}.Namespace2.Class1.prop2[PropertyDeclaration]');
+
+        const famixProperties = fmxRep._getAllEntitiesWithType('Property') as Set<Famix.Property>;
+        const famixProp1 = Array.from(famixProperties).find(p => p.fullyQualifiedName === '{MethodOverloadFQN.ts}.Namespace2.Class1.prop1[PropertyDeclaration]');
+        expect(famixProp1).toBeTruthy();
+        expect(famixProp1?.name).toBe('prop1');
+
+        const famixProp2 = Array.from(famixProperties).find(p => p.fullyQualifiedName === '{MethodOverloadFQN.ts}.Namespace2.Class1.prop2[PropertyDeclaration]');
+        expect(famixProp2).toBeTruthy();
+        expect(famixProp2?.name).toBe('prop2');
+    });
+
+    it('should generate correct FQNs for class properties in Namespace3.Class2', () => {
+        const properties = sourceFile.getDescendantsOfKind(SyntaxKind.PropertyDeclaration);
+
+        const prop3 = properties.find(p => p.getName() === 'prop3');
+        expect(prop3).toBeDefined();
+        expect(getFQN(prop3!)).toBe('{MethodOverloadFQN.ts}.Namespace3.Class2.prop3[PropertyDeclaration]');
+
+        const famixProperties = fmxRep._getAllEntitiesWithType('Property') as Set<Famix.Property>;
+        const famixProp3 = Array.from(famixProperties).find(p => p.fullyQualifiedName === '{MethodOverloadFQN.ts}.Namespace3.Class2.prop3[PropertyDeclaration]');
+        expect(famixProp3).toBeTruthy();
+        expect(famixProp3?.name).toBe('prop3');
+    });
+
+    it('should generate correct FQNs for class properties in Namespace4.Class3', () => {
+        const properties = sourceFile.getDescendantsOfKind(SyntaxKind.PropertyDeclaration);
+
+        const prop4 = properties.find(p => p.getName() === 'prop4');
+        expect(prop4).toBeDefined();
+        expect(getFQN(prop4!)).toBe('{MethodOverloadFQN.ts}.Namespace4.Class3.prop4[PropertyDeclaration]');
+
+        const prop5 = properties.find(p => p.getName() === 'prop5');
+        expect(prop5).toBeDefined();
+        expect(getFQN(prop5!)).toBe('{MethodOverloadFQN.ts}.Namespace4.Class3.prop5[PropertyDeclaration]');
+
+        const famixProperties = fmxRep._getAllEntitiesWithType('Property') as Set<Famix.Property>;
+        const famixProp4 = Array.from(famixProperties).find(p => p.fullyQualifiedName === '{MethodOverloadFQN.ts}.Namespace4.Class3.prop4[PropertyDeclaration]');
+        expect(famixProp4).toBeTruthy();
+        expect(famixProp4?.name).toBe('prop4');
+
+        const famixProp5 = Array.from(famixProperties).find(p => p.fullyQualifiedName === '{MethodOverloadFQN.ts}.Namespace4.Class3.prop5[PropertyDeclaration]');
+        expect(famixProp5).toBeTruthy();
+        expect(famixProp5?.name).toBe('prop5');
+    });
+
     it('should generate correct FQNs for class methods in namespace Namespace2.Class1', () => {
         const methods = sourceFile.getDescendantsOfKind(SyntaxKind.MethodDeclaration);
-        const method1_1 = methods.find(m => m.getName() === 'method1' && m.getParameters()[0]?.getType().getText() === 'string');
+        const method1_1 = methods.find(m => m.getName() === 'method1' && m.getParameters()[0]?.getType().getText().includes('string'));
         expect(method1_1).toBeDefined();
         expect(getFQN(method1_1!)).toBe('{MethodOverloadFQN.ts}.Namespace2.Class1.method1[MethodDeclaration]');
 
-        const method1_2 = methods.find(m => m.getName() === 'method1' && m.getParameters()[0]?.getType().getText() === 'number');
+        const method1_2 = methods.find(m => m.getName() === 'method1' && m.getParameters()[0]?.getType().getText().includes('number'));
         expect(method1_2).toBeDefined();
         expect(getFQN(method1_2!)).toBe('{MethodOverloadFQN.ts}.Namespace2.Class1.2.method1[MethodDeclaration]');
 
-        const method1_3 = methods.find(m => m.getName() === 'method1' && m.getParameters()[0]?.getType().getText() === 'any');
+        const method1_3 = methods.find(m => m.getName() === 'method1' && m.getParameters()[0]?.getType().getText().includes('any'));
         expect(method1_3).toBeDefined();
         expect(getFQN(method1_3!)).toBe('{MethodOverloadFQN.ts}.Namespace2.Class1.3.method1[MethodDeclaration]');
 
@@ -98,11 +162,11 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
 
     it('should generate correct FQNs for interface methods in namespace Namespace2.Interface1', () => {
         const methods = sourceFile.getDescendantsOfKind(SyntaxKind.MethodSignature);
-        const method2_1 = methods.find(m => m.getName() === 'method2' && m.getParameters()[0]?.getType().getText() === 'string');
+        const method2_1 = methods.find(m => m.getName() === 'method2' && m.getParameters()[0]?.getType().getText().includes('string'));
         expect(method2_1).toBeDefined();
         expect(getFQN(method2_1!)).toBe('{MethodOverloadFQN.ts}.Namespace2.Interface1.method2(string):number[MethodSignature]');
 
-        const method2_2 = methods.find(m => m.getName() === 'method2' && m.getParameters()[0]?.getType().getText() === 'number');
+        const method2_2 = methods.find(m => m.getName() === 'method2' && m.getParameters()[0]?.getType().getText().includes('number'));
         expect(method2_2).toBeDefined();
         expect(getFQN(method2_2!)).toBe('{MethodOverloadFQN.ts}.Namespace2.Interface1.2.method2(number):number[MethodSignature]');
 
@@ -117,15 +181,15 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
 
     it('should generate correct FQNs for parameters in Namespace2.Class1.method1', () => {
         const parameters = sourceFile.getDescendantsOfKind(SyntaxKind.Parameter);
-        const param1_1 = parameters.find(p => p.getName() === 'param1' && p.getType().getText() === 'string');
+        const param1_1 = parameters.find(p => p.getName() === 'param1' && p.getType().getText().includes('string'));
         expect(param1_1).toBeDefined();
         expect(getFQN(param1_1!)).toBe('{MethodOverloadFQN.ts}.Namespace2.Class1.method1.param1[Parameter]');
 
-        const param1_2 = parameters.find(p => p.getName() === 'param1' && p.getType().getText() === 'number');
+        const param1_2 = parameters.find(p => p.getName() === 'param1' && p.getType().getText().includes('number'));
         expect(param1_2).toBeDefined();
         expect(getFQN(param1_2!)).toBe('{MethodOverloadFQN.ts}.Namespace2.Class1.2.method1.param1[Parameter]');
 
-        const param1_3 = parameters.find(p => p.getName() === 'param1' && p.getType().getText() === 'any');
+        const param1_3 = parameters.find(p => p.getName() === 'param1' && p.getType().getText().includes('any'));
         expect(param1_3).toBeDefined();
         expect(getFQN(param1_3!)).toBe('{MethodOverloadFQN.ts}.Namespace2.Class1.3.method1.param1[Parameter]');
 
@@ -145,11 +209,11 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
 
     it('should generate correct FQNs for parameters in Namespace2.Interface1.method2', () => {
         const parameters = sourceFile.getDescendantsOfKind(SyntaxKind.Parameter);
-        const param2_1 = parameters.find(p => p.getName() === 'param2' && p.getType().getText() === 'string');
+        const param2_1 = parameters.find(p => p.getName() === 'param2' && p.getType().getText().includes('string'));
         expect(param2_1).toBeDefined();
         expect(getFQN(param2_1!)).toBe('{MethodOverloadFQN.ts}.Namespace2.Interface1.method2(string):number.param2[Parameter]');
 
-        const param2_2 = parameters.find(p => p.getName() === 'param2' && p.getType().getText() === 'number');
+        const param2_2 = parameters.find(p => p.getName() === 'param2' && p.getType().getText().includes('number'));
         expect(param2_2).toBeDefined();
         expect(getFQN(param2_2!)).toBe('{MethodOverloadFQN.ts}.Namespace2.Interface1.2.method2(number):number.param2[Parameter]');
 
@@ -165,11 +229,11 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
 
     it('should generate correct FQNs for class methods in namespace Namespace3.Class2', () => {
         const methods = sourceFile.getDescendantsOfKind(SyntaxKind.MethodDeclaration);
-        const method3_1 = methods.find(m => m.getName() === 'method3' && m.getParameters()[0]?.getType().getText() === 'boolean');
+        const method3_1 = methods.find(m => m.getName() === 'method3' && m.getParameters()[0]?.getType().getText().includes('boolean'));
         expect(method3_1).toBeDefined();
         expect(getFQN(method3_1!)).toBe('{MethodOverloadFQN.ts}.Namespace3.Class2.method3[MethodDeclaration]');
 
-        const method3_2 = methods.find(m => m.getName() === 'method3' && m.getParameters()[0]?.getType().getText() === 'null');
+        const method3_2 = methods.find(m => m.getName() === 'method3' && m.getParameters()[0]?.getType().getText().includes('null'));
         expect(method3_2).toBeDefined();
         expect(getFQN(method3_2!)).toBe('{MethodOverloadFQN.ts}.Namespace3.Class2.2.method3[MethodDeclaration]');
 
@@ -184,11 +248,11 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
 
     it('should generate correct FQNs for parameters in Namespace3.Class2.method3', () => {
         const parameters = sourceFile.getDescendantsOfKind(SyntaxKind.Parameter);
-        const param3_1 = parameters.find(p => p.getName() === 'param3' && p.getType().getText() === 'boolean');
+        const param3_1 = parameters.find(p => p.getName() === 'param3' && p.getType().getText().includes('boolean'));
         expect(param3_1).toBeDefined();
         expect(getFQN(param3_1!)).toBe('{MethodOverloadFQN.ts}.Namespace3.Class2.method3.param3[Parameter]');
 
-        const param3_2 = parameters.find(p => p.getName() === 'param3' && p.getType().getText() === 'null');
+        const param3_2 = parameters.find(p => p.getName() === 'param3' && p.getType().getText().includes('null'));
         expect(param3_2).toBeDefined();
         expect(getFQN(param3_2!)).toBe('{MethodOverloadFQN.ts}.Namespace3.Class2.2.method3.param3[Parameter]');
 
@@ -272,33 +336,6 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
         expect(famixParam3_4).toBeTruthy();
         expect(famixParam3_4?.name).toBe('param3');
     });
-
-    // it('should generate correct FQNs for function overloads in namespace Namespace1.Module1', () => {
-    //     const functions = sourceFile.getDescendantsOfKind(SyntaxKind.FunctionDeclaration);
-    //     const function1_1 = functions.find(f => f.getName() === 'function1' && f.getParameters()[0]?.getType().getText() === 'Interface3' && f.getParameters().length === 1);
-    //     expect(function1_1).toBeDefined();
-    //     expect(getFQN(function1_1!)).toBe('{MethodOverloadFQN.ts}.Namespace1.Module1.function1[FunctionDeclaration]');
-
-    //     const function1_2 = functions.find(f => f.getName() === 'function1' && f.getParameters()[0]?.getType().getText() === 'Interface3' && f.getParameters().length === 2);
-    //     expect(function1_2).toBeDefined();
-    //     expect(getFQN(function1_2!)).toBe('{MethodOverloadFQN.ts}.Namespace1.Module1.2.function1[FunctionDeclaration]');
-
-    //     const function1_3 = functions.find(f => f.getName() === 'function1' && f.getParameters()[0]?.getType().getText() === 'Interface7');
-    //     expect(function1_3).toBeDefined();
-    //     expect(getFQN(function1_3!)).toBe('{MethodOverloadFQN.ts}.Namespace1.Module1.3.function1[FunctionDeclaration]');
-
-    //     const famixFunction1_1 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace1.Module1.function1[FunctionDeclaration]');
-    //     expect(famixFunction1_1).toBeTruthy();
-    //     expect(famixFunction1_1.name).toBe('function1');
-
-    //     const famixFunction1_2 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace1.Module1.2.function1[FunctionDeclaration]');
-    //     expect(famixFunction1_2).toBeTruthy();
-    //     expect(famixFunction1_2.name).toBe('function1');
-
-    //     const famixFunction1_3 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace1.Module1.3.function1[FunctionDeclaration]');
-    //     expect(famixFunction1_3).toBeTruthy();
-    //     expect(famixFunction1_3.name).toBe('function1');
-    // });
 
     it('should generate correct FQNs for parameters in Namespace1.Module1.function1', () => {
         const parameters = sourceFile.getDescendantsOfKind(SyntaxKind.Parameter);
