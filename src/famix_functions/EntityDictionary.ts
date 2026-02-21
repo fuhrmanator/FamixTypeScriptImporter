@@ -1031,10 +1031,10 @@ export class EntityDictionary {
                         ancestor = this.createOrGetFamixType(typeAncestor.getText(), typeAncestor.getType(), typeAncestor as TSMorphTypeDeclaration);
                         // console.log('Ancestor not found in repo, creating it');
                     } else {
-                        console.log(`Found ancestor in famixRep: ${ancestor.fullyQualifiedName}`);
+                        // console.log(`Found ancestor in famixRep: ${ancestor.fullyQualifiedName}`);
                     }
                 } else {
-                    console.log(`No type ancestor found for ${typeName} - proceeding without container`);
+                    // console.log(`No type ancestor found for ${typeName} - proceeding without container`);
                 }
             }
     
@@ -1180,54 +1180,63 @@ export class EntityDictionary {
         return fmxType;
     }
 
-    /**
-     * Creates a Famix access
-     * @param node A node
-     * @param id An id of a parameter, a variable, a property or an enum member
-     */
-    public createFamixAccess(node: Identifier, id: number): void {
-        const fmxVar = this.famixRep.getFamixEntityById(id) as Famix.StructuralEntity;
-        if (!fmxVar) {
-            throw new Error(`Famix entity with id ${id} not found, for node ${node.getText()} in ${node.getSourceFile().getBaseName()} at line ${node.getStartLineNumber()}.`);
-        }
-    
-        logger.debug(`Creating FamixAccess. Node: [${node.getKindName()}] '${node.getText()}' at line ${node.getStartLineNumber()} in ${node.getSourceFile().getBaseName()}, id: ${id} refers to fmxVar '${fmxVar.fullyQualifiedName}'.`);
-    
-        const nodeReferenceAncestor = Helpers.findAncestor(node);
-        if (!nodeReferenceAncestor) {
-            logger.error(`No ancestor found for node '${node.getText()}'`);
-            return;
-        }
-    
-        const ancestorFullyQualifiedName = FQNFunctions.getFQN(nodeReferenceAncestor);
-        const accessor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
-        if (!accessor) {
-            logger.error(`Ancestor ${ancestorFullyQualifiedName} of kind ${nodeReferenceAncestor.getKindName()} not found.`);
-            return; // Bail out for now
-        } else {
-            logger.debug(`Found accessor to be ${accessor.fullyQualifiedName}.`);
-        }
-    
-        // Ensure accessor is a method, function, script, or module
-        if (!(accessor instanceof Famix.Method) && !(accessor instanceof Famix.ArrowFunction) && !(accessor instanceof Famix.Function) && !(accessor instanceof Famix.ScriptEntity) && !(accessor instanceof Famix.Module)) {
-            logger.error(`Accessor ${accessor.fullyQualifiedName} is not a method, function, etc.`);
-            return;
-        }
-    
-        // Avoid duplicates
-        const foundAccess = this.famixRep.getFamixAccessByAccessorAndVariable(accessor, fmxVar);
-        if (foundAccess) {
-            logger.debug(`FamixAccess already exists for accessor ${accessor.fullyQualifiedName} and variable ${fmxVar.fullyQualifiedName}.`);
-            return;
-        }
-    
-        const fmxAccess = new Famix.Access();
-        fmxAccess.accessor = accessor;
-        fmxAccess.variable = fmxVar;
-        this.famixRep.addElement(fmxAccess);
-        this.fmxElementObjectMap.set(fmxAccess, node);
-        logger.debug(`Created access: ${accessor.fullyQualifiedName} -> ${fmxVar.fullyQualifiedName}`);
+/**
+ * Creates a Famix access
+ * @param node A node
+ * @param id An id of a parameter, a variable, a property or an enum member
+ */
+public createFamixAccess(node: Identifier, id: number): void {
+    const fmxVar = this.famixRep.getFamixEntityById(id) as Famix.StructuralEntity;
+    if (!fmxVar) {
+        throw new Error(`Famix entity with id ${id} not found, for node ${node.getText()} in ${node.getSourceFile().getBaseName()} at line ${node.getStartLineNumber()}.`);
     }
+
+    logger.debug(`Creating FamixAccess. Node: [${node.getKindName()}] '${node.getText()}' at line ${node.getStartLineNumber()} in ${node.getSourceFile().getBaseName()}, id: ${id} refers to fmxVar '${fmxVar.fullyQualifiedName}'.`);
+
+    const nodeReferenceAncestor = Helpers.findAncestor(node);
+    if (!nodeReferenceAncestor) {
+        logger.error(`No ancestor found for node '${node.getText()}'`);
+        return;
+    }
+
+    const ancestorFullyQualifiedName = FQNFunctions.getFQN(nodeReferenceAncestor);
+    const accessor = this.famixRep.getFamixEntityByFullyQualifiedName(ancestorFullyQualifiedName) as Famix.ContainerEntity;
+    if (!accessor) {
+        logger.error(`Ancestor ${ancestorFullyQualifiedName} of kind ${nodeReferenceAncestor.getKindName()} not found.`);
+        return;
+    } else {
+        logger.debug(`Found accessor to be ${accessor.fullyQualifiedName}.`);
+    }
+
+    // Check if the accessor is a valid type (method, function, script, module, or class for specific cases)
+    if (!(accessor instanceof Famix.Method) && 
+        !(accessor instanceof Famix.ArrowFunction) && 
+        !(accessor instanceof Famix.Function) && 
+        !(accessor instanceof Famix.ScriptEntity) && 
+        !(accessor instanceof Famix.Module)) {
+        // Handle class-level accesses (e.g., decorators, DI)
+        if (accessor instanceof Famix.Class) {
+            logger.debug(`Skipping FamixAccess for class accessor ${accessor.fullyQualifiedName} (node: '${node.getText()}', parent: ${node.getParent()?.getKindName() || 'unknown'}). Likely decorator or DI reference.`);
+            return;
+        }
+        logger.error(`Accessor ${accessor.fullyQualifiedName} is not a method, function, etc.`);
+        return;
+    }
+
+    // Avoid duplicates
+    const foundAccess = this.famixRep.getFamixAccessByAccessorAndVariable(accessor, fmxVar);
+    if (foundAccess) {
+        logger.debug(`FamixAccess already exists for accessor ${accessor.fullyQualifiedName} and variable ${fmxVar.fullyQualifiedName}.`);
+        return;
+    }
+
+    const fmxAccess = new Famix.Access();
+    fmxAccess.accessor = accessor;
+    fmxAccess.variable = fmxVar;
+    this.famixRep.addElement(fmxAccess);
+    this.fmxElementObjectMap.set(fmxAccess, node);
+    logger.debug(`Created access: ${accessor.fullyQualifiedName} -> ${fmxVar.fullyQualifiedName}`);
+}
 
     /**
      * Creates a Famix invocation
