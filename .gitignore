@@ -147,3 +147,5 @@ doc-metamodel/*
 JSONModels/*
 PUMLModels/*
 .vscode/settings.json
+*.vsix
+.DS_Store

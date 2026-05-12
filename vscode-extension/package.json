@@ -1,5 +1,6 @@
 {
 	"name": "ts2famix-vscode-extension",
+	"publisher": "lidiia-makarchuk",
 	"description": "Real-time TypeScript model generation for FAMIX/Moose analysis. This extension automatically creates and updates FAMIX models of your TypeScript code as you make changes, eliminating manual model generation steps. The models can be imported into the Moose platform for advanced code analysis and visualization.",
 	"author": "Lidiia Makarchuk <makarchuk.lidiia@gmail.com>",
 	"contributors": [
@@ -10,7 +11,7 @@
 	"categories": [],
 	"keywords": [],
 	"engines": {
-		"vscode": "^1.99.0"
+		"vscode": "^1.94.0"
 	},
 	"activationEvents": [
 		"workspaceContains:**/tsconfig.json"
