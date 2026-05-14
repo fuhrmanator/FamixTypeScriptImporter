@@ -1,6 +1,6 @@
 import { context } from "esbuild";
 import process from "process";
-import { console } from "console";
+
 
 const production = process.argv.includes('--production');
 const watch = process.argv.includes('--watch');

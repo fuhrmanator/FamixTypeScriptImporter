@@ -7,7 +7,7 @@
 		"Christopher Fuhrman <christopher.fuhrman@etsmtl.ca>"
 	],
 	"license": "MIT",
-	"version": "0.0.1",
+	"version": "0.0.3",
 	"categories": [],
 	"keywords": [],
 	"engines": {
@@ -38,7 +38,7 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
+		"vscode:prepublish": "(cd client && node esbuild.js --production) && (cd server && node esbuild.mjs --production)",
 		"compile": "tsc -b",
 		"watch": "tsc -b -w",
 		"lint": "eslint",
