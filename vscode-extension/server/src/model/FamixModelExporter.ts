@@ -3,6 +3,7 @@ import {
 } from 'vscode-languageserver/node';
 import { FamixRepository } from 'ts2famix';
 import * as fs from "fs";
+import * as url from 'url';
 import path from 'path';
 import { getOutputFilePath } from '../utils';
 import { err, ok, Result } from 'neverthrow';
@@ -15,9 +16,15 @@ export class FamixModelExporter {
     }
 	
     public async exportModelToFile(famixRep: FamixRepository): Promise<Result<void, Error>> {
-        const jsonFilePath = await getOutputFilePath(this._connection);
+        let jsonFilePath = await getOutputFilePath(this._connection);
+        
         if (!jsonFilePath) {
-            return err(new Error('No output file path provided for model generation.'));
+            const folders = await this._connection.workspace.getWorkspaceFolders();
+            if (!folders || folders.length === 0) {
+                return err(new Error('No workspace folder found.'));
+            }
+            const workspaceRoot = url.fileURLToPath(folders[0].uri);
+            jsonFilePath = path.join(workspaceRoot, 'model.json');
         }
 
         const jsonOutput = famixRep.export({ format: "json" });

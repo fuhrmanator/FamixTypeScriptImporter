@@ -7,7 +7,7 @@
 		"Christopher Fuhrman <christopher.fuhrman@etsmtl.ca>"
 	],
 	"license": "MIT",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"categories": [],
 	"keywords": [],
 	"engines": {
@@ -18,14 +18,14 @@
 	],
 	"main": "./client/dist/extension",
 	"contributes": {
-    	"views": {
-        	"explorer": [
-            	{
-                	"id": "ts2famixModel",
-                	"name": "Famix Model"
-            	}
-        	]
-    	},
+		"views": {
+			"explorer": [
+				{
+					"id": "ts2famixModel",
+					"name": "Famix Model"
+				}
+			]
+		},
 		"commands": [
 			{
 				"command": "ts2famix.generateModelForProject",
