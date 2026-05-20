@@ -18,6 +18,14 @@
 	],
 	"main": "./client/dist/extension",
 	"contributes": {
+    	"views": {
+        	"explorer": [
+            	{
+                	"id": "ts2famixModel",
+                	"name": "Famix Model"
+            	}
+        	]
+    	},
 		"commands": [
 			{
 				"command": "ts2famix.generateModelForProject",
