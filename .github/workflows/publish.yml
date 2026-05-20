@@ -1,25 +1,25 @@
-name: Publish Package (npmjs)
+name: Publish VSCode Extension
 
 on:
   release:
-    types: [published]
+    types: [created]
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
-      # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
         with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm run build
-
-      # Publish to npm
-      - run: npm publish --access=public
+          node-version: 22
+      - name: Install and build
+        run: |
+          npm install
+          cd vscode-extension
+          npm install
+      - name: Publish to marketplace
+        run: |
+          cd vscode-extension
+          npx @vscode/vsce publish --allow-missing-repository --baseContentUrl https://github.com/Leoo-code/FamixTypeScriptImporter/blob/dev/vscode-extension
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
