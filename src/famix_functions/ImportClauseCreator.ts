@@ -91,11 +91,11 @@ export class ImportClauseCreator {
         const moduleSpecifier = this.getModuleSpecifierFromDeclaration(importDeclaration);
 
         // TODO: finish implementation
-        throw new Error("Not implemented");
+        return;
     }
 
     public ensureFamixImportClauseForImportEqualsDeclaration(importEqualsDeclaration: ImportEqualsDeclaration) {
-        throw new Error("Not implemented");
+        return;
     }
 
     private ensureImportedEntity = (namedEntityDeclaration: Node<ts.Node> | undefined, importedEntityDeclaration: Node<ts.Node>) => {

@@ -1,13 +1,9 @@
 .vscode/**
 .vscode-test/**
-src/**
-**/*.ts
-!dist/**
-node_modules/**
-server/node_modules/**
-client/node_modules/**
-**/.gitignore
-**/.eslintrc.json
+**/*.map
 **/tsconfig.json
 **/jest.config*
 **/coverage/**
+client/node_modules/**
+node_modules/**
+**/.gitignore

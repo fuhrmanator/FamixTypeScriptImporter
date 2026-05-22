@@ -13,6 +13,7 @@ async function main() {
         sourcesContent: false,
         platform: 'node',
         outfile: 'dist/server.js',
+        external: ['typescript'],
         logLevel: 'silent',
     });
     if (watch) { await ctx.watch(); }
