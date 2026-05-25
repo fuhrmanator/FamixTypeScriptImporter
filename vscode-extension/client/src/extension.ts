@@ -28,7 +28,15 @@ export async function activate(context: ExtensionContext) {
 
     const refreshModel = () => {
         const config = vscode.workspace.getConfiguration('ts2famix');
-        const modelPath = config.get<string>('FamixModelOutputFilePath', '');
+        let modelPath = config.get<string>('FamixModelOutputFilePath', '');
+    
+        if (!modelPath) {
+            const workspaceFolders = vscode.workspace.workspaceFolders;
+            if (workspaceFolders && workspaceFolders.length > 0) {
+                modelPath = path.join(workspaceFolders[0].uri.fsPath, 'model.json');
+            }
+        }
+    
         if (modelPath && fs.existsSync(modelPath)) {
             modelProvider.refresh(modelPath);
         }
