@@ -7,7 +7,7 @@
 		"Christopher Fuhrman <christopher.fuhrman@etsmtl.ca>"
 	],
 	"license": "MIT",
-	"version": "1.0.3",
+	"version": "1.1.0",
 	"categories": [],
 	"keywords": [],
 	"engines": {
@@ -33,10 +33,10 @@
 				"category": "ts2famix"
 			},
 			{
-        		"command": "ts2famix.showDiagram",
-        		"title": "Show Class Diagram",
-        		"category": "ts2famix"
-    		}
+				"command": "ts2famix.showDiagram",
+				"title": "Show Class Diagram",
+				"category": "ts2famix"
+			}
 		],
 		"configuration": {
 			"title": "Ts2Famix",
