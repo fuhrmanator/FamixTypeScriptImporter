@@ -31,7 +31,12 @@
 				"command": "ts2famix.generateModelForProject",
 				"title": "Generate Famix Model",
 				"category": "ts2famix"
-			}
+			},
+			{
+        		"command": "ts2famix.showDiagram",
+        		"title": "Show Class Diagram",
+        		"category": "ts2famix"
+    		}
 		],
 		"configuration": {
 			"title": "Ts2Famix",
