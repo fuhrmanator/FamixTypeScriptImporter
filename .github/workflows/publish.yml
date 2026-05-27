@@ -39,6 +39,10 @@ jobs:
           npm install
           cd vscode-extension
           npm install
+          cd server
+          npm cache clean --force
+          rm -rf node_modules/ts2famix
+          npm install
       - name: Publish to marketplace
         run: |
           cd vscode-extension
