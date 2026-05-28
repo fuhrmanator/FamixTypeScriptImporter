@@ -9,7 +9,7 @@
 		"strict": true,
 		"outDir": "./dist",
 		"rootDir": "./src",
-		"baseUrl": "./",
+		//"baseUrl": "./",
 		"skipLibCheck": true,
 		"isolatedModules": true,
 		"esModuleInterop": true,

@@ -8,10 +8,6 @@ export default {
             'ts-jest',
             {
                 tsconfig: {
-                    ignoreDeprecations: '6.0',
-                    baseUrl: './',
-                    module: 'node18',
-                    moduleResolution: 'nodenext',
                     strict: true,
                     esModuleInterop: true,
                     skipLibCheck: true,
