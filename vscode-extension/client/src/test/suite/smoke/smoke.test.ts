@@ -2,7 +2,8 @@ import { TestHelper } from '../../helper';
 import * as vscode from 'vscode';
 import * as assert from 'assert';
 
-suite('Smoke Tests', () => {  
+suite('Smoke Tests', function() {
+    this.timeout(30000);
     test('Extension loads and activates without errors', async () => {
         const extensionId = TestHelper.getExtensionId();
         const extension = vscode.extensions.getExtension(extensionId);

@@ -7,7 +7,15 @@ export default {
         '^.+\\.tsx?$': [
             'ts-jest',
             {
-                tsconfig: 'tsconfig.json',
+                tsconfig: {
+                    ignoreDeprecations: '6.0',
+                    baseUrl: './',
+                    module: 'node18',
+                    moduleResolution: 'nodenext',
+                    strict: true,
+                    esModuleInterop: true,
+                    skipLibCheck: true,
+                },
             },
         ],
     },
