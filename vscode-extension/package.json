@@ -7,11 +7,11 @@
 		"Christopher Fuhrman <christopher.fuhrman@etsmtl.ca>"
 	],
 	"license": "MIT",
-	"version": "1.0.0",
+	"version": "1.1.8",
 	"categories": [],
 	"keywords": [],
 	"engines": {
-		"vscode": "^1.94.0"
+		"vscode": "^1.75.1"
 	},
 	"activationEvents": [
 		"workspaceContains:**/tsconfig.json"
