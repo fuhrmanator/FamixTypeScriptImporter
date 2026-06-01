@@ -23,18 +23,17 @@ export class FamixModelExporter {
             if (!folders || folders.length === 0) {
                 return err(new Error('No workspace folder found.'));
             }
-            const workspaceRoot = url.fileURLToPath(folders[0].uri);
+            const workspaceRoot = folders[0].uri.replace(/^file:\/\/\//, '').replace(/^file:\/\//, '');
             jsonFilePath = path.join(workspaceRoot, 'model.json');
         }
 
         const jsonOutput = famixRep.export({ format: "json" });
-
         const outputDir = path.dirname(jsonFilePath);
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true });
         }
-
         await fs.promises.writeFile(jsonFilePath, jsonOutput);
         return ok();
     }
 }
+

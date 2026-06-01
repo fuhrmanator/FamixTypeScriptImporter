@@ -7,11 +7,7 @@ export default {
         '^.+\\.tsx?$': [
             'ts-jest',
             {
-                tsconfig: {
-                    strict: true,
-                    esModuleInterop: true,
-                    skipLibCheck: true,
-                },
+                tsconfig: 'tsconfig.json',
             },
         ],
     },
