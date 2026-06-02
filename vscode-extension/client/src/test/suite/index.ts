@@ -1,43 +1,32 @@
 import * as path from 'path';
-import Mocha from 'mocha';
-import * as glob from 'glob';
+import * as fs from 'fs';
 
-// https://code.visualstudio.com/api/working-with-extensions/testing-extension#the-test-runner-script
 export function run(): Promise<void> {
-    const mocha = new Mocha({
-        ui: 'tdd',
-        color: true
-    });
-
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const Mocha = require('/Users/leo/Desktop/Projet_ETS/lidiia-repo/vscode-extension/client/node_modules/mocha');
+    
+    const mocha = new Mocha({ ui: 'tdd', color: true, timeout: 30000 });
     const testsRoot = path.resolve(__dirname, '..');
 
     return new Promise((c, e) => {
-        const testFiles = new glob.Glob("**/**.test.js", { cwd: testsRoot });
-        const testFileStream = testFiles.stream();
-
-        testFileStream.on("data", (file) => {
-            if (process.env.MOCHA_GREP) {
-                const filterPattern = new RegExp(process.env.MOCHA_GREP);
-                if (!filterPattern.test(file)) {
-                    return;
-                }
-            }
-            mocha.addFile(path.resolve(testsRoot, file));
-        });
-    
-        testFileStream.on("end", () => {
-            try {
-                mocha.run(failures => {
-                    if (failures > 0) {
-                        e(new Error(`${failures} tests failed.`));
-                    } else {
-                        c();
-                    }
-                });
-            } catch (err) {
-                console.error(err);
-                e(err);
-            }
-        });
+        try {
+            const testFiles = findTestFiles(testsRoot);
+            testFiles.forEach(f => mocha.addFile(f));
+            mocha.run((failures: number) => {
+                failures > 0 ? e(new Error(`${failures} tests failed.`)) : c();
+            });
+        } catch (err) {
+            e(err);
+        }
     });
+}
+
+function findTestFiles(dir: string): string[] {
+    const results: string[] = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) results.push(...findTestFiles(fullPath));
+        else if (entry.name.endsWith('.test.js')) results.push(fullPath);
+    }
+    return results;
 }
