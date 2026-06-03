@@ -46,7 +46,9 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "(cd client && node esbuild.js --production) && (cd server && node esbuild.mjs --production)",
+		"vscode:prepublish": "npm run build:client && npm run build:server",
+		"build:client": "cd client && node esbuild.js --production",
+		"build:server": "cd server && node esbuild.mjs --production",
 		"compile": "tsc -b",
 		"watch": "tsc -b -w",
 		"lint": "eslint",
