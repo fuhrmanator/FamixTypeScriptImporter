@@ -42,11 +42,11 @@ export class Property extends StructuralEntity {
     public set isJavaScriptPrivate(value: boolean) {
         this._isJavaScriptPrivate = value;
     }
-    private _isDefinitelyAssigned!: boolean;
+    private _isDefinitelyAssigned: boolean = false;
 
-    private _isOptional!: boolean;
+    private _isOptional: boolean = false;
 
-    private _isJavaScriptPrivate!: boolean;
+    private _isJavaScriptPrivate: boolean = false;
 
     public get visibility() {
         return this._visibility;

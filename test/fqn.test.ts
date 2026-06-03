@@ -1,6 +1,8 @@
 import { Project, SyntaxKind } from 'ts-morph';
 import { getFQN } from '../src/fqn';
 
+// TODO: ⏳ Review if the test is still in a sync with a current solution.
+
 describe('getFQN functionality', () => {
     let project: Project;
     let sourceFile: ReturnType<Project['createSourceFile']>;

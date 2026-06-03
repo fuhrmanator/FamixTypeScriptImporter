@@ -4,6 +4,7 @@
   "description": "A TypeScript to JSON importer for Moose.",
   "main": "dist/ts2famix-cli.js",
   "scripts": {
+    "prepare": "tsc",
     "dev": "ts-node src/ts2famix-cli.ts",
     "debug": "node --inspect-brk node_modules/.bin/ts-node",
     "build": "tsc",
@@ -17,6 +18,14 @@
   },
   "bin": {
     "ts2famix": "dist/ts2famix-cli-wrapper.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./package.json": "./package.json"
   },
   "keywords": [
     "TypeScript",

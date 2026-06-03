@@ -1,7 +1,8 @@
 import { ArrowFunction, CallExpression, ClassDeclaration, ConstructorDeclaration, Decorator, EnumDeclaration, ExpressionWithTypeArguments, FunctionDeclaration, FunctionExpression, GetAccessorDeclaration, Identifier, ImportDeclaration, ImportEqualsDeclaration, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, Node, PropertyDeclaration, SetAccessorDeclaration, SourceFile, SyntaxKind, TypeParameterDeclaration, VariableDeclaration } from "ts-morph";
-import { entityDictionary, logger } from "./analyze";
+import { logger } from "./analyze";
 import path from "path";
 import { TSMorphTypeDeclaration } from "./famix_functions/EntityDictionary";
+import { convertToRelativePath } from "./famix_functions/helpers_path";
 
 type FQNNode = SourceFile | VariableDeclaration | ArrowFunction | Identifier | MethodDeclaration | MethodSignature | FunctionDeclaration | FunctionExpression | PropertyDeclaration | TSMorphTypeDeclaration | EnumDeclaration | ImportDeclaration | ImportEqualsDeclaration | CallExpression | GetAccessorDeclaration | SetAccessorDeclaration | ConstructorDeclaration | TypeParameterDeclaration | ClassDeclaration | InterfaceDeclaration | Decorator | ModuleDeclaration;
 
@@ -235,9 +236,8 @@ function buildMethodPositionMap(sourceFile: SourceFile): Map<number, number> {
  * @param node The AST node to generate an FQN for
  * @returns A string representing the node's FQN (e.g., "{path}.operations.add.compute[MethodDeclaration]")
  */
-export function getFQN(node: FQNNode | Node): string {
+export function getFQN(node: FQNNode | Node, absolutePathProject: string = ""): string {
     const sourceFile = node.getSourceFile();
-    const absolutePathProject = entityDictionary.famixRep.getAbsolutePath();
     const parts: string[] = [];
     let currentNode: Node | undefined = node;
 
@@ -365,7 +365,7 @@ export function getFQN(node: FQNNode | Node): string {
         currentNode = currentNode.getParent();
     }
 
-    let relativePath = entityDictionary.convertToRelativePath(
+    let relativePath = convertToRelativePath(
         path.normalize(sourceFile.getFilePath()),
         absolutePathProject
     ).replace(/\\/g, "/");
@@ -383,18 +383,17 @@ export function getFQN(node: FQNNode | Node): string {
 }
 
 
-export function getUniqueFQN(node: Node): string | undefined {
-    const absolutePathProject = entityDictionary.famixRep.getAbsolutePath();
+export function getUniqueFQN(node: Node, absolutePathProject: string = ""): string | undefined {
     const parts: string[] = [];
 
     if (node instanceof SourceFile) {
-        return entityDictionary.convertToRelativePath(path.normalize(node.getFilePath()), absolutePathProject).replace(/\\/g, "/");
+        return convertToRelativePath(path.normalize(node.getFilePath()), absolutePathProject).replace(/\\/g, "/");
     }
 
     let currentNode: Node | undefined = node;
     while (currentNode) {
         if (Node.isSourceFile(currentNode)) {
-            const relativePath = entityDictionary.convertToRelativePath(path.normalize(currentNode.getFilePath()), absolutePathProject).replace(/\\/g, "/");
+            const relativePath = convertToRelativePath(path.normalize(currentNode.getFilePath()), absolutePathProject).replace(/\\/g, "/");
             if (relativePath.includes("..")) {
                 logger.error(`Relative path contains ../: ${relativePath}`);
             }

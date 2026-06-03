@@ -1,9 +1,10 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
-import { Entity } from "./entity";
+import { FullyQualifiedNameEntity } from "../interfaces";
 import { Module } from "./module";
 import { NamedEntity } from "./named_entity";
+import { EntityWithSourceAnchor } from "./sourced_entity";
 
-export class ImportClause extends Entity {
+export class ImportClause extends EntityWithSourceAnchor implements FullyQualifiedNameEntity {
 
     private _importingEntity!: Module;
     private _importedEntity!: NamedEntity;
@@ -47,5 +48,9 @@ export class ImportClause extends Entity {
 
     set moduleSpecifier(moduleSpecifier: string) {
         this._moduleSpecifier = moduleSpecifier;
+    }
+
+    get fullyQualifiedName(): string {
+        return `${this.importingEntity.fullyQualifiedName} -> ${this.importedEntity.fullyQualifiedName}`;
     }
 }

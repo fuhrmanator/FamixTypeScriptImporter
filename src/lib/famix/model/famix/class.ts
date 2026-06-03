@@ -34,6 +34,12 @@ export class Class extends Type {
         }
     }
 
+    public removeSuperInheritance(superInheritance: Inheritance): void {
+        if (this._superInheritances.has(superInheritance)) {
+            this._superInheritances.delete(superInheritance);
+        }
+    }
+
     private _subInheritances: Set<Inheritance> = new Set();
 
     public addSubInheritance(subInheritance: Inheritance): void {
@@ -42,7 +48,12 @@ export class Class extends Type {
             subInheritance.superclass = this;
         }
     }
-
+    
+    public removeSubInheritance(subInheritance: Inheritance): void {
+        if (this._subInheritances.has(subInheritance)) {
+            this._subInheritances.delete(subInheritance);
+        }
+    }
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("Class", this);

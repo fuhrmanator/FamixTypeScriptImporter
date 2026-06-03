@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug ts2famix-cli",
+      "program": "${workspaceFolder}/src/ts2famix-cli.ts",
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      // NOTE: change this to your tsconfig.json path and output file path
+      "args": [
+        "--input",
+        "<your-path-here/tsconfig.json>",
+        "--output",
+        "${workspaceFolder}/<your-path-here/file-name.json>"
+      ],
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ],
+      "console": "integratedTerminal",
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+  ]
+}

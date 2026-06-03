@@ -5,10 +5,30 @@ import { Comment } from "./comment";
 import { SourceAnchor } from "./source_anchor";
 import { logger } from "../../../../analyze";
 
-export class SourcedEntity extends Entity {
+/**
+ * NOTE: Abstract class that encapsulates the sourceAnchor field.
+ * The sourceAnchor property was moved from SourcedEntity to this base class to allow
+ * its reuse in other entities that may need source anchoring, without inheriting all
+ * SourcedEntity properties. This separation enables more flexible composition and
+ * makes it possible to use instanceof checks to determine if an entity supports source anchoring.
+ */
+export abstract class EntityWithSourceAnchor extends Entity {
+    protected _sourceAnchor!: SourceAnchor;
+    get sourceAnchor() {
+        return this._sourceAnchor;
+    }
+
+    set sourceAnchor(sourceAnchor: SourceAnchor) {
+        if (this._sourceAnchor === undefined) {
+            this._sourceAnchor = sourceAnchor;
+            sourceAnchor.element = this;
+        }
+    }
+}
+
+export class SourcedEntity extends EntityWithSourceAnchor {
 
     private _isStub!: boolean;
-    private _sourceAnchor!: SourceAnchor;
     private _comments: Set<Comment> = new Set();
 
     public addComment(comment: Comment): void {
@@ -42,17 +62,6 @@ export class SourcedEntity extends Entity {
 
     set isStub(isStub: boolean) {
         this._isStub = isStub;
-    }
-
-    get sourceAnchor() {
-        return this._sourceAnchor;
-    }
-
-    set sourceAnchor(sourceAnchor: SourceAnchor) {
-        if (this._sourceAnchor === undefined) {
-            this._sourceAnchor = sourceAnchor;
-            sourceAnchor.element = this;
-        }
     }
 
     get comments() {

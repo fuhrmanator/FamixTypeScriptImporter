@@ -1,0 +1,10 @@
+.vscode/**
+.vscode-test/**
+**/*.map
+**/tsconfig.json
+**/jest.config*
+**/coverage/**
+client/node_modules/**
+node_modules/**
+**/.gitignore
+model.json

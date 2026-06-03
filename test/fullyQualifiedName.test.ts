@@ -1,6 +1,8 @@
 import { Block, Project, ReturnStatement, SyntaxKind } from 'ts-morph';
 import { getFQN } from '../src/fqn';
 
+// TODO: ⏳ Review if the test is still in a sync with a current solution.
+
 const project = new Project(
     {
         compilerOptions: {
