@@ -65,6 +65,31 @@ suite('Smoke Tests', () => {
         assert.ok(fs.existsSync(modelPath), 'model.json should exist after generation');
         fs.unlinkSync(modelPath);
     });
+    
+    test('Generates Famix model for a project like Emojiopoly', async function() {
+        this.timeout(30000);
+        const fs = require('fs');
+        const path = require('path');
+
+        const fixturePath = path.resolve(__dirname, '../../../../src/test/fixtures/project-with-emojiopoly-imports');
+        const modelPath = path.join(fixturePath, 'model.json');
+
+        if (fs.existsSync(modelPath)) {
+            fs.unlinkSync(modelPath);
+        }
+
+        const config = vscode.workspace.getConfiguration('ts2famix');
+        await config.update('FamixModelOutputFilePath', modelPath, vscode.ConfigurationTarget.Global);
+
+        await vscode.commands.executeCommand('ts2famix.generateModelForProject');
+        await new Promise(resolve => setTimeout(resolve, 8000));
+
+        assert.ok(fs.existsSync(modelPath), 'model.json should exist for Emojiopoly-like project');
+
+        if (fs.existsSync(modelPath)) {
+            fs.unlinkSync(modelPath);
+        }
+    });
 
     test('Generates Famix model for a project with external imports', async function() {
         this.timeout(30000);
