@@ -3,8 +3,7 @@ import * as fs from 'fs';
 
 export function run(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const Mocha = require('/Users/leo/Desktop/Projet_ETS/lidiia-repo/vscode-extension/client/node_modules/mocha');
-    
+    const Mocha = require(path.resolve(__dirname, '../../../node_modules/mocha'));
     const mocha = new Mocha({ ui: 'tdd', color: true, timeout: 30000 });
     const testsRoot = path.resolve(__dirname, '..');
 
