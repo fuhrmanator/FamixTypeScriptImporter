@@ -53,7 +53,7 @@
 		"watch": "tsc -b -w",
 		"lint": "eslint",
 		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-		"test:client": "npm run compile && node ./client/dist/test/runTest.js",
+		"test:client": "npm run compile && npx @vscode/vsce package --allow-missing-repository --baseContentUrl https://github.com/Leoo-code/FamixTypeScriptImporter/blob/dev/vscode-extension && node ./client/dist/test/runTest.js",
 		"test": "npm run compile && node ./client/dist/test/runTest.js && cd server && npm run test"
 	},
 	"devDependencies": {
