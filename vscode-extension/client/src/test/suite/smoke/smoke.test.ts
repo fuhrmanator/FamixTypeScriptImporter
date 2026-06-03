@@ -41,6 +41,53 @@ suite('Smoke Tests', () => {
         } catch (error) {
             assert.fail(`Failed to communicate with the server: ${error}`);
         }
-        
+    });
+    
+    test('Generates Famix model for a TypeScript project', async function() {
+        this.timeout(30000);
+        const fs = require('fs');
+        const path = require('path');
+
+        const fixturePath = path.resolve(__dirname, '../../../../src/test/fixtures/project-with-tsconfig');
+        const modelPath = path.join(fixturePath, 'model.json');
+
+        if (fs.existsSync(modelPath)) {
+            fs.unlinkSync(modelPath);
+        }
+        assert.ok(!fs.existsSync(modelPath), 'model.json should not exist before the test');
+
+        const config = vscode.workspace.getConfiguration('ts2famix');
+        await config.update('FamixModelOutputFilePath', modelPath, vscode.ConfigurationTarget.Global);
+
+        await vscode.commands.executeCommand('ts2famix.generateModelForProject');
+        await new Promise(resolve => setTimeout(resolve, 8000));
+
+        assert.ok(fs.existsSync(modelPath), 'model.json should exist after generation');
+        fs.unlinkSync(modelPath);
+    });
+
+    test('Generates Famix model for a project with external imports', async function() {
+        this.timeout(30000);
+        const fs = require('fs');
+        const path = require('path');
+
+        const fixturePath = path.resolve(__dirname, '../../../../src/test/fixtures/project-with-external-imports');
+        const modelPath = path.join(fixturePath, 'model.json');
+
+        if (fs.existsSync(modelPath)) {
+            fs.unlinkSync(modelPath);
+        }
+
+        const config = vscode.workspace.getConfiguration('ts2famix');
+        await config.update('FamixModelOutputFilePath', modelPath, vscode.ConfigurationTarget.Global);
+
+        await vscode.commands.executeCommand('ts2famix.generateModelForProject');
+        await new Promise(resolve => setTimeout(resolve, 8000));
+
+        assert.ok(fs.existsSync(modelPath), 'model.json should exist even with external imports');
+
+        if (fs.existsSync(modelPath)) {
+            fs.unlinkSync(modelPath);
+        }
     });
 });
