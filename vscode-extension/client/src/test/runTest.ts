@@ -26,7 +26,8 @@ async function main() {
                 workspacePath,
                 `--install-extension=${vsixFile}`,
                 '--disable-extensions',
-                '--disable-extension=Leo-maure.ts2famix-vscode-extension'
+                '--disable-extension=Leo-maure.ts2famix-vscode-extension',
+                '--user-data-dir=/tmp/vscode-test'
             ]
         });
     } catch (err) {
