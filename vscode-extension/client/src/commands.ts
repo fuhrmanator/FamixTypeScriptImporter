@@ -15,9 +15,10 @@ export const registerCommands = (context: vscode.ExtensionContext, client: Langu
                 const response = await client.sendRequest<ResponseMessage>(serverMethodName);
                 if (response && response.error) {
                     const code = response.error.code;
-                    const message = response.error.message || response.error.data;
+                    const message = String(response.error.message || response.error.data || 'Unknown error');
                     const data = response.error.data;
-                    vscode.window.showErrorMessage(`Failed to generate model [${code}]: ${message} — ${data}`);
+                    const detail = data && String(data) !== message ? ` — ${String(data)}` : '';
+                    vscode.window.showErrorMessage(`Failed to generate model [${code}]: ${message}${detail}`);
                 } else {
                     vscode.window.showInformationMessage('Successfully generated Famix model.');
                 }
