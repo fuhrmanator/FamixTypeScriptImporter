@@ -20,5 +20,5 @@
 		"composite": true,
 	},
 	"include": ["src"],
-	"exclude": ["node_modules", "../../node_modules", ".vscode-test", "./coverage", "src/test/fixtures"]
+	"exclude": ["node_modules", "../../node_modules", ".vscode-test", "./coverage"]
 }
