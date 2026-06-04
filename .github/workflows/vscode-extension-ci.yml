@@ -16,9 +16,12 @@ jobs:
           - ubuntu-latest
           - macos-latest
           - windows-latest
-        node-version: [20.x]
+        node-version: [22.x]
 
     name: Test VS Code Extension on ${{ matrix.os }}
+
+    env:
+      VSCODE_TEST_CMD: npm run test:vsix
 
     steps:
       - name: Checkout repository
@@ -37,20 +40,22 @@ jobs:
 
       - name: Install dependencies for the VS Code extension
         working-directory: ./vscode-extension
-        run: npm install
+        run: npm ci
 
       - name: Package VS Code extension
         working-directory: ./vscode-extension
         run: npx @vscode/vsce package --allow-missing-repository --baseContentUrl https://github.com/Leoo-code/FamixTypeScriptImporter/blob/dev/vscode-extension
 
+      # Linux runners are headless and have no display server, so Xvfb is needed to run VS Code tests.
       - name: Run VS Code extension tests (Linux)
         uses: coactions/setup-xvfb@v1
         if: runner.os == 'Linux'
         with:
-          run: npm run test:client
+          run: ${{ env.VSCODE_TEST_CMD }}
           working-directory: ./vscode-extension
 
+      # Windows and macOS runners have a native display server, so no Xvfb wrapper is needed.
       - name: Run VS Code extension tests (Windows/macOS)
         if: runner.os != 'Linux'
         working-directory: ./vscode-extension
-        run: npm run test:client
+        run: ${{ env.VSCODE_TEST_CMD }}
