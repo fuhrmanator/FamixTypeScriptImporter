@@ -8,16 +8,16 @@ import {
     resolveCliArgsFromVSCodeExecutablePath,
 } from '@vscode/test-electron';
 
-function findLatestVsix(vsixDir: string): string {
-    const vsixFiles = fs.readdirSync(vsixDir)
-        .filter(f => f.endsWith('.vsix'))
-        .sort();
+function findVsix(vsixDir: string): string {
+    // Derive the exact filename from package.json (same logic vsce uses)
+    const pkg = JSON.parse(fs.readFileSync(path.join(vsixDir, 'package.json'), 'utf-8'));
+    const vsixFile = path.resolve(vsixDir, `${pkg.name}-${pkg.version}.vsix`);
 
-    if (vsixFiles.length === 0) {
-        throw new Error('No .vsix file found. Run vsce package first.');
+    if (!fs.existsSync(vsixFile)) {
+        throw new Error(`Expected VSIX not found: ${vsixFile}\nRun vsce package first.`);
     }
 
-    return path.resolve(vsixDir, vsixFiles[vsixFiles.length - 1]);
+    return vsixFile;
 }
 
 function installVsix(
@@ -70,7 +70,7 @@ function installVsix(
 async function main() {
     try {
         const extensionRoot = path.resolve(__dirname, '../../..');
-        const vsixFile = findLatestVsix(extensionRoot);
+        const vsixFile = findVsix(extensionRoot);
         console.log(`\n[VSIX Test] Testing packaged extension: ${vsixFile}\n`);
 
         const workspacePath = path.resolve(
