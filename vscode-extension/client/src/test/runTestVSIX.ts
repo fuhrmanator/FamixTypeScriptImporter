@@ -110,8 +110,6 @@ async function main() {
             extensionTestsPath,
             launchArgs: [
                 workspacePath,
-                '--user-data-dir', userDataDir,
-                '--extensions-dir', extensionsDir,
             ],
         });
     } catch (err) {
