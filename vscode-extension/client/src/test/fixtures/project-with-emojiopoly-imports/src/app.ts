@@ -1,5 +1,5 @@
-import * as express from 'express';
-import * as _ from 'lodash';
+import express from 'express';
+import _ from 'lodash';
 
 export class App {
     private app: express.Application;
@@ -9,6 +9,7 @@ export class App {
     }
 
     start(): void {
+        _.noop();
         this.app.listen(3000);
     }
 }
