@@ -8,3 +8,9 @@ client/node_modules/**
 node_modules/**
 **/.gitignore
 model.json
+# ignore the src files (typescript source files)
+client/src/**
+server/src/**
+client/test-harness/**
+server/tests/**
+server/node_modules/**

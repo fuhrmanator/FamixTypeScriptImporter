@@ -1,0 +1,8 @@
+{
+  "name": "vscode-test-dummy",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "vscode": "^1.75.0"
+  }
+}

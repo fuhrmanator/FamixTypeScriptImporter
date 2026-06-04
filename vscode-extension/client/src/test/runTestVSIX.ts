@@ -36,8 +36,8 @@ function installVsix(
         '--force',
     ];
 
-    console.log(`VSIX install CLI: ${cliPath}`);
-    console.log(`VSIX install args: ${JSON.stringify(args)}`);
+    console.log(`[VSIX Test] Installing: ${vsixFile}`);
+    console.log(`[VSIX Test] To: ${extensionsDir}`);
 
     const result = cp.spawnSync(
         cliPath,
@@ -52,39 +52,34 @@ function installVsix(
     if (result.error) {
         throw new Error(
             `VSIX install failed to start: ${result.error.message}\n` +
-            `CLI: ${cliPath}\n` +
-            `Args: ${JSON.stringify(args)}`
+            `CLI: ${cliPath}`
         );
     }
 
     if (result.signal) {
-        throw new Error(
-            `VSIX install terminated by signal ${result.signal}\n` +
-            `CLI: ${cliPath}\n` +
-            `Args: ${JSON.stringify(args)}`
-        );
+        throw new Error(`VSIX install terminated by signal ${result.signal}`);
     }
 
     if (result.status !== 0) {
-        throw new Error(
-            `VSIX install failed with exit code ${result.status}\n` +
-            `CLI: ${cliPath}\n` +
-            `Args: ${JSON.stringify(args)}`
-        );
+        throw new Error(`VSIX install failed with exit code ${result.status}`);
     }
+
+    console.log(`[VSIX Test] Install successful`);
 }
 
 async function main() {
     try {
         const extensionRoot = path.resolve(__dirname, '../../..');
         const vsixFile = findLatestVsix(extensionRoot);
-        console.log(`Testing VSIX only: ${vsixFile}`);
+        console.log(`\n[VSIX Test] Testing packaged extension: ${vsixFile}\n`);
 
         const workspacePath = path.resolve(
             __dirname,
             '../../src/test/fixtures/project-with-tsconfig'
         );
-        const extensionTestsPath = path.resolve(__dirname, './suite/index');
+
+        // Point to index.ts which sets up mocha and discovers all test files
+        const extensionTestsPath = path.resolve(__dirname, './suite');
 
         const tmpBase = fs.mkdtempSync(path.join(os.tmpdir(), 'ts2famix-vsix-test-'));
         const userDataDir = path.join(tmpBase, 'user-data');
@@ -92,28 +87,47 @@ async function main() {
         fs.mkdirSync(userDataDir, { recursive: true });
         fs.mkdirSync(extensionsDir, { recursive: true });
 
+        console.log(`[VSIX Test] Isolated profile: ${tmpBase}\n`);
+
         const vscodeExecutablePath = await downloadAndUnzipVSCode('stable');
 
-        // Install only the packaged extension into an isolated profile.
+        // Install the packaged extension into isolated profile
         installVsix(vscodeExecutablePath, vsixFile, userDataDir, extensionsDir);
 
-        // Important: extensionDevelopmentPath points to a tiny harness extension,
-        // not your real source extension. This prevents source fallback.
-        const harnessExtensionPath = path.resolve(__dirname, '../../test-harness');
-
-        if (!fs.existsSync(path.join(harnessExtensionPath, 'package.json'))) {
-            throw new Error(`Harness extension not found at ${harnessExtensionPath}`);
+        // Critical: use a minimal dummy extension, NOT your real source
+        // This prevents VS Code from loading the source extension as fallback
+        const dummyExtensionPath = path.resolve(__dirname, '../../.vscode-test-dummy');
+        fs.mkdirSync(dummyExtensionPath, { recursive: true });
+        const dummyManifest = path.join(dummyExtensionPath, 'package.json');
+        if (!fs.existsSync(dummyManifest)) {
+            fs.writeFileSync(
+                dummyManifest,
+                JSON.stringify({
+                    name: 'vscode-test-dummy',
+                    version: '0.0.1',
+                    private: true,
+                    engines: { vscode: '^1.75.0' },
+                }, null, 2)
+            );
         }
+
+        console.log(`[VSIX Test] Running smoke tests against installed VSIX...\n`);
+
         await runTests({
             vscodeExecutablePath,
-            extensionDevelopmentPath: harnessExtensionPath,
+            extensionDevelopmentPath: dummyExtensionPath,
             extensionTestsPath,
             launchArgs: [
                 workspacePath,
+                '--user-data-dir', userDataDir,
+                '--extensions-dir', extensionsDir,
             ],
         });
+
+        console.log(`\n[VSIX Test] ✓ Smoke tests passed. Extension works in isolated environment.\n`);
+
     } catch (err) {
-        console.error(`Failed to run VSIX-only tests: ${err}`);
+        console.error(`\n[VSIX Test] ✗ Failed: ${err}\n`);
         process.exit(1);
     }
 }
