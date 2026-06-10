@@ -1,9 +1,9 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
-import { Entity } from "./entity";
+import { EntityWithSourceAnchor } from "./sourced_entity";
 import { Module } from "./module";
 import { NamedEntity } from "./named_entity";
 
-export class ImportClause extends Entity {
+export class ImportClause extends EntityWithSourceAnchor {
 
     private _importingEntity!: Module;
     private _importedEntity!: NamedEntity;

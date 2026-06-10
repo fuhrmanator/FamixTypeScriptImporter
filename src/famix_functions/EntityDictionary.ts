@@ -52,7 +52,9 @@ export class EntityDictionary {
     constructor() {
         this.famixRep.setFmxElementObjectMap(this.fmxElementObjectMap);      
     }
-
+    public getAbsolutePath(): string {
+        return this.famixRep.getAbsolutePath();
+    }   
     public addSourceAnchor(fmx: Famix.SourcedEntity, node: TSMorphObjectType): Famix.IndexedFileAnchor {
         const sourceAnchor: Famix.IndexedFileAnchor = new Famix.IndexedFileAnchor();
         let sourceStart, sourceEnd: number;

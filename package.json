@@ -2,7 +2,8 @@
   "name": "ts2famix",
   "version": "3.1.0",
   "description": "A TypeScript to JSON importer for Moose.",
-  "main": "dist/ts2famix-cli.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "dev": "ts-node src/ts2famix-cli.ts",
     "debug": "node --inspect-brk node_modules/.bin/ts-node",
@@ -66,5 +67,9 @@
   },
   "engines": {
     "node": ">=18.20.4"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./cli": "./dist/ts2famix-cli.js"
   }
 }

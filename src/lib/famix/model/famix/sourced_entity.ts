@@ -5,10 +5,19 @@ import { Comment } from "./comment";
 import { SourceAnchor } from "./source_anchor";
 import { logger } from "../../../../analyze";
 
-export class SourcedEntity extends Entity {
+export abstract class EntityWithSourceAnchor extends Entity {
+    protected _sourceAnchor!: SourceAnchor;
+    get sourceAnchor() {
+        return this._sourceAnchor;
+    }
+    set sourceAnchor(sourceAnchor: SourceAnchor) {
+        this._sourceAnchor = sourceAnchor;
+    }
+}
+
+export class SourcedEntity extends EntityWithSourceAnchor {
 
     private _isStub!: boolean;
-    private _sourceAnchor!: SourceAnchor;
     private _comments: Set<Comment> = new Set();
 
     public addComment(comment: Comment): void {
@@ -44,11 +53,7 @@ export class SourcedEntity extends Entity {
         this._isStub = isStub;
     }
 
-    get sourceAnchor() {
-        return this._sourceAnchor;
-    }
-
-    set sourceAnchor(sourceAnchor: SourceAnchor) {
+    override set sourceAnchor(sourceAnchor: SourceAnchor) {
         if (this._sourceAnchor === undefined) {
             this._sourceAnchor = sourceAnchor;
             sourceAnchor.element = this;

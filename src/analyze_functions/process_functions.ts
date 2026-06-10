@@ -24,7 +24,7 @@ const processedNodesWithTypeParams = new Set<number>(); // Set of nodes that hav
  * @param sourceFile A source file
  * @returns A boolean indicating if the file is a module
  */
-function isSourceFileAModule(sourceFile: SourceFile): boolean {
+export function isSourceFileAModule(sourceFile: SourceFile): boolean {
     return sourceFile.getImportDeclarations().length > 0 || sourceFile.getExportedDeclarations().size > 0;
 }
 
