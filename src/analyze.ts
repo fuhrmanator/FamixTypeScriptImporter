@@ -105,9 +105,9 @@ export class Importer {
      */
     public famixRepFromProject(project: Project): FamixRepository {
         //const sourceFileNames = project.getSourceFiles().map(f => f.getFilePath()) as Array<string>;
-
+        entityDictionary.reset(); 
         //const famixRep = this.famixRepFromPaths(sourceFileNames);
-
+        processFunctions.resetProcessFunctions();
         initFamixRep(project);
 
         this.processEntities(project);

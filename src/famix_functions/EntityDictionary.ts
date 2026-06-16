@@ -52,6 +52,26 @@ export class EntityDictionary {
     constructor() {
         this.famixRep.setFmxElementObjectMap(this.fmxElementObjectMap);      
     }
+    public reset(): void {
+    this.famixRep = new FamixRepository();
+    this.fmxElementObjectMap = new Map();
+    this.tsMorphElementObjectMap = new Map();
+    this.fmxAliasMap = new Map();
+    this.fmxClassMap = new Map();
+    this.fmxInterfaceMap = new Map();
+    this.fmxModuleMap = new Map();
+    this.fmxFileMap = new Map();
+    this.fmxTypeMap = new Map();
+    this.fmxPrimitiveTypeMap = new Map();
+    this.fmxFunctionAndMethodMap = new Map();
+    this.fmxArrowFunctionMap = new Map();
+    this.fmxParameterMap = new Map();
+    this.fmxVariableMap = new Map();
+    this.fmxImportClauseMap = new Map();
+    this.fmxEnumMap = new Map();
+    this.fmxInheritanceMap = new Map();
+    this.famixRep.setFmxElementObjectMap(this.fmxElementObjectMap);
+}
     public getAbsolutePath(): string {
         return this.famixRep.getAbsolutePath();
     }   

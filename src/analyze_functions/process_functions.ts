@@ -19,6 +19,15 @@ export const listOfExportMaps = new Array<ReadonlyMap<string, ExportedDeclaratio
 export let currentCC: { [key: string]: number }; // Stores the cyclomatic complexity metrics for the current source file
 const processedNodesWithTypeParams = new Set<number>(); // Set of nodes that have been processed and have type parameters
 
+export function resetProcessFunctions(): void {
+    methodsAndFunctionsWithId.clear();
+    accessMap.clear();
+    classes.length = 0;
+    interfaces.length = 0;
+    modules.length = 0;
+    listOfExportMaps.length = 0;
+}
+
 /**
  * Checks if the file has any imports or exports to be considered a module
  * @param sourceFile A source file
