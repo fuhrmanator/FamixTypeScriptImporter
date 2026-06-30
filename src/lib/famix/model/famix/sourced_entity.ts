@@ -53,6 +53,9 @@ export class SourcedEntity extends EntityWithSourceAnchor {
         this._isStub = isStub;
     }
 
+    override get sourceAnchor() {
+        return this._sourceAnchor;
+    }
     override set sourceAnchor(sourceAnchor: SourceAnchor) {
         if (this._sourceAnchor === undefined) {
             this._sourceAnchor = sourceAnchor;

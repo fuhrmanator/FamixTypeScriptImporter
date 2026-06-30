@@ -230,7 +230,8 @@ export class EntityDictionary {
             fmxIndexFileAnchor.startPos = 0;
             fmxIndexFileAnchor.endPos = 0;
         }
-
+        
+        famixElement.sourceAnchor = fmxIndexFileAnchor;
         this.famixRep.addElement(fmxIndexFileAnchor);
     }
 
@@ -381,7 +382,7 @@ export class EntityDictionary {
 
     /**
      * Creates or gets a Famix interface or parameterizable interface
-     * @param inter An interface
+     * @param inter An interfacex
      * @returns The Famix model of the interface
      */
     public createOrGetFamixInterface(inter: InterfaceDeclaration): Famix.Interface | Famix.ParametricInterface {
