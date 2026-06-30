@@ -4,7 +4,7 @@ import { calculate } from "../lib/ts-complex/cyclomatic-service";
 import * as fs from 'fs';
 import { logger, entityDictionary } from "../analyze";
 import { getFQN } from "../fqn";
-import { InvocableType } from "src/famix_functions/EntityDictionary";
+import { InvocableType } from "../famix_functions/EntityDictionary";
 
 export type AccessibleTSMorphElement = ParameterDeclaration | VariableDeclaration | PropertyDeclaration | EnumMember;
 export type FamixID = number;
