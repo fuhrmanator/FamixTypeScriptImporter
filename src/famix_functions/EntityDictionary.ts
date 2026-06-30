@@ -1705,6 +1705,7 @@ export class EntityDictionary {
                         });
             
                         if (createConcretisation) {
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             const fmxConcretisation : Famix.Concretisation = this.createFamixConcretisation(conEntity,genEntity);
                         }
                     }
@@ -1746,6 +1747,7 @@ export class EntityDictionary {
                         });
             
                         if (createConcretisation) {
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             const fmxConcretisation : Famix.Concretisation = this.createFamixConcretisation(conEntity,genEntity);
                         }
                     }
@@ -1794,6 +1796,7 @@ export class EntityDictionary {
                                 });
         
                                 if (createConcretisation) {
+                                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                     const fmxConcretisation : Famix.Concretisation = this.createFamixConcretisation(concElement,genElement);
                                 }
                             }
@@ -1833,6 +1836,7 @@ export class EntityDictionary {
                     });
             
                     if (createConcretisation) {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         const fmxConcretisation : Famix.Concretisation = this.createFamixConcretisation(conInterface,genInterface);
                     }
                 }
@@ -1860,7 +1864,9 @@ export class EntityDictionary {
                             throw new Error(`TypeReferenceNode not found for ${parentNode.getText()}`);
                         }
                         const typeReferenceNodeIsGeneric = typeReferenceNode.getTypeArguments().length > 0;
-                        if (typeReferenceNodeIsGeneric) { }
+                        if (typeReferenceNodeIsGeneric) { 
+                            logger.debug(`Found a generic type reference: ${typeReferenceNode.getText()}`);
+                        }
                         const args = typeReferenceNode.getTypeArguments();
                         const conParams = typeReferenceNode.getTypeArguments().map(param => param.getText());
                         if (!Helpers.arraysAreEqual(conParams, genParams)) {
@@ -1880,6 +1886,7 @@ export class EntityDictionary {
                             });
 
                             if (createConcretisation) {
+                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                 const fmxConcretisation: Famix.Concretisation = this.createFamixConcretisation(concElement, genElement);
                             }
                         }

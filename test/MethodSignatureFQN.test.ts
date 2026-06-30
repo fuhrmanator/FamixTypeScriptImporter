@@ -1,7 +1,8 @@
 import { Project, SyntaxKind } from 'ts-morph';
 import { getFQN } from '../src/fqn';
 import { Importer } from '../src/analyze';
-import * as Famix from '../src/lib/famix/model/famix';
+import { FamixRepository } from '../src/lib/famix/famix_repository';
+import * as Famix from "../src/lib/famix/model/famix";
 
 const project = new Project({
     compilerOptions: {
@@ -13,7 +14,7 @@ const project = new Project({
 describe('Method Signature FQN Generation with Return Type', () => {
     let sourceFile: ReturnType<Project['createSourceFile']>;
     let importer: Importer;
-    let fmxRep: any;
+    let fmxRep: FamixRepository;
 
     beforeAll(() => {
         sourceFile = project.createSourceFile('/SourceFile1.ts', `
@@ -56,7 +57,7 @@ describe('Method Signature FQN Generation with Return Type', () => {
 
         const famixMethod1 = fmxRep._getFamixMethod('{SourceFile1.ts}.Interface1.method1(string|symbol|Function|GenericType<TInput>):TOutput[MethodSignature]');
         expect(famixMethod1).toBeTruthy();
-        expect(famixMethod1.name).toBe('method1');
+        expect(famixMethod1!.name).toBe('method1');
     });
 
     it('should generate correct FQN for first method1 return type', () => {
@@ -67,7 +68,7 @@ describe('Method Signature FQN Generation with Return Type', () => {
         const returnTypeFQN = '{SourceFile1.ts}.Interface1.method1(string|symbol|Function|GenericType<TInput>):TOutput[ReturnType]';
         const famixReturnType = fmxRep.getFamixEntityByFullyQualifiedName(returnTypeFQN);
         expect(famixReturnType).toBeTruthy();
-        expect(famixReturnType.name).toBe('TOutput');
+        expect((famixReturnType! as Famix.Type).name).toBe('TOutput');
     });
 
     it('should generate correct FQN for second method1 signature', () => {
@@ -78,7 +79,7 @@ describe('Method Signature FQN Generation with Return Type', () => {
 
         const famixMethod2 = fmxRep._getFamixMethod('{SourceFile1.ts}.Interface1.2.method1(string|symbol|Function|GenericType<TInput>,{strict?:boolean;each?:false;}):TOutput[MethodSignature]');
         expect(famixMethod2).toBeTruthy();
-        expect(famixMethod2.name).toBe('method1');
+        expect(famixMethod2!.name).toBe('method1');
     });
 
     it('should generate correct FQN for second method1 return type', () => {
@@ -89,7 +90,7 @@ describe('Method Signature FQN Generation with Return Type', () => {
         const returnTypeFQN = '{SourceFile1.ts}.Interface1.2.method1(string|symbol|Function|GenericType<TInput>,{strict?:boolean;each?:false;}):TOutput[ReturnType]';
         const famixReturnType = fmxRep.getFamixEntityByFullyQualifiedName(returnTypeFQN);
         expect(famixReturnType).toBeTruthy();
-        expect(famixReturnType.name).toBe('TOutput');
+        expect((famixReturnType! as Famix.Type).name).toBe('TOutput');
     });
 
     it('should generate correct FQN for third method1 signature', () => {
@@ -100,7 +101,7 @@ describe('Method Signature FQN Generation with Return Type', () => {
 
         const famixMethod3 = fmxRep._getFamixMethod('{SourceFile1.ts}.Interface1.3.method1(string|symbol|Function|GenericType<TInput>,{strict?:boolean;each:true;}):TOutput[][MethodSignature]');
         expect(famixMethod3).toBeTruthy();
-        expect(famixMethod3.name).toBe('method1');
+        expect(famixMethod3!.name).toBe('method1');
     });
 
     it('should generate correct FQN for third method1 return type', () => {
@@ -111,7 +112,7 @@ describe('Method Signature FQN Generation with Return Type', () => {
         const returnTypeFQN = '{SourceFile1.ts}.Interface1.3.method1(string|symbol|Function|GenericType<TInput>,{strict?:boolean;each:true;}):TOutput[][ReturnType]';
         const famixReturnType = fmxRep.getFamixEntityByFullyQualifiedName(returnTypeFQN);
         expect(famixReturnType).toBeTruthy();
-        expect(famixReturnType.name).toBe('TOutput[]');
+        expect((famixReturnType! as Famix.Type).name).toBe('TOutput[]');
     });
 
     it('should generate correct FQN for method parameters', () => {
