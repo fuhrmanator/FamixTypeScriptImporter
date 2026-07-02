@@ -3,6 +3,7 @@ import { Class, Interface, Variable, Method, ArrowFunction, Function as FamixFun
 import * as Famix from "./model/famix";
 import { TSMorphObjectType } from "../../famix_functions/EntityDictionary";
 import { logger } from "../../analyze";
+import { EntityWithSourceAnchor } from "./model/famix/sourced_entity";
 
 /**
  * This class is used to store all Famix elements
@@ -285,4 +286,62 @@ export class FamixRepository {
         ret = ret.substring(0, ret.length - 1);
         return ret + "]";
     }
+public removeElements(entities: FamixBaseElement[]): void {
+    for (const entity of entities) {
+        this.elements.delete(entity);
+
+        if (entity instanceof Class) this.famixClasses.delete(entity);
+        else if (entity instanceof Interface) this.famixInterfaces.delete(entity);
+        else if (entity instanceof Module) this.famixModules.delete(entity);
+        else if (entity instanceof Variable) this.famixVariables.delete(entity);
+        else if (entity instanceof Method) this.famixMethods.delete(entity);
+        else if (entity instanceof FamixFunctionEntity || entity instanceof ArrowFunction) this.famixFunctions.delete(entity as any);
+        else if (entity instanceof ScriptEntity) this.famixFiles.delete(entity);
+
+        const tsObj = this.fmxElementObjectMap.get(entity as Famix.Entity);
+        if (tsObj) {
+            this.tsMorphObjectMap.delete(tsObj);
+            this.fmxElementObjectMap.delete(entity as Famix.Entity);
+        }
+    }
 }
+
+    public getImportClauses(): Famix.ImportClause[] {
+        return Array.from(this.elements.values()).filter(e => e instanceof Famix.ImportClause) as Famix.ImportClause[];
+    }
+
+    public getInheritances(): Famix.Inheritance[] {
+        return Array.from(this.elements.values()).filter(e => e instanceof Famix.Inheritance) as Famix.Inheritance[];
+    }
+private getElementsBySourceFile(sourceFile: string): FamixBaseElement[] {
+    return Array.from(this.elements.values()).filter(e => {
+        if (e instanceof EntityWithSourceAnchor && e.sourceAnchor instanceof Famix.IndexedFileAnchor) {
+            return e.sourceAnchor.fileName === sourceFile;
+        }
+        if (e instanceof Famix.IndexedFileAnchor) {
+            return e.fileName === sourceFile;
+        }
+        return false;
+    });
+}
+
+    public removeEntitiesBySourceFile(sourceFile: string): FamixBaseElement[] {
+        const entitiesToRemove = this.getElementsBySourceFile(sourceFile);
+        this.removeElements(entitiesToRemove);
+        this.removeRelatedAssociations(entitiesToRemove);
+        return entitiesToRemove;
+    }
+
+    public removeRelatedAssociations(entities: FamixBaseElement[]): void {
+        for (const entity of entities) {
+            if (entity instanceof Famix.Inheritance) {
+                entity.subclass.removeSuperInheritance(entity);
+                entity.superclass.removeSubInheritance(entity);
+            } else if (entity instanceof Famix.ImportClause) {
+                entity.importingEntity.removeOutgoingImport(entity);
+                entity.importedEntity.removeIncomingImport(entity);
+            }
+        }
+    }
+}
+

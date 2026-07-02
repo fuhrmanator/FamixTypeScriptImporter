@@ -44,6 +44,11 @@ export class Module extends ScriptEntity {
             importClause.importingEntity = this;  // opposite
         }
     }
+    removeOutgoingImport(importClause: ImportClause) {
+        if (this._outgoingImports.has(importClause)) {
+            this._outgoingImports.delete(importClause);
+        }
+    }
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("Module", this);

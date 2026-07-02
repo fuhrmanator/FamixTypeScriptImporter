@@ -1,7 +1,6 @@
 import * as Famix from "../lib/famix/model/famix";
 import { logger } from "../analyze";
-import { ConstructorDeclaration, Identifier, FunctionDeclaration, MethodDeclaration, MethodSignature, PropertyDeclaration, PropertySignature, VariableDeclaration, ParameterDeclaration, GetAccessorDeclaration, SetAccessorDeclaration, EnumMember, TypeAliasDeclaration, Node, SyntaxKind, FunctionExpression } from "ts-morph";
-import { TSMorphTypeDeclaration } from "./EntityDictionary";
+import { Identifier, Node, SyntaxKind } from "ts-morph";
 
 interface SearchParameters {
     searchArray: string[];
@@ -65,8 +64,7 @@ export function computeSignature(text: string): string {
  * @returns The ancestor of the node
  */
 export function findAncestor(node: Identifier): Node {
-    let ancestor: Node | undefined;
-    ancestor = node.getAncestors().find(a => 
+    const ancestor: Node | undefined = node.getAncestors().find(a => 
         a.getKind() === SyntaxKind.MethodDeclaration || 
         a.getKind() === SyntaxKind.Constructor || 
         a.getKind() === SyntaxKind.FunctionDeclaration || 
@@ -79,7 +77,7 @@ export function findAncestor(node: Identifier): Node {
     if (!ancestor) {
         throw new Error(`Ancestor not found for ${node.getText()}`);
     }
-    return ancestor
+    return ancestor;
 }
 
 /**
@@ -88,11 +86,10 @@ export function findAncestor(node: Identifier): Node {
  * @returns The ancestor of the ts-morph element
  */
 export function findTypeAncestor(element: Node): Node | undefined {
-    let ancestor: Node | undefined;
     const ancestors = element.getAncestors();
-    console.log(`Ancestors count: ${ancestors.length}`);
+    logger.info(`Ancestors count: ${ancestors.length}`);
 
-    ancestor = ancestors.find(a => {
+    const ancestor = ancestors.find(a => {
         const kind = a.getKind();
         const kindName = a.getKindName();
         return kind === SyntaxKind.MethodDeclaration ||
@@ -109,6 +106,7 @@ export function findTypeAncestor(element: Node): Node | undefined {
     });
 
     if (!ancestor) {
+        logger.error(`Type ancestor not found for ${element.getKindName()}`);
         throw new Error(`Type ancestor not found for ${element.getKindName()}`);
     } 
 

@@ -2,6 +2,7 @@ import { Project, SyntaxKind } from 'ts-morph';
 import { getFQN } from '../src/fqn';
 import { Importer } from '../src/analyze'; 
 import * as Famix from '../src/lib/famix/model/famix'; 
+import { FamixRepository } from '../src/lib/famix/famix_repository';
 
 const project = new Project({
     compilerOptions: {
@@ -13,7 +14,7 @@ const project = new Project({
 describe('Object Literal Index Signature FQN Generation', () => {
     let sourceFile: ReturnType<Project['createSourceFile']>;
     let importer: Importer;
-    let fmxRep: any;
+    let fmxRep: FamixRepository;
 
     beforeAll(() => {
         sourceFile = project.createSourceFile('/ObjectLiteralIndexSignatureFQN.ts', `
@@ -74,11 +75,11 @@ describe('Object Literal Index Signature FQN Generation', () => {
 
         const famixMethod1 = fmxRep._getFamixMethod('{ObjectLiteralIndexSignatureFQN.ts}.object1.1.method1[MethodDeclaration]');
         expect(famixMethod1).toBeTruthy();
-        expect(famixMethod1.name).toBe('method1');
+        expect(famixMethod1!.name).toBe('method1');
 
         const famixMethod2 = fmxRep._getFamixMethod('{ObjectLiteralIndexSignatureFQN.ts}.object1.1.method2[MethodDeclaration]');
         expect(famixMethod2).toBeTruthy();
-        expect(famixMethod2.name).toBe('method2');
+        expect(famixMethod2!.name).toBe('method2');
     });
 
     it('should generate correct FQN for string literal key methods', () => {
@@ -93,11 +94,11 @@ describe('Object Literal Index Signature FQN Generation', () => {
 
         const famixMethod3 = fmxRep._getFamixMethod('{ObjectLiteralIndexSignatureFQN.ts}.object1.keyString.method3[MethodDeclaration]');
         expect(famixMethod3).toBeTruthy();
-        expect(famixMethod3.name).toBe('method3');
+        expect(famixMethod3!.name).toBe('method3');
 
         const famixMethod4 = fmxRep._getFamixMethod('{ObjectLiteralIndexSignatureFQN.ts}.object1.keyString.method4[MethodDeclaration]');
         expect(famixMethod4).toBeTruthy();
-        expect(famixMethod4.name).toBe('method4');
+        expect(famixMethod4!.name).toBe('method4');
     });
 
     it('should generate correct FQN for computed property (string concat) method', () => {
@@ -108,7 +109,7 @@ describe('Object Literal Index Signature FQN Generation', () => {
 
         const famixMethod5 = fmxRep._getFamixMethod('{ObjectLiteralIndexSignatureFQN.ts}.object1.prefixKey.method5[MethodDeclaration]');
         expect(famixMethod5).toBeTruthy();
-        expect(famixMethod5.name).toBe('method5');
+        expect(famixMethod5!.name).toBe('method5');
     });
 
     it('should generate correct FQN for symbol key method', () => {
@@ -119,7 +120,7 @@ describe('Object Literal Index Signature FQN Generation', () => {
 
         const famixMethod6 = fmxRep._getFamixMethod('{ObjectLiteralIndexSignatureFQN.ts}.object1.key1.method6[MethodDeclaration]');
         expect(famixMethod6).toBeTruthy();
-        expect(famixMethod6.name).toBe('method6');
+        expect(famixMethod6!.name).toBe('method6');
     });
 
     it('should generate correct FQN for template literal key method', () => {
@@ -130,7 +131,7 @@ describe('Object Literal Index Signature FQN Generation', () => {
 
         const famixMethod7 = fmxRep._getFamixMethod('{ObjectLiteralIndexSignatureFQN.ts}.object1.template7.method7[MethodDeclaration]');
         expect(famixMethod7).toBeTruthy();
-        expect(famixMethod7.name).toBe('method7');
+        expect(famixMethod7!.name).toBe('method7');
     });
 
     it('should generate correct FQN for dynamic string variable key method', () => {
@@ -141,7 +142,7 @@ describe('Object Literal Index Signature FQN Generation', () => {
 
         const famixMethod8 = fmxRep._getFamixMethod('{ObjectLiteralIndexSignatureFQN.ts}.object1.varString.method8[MethodDeclaration]');
         expect(famixMethod8).toBeTruthy();
-        expect(famixMethod8.name).toBe('method8');
+        expect(famixMethod8!.name).toBe('method8');
     });
 
     it('should generate correct FQN for dynamic numeric variable key method', () => {
@@ -152,7 +153,7 @@ describe('Object Literal Index Signature FQN Generation', () => {
 
         const famixMethod9 = fmxRep._getFamixMethod('{ObjectLiteralIndexSignatureFQN.ts}.object1.42.method9[MethodDeclaration]');
         expect(famixMethod9).toBeTruthy();
-        expect(famixMethod9.name).toBe('method9');
+        expect(famixMethod9!.name).toBe('method9');
     });
 
     it('should have the correct number of methods in the Famix representation', () => {

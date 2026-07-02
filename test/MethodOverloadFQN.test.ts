@@ -2,6 +2,7 @@ import { Project, SyntaxKind } from 'ts-morph';
 import { getFQN } from '../src/fqn';
 import { Importer } from '../src/analyze';
 import * as Famix from '../src/lib/famix/model/famix';
+import { FamixRepository } from '../src/lib/famix/famix_repository';
 
 const project = new Project({
     compilerOptions: {
@@ -13,7 +14,7 @@ const project = new Project({
 describe('Method and Function Overload with Parameter FQN Generation', () => {
     let sourceFile: ReturnType<Project['createSourceFile']>;
     let importer: Importer;
-    let fmxRep: any;
+    let fmxRep: FamixRepository;
 
     beforeAll(() => {
         sourceFile = project.createSourceFile('/MethodOverloadFQN.ts', `
@@ -85,15 +86,15 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
 
         const famixMethod1_1 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace2.Class1.method1[MethodDeclaration]');
         expect(famixMethod1_1).toBeTruthy();
-        expect(famixMethod1_1.name).toBe('method1');
+        expect(famixMethod1_1!.name).toBe('method1');
 
         const famixMethod1_2 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace2.Class1.2.method1[MethodDeclaration]');
         expect(famixMethod1_2).toBeTruthy();
-        expect(famixMethod1_2.name).toBe('method1');
+        expect(famixMethod1_2!.name).toBe('method1');
 
         const famixMethod1_3 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace2.Class1.3.method1[MethodDeclaration]');
         expect(famixMethod1_3).toBeTruthy();
-        expect(famixMethod1_3.name).toBe('method1');
+        expect(famixMethod1_3!.name).toBe('method1');
     });
 
     it('should generate correct FQNs for interface methods in namespace Namespace2.Interface1', () => {
@@ -108,11 +109,11 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
 
         const famixMethod2_1 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace2.Interface1.method2(string):number[MethodSignature]');
         expect(famixMethod2_1).toBeTruthy();
-        expect(famixMethod2_1.name).toBe('method2');
+        expect(famixMethod2_1!.name).toBe('method2');
 
         const famixMethod2_2 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace2.Interface1.2.method2(number):number[MethodSignature]');
         expect(famixMethod2_2).toBeTruthy();
-        expect(famixMethod2_2.name).toBe('method2');
+        expect(famixMethod2_2!.name).toBe('method2');
     });
 
     it('should generate correct FQNs for parameters in Namespace2.Class1.method1', () => {
@@ -175,11 +176,11 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
 
         const famixMethod3_1 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace3.Class2.method3[MethodDeclaration]');
         expect(famixMethod3_1).toBeTruthy();
-        expect(famixMethod3_1.name).toBe('method3');
+        expect(famixMethod3_1!.name).toBe('method3');
 
         const famixMethod3_2 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace3.Class2.2.method3[MethodDeclaration]');
         expect(famixMethod3_2).toBeTruthy();
-        expect(famixMethod3_2.name).toBe('method3');
+        expect(famixMethod3_2!.name).toBe('method3');
     });
 
     it('should generate correct FQNs for parameters in Namespace3.Class2.method3', () => {
@@ -222,19 +223,19 @@ describe('Method and Function Overload with Parameter FQN Generation', () => {
 
         const famixMethod4_1 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace4.Class3.method4[MethodDeclaration]');
         expect(famixMethod4_1).toBeTruthy();
-        expect(famixMethod4_1.name).toBe('method4');
+        expect(famixMethod4_1!.name).toBe('method4');
 
         const famixMethod4_2 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace4.Class3.2.method4[MethodDeclaration]');
         expect(famixMethod4_2).toBeTruthy();
-        expect(famixMethod4_2.name).toBe('method4');
+        expect(famixMethod4_2!.name).toBe('method4');
 
         const famixMethod4_3 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace4.Class3.3.method4[MethodDeclaration]');
         expect(famixMethod4_3).toBeTruthy();
-        expect(famixMethod4_3.name).toBe('method4');
+        expect(famixMethod4_3!.name).toBe('method4');
 
         const famixMethod4_4 = fmxRep._getFamixMethod('{MethodOverloadFQN.ts}.Namespace4.Class3.4.method4[MethodDeclaration]');
         expect(famixMethod4_4).toBeTruthy();
-        expect(famixMethod4_4.name).toBe('method4');
+        expect(famixMethod4_4!.name).toBe('method4');
     });
 
     it('should generate correct FQNs for parameters in Namespace4.Class3.method4', () => {

@@ -25,6 +25,11 @@ export class NamedEntity extends SourcedEntity {
             anImport.importedEntity = this;  // opposite
         }
     }
+    public removeIncomingImport(anImport: ImportClause): void {
+        if (this._incomingImports.has(anImport)) {
+            this._incomingImports.delete(anImport);
+        }
+    }
 
     private _name!: string;
     private _aliases: Set<Alias> = new Set();

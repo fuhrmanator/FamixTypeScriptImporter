@@ -4,7 +4,7 @@ import tseslint from "typescript-eslint";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-    { ignores: [ "node_modules", "test_src", "src/lib" ] },
+    { ignores: [ "node_modules", "dist", "test_src", "src/lib" ] },
     {
         files: [ "**/*.{js,mjs,cjs,ts}" ],
         languageOptions: {

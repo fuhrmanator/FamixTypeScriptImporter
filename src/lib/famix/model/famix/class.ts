@@ -33,6 +33,12 @@ export class Class extends Type {
             superInheritance.subclass = this;
         }
     }
+    public removeSuperInheritance(superInheritance: Inheritance): void {
+        if (this._superInheritances.has(superInheritance)) {
+            this._superInheritances.delete(superInheritance);
+        }
+    }
+
 
     private _subInheritances: Set<Inheritance> = new Set();
 
@@ -42,6 +48,12 @@ export class Class extends Type {
             subInheritance.superclass = this;
         }
     }
+    public removeSubInheritance(subInheritance: Inheritance): void {
+        if (this._subInheritances.has(subInheritance)) {
+            this._subInheritances.delete(subInheritance);
+        }
+    }
+
 
 
     public getJSON(): string {
