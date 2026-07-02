@@ -299,13 +299,15 @@ export class FamixRepository {
     public getInheritances(): Famix.Inheritance[] {
         return Array.from(this.elements.values()).filter(e => e instanceof Famix.Inheritance) as Famix.Inheritance[];
     }
-    private getElementsBySourceFile(sourceFile: string): FamixBaseElement[] {
+private getElementsBySourceFile(sourceFile: string): FamixBaseElement[] {
     return Array.from(this.elements.values()).filter(e => {
-        if (e instanceof EntityWithSourceAnchor && e.sourceAnchor && e.sourceAnchor instanceof Famix.IndexedFileAnchor) {
+        if (e instanceof EntityWithSourceAnchor && e.sourceAnchor instanceof Famix.IndexedFileAnchor) {
             return e.sourceAnchor.fileName === sourceFile;
-        } else if (e instanceof Famix.IndexedFileAnchor) {
+        }
+        if (e instanceof Famix.IndexedFileAnchor) {
             return e.fileName === sourceFile;
         }
+        return false;
     });
 }
 
