@@ -56,13 +56,17 @@ const getTransientDependentAssociations = (
         processedFiles.add(file);
 
         importClauses.forEach(importClause => {
-            if (importClause.moduleSpecifier === file) {
+            const importedFileName = importClause.importedEntity.sourceAnchor instanceof IndexedFileAnchor
+                ? (importClause.importedEntity.sourceAnchor as IndexedFileAnchor).fileName
+                : undefined;
+
+            if (importClause.moduleSpecifier === file || importedFileName === file) {
                 transientDependentAssociations.add(importClause);
                 if (importClause.importedEntity.isStub) {
                     transientDependentAssociations.add(importClause.importedEntity);
                 }
 
-                const importingEntityFileName = (importClause.sourceAnchor as IndexedFileAnchor).fileName;
+                const importingEntityFileName = (importClause.importingEntity.sourceAnchor as IndexedFileAnchor).fileName;
 
                 if (!unprocessedFiles.has(importingEntityFileName) && !processedFiles.has(importingEntityFileName)) {
                     unprocessedFiles.add(importingEntityFileName);
