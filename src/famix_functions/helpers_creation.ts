@@ -87,7 +87,7 @@ export function findAncestor(node: Identifier): Node {
  */
 export function findTypeAncestor(element: Node): Node | undefined {
     const ancestors = element.getAncestors();
-    console.log(`Ancestors count: ${ancestors.length}`);
+    logger.info(`Ancestors count: ${ancestors.length}`);
 
     const ancestor = ancestors.find(a => {
         const kind = a.getKind();
@@ -106,6 +106,7 @@ export function findTypeAncestor(element: Node): Node | undefined {
     });
 
     if (!ancestor) {
+        logger.error(`Type ancestor not found for ${element.getKindName()}`);
         throw new Error(`Type ancestor not found for ${element.getKindName()}`);
     } 
 
