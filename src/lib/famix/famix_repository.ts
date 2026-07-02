@@ -286,11 +286,25 @@ export class FamixRepository {
         ret = ret.substring(0, ret.length - 1);
         return ret + "]";
     }
-    public removeElements(entities: FamixBaseElement[]): void {
-        for (const entity of entities) {
-            this.elements.delete(entity);
+public removeElements(entities: FamixBaseElement[]): void {
+    for (const entity of entities) {
+        this.elements.delete(entity);
+
+        if (entity instanceof Class) this.famixClasses.delete(entity);
+        else if (entity instanceof Interface) this.famixInterfaces.delete(entity);
+        else if (entity instanceof Module) this.famixModules.delete(entity);
+        else if (entity instanceof Variable) this.famixVariables.delete(entity);
+        else if (entity instanceof Method) this.famixMethods.delete(entity);
+        else if (entity instanceof FamixFunctionEntity || entity instanceof ArrowFunction) this.famixFunctions.delete(entity as any);
+        else if (entity instanceof ScriptEntity) this.famixFiles.delete(entity);
+
+        const tsObj = this.fmxElementObjectMap.get(entity as Famix.Entity);
+        if (tsObj) {
+            this.tsMorphObjectMap.delete(tsObj);
+            this.fmxElementObjectMap.delete(entity as Famix.Entity);
         }
     }
+}
 
     public getImportClauses(): Famix.ImportClause[] {
         return Array.from(this.elements.values()).filter(e => e instanceof Famix.ImportClause) as Famix.ImportClause[];
