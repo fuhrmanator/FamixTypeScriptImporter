@@ -20,12 +20,11 @@ export const getSourceFilesToUpdate = (
     ];
 
     const dependentFileNames = getDependentSourceFileNames(dependentAssociations);
-    const dependentFileNamesToAdd = Array.from(dependentFileNames)
-        .map(fileName => getFamixIndexFileAnchorFileName(fileName, projectBaseUrl))
-        .filter(
-            fileName => !Array.from(sourceFileChangeMap.values())
-            .flat().some(sourceFile => sourceFile.getFilePath() === fileName));
-
+const dependentFileNamesToAdd = Array.from(dependentFileNames)
+    .map(fileName => getFamixIndexFileAnchorFileName(fileName, projectBaseUrl))
+    .filter(fileName => !Array.from(sourceFileChangeMap.values())
+        .flat()
+        .some(sourceFile => getFamixIndexFileAnchorFileName(sourceFile.getFilePath(), projectBaseUrl) === fileName));
     const dependentFiles = allSourceFiles.filter(
         sourceFile => {
             const filePath = getFamixIndexFileAnchorFileName(sourceFile.getFilePath(), projectBaseUrl);
