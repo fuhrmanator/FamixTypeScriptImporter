@@ -26,6 +26,7 @@ export function resetProcessFunctions(): void {
     interfaces.length = 0;
     modules.length = 0;
     listOfExportMaps.length = 0;
+    processedNodesWithTypeParams.clear();
 }
 
 /**
