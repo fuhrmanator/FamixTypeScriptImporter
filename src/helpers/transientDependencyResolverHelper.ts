@@ -92,8 +92,8 @@ const getOtherTransientDependencies = (
 
     if (importedEntity instanceof Class || importedEntity instanceof Interface || importedEntity.isStub) {
         inheritances.forEach(inheritance => {
-            const doesInheritanceContainImportedEntity = inheritance.superclass === importClause.importedEntity && 
-                importingEntityFileName === (inheritance.sourceAnchor as IndexedFileAnchor).fileName;
+            const doesInheritanceContainImportedEntity = inheritance.superclass === importClause.importedEntity &&
+                importingEntityFileName === (inheritance.subclass.sourceAnchor as IndexedFileAnchor).fileName;
 
             if (doesInheritanceContainImportedEntity) {
                 transientDependentAssociations.add(inheritance);
@@ -101,7 +101,7 @@ const getOtherTransientDependencies = (
                 transientDependentAssociations.add(inheritance);
                 transientDependentAssociations.add(inheritance.superclass);
             }
-        });                
+        });
     }
 
     // TODO: find the other associations (access, invocation) between the imported entity and the sourceFile
