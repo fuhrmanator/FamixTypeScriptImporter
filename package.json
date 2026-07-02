@@ -33,7 +33,7 @@
   "bugs": {
     "url": "https://github.com/fuhrmanator/FamixTypeScriptImporter/issues"
   },
-  "homepage": "https://github.com/fuhrmanator/FamixTypeScriptImporter?tab=readme-ov-file#famixtypescriptimporter",
+  "homepage": "https://github.com/fuhrmanator/FamixTypeScriptImporter#readme",
   "nodemonConfig": {
     "ignore": [
       "dist/*"
