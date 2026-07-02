@@ -6,12 +6,13 @@ export * from './helpers';
 
 import { Project } from 'ts-morph';
 import { logger } from "./analyze";
-logger.info('Initializing ts-morph project');
+
 export const getTsMorphProject = (tsConfigFilePath: string, baseUrl: string) => {
+    logger.info('Initializing ts-morph project');
     return new Project({
         tsConfigFilePath,
         compilerOptions: {
-            baseUrl: baseUrl,
+            baseUrl,
         }
     });// le main doit etre le point de départ
 };
