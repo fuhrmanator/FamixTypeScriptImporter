@@ -98,8 +98,8 @@ export const removeDependentAssociations = (
             association.superclass.removeSubInheritance(association);
             association.subclass.removeSuperInheritance(association);
         } else if (association instanceof ImportClause) {
-            association.importedEntity.incomingImports.delete(association);
-            association.importingEntity.outgoingImports.delete(association);
+            association.importedEntity.removeIncomingImport(association);
+            association.importingEntity.removeOutgoingImport(association);
         }
     });
 };
