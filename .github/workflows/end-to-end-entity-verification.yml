@@ -1,8 +1,8 @@
 name: TypeScript Analysis with Moose
 
 on:
-  # push:
-  #   branches: [ main ]
+  push:
+    branches: [ taha-dev ]
   # pull_request:
   #   branches: [ main ]
   workflow_dispatch:
