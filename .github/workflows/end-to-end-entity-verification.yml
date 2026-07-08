@@ -1,0 +1,62 @@
+name: TypeScript Analysis with Moose
+
+on:
+  # push:
+  #   branches: [ main ]
+  # pull_request:
+  #   branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install ts2famix
+        run: npm install -g ts2famix
+
+      - name: Generate Famix model (JSON)
+        run: |
+          # -l 4 is log warnings only
+          ts2famix -l 4 -i tsconfig.json -o model.json
+          echo "Model generated: $(wc -c < model.json) bytes"
+          # Quick verification that the JSON is valid
+          python3 -c "import json; json.load(open('model.json')); print('JSON valid')"
+
+      # Install Pharo/Moose
+      - name: Install smalltalkCI (Moose image)
+        uses: hpi-swa/setup-smalltalkCI@v1
+        id: smalltalkci
+        with:
+          # Moose64-12 = Moose on Pharo 12, compatible with FamixTypeScript
+          smalltalk-image: Moose64-12
+
+      # Load FamixTypeScript metamodel and run analysis
+      - name: Load FamixTypeScript and export CSV metrics
+        run: |
+          # the .ston file loads the metamodel and runs a script to do analysis (see .ston file fore more info)
+          smalltalkci -s ${{ steps.smalltalkci.outputs.smalltalk-image }} .github/moose-analysis.ston
+        shell: bash
+        timeout-minutes: 20
+
+      - name: Upload metrics artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: export-metrics
+          path: export_metrics.md
+          if-no-files-found: error
