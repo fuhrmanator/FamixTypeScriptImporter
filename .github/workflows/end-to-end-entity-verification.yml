@@ -27,6 +27,9 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Install project dependencies
+        run: npm install
+
       - name: Install ts2famix
         run: npm install -g ts2famix
 
@@ -47,16 +50,21 @@ jobs:
           smalltalk-image: Moose64-12
 
       # Load FamixTypeScript metamodel and run analysis
-      - name: Load FamixTypeScript and export CSV metrics
+      - name: Load FamixTypeScript and export metrics
         run: |
           # the .ston file loads the metamodel and runs a script to do analysis (see .ston file fore more info)
           smalltalkci -s ${{ steps.smalltalkci.outputs.smalltalk-image }} .github/moose-analysis.ston
         shell: bash
         timeout-minutes: 20
 
+      - name: Run ts-morph and Famix count comparison
+        run: bash .github/run-count-comparison.sh
+
       - name: Upload metrics artifact
         uses: actions/upload-artifact@v4
         with:
           name: export-metrics
-          path: moose-counts.json
+          path: |
+            moose-counts.json
+            .github/tsmorph-counts.json
           if-no-files-found: error

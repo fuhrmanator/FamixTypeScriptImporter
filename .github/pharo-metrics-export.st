@@ -40,7 +40,7 @@ modelFile readStreamDo: [ :readStream |
 Transcript show: 'Model loaded.'; cr.
 
 "--- 3. Extract Entity Counts ---"
- counts := Dictionary new.
+counts := Dictionary new.
 
 
 "Modules / source files"

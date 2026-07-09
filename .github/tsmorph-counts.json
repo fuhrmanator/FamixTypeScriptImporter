@@ -1,0 +1,13 @@
+{
+  "modules": 62,
+  "classes": 47,
+  "interfaces": 1,
+  "methods": 213,
+  "functions": 75,
+  "accesses": 3395,
+  "invocations": 2239,
+  "inheritances": 42,
+  "concretisations": 0,
+  "imports": 254,
+  "exports": 47
+}
