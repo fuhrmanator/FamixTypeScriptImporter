@@ -14,12 +14,12 @@ SmalltalkCISpec {
     },
     #failOnZeroTests : false
   },
-  #preTesting : SCICustomScript {
+  #preTesting : [
     SCICustomScript {
       #path : 'pharo-metrics-export.st'
     },
     SCICustomScript {
       #path : 'count-moose-entities.st'
     }
-  }
+  ]
 }
