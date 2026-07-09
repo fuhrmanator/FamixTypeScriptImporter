@@ -2,7 +2,7 @@
 "Pharo Script - Export metrics from FamixTypeScript model to Markdown"
 "  it is better to test this script in a Playground if you modify it"
 "============================================================"
-| modelFile model classes stream writer srcDir |
+| modelFile model classes stream writer srcDir counts json |
 
 "--- 1. Locate the model.json file ---"
 "First, search in the current directory,"
@@ -39,43 +39,85 @@ modelFile readStreamDo: [ :readStream |
 ].
 Transcript show: 'Model loaded.'; cr.
 
-"--- 3. Extract Metrics ---"
-"allModelClasses returns all FamixTypeScriptClass entities."
-classes := model allModelClasses.
-Transcript show: 'Classes found: ', classes size printString; cr.
+"--- 3. Extract Entity Counts ---"
+ counts := Dictionary new.
 
-"Opening the .md file for writing."
-stream := './export_metrics.md' asFileReference writeStream.
 
-stream nextPutAll: 'Current working directory: '; nextPutAll: FileSystem workingDirectory pathString; cr; cr.
+"Modules / source files"
+counts
+    at: 'modules'
+    put: model allSourceFiles size.
 
-srcDir := './src' asFileReference.
 
-srcDir exists ifTrue: [
-    stream nextPutAll: 'Files in src/ directory:'; cr.
-    srcDir entries do: [ :entry |
-        entry isFile ifTrue: [
-            stream nextPutAll: '- '; nextPutAll: entry name; cr.
-        ].
-    ].
-    stream cr.
-] ifFalse: [
-    stream nextPutAll: 'src/ directory not found'; cr; cr.
-].
+"Classes"
+counts
+    at: 'classes'
+    put: (model allWithType: FamixTypeScriptClass) size.
 
-stream nextPutAll: 'There are '; nextPutAll: classes size asString; nextPutAll: ' classes  '; cr; cr.
 
-"Produce a markdown table."
-stream nextPutAll: '| Class | Methods | Attributes | Lines of Code |'; cr.
-stream nextPutAll: '|-------|---------|------------|---------------|'; cr.
-classes do: [ :each |
-    stream nextPutAll: '| '; nextPutAll: each name; nextPutAll: ' | ';
-        nextPutAll: each numberOfMethods asString; nextPutAll: ' | ';
-        nextPutAll: each numberOfAttributes asString; nextPutAll: ' | ';
-        nextPutAll: each numberOfLinesOfCode asString; nextPutAll: ' |';
-        cr.
-].
+"Interfaces"
+counts
+    at: 'interfaces'
+    put: (model allWithType: FamixTypeScriptInterface) size.
 
-stream close.
 
-Transcript show: 'Export complete - export_metrics.md'; cr.
+"Methods"
+counts
+    at: 'methods'
+    put: (model allWithType: FamixTypeScriptMethod) size.
+
+
+"Functions"
+counts
+    at: 'functions'
+    put: (model allWithType: FamixTypeScriptFunction) size.
+
+
+"Accesses"
+counts
+    at: 'accesses'
+    put: (model allWithType: FamixTypeScriptAccess) size.
+
+
+"Invocations"
+counts
+    at: 'invocations'
+    put: (model allWithType: FamixTypeScriptInvocation) size.
+
+
+"Inheritance relationships"
+counts
+    at: 'inheritances'
+    put: (model allWithType: FamixTypeScriptInheritance) size.
+
+
+"Interface implementations"
+counts
+    at: 'concretisations'
+    put: (model allWithType: FamixTypeScriptConcretisation) size.
+
+
+"Imports"
+counts
+    at: 'imports'
+    put: (model allWithType: FamixTypeScriptImport) size.
+
+
+"Exports"
+counts
+    at: 'exports'
+    put: (model allWithType: FamixTypeScriptExport) size.
+
+
+
+json := NeoJSONWriter toString: counts.
+
+
+(FileLocator workingDirectory / 'moose-counts.json')
+    writeStreamDo: [ :stream |
+        stream nextPutAll: json ].
+
+
+Transcript
+    show: 'Moose entity counts exported';
+    cr.
