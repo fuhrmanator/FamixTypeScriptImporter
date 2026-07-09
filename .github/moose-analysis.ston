@@ -14,12 +14,7 @@ SmalltalkCISpec {
     },
     #failOnZeroTests : false
   },
-  #preTesting : [
-    SCICustomScript {
-      #path : 'pharo-metrics-export.st'
-    },
-    SCICustomScript {
-      #path : 'count-moose-entities.st'
-    }
-  ]
+  #preTesting : SCICustomScript {
+    #path : 'pharo-metrics-export.st'
+  }
 }
