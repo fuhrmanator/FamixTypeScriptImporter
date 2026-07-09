@@ -93,13 +93,8 @@ counts
 "Imports"
 counts
     at: 'imports'
-    put: (model allWithType: FamixTypeScriptImport) size.
+    put: (model allWithType: FamixTypeScriptImportClause) size.
 
-
-"Exports"
-counts
-    at: 'exports'
-    put: (model allWithType: FamixTypeScriptExport) size.
 
 
 
