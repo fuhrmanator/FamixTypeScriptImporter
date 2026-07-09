@@ -15,6 +15,6 @@ SmalltalkCISpec {
     #failOnZeroTests : false
   },
   #preTesting : SCICustomScript {
-    #path : 'pharo-metrics-export.st'
+    #path : 'count-moose-entities.st'
   }
 }
