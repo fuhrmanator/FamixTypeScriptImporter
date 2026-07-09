@@ -90,15 +90,6 @@ counts
     at: 'inheritances'
     put: (model allWithType: FamixTypeScriptInheritance) size.
 
-
-"Interface implementations"
-counts
-    at: 'concretisations'
-    (Smalltalk includesKey: #FamixTypeScriptConcretisation)
-        ifTrue: [ counts at: 'concretisations' put: (model allWithType: (Smalltalk at: #FamixTypeScriptConcretisation)) size ]
-        ifFalse: [ counts at: 'concretisations' put: (model allSelect: [ :e | (e class name asString includesSubstring: 'Concretisation') ]) size ].
-
-
 "Imports"
 counts
     at: 'imports'
