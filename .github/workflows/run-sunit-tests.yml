@@ -48,7 +48,4 @@ jobs:
           smalltalk-image: 'Moose64-12'
       - run: smalltalkci -s ${{ steps.smalltalkci.outputs.smalltalk-image }} .github/pharo-setup.smalltalk.ston
         shell: bash
-        timeout-minutes: 15 
-
-      - name: Setup upterm session
-        uses: owenthereal/action-upterm@v1
+        timeout-minutes: 15
