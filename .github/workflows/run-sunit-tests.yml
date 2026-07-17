@@ -41,14 +41,14 @@ jobs:
           echo "MODEL_JSON_PATH=$OUTPUT_PATH" >> $GITHUB_ENV
 
       # 5. Set up smalltalk-ci and run the tests using Moose 12
-      # - name: Run Pharo/Moose Tests
-      #   uses: hpi-swa/setup-smalltalkCI@v1
-      #   id: smalltalkci
-      #   with:
-      #     smalltalk-image: 'Moose64-12'
-      # - run: smalltalkci -s ${{ steps.smalltalkci.outputs.smalltalk-image }} .github/pharo-setup.smalltalk.ston
-      #   shell: bash
-      #   timeout-minutes: 15 
+      - name: Run Pharo/Moose Tests
+        uses: hpi-swa/setup-smalltalkCI@v1
+        id: smalltalkci
+        with:
+          smalltalk-image: 'Moose64-12'
+      - run: smalltalkci -s ${{ steps.smalltalkci.outputs.smalltalk-image }} .github/pharo-setup.smalltalk.ston
+        shell: bash
+        timeout-minutes: 15 
 
       - name: Setup upterm session
         uses: owenthereal/action-upterm@v1
