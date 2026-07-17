@@ -1,0 +1,45 @@
+name: Pharo/Moose Tests
+
+on:
+  push:
+    branches: [ master, pharo-tests-ci ]
+  pull_request:
+    branches: [ master, pharo-tests-ci ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout ts2famix repository
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref }}
+
+      # 3. Set up Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          # cache: 'npm'
+
+      # 4. Use npx to install ts2famix and generate the model.json from your src/ folder
+      - name: Generate Model JSON
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/.github/ImporterSampleProject/JSONModels
+          OUTPUT_PATH="$GITHUB_WORKSPACE/.github/ImporterSampleProject/JSONModels/model.json"
+
+          npx ts2famix -i $GITHUB_WORKSPACE/.github/ImporterSampleProject/tsconfig.json -o $OUTPUT_PATH
+
+          echo "MODEL_JSON_PATH=$OUTPUT_PATH" >> $GITHUB_ENV
+
+      # 5. Set up smalltalk-ci and run the tests using Moose 12
+      - name: Run Pharo/Moose Tests
+        uses: hpi-swa/setup-smalltalkCI@v1
+        id: smalltalkci
+        with:
+          smalltalk-image: 'Moose64-12'
+      - run: smalltalkci -s ${{ steps.smalltalkci.outputs.smalltalk-image }} .github/pharo-setup.smalltalk.ston
+        shell: bash
+        timeout-minutes: 15 
