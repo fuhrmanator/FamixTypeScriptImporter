@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    name: Run Pharo/Moose Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -17,12 +18,17 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      # 3. Set up Node.js environment
+      # 2. Set up Node.js environment
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
           node-version: '22'
           # cache: 'npm'
+
+      # 3. Install dependencies
+      - name: Build and Install Dependencies
+        run: npm ci
+      - run: npm run build
 
       # 4. Use npx to install ts2famix and generate the model.json from your src/ folder
       - name: Generate Model JSON
