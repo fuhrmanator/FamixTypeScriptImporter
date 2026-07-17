@@ -1,0 +1,14 @@
+{
+  "name": "ts2famix-sample",
+  "version": "1.0.0",
+  "description": "A small TypeScript project exercising a broad range of language constructs, meant as a fixture for testing ts2famix / Famix import in Pharo.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.11.0"
+  }
+}
