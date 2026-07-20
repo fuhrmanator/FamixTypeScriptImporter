@@ -2,7 +2,6 @@
   "collectCoverage": false,
   "coverageDirectory": "coverage",
   "coverageProvider": "babel",
-  "forceExit": true,
   "maxWorkers": "50%",
   "transform": {
     "^.+\\.tsx?$": ["ts-jest", { }]
