@@ -1,0 +1,12 @@
+SmalltalkCISpec {
+  #loading : [
+    SCIMetacelloLoadSpec {
+      #baseline : 'FamixTypeScriptImporterTests',
+      #repository : 'github://MTahaCode/FamixTypeScriptImporterTests/master',
+      #platforms : [ #pharo ]
+    }
+  ],
+  #testing : {
+    #packages : [ 'Famix-TypeScript-Importer-Tests' ]
+  }
+}
