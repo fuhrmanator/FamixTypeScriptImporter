@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { ParameterType } from '../src/lib/famix/model/famix/parameter_type';
+import { TypeParameter } from '../src/lib/famix/model/famix/type_parameter';
 import { PrimitiveType } from '../src/lib/famix/model/famix/primitive_type';
 import { Type } from '../src/lib/famix/model/famix/type';
 import { IndexedFileAnchor } from '../src/lib/famix/model/famix';
@@ -35,8 +35,8 @@ describe('Tests for types', () => {
 
     const types = Array.from(fmxRep._getAllEntitiesWithType("Type") as Set<Type>);
     const primitiveTypes = Array.from(fmxRep._getAllEntitiesWithType("PrimitiveType") as Set<PrimitiveType>);
-    const parameterTypes = Array.from(fmxRep._getAllEntitiesWithType("ParameterType") as Set<ParameterType>);
-    const theParameterType = parameterTypes.find(t => t.name === "T");
+    const typeParameters = Array.from(fmxRep._getAllEntitiesWithType("TypeParameter") as Set<TypeParameter>);
+    const theTypeParameter = typeParameters.find(t => t.name === "T");
     const theBaseType = types.find(t => t.name === "Map");
     const theFile = fmxRep._getFamixFile("types.ts");
     const theAnyType = primitiveTypes.find(t => t.name === "any");
@@ -78,12 +78,12 @@ describe('Tests for types', () => {
     });
 
     it("should contain a parameterized type 'T' from 'class B<T>'", () => {
-        expect(parameterTypes.length).toBe(1);
-        expect(parameterTypes.find(t => t.name === "T")).toBeTruthy();
+        expect(typeParameters.length).toBe(1);
+        expect(typeParameters.find(t => t.name === "T")).toBeTruthy();
     });
 
     it("should have B for base type of B<T>", () => {
-        expect(theParameterType?.baseType).toBe(theBaseType);
+        expect(theTypeParameter?.baseType).toBe(theBaseType);
     });
 
     it("should have types.ts for container", () => {
@@ -91,7 +91,7 @@ describe('Tests for types', () => {
     });
 
     it("should have an IndexedFileAnchor with a filename of 'types.ts' for B<T>", () => {
-        const indexedFileAnchor = theParameterType?.sourceAnchor;
+        const indexedFileAnchor = theTypeParameter?.sourceAnchor;
         expect(indexedFileAnchor).toBeTruthy();
         expect((indexedFileAnchor as IndexedFileAnchor).fileName.endsWith("types.ts")).toBe(true);
     });

@@ -2,9 +2,9 @@ name: Pharo/Moose Tests
 
 on:
   push:
-    branches: [ master, update-for-moose13, MTahaCode/issue99 ]
+    branches: [ master, merge-importer-tests ]
   pull_request:
-    branches: [ master, update-for-moose13 ]
+    branches: [ master, merge-importer-tests ]
 
 jobs:
   test:

@@ -40,8 +40,8 @@ describe('Tests for generics', () => {
         const pcList = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass") as Set<ParametricClass>);
         expect(pcList).toBeTruthy();
         const parametricClass = pcList.find(c => c.name === "ClassParametric");
-        const parameterTypes = parametricClass?.genericParameters;
-        expect(parameterTypes?.values().next().value.name).toBe('T');
+        const typeParameters = parametricClass?.genericParameters;
+        expect(typeParameters?.values().next().value.name).toBe('T');
     });
 
     const theClass = fmxRep._getFamixClass("{parametricMethod.ts}.ClassParametric<T>[ClassDeclaration]");
@@ -73,8 +73,8 @@ describe('Tests for generics', () => {
         const pmList = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod") as Set<ParametricMethod>);
         expect(pmList).toBeTruthy();
         const parametricMethod = pmList.find(m => m.name === "methodParametric");
-        const parameterTypes = parametricMethod?.genericParameters;
-        expect(parameterTypes?.values().next().value.name).toBe('V');
+        const typeParameters = parametricMethod?.genericParameters;
+        expect(typeParameters?.values().next().value.name).toBe('V');
     });
 
 });
