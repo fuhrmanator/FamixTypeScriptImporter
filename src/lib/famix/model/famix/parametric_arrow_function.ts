@@ -1,17 +1,20 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { ArrowFunction } from "./arrow_function";
-import { Class } from "./class";
-import { Interface } from "./interface";
-import { PrimitiveType } from "./primitive_type";
+import { TypeParameter } from "./type_parameter";
 
 export class ParametricArrowFunction extends ArrowFunction {
 
-    private _concreteParameters: Set<PrimitiveType | Class | Interface> = new Set();
+    private _typeParameters: Set<TypeParameter> = new Set();
 
-    public addConcreteParameter(concreteParameter: PrimitiveType | Class | Interface): void {
-        if (!this._concreteParameters.has(concreteParameter)) {
-            this._concreteParameters.add(concreteParameter);
+    public addTypeParameter(typeParameter: TypeParameter): void {
+        if (!this._typeParameters.has(typeParameter)) {
+            this._typeParameters.add(typeParameter);
+            typeParameter.genericEntity = this;
         }
+    }
+
+    public clearTypeParameters(): void {
+        this._typeParameters.clear();
     }
 
     public getJSON(): string {
@@ -22,11 +25,10 @@ export class ParametricArrowFunction extends ArrowFunction {
 
     public addPropertiesToExporter(exporter: FamixJSONExporter): void {
         super.addPropertiesToExporter(exporter);
-        exporter.addProperty("genericParameters", this.genericParameters);
-        exporter.addProperty("concreteParameters", this.concreteParameters);
+        exporter.addProperty("typeParameters", this._typeParameters);
     }
 
-    get concreteParameters() {
-        return this._concreteParameters;
+    get typeParameters(): Set<TypeParameter> {
+        return this._typeParameters;
     }
 }

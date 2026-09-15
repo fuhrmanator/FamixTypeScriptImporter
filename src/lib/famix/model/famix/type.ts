@@ -4,6 +4,7 @@ import { ContainerEntity } from "./container_entity";
 import { Reference } from "./reference";
 import { BehavioralEntity } from "./behavioral_entity";
 import { Alias } from "./alias";
+import { EntityTyping } from "./entity_typing";
 
 export class Type extends ContainerEntity {
 
@@ -27,6 +28,15 @@ export class Type extends ContainerEntity {
         if (!this._incomingReferences.has(incomingReference)) {
             this._incomingReferences.add(incomingReference);
             incomingReference.target = this;
+        }
+    }
+
+    private _incomingTypings: Set<EntityTyping> = new Set();
+
+    public addIncomingTyping(incomingTyping: EntityTyping): void {
+        if (!this._incomingTypings.has(incomingTyping)) {
+            this._incomingTypings.add(incomingTyping);
+            incomingTyping.declaredType = this;
         }
     }
 

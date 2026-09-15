@@ -2,17 +2,13 @@ import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { Type } from "./type";
 import { ParametricClass } from "./parametric_class";
 import { ParametricInterface } from "./parametric_interface";
-import { Method } from "./method";
-import { Function as FamixFunction } from "./function";
-import { Accessor } from "./accessor";
 import { ParametricMethod } from "./parametric_method";
 import { ParametricFunction } from "./parametric_function";
-import { ArrowFunction } from "./arrow_function";
 import { ParametricArrowFunction } from "./parametric_arrow_function";
 
 export class TypeParameter extends Type {
 
-    private _parentGeneric!: ParametricClass | ParametricInterface | Method | ParametricMethod | Accessor | FamixFunction | ParametricFunction | ArrowFunction | ParametricArrowFunction;
+    private _genericEntity!: ParametricClass | ParametricInterface | ParametricMethod | ParametricFunction | ParametricArrowFunction;
     private _baseType!: Type;
     private _arguments: Set<Type> = new Set();
 
@@ -30,18 +26,18 @@ export class TypeParameter extends Type {
 
     public addPropertiesToExporter(exporter: FamixJSONExporter): void {
         super.addPropertiesToExporter(exporter);
-        exporter.addProperty("parentGeneric", this.parentGeneric);
+        exporter.addProperty("genericEntity", this.genericEntity);
         exporter.addProperty("baseType", this.baseType);
         exporter.addProperty("arguments", this.arguments);
     }
 
-    get parentGeneric() {
-        return this._parentGeneric;
+    get genericEntity() {
+        return this._genericEntity;
     }
 
-    set parentGeneric(parentGeneric: ParametricClass | ParametricInterface | Method | ParametricMethod | Accessor | FamixFunction | ParametricFunction | ArrowFunction | ParametricArrowFunction) {
-        this._parentGeneric = parentGeneric;
-        parentGeneric.addGenericParameter(this);
+    set genericEntity(genericEntity: ParametricClass | ParametricInterface | ParametricMethod | ParametricFunction | ParametricArrowFunction) {
+        this._genericEntity = genericEntity;
+        genericEntity.addTypeParameter(this);
     }
 
     get baseType() {
