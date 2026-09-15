@@ -2,6 +2,8 @@ import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { Entity } from "./entity";
 import { ParametricEntityTyping } from "./parametric_entity_typing";
 import { ParametricInvocation } from "./parametric_invocation";
+import { ParametricInheritance } from "./parametric_inheritance";
+import { ParametricReference } from "./parametric_reference";
 import { Type } from "./type";
 import { TypeParameter } from "./type_parameter";
 import { ParametricClass } from "./parametric_class";
@@ -9,8 +11,8 @@ import { ParametricFunction } from "./parametric_function";
 import { ParametricInterface } from "./parametric_interface";
 import { ParametricMethod } from "./parametric_method";
 
-// More will be added here
-type ParametricAssociation = ParametricEntityTyping | ParametricInvocation;
+// More will be added here (e.g. ParametricImplementation, once Implementation exists)
+type ParametricAssociation = ParametricEntityTyping | ParametricInvocation | ParametricInheritance | ParametricReference;
 
 export class Concretization extends Entity {
 
@@ -37,6 +39,7 @@ export class Concretization extends Entity {
 
     set typeParameter(typeParameter: TypeParameter) {
         this._typeParameter = typeParameter;
+        typeParameter.addConcretization(this);
     }
 
     get typeArgument(): Type {
@@ -45,6 +48,7 @@ export class Concretization extends Entity {
 
     set typeArgument(typeArgument: Type) {
         this._typeArgument = typeArgument;
+        typeArgument.addOutgoingConcretization(this);
     }
 
     get triggeringAssociation(): ParametricAssociation {

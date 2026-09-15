@@ -5,16 +5,24 @@ import { ParametricInterface } from "./parametric_interface";
 import { ParametricMethod } from "./parametric_method";
 import { ParametricFunction } from "./parametric_function";
 import { ParametricArrowFunction } from "./parametric_arrow_function";
+import { Concretization } from "./concretization";
 
 export class TypeParameter extends Type {
 
     private _genericEntity!: ParametricClass | ParametricInterface | ParametricMethod | ParametricFunction | ParametricArrowFunction;
     private _baseType!: Type;
     private _arguments: Set<Type> = new Set();
+    private _concretizations: Set<Concretization> = new Set();
 
     public addArgument(argument: Type): void {
         if (!this._arguments.has(argument)) {
             this._arguments.add(argument);
+        }
+    }
+
+    public addConcretization(concretization: Concretization): void {
+        if (!this._concretizations.has(concretization)) {
+            this._concretizations.add(concretization);
         }
     }
 
@@ -29,6 +37,7 @@ export class TypeParameter extends Type {
         exporter.addProperty("genericEntity", this.genericEntity);
         exporter.addProperty("baseType", this.baseType);
         exporter.addProperty("arguments", this.arguments);
+        exporter.addProperty("concretizations", this.concretizations);
     }
 
     get genericEntity() {
@@ -50,5 +59,9 @@ export class TypeParameter extends Type {
 
     get arguments() {
         return this._arguments;
+    }
+
+    get concretizations() {
+        return this._concretizations;
     }
 }
