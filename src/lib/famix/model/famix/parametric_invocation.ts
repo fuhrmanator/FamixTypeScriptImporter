@@ -8,6 +8,7 @@ export class ParametricInvocation extends Invocation {
     public addConcretization(concretization: Concretization): void {
         if (!this._concretizations.has(concretization)) {
             this._concretizations.add(concretization);
+            concretization.triggeringAssociation = this;
         }
     }
 

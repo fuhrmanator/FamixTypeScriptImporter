@@ -27,5 +27,6 @@ export class ParametricEntityTyping extends EntityTyping {
 
     public addPropertiesToExporter(exporter: FamixJSONExporter): void {
         super.addPropertiesToExporter(exporter);
+        exporter.addProperty("concretizations", this.concretizations);
     }
 }

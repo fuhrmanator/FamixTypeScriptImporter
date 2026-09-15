@@ -2,8 +2,8 @@ import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { ContainerEntity } from "./container_entity";
 import { Parameter } from "./parameter";
 import { Invocation } from "./invocation";
-import { TypeParameter } from "./type_parameter";
 import { EntityTyping } from "./entity_typing";
+import { ParametricEntityTyping } from "./parametric_entity_typing";
 
 export class BehavioralEntity extends ContainerEntity {
 
@@ -27,19 +27,7 @@ export class BehavioralEntity extends ContainerEntity {
         }
     }
 
-    private _typing!: EntityTyping;
-    private _genericParameters: Set<TypeParameter> = new Set();
-
-    public addGenericParameter(genericParameter: TypeParameter): void {
-        if (!this._genericParameters.has(genericParameter)) {
-            this._genericParameters.add(genericParameter);
-            genericParameter.parentGeneric = this;
-        }
-    }
-
-    clearGenericParameters(): void {
-        this._genericParameters.clear();
-    }
+    private _typing!: EntityTyping | ParametricEntityTyping;
 
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("BehavioralEntity", this);
@@ -79,15 +67,11 @@ export class BehavioralEntity extends ContainerEntity {
         return this._incomingInvocations;
     }
 
-    get typing(): EntityTyping {
+    get typing(): EntityTyping | ParametricEntityTyping {
         return this._typing;
     }
 
-    set typing(typing: EntityTyping) {
+    set typing(typing: EntityTyping | ParametricEntityTyping) {
         this._typing = typing;
-    }
-
-    get genericParameters(): Set<TypeParameter> {
-        return this._genericParameters;
     }
 }
