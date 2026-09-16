@@ -22,10 +22,6 @@ export type TSMorphTypeDeclaration = TypeAliasDeclaration | PropertyDeclaration 
 
 export type TSMorphParametricType = ClassDeclaration | InterfaceDeclaration | FunctionDeclaration | MethodDeclaration | ArrowFunction;
 
-type ParametricVariantType = Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod;
-
-type ConcreteElementTSMorphType = ClassDeclaration | InterfaceDeclaration | FunctionDeclaration | MethodDeclaration;
-
 export type InvocableType = MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction;
 
 export class EntityDictionary {
@@ -418,70 +414,6 @@ export class EntityDictionary {
     }
 
     
-    /**
-     * Creates or gets a Famix concrete element
-     * @param concreteElement A parametric Element   
-     * @param concreteElementDeclaration the element declaration
-     * @param concreteArguments concrete arguments
-     * @returns A parametric Element  
-     */
-    public createOrGetFamixConcreteElement(concreteElement : ParametricVariantType, 
-                                           concreteElementDeclaration : ConcreteElementTSMorphType, 
-                                           concreteArguments: TypeNode[]): ParametricVariantType {
-        
-        let fullyQualifiedFilename = concreteElement.fullyQualifiedName;
-        let params = "";
-        
-        concreteArguments.map((param) => {
-            params = params+param.getText()+',';
-        });
-        
-        params = params.substring(0, params.length - 1);
-                
-        fullyQualifiedFilename = Helpers.replaceLastBetweenTags(fullyQualifiedFilename,params);
-
-        let concElement: ParametricVariantType;
-
-        if (!this.fmxInterfaceMap.has(fullyQualifiedFilename) && 
-            !this.fmxClassMap.has(fullyQualifiedFilename) && 
-            !this.fmxFunctionAndMethodMap.has(fullyQualifiedFilename)){
-            concElement = _.cloneDeep(concreteElement); 
-            concElement.fullyQualifiedName = fullyQualifiedFilename;
-            concElement.clearGenericParameters();
-            concreteArguments.map((param) => {
-                if (param instanceof TypeParameterDeclaration) {
-                    const parameter = this.createOrGetFamixType(param.getText(),param.getType(), param);
-                    concElement.addConcreteParameter(parameter);
-                } else {
-                    logger.warn(`> WARNING: concrete argument ${param.getText()} is not a TypeParameterDeclaration. It is a ${param.getKindName()}.`);
-                }
-            });
-            
-            if (concreteElement instanceof Famix.ParametricClass) {
-                this.fmxClassMap.set(fullyQualifiedFilename, concElement as Famix.ParametricClass);
-            } else if (concreteElement instanceof Famix.ParametricInterface) {
-                this.fmxInterfaceMap.set(fullyQualifiedFilename, concElement as Famix.ParametricInterface);
-            } else if (concreteElement instanceof Famix.ParametricFunction) {
-                this.fmxFunctionAndMethodMap.set(fullyQualifiedFilename, concElement as Famix.ParametricFunction);
-            } else { // if (concreteElement instanceof Famix.ParametricMethod) {
-                this.fmxFunctionAndMethodMap.set(fullyQualifiedFilename, concElement as Famix.ParametricMethod);
-            }
-            this.famixRep.addElement(concElement);
-            this.fmxElementObjectMap.set(concElement,concreteElementDeclaration);
-        } else {
-            if (concreteElement instanceof Famix.ParametricClass) {
-                concElement = this.fmxClassMap.get(fullyQualifiedFilename) as Famix.ParametricClass;
-            } else if (concreteElement instanceof Famix.ParametricInterface) {
-                concElement = this.fmxInterfaceMap.get(fullyQualifiedFilename) as Famix.ParametricInterface;
-            } else if (concreteElement instanceof Famix.ParametricFunction) {
-                concElement = this.fmxFunctionAndMethodMap.get(fullyQualifiedFilename) as Famix.ParametricFunction;
-            } else {  // if (concreteElement instanceof Famix.ParametricMethod) {
-                concElement = this.fmxFunctionAndMethodMap.get(fullyQualifiedFilename) as Famix.ParametricMethod;
-            }
-        }
-        return concElement;
-    }
-
     /**
      * Creates a Famix property
      * @param property A property
@@ -1633,76 +1565,54 @@ export class EntityDictionary {
     }
 
     /**
-     * Creates a Famix concretization
-     * @param cls A class
-     * @returns The Famix model of the concretization
+     * Creates a Famix concretization for each type parameter of a generic entity that is substituted by a concrete type argument
+     * @param genEntity The generic entity whose type parameters are being concretized
+     * @param typeArguments The concrete type arguments, in the same order as genEntity's type parameters
+     * @param triggeringAssociation The parametric association (typing, invocation, inheritance or reference) that caused this concretization
+     * @returns The Famix models of the concretizations created, one per type parameter / type argument pair
      */
-    public createFamixConcretization(conEntity : Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod ,genEntity : Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod): Famix.Concretization {
-        
-        const fmxConcretization : Famix.Concretization = new Famix.Concretization();              
-        
-        fmxConcretization.concreteEntity = conEntity;
-        fmxConcretization.genericEntity = genEntity;
-        // this.fmxElementObjectMap.set(fmxConcretization,null);
-        this.famixRep.addElement(fmxConcretization);
-        // const parameterConcretization = this.createFamixParameterConcretization(fmxConcretization);
-            
-        return fmxConcretization;
-    }
+    public createFamixConcretization(
+        genEntity: Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricFunction | Famix.ParametricMethod | Famix.ParametricArrowFunction,
+        typeArguments: TypeNode[],
+        triggeringAssociation: Famix.ParametricEntityTyping | Famix.ParametricInvocation | Famix.ParametricInheritance | Famix.ParametricReference
+    ): Famix.Concretization[] {
 
-    /**
-     * Creates a Famix concretization
-     * @param concretization A FamixConcretization
-     * @returns The Famix model of the ParameterConcrestisation
-     */
-    public createFamixParameterConcretization(concretization: Famix.Concretization): Famix.ParameterConcretization | undefined{
-        const conClass = concretization.concreteEntity;
-        const genClass = concretization.genericEntity;
-        logger.debug(`Creating parameter concretization between ${conClass.fullyQualifiedName} and ${genClass.fullyQualifiedName}`);
-        const parameterConcretizations = this.famixRep._getAllEntitiesWithType("ParameterConcretization") as Set<Famix.ParameterConcretization>;
-        const concreteParameters = conClass.concreteParameters;
-        const genericParameters = genClass.genericParameters;
-        
-        const conClassTypeParametersIterator = concreteParameters.values();
-        const genClassTypeParametersIterator = genericParameters.values();
-        let fmxParameterConcretization : Famix.ParameterConcretization | undefined = undefined;
+        const typeParameters = Array.from(genEntity.typeParameters);
+        const fmxConcretizations: Famix.Concretization[] = [];
 
-        for (let i = 0; i < genericParameters.size; i++) {
-            const conClassTypeParameter = conClassTypeParametersIterator.next().value as Famix.TypeParameter;
-            const genClassTypeParameter = genClassTypeParametersIterator.next().value as Famix.TypeParameter;
-            let createParameterConcretization : boolean = true;
-            if(conClassTypeParameter && genClassTypeParameter && conClassTypeParameter.name != genClassTypeParameter.name){
-                parameterConcretizations.forEach((param : Famix.ParameterConcretization) => {
-                    if (conClassTypeParameter.name == param.concreteParameter.name && genClassTypeParameter.name == param.genericParameter.name) {
-                        createParameterConcretization = false;
-                        fmxParameterConcretization = param;
-                    }
-                });
-                if (createParameterConcretization) {
-                    fmxParameterConcretization = new Famix.ParameterConcretization();
-                    fmxParameterConcretization.genericParameter = genClassTypeParameter;
-                    fmxParameterConcretization.concreteParameter = conClassTypeParameter;
-                    fmxParameterConcretization.addConcretization(concretization);
-                    // this.fmxElementObjectMap.set(fmxParameterConcretization,null);
-                } else {
-                    if (!fmxParameterConcretization) {
-                        throw new Error(`fmxParameterConcretization was undefined for concretization with generic parameter ${genClassTypeParameter.name} and concrete parameter ${conClassTypeParameter.name}`);
-                    }
-                    fmxParameterConcretization.addConcretization(concretization);
-                }
-                this.famixRep.addElement(fmxParameterConcretization);
+        typeParameters.forEach((typeParameter, i) => {
+            const typeArgumentNode = typeArguments[i];
+            if (!typeArgumentNode) {
+                return;
             }
-        }
-        if (!fmxParameterConcretization) {
-            logger.error(`fmxParameterConcretization was undefined for concretization with concrete entity ${conClass.fullyQualifiedName} and generic entity ${genClass.fullyQualifiedName}`);
-        }
-        return fmxParameterConcretization;
 
+            const fmxTypeArgument = this.createOrGetFamixType(
+                typeArgumentNode.getText(),
+                typeArgumentNode.getType(),
+                typeArgumentNode as unknown as TSMorphTypeDeclaration
+            );
+
+            const fmxConcretization: Famix.Concretization = new Famix.Concretization();
+            fmxConcretization.typeParameter = typeParameter;
+            fmxConcretization.typeArgument = fmxTypeArgument;
+            triggeringAssociation.addConcretization(fmxConcretization);
+
+            this.famixRep.addElement(fmxConcretization);
+            fmxConcretizations.push(fmxConcretization);
+        });
+
+        return fmxConcretizations;
     }
 
     /**
-     * Creates a Famix concretization between two classes or two interfaces
-     * @param element A class or an Interface
+     * @param element The subclass or subinterface declaration whose `extends` clause is inspected
+     * @example
+     * ```ts
+     * class Box<T> {}
+     * class StringBox extends Box<string> {}
+     * // -> ParametricInheritance(subclass: StringBox, superclass: Box)
+     * //    Concretization(typeParameter: T, typeArgument: string)
+     * ```
      */
     public createFamixConcretizationClassOrInterfaceSpecialisation(element: ClassDeclaration | InterfaceDeclaration){
         
@@ -1734,34 +1644,43 @@ export class EntityDictionary {
                         EntityDeclaration = entity.getExpression().getSymbol()?.getDeclarations()[0] as InterfaceDeclaration;
                         genEntity = this.createOrGetFamixInterface(EntityDeclaration) as Famix.ParametricInterface;
                     }
+                    // might need rework for e.g: class A extends B<T> implements C<T> {} or for interface having multiple inheritances
                     const genParams = EntityDeclaration.getTypeParameters().map((param) => param.getText());
                     const args = element.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments();
                     const conParams = element.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments().map((param) => param.getText());
-                    if (!Helpers.arraysAreEqual(conParams,genParams)) {
-                        const conEntity = this.createOrGetFamixConcreteElement(genEntity,EntityDeclaration,args);
-                        const concretizations = this.famixRep._getAllEntitiesWithType("Concretization") as Set<Famix.Concretization>;
-                        let createConcretization : boolean = true;
-                        concretizations.forEach((conc : Famix.Concretization) => {
-                            if (genEntity.fullyQualifiedName == conc.genericEntity.fullyQualifiedName && conc.concreteEntity.fullyQualifiedName == conEntity.fullyQualifiedName){
-                                createConcretization = false;
-                            }
-                        });
-            
-                        if (createConcretization) {
-                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                            const fmxConcretization : Famix.Concretization = this.createFamixConcretization(conEntity,genEntity);
-                        }
+                    if (!Helpers.arraysAreEqual(conParams,genParams)) { //checks if any of the type parameters (e.g <T>) are substituted by a concrete type (e.g <string>)
+                        const subEntity = element instanceof ClassDeclaration
+                            ? this.createOrGetFamixClass(element)
+                            : this.createOrGetFamixInterface(element);
+
+                        const fmxParametricInheritance = new Famix.ParametricInheritance();
+                        fmxParametricInheritance.subclass = subEntity;
+                        fmxParametricInheritance.superclass = genEntity;
+                        this.famixRep.addElement(fmxParametricInheritance);
+
+                        this.createFamixConcretization(genEntity, args, fmxParametricInheritance);
                     }
                 }
             });
         }
-        // TODO: This function seems unfinished
-    }    
+        // TODO: This function seems unfinished for multiple inheritances
+    }
     
 
     /**
-     * Creates a Famix concretization between a class and its instanciations
-     * @param cls A class
+     * @param cls The generic class declaration whose constructor call sites are inspected
+     * @example
+     * ```ts
+     * class Box<T> {
+     *     constructor(public value: T) {}
+     * }
+     *
+     * function makeBox() {
+     *     return new Box<string>("hi");
+     * }
+     * // -> ParametricInvocation(sender: makeBox, receiver: Box, candidates: [Box.constructor])
+     * //    Concretization(typeParameter: T, typeArgument: string)
+     * ```
      */
     public createFamixConcretizationGenericInstantiation(cls: ClassDeclaration){
        
@@ -1780,19 +1699,32 @@ export class EntityDictionary {
                     const genEntity = this.createOrGetFamixClass(cls) as Famix.ParametricClass;
                     const genParams = cls.getTypeParameters().map((param) => param.getText());
                     if (!Helpers.arraysAreEqual(conParams,genParams)) {
-                        const conEntity = this.createOrGetFamixConcreteElement(genEntity,cls,instance.getTypeArguments());
-                        const concretizations = this.famixRep._getAllEntitiesWithType("Concretization") as Set<Famix.Concretization>;
-                        let createConcretization : boolean = true;
-                        concretizations.forEach((conc : Famix.Concretization) => {
-                            if (genEntity.fullyQualifiedName == conc.genericEntity.fullyQualifiedName && conc.concreteEntity.fullyQualifiedName == conEntity.fullyQualifiedName){
-                                createConcretization = false;
+                        const args = instance.getTypeArguments();
+
+                        const containerOfNode = Helpers.findAncestor(instance.getExpression() as Identifier);
+                        const containerFQN = FQNFunctions.getFQN(containerOfNode);
+                        let sender = this.famixRep.getFamixEntityByFullyQualifiedName(containerFQN) as Famix.ContainerEntity;
+                        if (sender instanceof Famix.Type) {//if accidently resolving to a type instead of a container
+                            const senderContainer = sender.container;
+                            if (senderContainer) {
+                                sender = senderContainer;
                             }
-                        });
-            
-                        if (createConcretization) {
-                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                            const fmxConcretization : Famix.Concretization = this.createFamixConcretization(conEntity,genEntity);
                         }
+
+                        const fmxParametricInvocation = new Famix.ParametricInvocation();
+                        fmxParametricInvocation.sender = sender;
+                        fmxParametricInvocation.receiver = genEntity;
+
+                        const constructorDeclaration = cls.getConstructors()[0];
+                        if (constructorDeclaration) {
+                            const fmxConstructor = this.createOrGetFamixMethod(constructorDeclaration, {});
+                            fmxParametricInvocation.addCandidate(fmxConstructor);
+                            fmxParametricInvocation.signature = fmxConstructor.signature;
+                        }
+
+                        this.famixRep.addElement(fmxParametricInvocation);
+
+                        this.createFamixConcretization(genEntity, args, fmxParametricInvocation);
                     }
                 }
             });
@@ -1801,14 +1733,25 @@ export class EntityDictionary {
     }
 
     /**
-     * Creates a Famix concretization between a class and its instanciations
-     * @param func A function
+     * @param element The generic function or method declaration whose call sites are inspected
+     * @example
+     * ```ts
+     * function identity<T>(value: T): T {
+     *     return value;
+     * }
+     *
+     * function caller() {
+     *     return identity<number>(42);
+     * }
+     * // -> ParametricInvocation(sender: caller, receiver: <module>, candidates: [identity])
+     * //    Concretization(typeParameter: T, typeArgument: number)
+     * ```
      */
     public createFamixConcretizationFunctionInstantiation(element: FunctionDeclaration | MethodDeclaration){
         const isGeneric = element.getTypeParameters().length > 0;
         if (isGeneric) {
             const genParams = element.getTypeParameters().map(param => param.getText());
-            const uses = element.findReferencesAsNodes();    
+            const uses = element.findReferencesAsNodes() as Array<Identifier>;
             uses.forEach(usage => {
                 let currentNode: TsMorphNode | undefined = usage;
 
@@ -1829,19 +1772,28 @@ export class EntityDictionary {
                                 } else {
                                     genElement = this.createOrGetFamixMethod(element, {}) as Famix.ParametricMethod;
                                 }
-                                const concElement = this.createOrGetFamixConcreteElement(genElement,element,args);
-                                const concretizations = this.famixRep._getAllEntitiesWithType("Concretization") as Set<Famix.Concretization>;
-                                let createConcretization : boolean = true;
-                                concretizations.forEach((conc : Famix.Concretization) => {
-                                    if (genElement.fullyQualifiedName == conc.genericEntity.fullyQualifiedName && conc.concreteEntity.fullyQualifiedName == concElement.fullyQualifiedName){
-                                        createConcretization = false;
+
+                                const containerOfNode = Helpers.findAncestor(usage);
+                                const containerFQN = FQNFunctions.getFQN(containerOfNode);
+                                let sender = this.famixRep.getFamixEntityByFullyQualifiedName(containerFQN) as Famix.ContainerEntity;
+                                if (sender instanceof Famix.Type) {
+                                    const senderContainer = sender.container;
+                                    if (senderContainer) {
+                                        sender = senderContainer;
                                     }
-                                });
-        
-                                if (createConcretization) {
-                                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                    const fmxConcretization : Famix.Concretization = this.createFamixConcretization(concElement,genElement);
                                 }
+
+                                const receiverFullyQualifiedName = FQNFunctions.getFQN(element.getParent());
+                                const receiver = this.famixRep.getFamixEntityByFullyQualifiedName(receiverFullyQualifiedName) as Famix.NamedEntity;
+
+                                const fmxParametricInvocation = new Famix.ParametricInvocation();
+                                fmxParametricInvocation.sender = sender;
+                                fmxParametricInvocation.receiver = receiver;
+                                fmxParametricInvocation.addCandidate(genElement);
+                                fmxParametricInvocation.signature = genElement.signature;
+                                this.famixRep.addElement(fmxParametricInvocation);
+
+                                this.createFamixConcretization(genElement, args, fmxParametricInvocation);
                             }
                         }
                         break;
@@ -1854,8 +1806,19 @@ export class EntityDictionary {
     }
 
     /**
-     * Creates a Famix concretization between a class and an interface
-     * @param cls A class
+     * @param cls The implementing class declaration whose `implements` clause is inspected
+     * @example
+     * ```ts
+     * interface Comparable<T> {
+     *     compareTo(other: T): number;
+     * }
+     *
+     * class Money implements Comparable<Money> {
+     *     compareTo(other: Money): number { return 0; }
+     * }
+     * // -> ParametricInheritance(subclass: Money, superclass: Comparable)
+     * //    Concretization(typeParameter: T, typeArgument: Money)
+     * ```
      */
     public createFamixConcretizationInterfaceClass(cls: ClassDeclaration){
     
@@ -1869,28 +1832,33 @@ export class EntityDictionary {
                 const args = cls.getHeritageClauses()[0].getTypeNodes()[0].getTypeArguments();
                 if (!Helpers.arraysAreEqual(conParams,genParams)) {
                     const genInterface = this.createOrGetFamixInterface(interfaceDeclaration) as Famix.ParametricInterface;
-                    const conInterface = this.createOrGetFamixConcreteElement(genInterface,interfaceDeclaration,args);
-                    const concretizations = this.famixRep._getAllEntitiesWithType("Concretization") as Set<Famix.Concretization>;
-                    let createConcretization : boolean = true;
-                    concretizations.forEach((conc : Famix.Concretization) => {
-                        if (genInterface.fullyQualifiedName == conc.genericEntity.fullyQualifiedName && conc.concreteEntity.fullyQualifiedName == conInterface.fullyQualifiedName){
-                            createConcretization = false;
-                        }
-                    });
-            
-                    if (createConcretization) {
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        const fmxConcretization : Famix.Concretization = this.createFamixConcretization(conInterface,genInterface);
-                    }
+                    const conClass = this.createOrGetFamixClass(cls);
+
+                    const fmxParametricInheritance = new Famix.ParametricInheritance();
+                    fmxParametricInheritance.subclass = conClass;
+                    fmxParametricInheritance.superclass = genInterface;
+                    this.famixRep.addElement(fmxParametricInheritance);
+
+                    this.createFamixConcretization(genInterface, args, fmxParametricInheritance);
                 }
             }
         });
     }
 
     /**
-     * Creates a Famix concretization between an interface and a Type
-     * @param element A variable or a function
-     * @param inter An interface
+     * @param element The generic class or interface declaration whose usages as a declared type are inspected
+     * @example
+     * ```ts
+     * interface Repository<T> {
+     *     findById(id: string): T;
+     * }
+     *
+     * class UserService {
+     *     private repo: Repository<User>;
+     * }
+     * // -> ParametricEntityTyping(typedEntity: repo, declaredType: Repository)
+     * //    Concretization(typeParameter: T, typeArgument: User)
+     * ```
      */
     public createFamixConcretizationTypeInstanciation(element: InterfaceDeclaration | ClassDeclaration) {
 
@@ -1919,18 +1887,19 @@ export class EntityDictionary {
                             } else {
                                 genElement = this.createOrGetFamixInterface(element) as Famix.ParametricInterface;
                             }
-                            const concElement = this.createOrGetFamixConcreteElement(genElement, element, args);
-                            const concretizations = this.famixRep._getAllEntitiesWithType("Concretization") as Set<Famix.Concretization>;
-                            let createConcretization: boolean = true;
-                            concretizations.forEach((conc: Famix.Concretization) => {
-                                if (genElement.fullyQualifiedName == conc.genericEntity.fullyQualifiedName && conc.concreteEntity.fullyQualifiedName == concElement.fullyQualifiedName) {
-                                    createConcretization = false;
-                                }
-                            });
+                            const typedEntityNode = typeReferenceNode.getParent();
+                            const typedEntityFQN = typedEntityNode ? FQNFunctions.getFQN(typedEntityNode) : undefined;
+                            const fmxTypedEntity = typedEntityFQN
+                                ? this.famixRep.getFamixEntityByFullyQualifiedName(typedEntityFQN) as Famix.Entity
+                                : undefined;
 
-                            if (createConcretization) {
-                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                const fmxConcretization: Famix.Concretization = this.createFamixConcretization(concElement, genElement);
+                            if (fmxTypedEntity) {
+                                const fmxParametricEntityTyping = new Famix.ParametricEntityTyping();
+                                fmxParametricEntityTyping.typedEntity = fmxTypedEntity;
+                                fmxParametricEntityTyping.declaredType = genElement;
+                                this.famixRep.addElement(fmxParametricEntityTyping);
+
+                                this.createFamixConcretization(genElement, args, fmxParametricEntityTyping);
                             }
                         }
                         break;
@@ -2045,7 +2014,6 @@ function getInterfaceOrClassDeclarationFromExpression(expression: ExpressionWith
 }
 
 import { Symbol as TSMorphSymbol, Node as TsMorphNode } from "ts-morph";
-import _ from "lodash";
 
 function resolveSymbolToInterfaceOrClassDeclaration(symbol: TSMorphSymbol): InterfaceDeclaration | ClassDeclaration | undefined {
     // Get the declarations associated with the symbol
