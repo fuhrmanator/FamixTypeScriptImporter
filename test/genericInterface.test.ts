@@ -35,9 +35,9 @@ describe('Tests for generic interface', () => {
         expect(pList).toBeTruthy();
         const MyInterface = pList.find(p => p.name === "MyInterface");
         expect(MyInterface).toBeTruthy();
-        expect(MyInterface?.genericParameters.size).toBe(1);
+        expect(MyInterface?.typeParameters.size).toBe(1);
         if (MyInterface) {
-            expect((Array.from(MyInterface.genericParameters)[0] as TypeParameter).name).toBe("T");
+            expect((Array.from(MyInterface.typeParameters)[0] as TypeParameter).name).toBe("T");
         }
     });
 });

@@ -37,9 +37,9 @@ describe('Generics', () => {
         expect(pList).toBeTruthy();
         const myDao = pList.find(p => p.name === "MyDao");
         expect(myDao).toBeTruthy();
-        expect(myDao?.genericParameters.size).toBe(1);
+        expect(myDao?.typeParameters.size).toBe(1);
         if (myDao) {
-            expect((Array.from(myDao.genericParameters)[0] as TypeParameter).name).toBe("T");
+            expect((Array.from(myDao.typeParameters)[0] as TypeParameter).name).toBe("T");
         }
     });
     
@@ -48,9 +48,9 @@ describe('Generics', () => {
         expect(pList).toBeTruthy();
         const myDaoInterface = pList.find(p => p.name === "MyDaoInterface");
         expect(myDaoInterface).toBeTruthy();
-        expect(myDaoInterface?.genericParameters.size).toBe(1);
+        expect(myDaoInterface?.typeParameters.size).toBe(1);
         if (myDaoInterface) {
-            expect((Array.from(myDaoInterface.genericParameters)[0] as TypeParameter).name).toBe("T");
+            expect((Array.from(myDaoInterface.typeParameters)[0] as TypeParameter).name).toBe("T");
         }
     });
     
