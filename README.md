@@ -86,4 +86,4 @@ git commit -m "Update UML documentation"
 
 The following diagram is generated using [tplant](https://github.com/bafolts/tplant), in a similar fashion described [here](https://modularmoose.org/posts/2021-07-19-automatic-metamodel-documentation-generation).
 
-![FamixTypeScript API Metamodel](doc-uml/famix-typescript-model.svg)
+![FamixTypeScript API Metamodel](https://www.plantuml.com/plantuml/proxy?cache=no&fmt=svg&src=https://raw.githubusercontent.com/fuhrmanator/FamixTypeScriptImporter/refs/heads/master/doc-uml/famix-typescript-model.puml)
