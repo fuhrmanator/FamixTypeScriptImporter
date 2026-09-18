@@ -1,4 +1,4 @@
-@startuml metamodel
+@startuml
 class FamixJSONExporter {
     -element: FamixBaseElement
     -bufferArray: any
