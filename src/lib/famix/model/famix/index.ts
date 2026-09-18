@@ -20,7 +20,7 @@ export { Invocation } from "./invocation";
 export { Method } from "./method";
 export { Module } from "./module";
 export { NamedEntity } from "./named_entity";
-export { ParameterType } from "./parameter_type";
+export { TypeParameter } from "./type_parameter";
 export { Parameter } from "./parameter";
 export { ParametricClass } from "./parametric_class";
 export { ParametricInterface } from "./parametric_interface";

@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { ParametricInterface, ParameterType } from '../src/lib/famix/model/famix';
+import { ParametricInterface, TypeParameter } from '../src/lib/famix/model/famix';
 import { project, exportProjectSourceFilesForEndtoEndPharoTests } from './testUtils';
 
 const importer = new Importer();
@@ -37,7 +37,7 @@ describe('Tests for generic interface', () => {
         expect(MyInterface).toBeTruthy();
         expect(MyInterface?.genericParameters.size).toBe(1);
         if (MyInterface) {
-            expect((Array.from(MyInterface.genericParameters)[0] as ParameterType).name).toBe("T");
+            expect((Array.from(MyInterface.genericParameters)[0] as TypeParameter).name).toBe("T");
         }
     });
 });

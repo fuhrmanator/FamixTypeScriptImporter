@@ -2,7 +2,7 @@ import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { ContainerEntity } from "./container_entity";
 import { Parameter } from "./parameter";
 import { Invocation } from "./invocation";
-import { ParameterType } from "./parameter_type";
+import { TypeParameter } from "./type_parameter";
 import { EntityTyping } from "./entity_typing";
 
 export class BehavioralEntity extends ContainerEntity {
@@ -28,9 +28,9 @@ export class BehavioralEntity extends ContainerEntity {
     }
 
     private _typing!: EntityTyping;
-    private _genericParameters: Set<ParameterType> = new Set();
+    private _genericParameters: Set<TypeParameter> = new Set();
 
-    public addGenericParameter(genericParameter: ParameterType): void {
+    public addGenericParameter(genericParameter: TypeParameter): void {
         if (!this._genericParameters.has(genericParameter)) {
             this._genericParameters.add(genericParameter);
             genericParameter.parentGeneric = this;
@@ -87,7 +87,7 @@ export class BehavioralEntity extends ContainerEntity {
         this._typing = typing;
     }
 
-    get genericParameters(): Set<ParameterType> {
+    get genericParameters(): Set<TypeParameter> {
         return this._genericParameters;
     }
 }

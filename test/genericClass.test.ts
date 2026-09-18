@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { ParametricClass, ParameterType } from '../src/lib/famix/model/famix';
+import { ParametricClass, TypeParameter } from '../src/lib/famix/model/famix';
 import { project, exportProjectSourceFilesForEndtoEndPharoTests } from './testUtils';
 
 const importer = new Importer();
@@ -34,8 +34,8 @@ describe('Tests for generic class', () => {
         expect(MyClass).toBeTruthy();
         expect(MyClass?.genericParameters.size).toBe(1);
         if (MyClass) {
-            expect((Array.from(MyClass.genericParameters)[0] as ParameterType).name).toBe("T");
-            expect((Array.from(MyClass.genericParameters)[0] as ParameterType).parentGeneric).toBe(MyClass);
+            expect((Array.from(MyClass.genericParameters)[0] as TypeParameter).name).toBe("T");
+            expect((Array.from(MyClass.genericParameters)[0] as TypeParameter).parentGeneric).toBe(MyClass);
         }
     });
 

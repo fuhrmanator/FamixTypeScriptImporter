@@ -684,8 +684,8 @@ function processTypeParameters(
  * @param tp A type parameter
  * @returns A Famix.TypeParameter representing the type parameter
  */
-function processTypeParameter(tp: TypeParameterDeclaration): Famix.ParameterType {
-    const fmxTypeParameter = entityDictionary.createFamixParameterType(tp);
+function processTypeParameter(tp: TypeParameterDeclaration): Famix.TypeParameter {
+    const fmxTypeParameter = entityDictionary.createFamixTypeParameter(tp);
     logger.debug(`type parameter: ${tp.getName()}, (${tp.getType().getText()}), fqn = ${fmxTypeParameter.fullyQualifiedName}`);
     processComments(tp, fmxTypeParameter);
     return fmxTypeParameter;

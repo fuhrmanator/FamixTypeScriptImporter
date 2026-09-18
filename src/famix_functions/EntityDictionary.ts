@@ -36,7 +36,7 @@ export class EntityDictionary {
     private fmxInterfaceMap = new Map<string, Famix.Interface | Famix.ParametricInterface>(); // Maps the interface names to their Famix model
     private fmxModuleMap = new Map<ModuleDeclaration, Famix.Module>(); // Maps the namespace names to their Famix model
     private fmxFileMap = new Map<string, Famix.ScriptEntity | Famix.Module>(); // Maps the source file names to their Famix model
-    private fmxTypeMap = new Map<TSMorphTypeDeclaration, Famix.Type | Famix.ParameterType>(); // Maps the types declarations to their Famix model
+    private fmxTypeMap = new Map<TSMorphTypeDeclaration, Famix.Type | Famix.TypeParameter>(); // Maps the types declarations to their Famix model
     private fmxPrimitiveTypeMap = new Map<string, Famix.PrimitiveType>(); // Maps the primitive type names to their Famix model
     private fmxFunctionAndMethodMap = new Map<string, Famix.Function | Famix.ParametricFunction | Famix.Method | Famix.ParametricMethod>; // Maps the function names to their Famix model
     private fmxArrowFunctionMap = new Map<string, Famix.ArrowFunction>; // Maps the function names to their Famix model
@@ -744,19 +744,19 @@ export class EntityDictionary {
      * @param tp A type parameter
      * @returns The Famix model of the type parameter
      */
-    public createFamixParameterType(tp: TypeParameterDeclaration): Famix.ParameterType {
+    public createFamixTypeParameter(tp: TypeParameterDeclaration): Famix.TypeParameter {
         
-        const fmxParameterType = new Famix.ParameterType();
+        const fmxTypeParameter = new Famix.TypeParameter();
    
-        fmxParameterType.name = tp.getName();      
-        initFQN(tp, fmxParameterType);
-        this.makeFamixIndexFileAnchor(tp, fmxParameterType);
+        fmxTypeParameter.name = tp.getName();      
+        initFQN(tp, fmxTypeParameter);
+        this.makeFamixIndexFileAnchor(tp, fmxTypeParameter);
 
-        this.famixRep.addElement(fmxParameterType);
+        this.famixRep.addElement(fmxTypeParameter);
 
-        this.fmxElementObjectMap.set(fmxParameterType,tp);
+        this.fmxElementObjectMap.set(fmxTypeParameter,tp);
 
-        return fmxParameterType;
+        return fmxTypeParameter;
     }
 
 
@@ -1668,8 +1668,8 @@ export class EntityDictionary {
         let fmxParameterConcretization : Famix.ParameterConcretization | undefined = undefined;
 
         for (let i = 0; i < genericParameters.size; i++) {
-            const conClassTypeParameter = conClassTypeParametersIterator.next().value as Famix.ParameterType;
-            const genClassTypeParameter = genClassTypeParametersIterator.next().value as Famix.ParameterType;
+            const conClassTypeParameter = conClassTypeParametersIterator.next().value as Famix.TypeParameter;
+            const genClassTypeParameter = genClassTypeParametersIterator.next().value as Famix.TypeParameter;
             let createParameterConcretization : boolean = true;
             if(conClassTypeParameter && genClassTypeParameter && conClassTypeParameter.name != genClassTypeParameter.name){
                 parameterConcretizations.forEach((param : Famix.ParameterConcretization) => {

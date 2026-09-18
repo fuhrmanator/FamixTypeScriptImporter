@@ -1,12 +1,12 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { Concretization } from "./concretization";
 import { Entity } from "./entity";
-import { ParameterType } from "./parameter_type";
+import { TypeParameter } from "./type_parameter";
 import { PrimitiveType } from "./primitive_type";
 
 export class ParameterConcretization extends Entity {
 
-    private _genericParameter!: ParameterType;
+    private _genericParameter!: TypeParameter;
     private _concreteParameter!: PrimitiveType;
     private _concretizations: Set<Concretization> = new Set();
 
@@ -33,7 +33,7 @@ export class ParameterConcretization extends Entity {
         return this._genericParameter;
     }
 
-    set genericParameter(genericEntity: ParameterType) {
+    set genericParameter(genericEntity: TypeParameter) {
         this._genericParameter = genericEntity;
     }
 

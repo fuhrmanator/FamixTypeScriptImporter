@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { ParametricClass, ParametricInterface, ParameterType } from '../src/lib/famix/model/famix';
+import { ParametricClass, ParametricInterface, TypeParameter } from '../src/lib/famix/model/famix';
 import { project, exportProjectSourceFilesForEndtoEndPharoTests } from './testUtils';
 
 const importer = new Importer();
@@ -39,7 +39,7 @@ describe('Generics', () => {
         expect(myDao).toBeTruthy();
         expect(myDao?.genericParameters.size).toBe(1);
         if (myDao) {
-            expect((Array.from(myDao.genericParameters)[0] as ParameterType).name).toBe("T");
+            expect((Array.from(myDao.genericParameters)[0] as TypeParameter).name).toBe("T");
         }
     });
     
@@ -50,7 +50,7 @@ describe('Generics', () => {
         expect(myDaoInterface).toBeTruthy();
         expect(myDaoInterface?.genericParameters.size).toBe(1);
         if (myDaoInterface) {
-            expect((Array.from(myDaoInterface.genericParameters)[0] as ParameterType).name).toBe("T");
+            expect((Array.from(myDaoInterface.genericParameters)[0] as TypeParameter).name).toBe("T");
         }
     });
     

@@ -71,6 +71,14 @@ To run the locally built version (not the globally installed one with npm).:
 npx ts2famix [options]
 ```
 
+To import sunit test inside moose:
+```smalltalk
+  Metacello new
+    baseline: 'FamixTypeScriptImporterTests';
+    repository: 'github://fuhrmanator/FamixTypeScriptImporter:master';
+    load.
+  ```
+
 ## TypeScript Metamodel API documentation (visualization)
 
 The UML files in `doc-uml/` are versioned with the source. CI now checks that they are up to date and fails the pull request if they are not.

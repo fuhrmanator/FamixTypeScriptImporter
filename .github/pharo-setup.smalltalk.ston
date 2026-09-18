@@ -2,7 +2,7 @@ SmalltalkCISpec {
   #loading : [
     SCIMetacelloLoadSpec {
       #baseline : 'FamixTypeScriptImporterTests',
-      #repository : 'github://MTahaCode/FamixTypeScriptImporterTests/master',
+      #directory : 'sunit',
       #platforms : [ #pharo ]
     }
   ],

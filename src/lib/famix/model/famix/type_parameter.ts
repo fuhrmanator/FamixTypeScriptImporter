@@ -10,7 +10,7 @@ import { ParametricFunction } from "./parametric_function";
 import { ArrowFunction } from "./arrow_function";
 import { ParametricArrowFunction } from "./parametric_arrow_function";
 
-export class ParameterType extends Type {
+export class TypeParameter extends Type {
 
     private _parentGeneric!: ParametricClass | ParametricInterface | Method | ParametricMethod | Accessor | FamixFunction | ParametricFunction | ArrowFunction | ParametricArrowFunction;
     private _baseType!: Type;
@@ -23,7 +23,7 @@ export class ParameterType extends Type {
     }
 
     public getJSON(): string {
-        const json: FamixJSONExporter = new FamixJSONExporter("ParameterType", this);
+        const json: FamixJSONExporter = new FamixJSONExporter("TypeParameter", this);
         this.addPropertiesToExporter(json);
         return json.getJSON();
     }

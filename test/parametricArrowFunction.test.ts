@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { ParameterType, ParametricArrowFunction } from '../src/lib/famix/model/famix';
+import { TypeParameter, ParametricArrowFunction } from '../src/lib/famix/model/famix';
 import { project, exportProjectSourceFilesForEndtoEndPharoTests } from './testUtils';
 
 const importer = new Importer();
@@ -42,8 +42,8 @@ describe('ArrowFunctions', () => {
     });
 
     it("should contain a type parameter T", () => {
-        const parameterType = theFunction?.genericParameters.values().next().value as ParameterType;
-        expect(parameterType.name).toBe('T');
+        const typeParameter = theFunction?.genericParameters.values().next().value as TypeParameter;
+        expect(typeParameter.name).toBe('T');
     });
 
 });
