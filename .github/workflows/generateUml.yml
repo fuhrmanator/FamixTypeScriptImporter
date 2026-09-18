@@ -28,7 +28,7 @@ jobs:
       run: npm install -g tplant@3.1.0
 
     - name: Generate PlantUML class diagram from source
-      run: tplant -i src/lib/famix/**/*.ts -o doc-uml/famix-typescript-model.puml
+      run: npm run uml
 
     - name: Check for changes in UML diagrams
       id: check_changes
