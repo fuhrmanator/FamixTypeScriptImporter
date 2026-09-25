@@ -5,7 +5,7 @@
  */
 
 
-import { ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ImportDeclaration, ImportEqualsDeclaration, SyntaxKind, Expression, TypeNode, Scope, ArrowFunction, ExpressionWithTypeArguments, HeritageClause, ts, Type } from "ts-morph";
+import { Node, ClassDeclaration, ConstructorDeclaration, FunctionDeclaration, Identifier, InterfaceDeclaration, MethodDeclaration, MethodSignature, ModuleDeclaration, PropertyDeclaration, PropertySignature, SourceFile, TypeParameterDeclaration, VariableDeclaration, ParameterDeclaration, Decorator, GetAccessorDeclaration, SetAccessorDeclaration, ImportSpecifier, CommentRange, EnumDeclaration, EnumMember, TypeAliasDeclaration, FunctionExpression, ImportDeclaration, ImportEqualsDeclaration, SyntaxKind, Expression, TypeNode, Scope, ArrowFunction, ExpressionWithTypeArguments, HeritageClause, ts, Type } from "ts-morph";
 import { isAmbient, isNamespace } from "../analyze_functions/process_functions";
 import * as Famix from "../lib/famix/model/famix";
 import { FamixRepository } from "../lib/famix/famix_repository";
@@ -24,6 +24,7 @@ export type TSMorphParametricType = ClassDeclaration | InterfaceDeclaration | Fu
 
 export type InvocableType = MethodDeclaration | ConstructorDeclaration | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction;
 
+export type TypeParameteredNode = PropertyDeclaration | PropertySignature;
 export class EntityDictionary {
     
     public famixRep = new FamixRepository();
@@ -40,10 +41,11 @@ export class EntityDictionary {
     private fmxVariableMap = new Map<VariableDeclaration, Famix.Variable>(); // Maps the variables to their Famix model
     private fmxImportClauseMap = new Map<ImportDeclaration | ImportEqualsDeclaration, Famix.ImportClause>(); // Maps the import clauses to their Famix model
     private fmxEnumMap = new Map<EnumDeclaration, Famix.Enum>(); // Maps the enum names to their Famix model
+    private fmxTypeParameterMap = new Map<TypeParameterDeclaration, Famix.TypeParameter>(); // Maps the type parameter declarations to their Famix model
     private fmxInheritanceMap = new Map<string, Famix.Inheritance>(); // Maps the inheritance names to their Famix model
     private UNKNOWN_VALUE = '(unknown due to parsing error)'; // The value to use when a name is not usable
     public fmxElementObjectMap = new Map<Famix.Entity,TSMorphObjectType>();
-    public tsMorphElementObjectMap = new Map<TSMorphObjectType,Famix.Entity>();
+    public tsMorphElementObjectMap = new Map<Famix.Entity, TSMorphObjectType>();
     public fmxEntityTypingMap = new Map<Famix.Entity, Famix.EntityTyping>();
             
     constructor() {
@@ -66,6 +68,7 @@ export class EntityDictionary {
     this.fmxVariableMap = new Map();
     this.fmxImportClauseMap = new Map();
     this.fmxEnumMap = new Map();
+    this.fmxTypeParameterMap = new Map();
     this.fmxInheritanceMap = new Map();
     this.famixRep.setFmxElementObjectMap(this.fmxElementObjectMap);
 }
@@ -547,7 +550,7 @@ export class EntityDictionary {
                 logger.error(`Failed to get return type for ${fqn}: ${error}`);
             }
     
-            const fmxType = this.createOrGetFamixType(methodTypeName, method.getType(), method);
+            const fmxType = this.createOrGetFamixType(methodTypeName, method.getReturnType(), method);
             // console.log(`Created/retrieved return type with FQN: ${fmxType.fullyQualifiedName}`);
             fmxMethod.numberOfLinesOfCode = method.getEndLineNumber() - method.getStartLineNumber();
             fmxMethod.numberOfParameters = method.getParameters().length;
@@ -558,7 +561,7 @@ export class EntityDictionary {
             this.famixRep.addElement(fmxMethod);
             this.makeFamixIndexFileAnchor(method, fmxMethod);
 
-            this.createOrGetFamixEntityTyping(fmxMethod, fmxType);
+            this.createOrGetFamixEntityTyping(fmxMethod, fmxType, method);
 
             this.fmxFunctionAndMethodMap.set(fqn, fmxMethod);
             logger.debug(`Added method ${fqn} to famixRep`);
@@ -608,14 +611,14 @@ export class EntityDictionary {
                 logger.error(`> WARNING: got exception ${error}. Failed to get usable name for return type of function: ${func.getName()}. Continuing...`);
             }
     
-            const fmxType = this.createOrGetFamixType(functionTypeName, func.getType(), func);
+            const fmxType = this.createOrGetFamixType(functionTypeName, func.getReturnType(), func);
             fmxFunction.numberOfLinesOfCode = func.getEndLineNumber() - func.getStartLineNumber();
             const parameters = func.getParameters();
             fmxFunction.numberOfParameters = parameters.length;
             fmxFunction.numberOfStatements = func.getStatements().length;
             this.makeFamixIndexFileAnchor(func, fmxFunction);
     
-            this.createOrGetFamixEntityTyping(fmxFunction, fmxType);
+            this.createOrGetFamixEntityTyping(fmxFunction, fmxType, func);
 
             this.famixRep.addElement(fmxFunction);
     
@@ -677,8 +680,13 @@ export class EntityDictionary {
      * @returns The Famix model of the type parameter
      */
     public createFamixTypeParameter(tp: TypeParameterDeclaration): Famix.TypeParameter {
-        
+        const foundTypeParameter = this.fmxTypeParameterMap.get(tp);
+        if (foundTypeParameter) {
+            return foundTypeParameter;
+        }
+
         const fmxTypeParameter = new Famix.TypeParameter();
+        this.fmxTypeParameterMap.set(tp, fmxTypeParameter);
    
         fmxTypeParameter.name = tp.getName();      
         initFQN(tp, fmxTypeParameter);
@@ -819,7 +827,7 @@ export class EntityDictionary {
         return fmxVariable;
     }
 
-    public createOrGetFamixEntityTyping(entity: Famix.BehavioralEntity | Famix.StructuralEntity, type: Famix.Type): Famix.EntityTyping {
+    public createOrGetFamixEntityTyping(entity: Famix.BehavioralEntity | Famix.StructuralEntity, type: Famix.Type, tsMorphElement: Node | undefined = undefined): Famix.EntityTyping {
         if (this.fmxEntityTypingMap.has(entity)) {
             const rEntityTyping = this.fmxEntityTypingMap.get(entity);
             if (rEntityTyping) { 
@@ -831,11 +839,36 @@ export class EntityDictionary {
 
         let fmxEntityTyping: Famix.EntityTyping | Famix.ParametricEntityTyping = new Famix.EntityTyping();
 
-        if (entity instanceof Famix.ParametricArrowFunction 
-            || entity instanceof Famix.ParametricFunction
-            || entity instanceof Famix.ParametricMethod
-        ) {
-            fmxEntityTyping = new Famix.ParametricEntityTyping();
+        if (tsMorphElement && (TypeNode.isFunctionDeclaration(tsMorphElement) || TypeNode.isMethodDeclaration(tsMorphElement) || TypeNode.isArrowFunction(tsMorphElement))) {
+            const isParameterized = tsMorphElement.getTypeParameters().length > 0;
+            if (isParameterized) {
+                
+
+                fmxEntityTyping = new Famix.ParametricEntityTyping();
+
+                const calls = tsMorphElement
+                    .getSourceFile()
+                    .getDescendantsOfKind(ts.SyntaxKind.CallExpression)
+                    .filter(call => {
+                        const expression = call.getExpression();
+                        if (!TypeNode.isArrowFunction(tsMorphElement)) {
+                            return expression.getText() === tsMorphElement.getName();
+                        }
+                        return expression.getText() === this.createOrGetFamixArrowFunction(tsMorphElement, {}).name; //arrow function names are generated
+                    });
+
+                calls.forEach(call => {
+                    const args = call.getTypeArguments();
+
+                    if (args.length > 0) {
+                        this.createFamixConcretization(
+                            entity as Famix.ParametricFunction,
+                            args,
+                            fmxEntityTyping as Famix.ParametricEntityTyping
+                        );
+                    }
+                });
+            }
         }
 
         fmxEntityTyping.typedEntity = entity;
@@ -968,6 +1001,27 @@ export class EntityDictionary {
 
         if (isPrimitiveType(typeName)) {
             return this.createOrGetFamixPrimitiveType(typeName);
+        }
+
+        // if the type refers to a declared class, interface or enum, use that entity instead of creating a new type
+        if (tsMorphType && !tsMorphType.isAnonymous()) {  // skip `typeof Foo`, object literals
+            const decl = (tsMorphType.getTargetType() ?? tsMorphType)  // List<string> -> List<T>
+                .getSymbol()?.getDeclarations()[0];
+
+            if (decl && !decl.getSourceFile().isInNodeModules() && !decl.getSourceFile().isFromExternalLibrary()) {
+                if (TypeNode.isInterfaceDeclaration(decl)) {
+                    return this.createOrGetFamixInterface(decl);
+                }
+                if (TypeNode.isClassDeclaration(decl)) {
+                    return this.createOrGetFamixClass(decl);
+                }
+                if (TypeNode.isEnumDeclaration(decl)) {
+                    return this.createOrGetFamixEnum(decl);
+                }
+                if (TypeNode.isTypeParameterDeclaration(decl)) {
+                    return this.createFamixTypeParameter(decl);
+                }
+            }
         }
 
         if (element.isKind(SyntaxKind.MethodSignature) || element.isKind(SyntaxKind.MethodDeclaration)) {
@@ -1552,7 +1606,7 @@ export class EntityDictionary {
             initFQN(arrowExpression as unknown as TSMorphObjectType, fmxArrowFunction);
             this.makeFamixIndexFileAnchor(arrowExpression as unknown as TSMorphObjectType, fmxArrowFunction);
 
-            this.createOrGetFamixEntityTyping(fmxArrowFunction, fmxType);
+            this.createOrGetFamixEntityTyping(fmxArrowFunction, fmxType, arrowExpression);
 
             this.famixRep.addElement(fmxArrowFunction);
             this.fmxElementObjectMap.set(fmxArrowFunction,arrowFunction as unknown as TSMorphObjectType);
@@ -1890,7 +1944,7 @@ export class EntityDictionary {
                             const typedEntityNode = typeReferenceNode.getParent();
                             const typedEntityFQN = typedEntityNode ? FQNFunctions.getFQN(typedEntityNode) : undefined;
                             const fmxTypedEntity = typedEntityFQN
-                                ? this.famixRep.getFamixEntityByFullyQualifiedName(typedEntityFQN) as Famix.Entity
+                                ? this.famixRep.getFamixEntityByFullyQualifiedName(typedEntityFQN) as Famix.BehavioralEntity | Famix.StructuralEntity
                                 : undefined;
 
                             if (fmxTypedEntity) {
