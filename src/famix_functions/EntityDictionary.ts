@@ -852,9 +852,11 @@ export class EntityDictionary {
                     .filter(call => {
                         const expression = call.getExpression();
                         if (!TypeNode.isArrowFunction(tsMorphElement)) {
-                            return expression.getText() === tsMorphElement.getName();
+                            console.log(`Comparing expression.getText(): ${expression.getText().replace("instance.", '')} with tsMorphElement.getName(): ${tsMorphElement.getName()}`);
+                            return expression.getText().replace("instance.", '') === tsMorphElement.getName();
                         }
-                        return expression.getText() === this.createOrGetFamixArrowFunction(tsMorphElement, {}).name; //arrow function names are generated
+                        console.log(`Comparing expression.getText(): ${expression.getText().replace("instance.", '')} with tsMorphElement.getName(): ${this.createOrGetFamixArrowFunction(tsMorphElement, {}).name}`);
+                        return expression.getText().replace("instance.", '') === this.createOrGetFamixArrowFunction(tsMorphElement, {}).name; //arrow function names are generated
                     });
 
                 calls.forEach(call => {
