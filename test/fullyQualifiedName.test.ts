@@ -3,19 +3,19 @@ import { getFQN } from '../src/fqn';
 import { project, exportProjectSourceFilesForEndtoEndPharoTests } from './testUtils';
 
 const sourceFile = project.createSourceFile('/sampleFile.ts', `
-            const createClassA1 = () => {
-                return class A {
-                    method1() {}
-                }
-            };
-            const createClassA2 = () => {
-                return class A {
-                    method2() {}
-                }
-            };
-            const instance1 = createClassA1();
-            const instance2 = createClassA2();
-        `);
+    const createClassA1 = () => {
+        return class A {
+            method1() {}
+        }
+    };
+    const createClassA2 = () => {
+        return class A {
+            method2() {}
+        }
+    };
+    const instance1 = createClassA1();
+    const instance2 = createClassA2();
+`);
 
 exportProjectSourceFilesForEndtoEndPharoTests(project, __filename);
 

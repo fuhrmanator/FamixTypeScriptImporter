@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { Concretization, ParametricFunction, ParametricMethod } from '../src/lib/famix/model/famix';
+import { Concretization, ParametricFunction, ParametricInvocation, ParametricMethod } from '../src/lib/famix/model/famix';
 import { project, exportProjectSourceFilesForEndtoEndPharoTests } from './testUtils';
 
 const importer = new Importer();
@@ -37,60 +37,75 @@ describe('Tests for concretization', () => {
         expect(fmxRep).toBeTruthy();
     });
 
-    it("should contain two generic functions", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParametricFunction").size).toBe(2);
+    it("should contain one generic function", () => {
+        expect(fmxRep._getAllEntitiesWithType("ParametricFunction").size).toBe(1);
     });
 
-    it("should contain generic functions named createInstance", () => {
+    it("should contain a single generic function named createInstance", () => {
         const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricFunction")).map(e => (e as ParametricFunction).name);
         expect(listOfNames).toContain("createInstance");
 
         const numberOfCreateInstance = listOfNames.filter(name => name === "createInstance").length;
-        expect(numberOfCreateInstance).toBe(2); 
+        expect(numberOfCreateInstance).toBe(1);
     });
 
-    it("should contain two generic methods", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParametricMethod").size).toBe(2);
+    it("should contain one generic method", () => {
+        expect(fmxRep._getAllEntitiesWithType("ParametricMethod").size).toBe(1);
     });
 
-    it("should contain generic methods named process", () => {
+    it("should contain a single generic method named process", () => {
         const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod")).map(e => (e as ParametricMethod).name);
         expect(listOfNames).toContain("process");
 
-        const numberOfCreateInstance = listOfNames.filter(name => name === "process").length;
-        expect(numberOfCreateInstance).toBe(2); 
+        const numberOfProcess = listOfNames.filter(name => name === "process").length;
+        expect(numberOfProcess).toBe(1);
     });
 
     it("should contain two concretizations", () => {
         expect(fmxRep._getAllEntitiesWithType("Concretization").size).toBe(2);
     });
 
-    const theInterface = fmxRep._getFamixInterface("{src/concretizationFunctionInstantiation.ts}.CustomType[InterfaceDeclaration]");
-
-    it.skip("The concrete Function should be createInstance with concreteParameter CustomType", () => {
-        const theConcretizations = fmxRep._getAllEntitiesWithType("Concretization") as Set<Concretization>;
-        const iterator = theConcretizations.values();
-        const firstElement = iterator.next().value as Concretization;
-        expect(firstElement).toBeTruthy();
-        const secondElement = iterator.next().value as Concretization;
-        expect(secondElement.concreteEntity.name).toBe("createInstance");
-        const concParameter = secondElement.concreteEntity.concreteParameters.values().next().value as ParametricFunction;
-        expect(concParameter).toBeTruthy();
-        expect(concParameter.name).toBe(theInterface?.name);
+    it("should contain a concretization of createInstance's type parameter T with CustomType", () => {
+        const theConcretizations = Array.from(fmxRep._getAllEntitiesWithType("Concretization") as Set<Concretization>);
+        const concretizationOfCreateInstance = theConcretizations.find(c => c.typeArgument.name === "CustomType");
+        expect(concretizationOfCreateInstance).toBeTruthy();
+        expect(concretizationOfCreateInstance?.typeParameter.name).toBe("T");
     });
 
-    it.skip("The concrete Method should be process with concreteParameter string", () => {
-        const theConcretizations = fmxRep._getAllEntitiesWithType("Concretization") as Set<Concretization>;
-        const iterator = theConcretizations.values();
-        const firstElement = iterator.next().value as Concretization;
-        expect(firstElement).toBeTruthy();
-        expect(firstElement.concreteEntity.name).toBe("process");
-        const concParameter = firstElement.concreteEntity.concreteParameters.values().next().value as ParametricMethod;
-        expect(concParameter).toBeTruthy();
-        expect(concParameter.name).toBe("string");
+    it("should contain a concretization of process's type parameter V with string", () => {
+        const theConcretizations = Array.from(fmxRep._getAllEntitiesWithType("Concretization") as Set<Concretization>);
+        const concretizationOfProcess = theConcretizations.find(c => c.typeParameter.name === "V");
+        expect(concretizationOfProcess).toBeTruthy();
+        expect(concretizationOfProcess?.typeArgument.name).toBe("string");
     });
 
-    it.skip("should contain two parameter concretizations", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParameterConcretization").size).toBe(2);
+    it("should contain two ParametricInvocation associations", () => {
+        expect(fmxRep._getAllEntitiesWithType("ParametricInvocation").size).toBe(2);
     });
+
+    it("should record the ParametricInvocation for the createInstance<CustomType> call", () => {
+        const invocations = Array.from(fmxRep._getAllEntitiesWithType("ParametricInvocation") as Set<ParametricInvocation>);
+        const createInstanceInvocation = invocations.find(inv => Array.from(inv.candidates).some(c => c.name === "createInstance"));
+        expect(createInstanceInvocation).toBeTruthy();
+        expect(createInstanceInvocation?.sender).toBeTruthy();
+        expect(createInstanceInvocation?.signature).toBeTruthy();
+
+        const ownConcretizations = Array.from(createInstanceInvocation?.concretizations ?? []);
+        expect(ownConcretizations.length).toBe(1);
+        expect(ownConcretizations[0].typeParameter.name).toBe("T");
+        expect(ownConcretizations[0].typeArgument.name).toBe("CustomType");
+    });
+
+    it("should record the ParametricInvocation for the processor.process<string> call", () => {
+        const invocations = Array.from(fmxRep._getAllEntitiesWithType("ParametricInvocation") as Set<ParametricInvocation>);
+        const processInvocation = invocations.find(inv => Array.from(inv.candidates).some(c => c.name === "process"));
+        expect(processInvocation).toBeTruthy();
+        expect(processInvocation?.receiver.name).toBe("Processor");
+
+        const ownConcretizations = Array.from(processInvocation?.concretizations ?? []);
+        expect(ownConcretizations.length).toBe(1);
+        expect(ownConcretizations[0].typeParameter.name).toBe("V");
+        expect(ownConcretizations[0].typeArgument.name).toBe("string");
+    });
+
 });
