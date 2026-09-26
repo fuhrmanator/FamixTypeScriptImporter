@@ -459,7 +459,9 @@ function processMethod(m: MethodDeclaration | ConstructorDeclaration | MethodSig
 
     processComments(m, fmxMethod);
 
-    processTypeParameters(m, fmxMethod);
+    if (fmxMethod instanceof Famix.ParametricMethod) {
+        processTypeParameters(m, fmxMethod);
+    }
 
     processParameters(m, fmxMethod);
 
@@ -504,7 +506,9 @@ function processFunction(f: FunctionDeclaration | FunctionExpression | ArrowFunc
 
     processAliases(f, fmxFunction);
 
-    processTypeParameters(f, fmxFunction);
+    if (fmxFunction instanceof Famix.ParametricFunction || fmxFunction instanceof Famix.ParametricArrowFunction) {
+        processTypeParameters(f, fmxFunction);
+    }
 
     processParameters(f, fmxFunction);
 
@@ -651,7 +655,7 @@ function processParameter(paramDecl: ParameterDeclaration): Famix.Parameter {
 
 function processTypeParameters(
     e: ClassDeclaration | InterfaceDeclaration | MethodDeclaration | ConstructorDeclaration | MethodSignature | GetAccessorDeclaration | SetAccessorDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction,
-    fmxScope: Famix.ParametricClass | Famix.ParametricInterface | Famix.Method | Famix.Accessor | Famix.Function | Famix.ArrowFunction
+    fmxScope: Famix.ParametricClass | Famix.ParametricInterface | Famix.ParametricMethod | Famix.ParametricFunction | Famix.ParametricArrowFunction
 ): void {
     logger.debug(`Finding Type Parameters:`);
     const nodeStart = e.getStart();
@@ -667,7 +671,7 @@ function processTypeParameters(
     // Process each type parameter
     typeParams.forEach((tp) => {
         const fmxParam = processTypeParameter(tp);
-        fmxScope.addGenericParameter(fmxParam);
+        fmxScope.addTypeParameter(fmxParam);
     });
 
     // Log if no type parameters were found

@@ -41,3 +41,6 @@ export { ParametricArrowFunction } from "./parametric_arrow_function";
 export { ParameterConcretization } from "./parameter_concretization";
 export { EntityTyping } from "./entity_typing";
 export { ParametricEntityTyping } from "./parametric_entity_typing";
+export { ParametricInvocation } from "./parametric_invocation";
+export { ParametricInheritance } from "./parametric_inheritance";
+export { ParametricReference } from "./parametric_reference";

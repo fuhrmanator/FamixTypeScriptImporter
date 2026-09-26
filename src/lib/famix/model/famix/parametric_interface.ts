@@ -1,30 +1,20 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
-import { Class } from "./class";
 import { Interface } from "./interface";
 import { TypeParameter } from "./type_parameter";
-import { PrimitiveType } from "./primitive_type";
 
 export class ParametricInterface extends Interface {
 
-    private _genericParameters: Set<TypeParameter> = new Set();
+    private _typeParameters: Set<TypeParameter> = new Set();
 
-    public addGenericParameter(genericParameter: TypeParameter): void {
-        if (!this._genericParameters.has(genericParameter)) {
-            this._genericParameters.add(genericParameter);
-            genericParameter.parentGeneric = this;
+    public addTypeParameter(typeParameter: TypeParameter): void {
+        if (!this._typeParameters.has(typeParameter)) {
+            this._typeParameters.add(typeParameter);
+            typeParameter.genericEntity = this;
         }
     }
 
-    clearGenericParameters(): void {
-        this._genericParameters.clear();
-    }
-
-    private _concreteParameters: Set<PrimitiveType | Class | Interface> = new Set();
-
-    public addConcreteParameter(concreteParameter: PrimitiveType | Class | Interface): void {
-        if (!this._concreteParameters.has(concreteParameter)) {
-            this._concreteParameters.add(concreteParameter);
-        }
+    public clearTypeParameters(): void {
+        this._typeParameters.clear();
     }
 
     public getJSON(): string {
@@ -35,15 +25,10 @@ export class ParametricInterface extends Interface {
 
     public addPropertiesToExporter(exporter: FamixJSONExporter): void {
         super.addPropertiesToExporter(exporter);
-        exporter.addProperty("genericParameters", this.genericParameters);
-        exporter.addProperty("concreteParameters", this.concreteParameters);
+        exporter.addProperty("typeParameters", this._typeParameters);
     }
 
-    get genericParameters(): Set<TypeParameter> {
-        return this._genericParameters;
-    }
-
-    get concreteParameters(): Set<PrimitiveType | Class | Interface> {
-        return this._concreteParameters;
+    get typeParameters(): Set<TypeParameter> {
+        return this._typeParameters;
     }
 }

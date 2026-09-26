@@ -42,7 +42,7 @@ describe('ArrowFunctions', () => {
     });
 
     it("should contain a type parameter T", () => {
-        const typeParameter = theFunction?.genericParameters.values().next().value as TypeParameter;
+        const typeParameter = theFunction?.typeParameters.values().next().value as TypeParameter;
         expect(typeParameter.name).toBe('T');
     });
 

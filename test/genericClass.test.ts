@@ -32,10 +32,10 @@ describe('Tests for generic class', () => {
         expect(pList).toBeTruthy();
         const MyClass = pList.find(p => p.name === "MyClass");
         expect(MyClass).toBeTruthy();
-        expect(MyClass?.genericParameters.size).toBe(1);
+        expect(MyClass?.typeParameters.size).toBe(1);
         if (MyClass) {
-            expect((Array.from(MyClass.genericParameters)[0] as TypeParameter).name).toBe("T");
-            expect((Array.from(MyClass.genericParameters)[0] as TypeParameter).parentGeneric).toBe(MyClass);
+            expect((Array.from(MyClass.typeParameters)[0] as TypeParameter).name).toBe("T");
+            expect((Array.from(MyClass.typeParameters)[0] as TypeParameter).genericEntity).toBe(MyClass);
         }
     });
 

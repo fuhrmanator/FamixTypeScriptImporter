@@ -1,10 +1,8 @@
 import { FamixJSONExporter } from "../../famix_JSON_exporter";
 import { Concretization } from "./concretization";
-import { EntityTyping } from "./entity_typing";
-import { Entity } from "./entity";
-import { Type } from "./type";
+import { Reference } from "./reference";
 
-export class ParametricEntityTyping extends EntityTyping {
+export class ParametricReference extends Reference {
 
     private _concretizations: Set<Concretization> = new Set();
 
@@ -20,7 +18,7 @@ export class ParametricEntityTyping extends EntityTyping {
     }
 
     public getJSON(): string {
-        const json: FamixJSONExporter = new FamixJSONExporter("ParametricEntityTyping", this);
+        const json: FamixJSONExporter = new FamixJSONExporter("ParametricReference", this);
         this.addPropertiesToExporter(json);
         return json.getJSON();
     }

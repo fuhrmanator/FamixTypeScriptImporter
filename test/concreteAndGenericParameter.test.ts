@@ -1,5 +1,5 @@
 import { Importer, logger } from '../src/analyze';
-import { ParametricClass } from '../src/lib/famix/model/famix';
+import { ParametricClass, TypeParameter } from '../src/lib/famix/model/famix';
 import { project, exportProjectSourceFilesForEndtoEndPharoTests } from './testUtils';
 
 const importer = new Importer();
@@ -46,16 +46,16 @@ describe('Tests for concrete and generic parameter', () => {
     it("should contain a concrete and generic parameter ''", () => {
         const classA = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass") as Set<ParametricClass>).find(v => v.name === "ClassA");
         expect(classA).toBeTruthy();
-        const param = classA?.genericParameters;
-        const firstParameter = param?.values().next().value as ParametricClass;
+        const param = classA?.typeParameters;
+        const firstParameter = param?.values().next().value as TypeParameter;
         expect(firstParameter?.name).toBe('V');
     });
 
     it("should contain a generic parameter 'U'", () => {
         const classC = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass") as Set<ParametricClass>).find(v => v.name === "ClassC");
         expect(classC).toBeTruthy();
-        const param = classC?.genericParameters;
-        const firstParameter = param?.values().next().value as ParametricClass;
+        const param = classC?.typeParameters;
+        const firstParameter = param?.values().next().value as TypeParameter;
         expect(firstParameter?.name).toBe('U');
     });
 

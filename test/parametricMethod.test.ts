@@ -1,6 +1,7 @@
 import { Importer } from '../src/analyze';
 import { ParametricClass } from "../src/lib/famix/model/famix/parametric_class";
 import { ParametricMethod } from "../src/lib/famix/model/famix/parametric_method";
+import { TypeParameter } from "../src/lib/famix/model/famix/type_parameter";
 import { project, exportProjectSourceFilesForEndtoEndPharoTests } from './testUtils';
 
 const importer = new Importer();
@@ -40,8 +41,8 @@ describe('Tests for generics', () => {
         const pcList = Array.from(fmxRep._getAllEntitiesWithType("ParametricClass") as Set<ParametricClass>);
         expect(pcList).toBeTruthy();
         const parametricClass = pcList.find(c => c.name === "ClassParametric");
-        const typeParameters = parametricClass?.genericParameters;
-        expect(typeParameters?.values().next().value.name).toBe('T');
+        const typeParameters = parametricClass?.typeParameters;
+        expect(typeParameters?.values().next()?.value?.name).toBe('T');
     });
 
     const theClass = fmxRep._getFamixClass("{parametricMethod.ts}.ClassParametric<T>[ClassDeclaration]");
@@ -73,8 +74,8 @@ describe('Tests for generics', () => {
         const pmList = Array.from(fmxRep._getAllEntitiesWithType("ParametricMethod") as Set<ParametricMethod>);
         expect(pmList).toBeTruthy();
         const parametricMethod = pmList.find(m => m.name === "methodParametric");
-        const typeParameters = parametricMethod?.genericParameters;
-        expect(typeParameters?.values().next().value.name).toBe('V');
+        const typeParameters = parametricMethod?.typeParameters;
+        expect(typeParameters?.values().next()?.value?.name).toBe('V');
     });
 
 });

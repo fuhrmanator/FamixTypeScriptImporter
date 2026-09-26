@@ -1,5 +1,5 @@
 import { Importer } from '../src/analyze';
-import { Concretization, ParameterConcretization, ParametricInterface } from '../src/lib/famix/model/famix';
+import { Concretization, ParametricInheritance, ParametricInterface } from '../src/lib/famix/model/famix';
 import { project, exportProjectSourceFilesForEndtoEndPharoTests } from './testUtils';
 
 const importer = new Importer();
@@ -38,67 +38,65 @@ describe('Tests for concretization', () => {
         expect(fmxRep).toBeTruthy();
     });
 
-    it("should contain 8 generic interfaces", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParametricInterface").size).toBe(8);
+    it("should contain 3 generic interfaces", () => {
+        // InterfaceA, InterfaceD and InterfaceE declare their own type parameters.
+        // InterfaceB, InterfaceF and the merged InterfaceH are plain (non-generic) interfaces.
+        expect(fmxRep._getAllEntitiesWithType("ParametricInterface").size).toBe(3);
     });
 
-    it("should contain generic interfaces named InterfaceA", () => {
+    it("should contain a single generic interface named InterfaceA", () => {
         const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).name);
         expect(listOfNames).toContain("InterfaceA");
         const numberOfInterfaceA = listOfNames.filter(name => name === "InterfaceA").length;
-        expect(numberOfInterfaceA).toBe(4); 
+        expect(numberOfInterfaceA).toBe(1);
     });
 
-    it("should contain generic interfaces named InterfaceE", () => {
+    it("should contain a single generic interface named InterfaceE", () => {
         const listOfNames = Array.from(fmxRep._getAllEntitiesWithType("ParametricInterface")).map(e => (e as ParametricInterface).name);
         expect(listOfNames).toContain("InterfaceE");
         const numberOfInterfaceE = listOfNames.filter(name => name === "InterfaceE").length;
-        expect(numberOfInterfaceE).toBe(3); 
+        expect(numberOfInterfaceE).toBe(1);
     });
 
     const theInterface = fmxRep._getFamixInterface("{concretizationInterfaceSpecialization.ts}.InterfaceA<T>[InterfaceDeclaration]");
 
-    it("should contain 3 concretizations", () => {
-        expect(fmxRep._getAllEntitiesWithType("Concretization").size).toBe(5);
+    it("should contain 6 concretizations", () => {
+        expect(fmxRep._getAllEntitiesWithType("Concretization").size).toBe(6);
     });
 
-    it("The generic Class should be InterfaceA<T> with genericParameter T", () => {
-        const theConcretizations = fmxRep._getAllEntitiesWithType("Concretization") as Set<Concretization>;
-        const iterator = theConcretizations.values();
-        const firstElement = iterator.next().value as Concretization;
-        expect(firstElement.genericEntity).toBe(theInterface);
-        const T = firstElement.genericEntity.genericParameters.values().next().value as ParametricInterface;
-        expect(T).toBeTruthy();
-        expect(T.name).toBe("T");
+    it("should contain a concretization of InterfaceA's type parameter T with string", () => {
+        const theConcretizations = Array.from(fmxRep._getAllEntitiesWithType("Concretization") as Set<Concretization>);
+        const concretizationOfInterfaceA = theConcretizations.find(c => c.typeParameter.genericEntity === theInterface && c.typeArgument.name === "string");
+        expect(concretizationOfInterfaceA).toBeTruthy();
+        expect(concretizationOfInterfaceA?.typeParameter.name).toBe("T");
     });
 
-    it.skip("The concrete Class should be InterfaceA<string> with concreteParameter string", () => {
-        const theConcretizations = fmxRep._getAllEntitiesWithType("Concretization") as Set<Concretization>;
-        const iterator = theConcretizations.values();
-        const firstElement = iterator.next().value as Concretization;
-        expect(firstElement.concreteEntity.name).toBe("InterfaceA");
-        const concParameter = firstElement.concreteEntity.concreteParameters.values().next().value as ParametricInterface;
-        expect(concParameter).toBeTruthy();
-        expect(concParameter.name).toBe("string");
+    it("should contain 6 ParametricInheritance associations", () => {
+        expect(fmxRep._getAllEntitiesWithType("ParametricInheritance").size).toBe(6);
     });
 
-    it.skip("should contain two parameter concretization", () => {
-        expect(fmxRep._getAllEntitiesWithType("ParameterConcretization").size).toBe(3);
+    it("should link InterfaceB's ParametricInheritance from InterfaceA to its own concretization", () => {
+        const inheritances = Array.from(fmxRep._getAllEntitiesWithType("ParametricInheritance"));
+        const interfaceBInheritance = inheritances.find(i => i.subclass.name === "InterfaceB");
+        expect(interfaceBInheritance).toBeTruthy();
+        expect(interfaceBInheritance?.superclass).toBe(theInterface);
+
+        const ownConcretizations = Array.from(interfaceBInheritance?.concretizations);
+        expect(ownConcretizations.length).toBe(1);
+        expect(ownConcretizations[0].typeParameter.name).toBe("T");
+        expect(ownConcretizations[0].typeArgument.name).toBe("string");
     });
 
-    it.skip("The first parameter concretization should contain two concretizations", () => {
-        const theConcretization = fmxRep._getAllEntitiesWithType("ParameterConcretization") as Set<ParameterConcretization>;
-        const iterator = theConcretization.values();
-        const firstElement = iterator.next().value as ParameterConcretization;
-        expect(firstElement).toBeTruthy();
-        const genericParameter = firstElement.genericParameter;
-        expect(genericParameter).toBeTruthy();
-        const concParameter = firstElement.concreteParameter;
-        expect(concParameter).toBeTruthy();
+    it("should record two separate ParametricInheritance for the merged InterfaceH declaration", () => {
+        // InterfaceH extends InterfaceE<string> in its first declaration, then is merged with
+        // `extends InterfaceE<number>, InterfaceA<number>`: each extended generic interface gets
+        // its own ParametricInheritance, so InterfaceH ends up with 3 in total.
+        const inheritances = Array.from(fmxRep._getAllEntitiesWithType("ParametricInheritance"));
+        const interfaceHInheritances = inheritances.filter(i => i.subclass.name === "InterfaceH");
+        expect(interfaceHInheritances.length).toBe(3);
 
-        expect(genericParameter.name).toBe("T");
-        expect(concParameter.name).toBe("string");
-        expect(firstElement.concretizations.size).toBe(2);
+        const superclassNames = interfaceHInheritances.map(i => i.superclass.name).sort();
+        expect(superclassNames).toEqual(["InterfaceA", "InterfaceE", "InterfaceE"]);
     });
 
 });

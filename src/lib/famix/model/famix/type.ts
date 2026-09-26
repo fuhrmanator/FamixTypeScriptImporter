@@ -4,6 +4,8 @@ import { ContainerEntity } from "./container_entity";
 import { Reference } from "./reference";
 import { BehavioralEntity } from "./behavioral_entity";
 import { Alias } from "./alias";
+import { EntityTyping } from "./entity_typing";
+import { Concretization } from "./concretization";
 
 export class Type extends ContainerEntity {
 
@@ -30,6 +32,23 @@ export class Type extends ContainerEntity {
         }
     }
 
+    private _incomingTypings: Set<EntityTyping> = new Set();
+
+    public addIncomingTyping(incomingTyping: EntityTyping): void {
+        if (!this._incomingTypings.has(incomingTyping)) {
+            this._incomingTypings.add(incomingTyping);
+            incomingTyping.declaredType = this;
+        }
+    }
+
+    private _outgoingConcretizations: Set<Concretization> = new Set();
+
+    public addOutgoingConcretization(outgoingConcretization: Concretization): void {
+        if (!this._outgoingConcretizations.has(outgoingConcretization)) {
+            this._outgoingConcretizations.add(outgoingConcretization);
+        }
+    }
+
     public getJSON(): string {
         const json: FamixJSONExporter = new FamixJSONExporter("Type", this);
         this.addPropertiesToExporter(json);
@@ -42,6 +61,7 @@ export class Type extends ContainerEntity {
         /* unsupported properties in MM so far */
         // exporter.addProperty("typeAliases", this.getTypeAliases());
         exporter.addProperty("incomingReferences", this.incomingReferences);
+        exporter.addProperty("outgoingConcretizations", this.outgoingConcretizations);
     }
 
     get container() {
@@ -67,5 +87,9 @@ export class Type extends ContainerEntity {
 
     get incomingReferences() {
         return this._incomingReferences;
+    }
+
+    get outgoingConcretizations() {
+        return this._outgoingConcretizations;
     }
 }
