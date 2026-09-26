@@ -14,7 +14,7 @@
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
     "doc": "typedoc && touch docs/.gitkeep",
     "coverage": "jest --colors --silent --coverage --coverageDirectory=coverage",
-    "uml": "./src/generate_uml.sh"
+    "uml": "tplant -i \"src/lib/famix/**/*.ts\" -o doc-uml/famix-typescript-model.puml && node -e \"const fs = require('fs'); const f = 'doc-uml/famix-typescript-model.puml'; fs.writeFileSync(f, fs.readFileSync(f, 'utf8').replace('@startuml', '@startuml metamodel'));\""
   },
   "bin": {
     "ts2famix": "dist/ts2famix-cli-wrapper.js"
@@ -50,7 +50,7 @@
     "globals": "^16.0.0",
     "jest": "^29.7.0",
     "jscpd": "^4.0.5",
-    "tplant": "^3.1.0",
+    "tplant": "^3.0.0",
     "ts-jest": "^29.2.6",
     "ts-node": "^10.9.2",
     "typedoc": "^0.28.0",
